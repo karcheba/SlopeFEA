@@ -1,0 +1,77 @@
+PROJECT:		SlopeFEA
+
+CONTACT:		Brandon Karchewski
+				Department of Civil Engineering
+				McMaster University, JHE-301
+				1280 Main St W
+				Hamilton, Ontario, Canada
+				L8S 4L7
+				p: 905-525-9140 x24287
+				f: 905-529-9688
+				e: karcheba@mcmaster.ca
+
+			
+DESCRIPTION:
+
+This project includes a set of specialized tools for numerical analysis
+of problems in geotechnical engineering. The project began in the summer
+of 2009 as a Matlab package for conducting slip circle analysis of slopes
+consisting of horizontally layered material using Bishop's method [1],
+the Rigid Finite Element Method (RFEM) [2], and both binary and continuous
+parameter Genetic Algorithm minimization schemes [3,4,5]. Selected results
+were presented at the 3rd Canadian Young Geotechnical Engineering &
+Geoscientists Conference (cYGEGC) and a conference paper has also been
+accepted to the 2011 Pan-Am CGS Geotechnical Conference [6].
+
+During the summer of 2010 a graphical front-end for the project was initially
+built using C++ and the Windows API. The GUI advanced the data input
+capabilities of the project since it allowed more complex layering and
+ground surface configurations to be drawn. During the fall and winter of
+2010-2011 the project was rebuilt in C# making use of Microsoft's .NET
+Framework v4 to simplify and enrich development of the user interface.
+
+As of May 2011 the project continues to be developed for the purpose of
+conducting numerical analysis as part of the author's M.A.Sc. thesis. Recent
+additions are structured mesh generation tools for 4-noded quadrilateral and
+3-noded triangular elements. Also included in these pre-processors are graphical
+input of kinematic boundary conditions and natural boundary conditions (tractions).
+Once these tools are complete, the main line of development will be the FEA
+engine for analyzing the problems defined by the user input and generated mesh.
+This component will be written in Fortran 90/95 and will be added to the
+repository as it becomes available. Also planned for the near future of the
+project are plotting tools for viewing the FEA output.
+
+Note that this project is being developed primarily for the author's research
+purposes and is not intended for community development. However, if you are
+interested in further information about the project please contact the author
+(see contact info above). For detailed information on the project's development
+see the revision history below.
+
+
+ACKNOWLEDGEMENTS:
+
+The author would like to acknowledge:
+
+-Natural Sciences and Engineering Research Council of Canada (NSERC) for their
+support in the form of a series of USRA grants and an Alexander Graham Bell
+CGS M scholarship.
+-Dr. Dieter Stolle and Dr. Peijun Guo for their continued supervision and
+provision of resources for the project.
+-The Department of Civil Engineering at McMaster University for provision
+of funding and resources.
+
+
+REFERENCES:
+
+[1]		Fredlund, D. and Krahn, J. 1977. "Comparison of slope stability methods of analysis," Canadian Geotechnical Journal, 25: 735-748.
+[2]		Stolle, D. and Guo, P. 2008. "Limit equilibrium slope stability analysis using rigid finite elements," Canadian Geotechnical Journal, 45: 653-662.
+[3]		Haupt, R. and Haupt, S. 1998.  Practical Genetic Algorithms, John Wiley and Sons, Inc., Toronto.
+[4]		McCombie, P. and Wilkinson, P. 2002. "The use of the simple genetic algorithm in finding the critical factor of safety in slope stability analysis," Computers and Geotechnics, 29: 699-714.
+[5]		Sengupta, A. and Upadhyay, A. 2005.  "An evolutionary algorithm for locating the critical failure surface in a soil slope," The Electronic Journal of Geotechnical Engineering, 10 (F).
+[6]		Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
+
+
+REVISION HISTORY:
+
+[29 May 2011]
++++ Added project to git://github.com/karcheba/SlopeFEA.git

@@ -1,0 +1,8 @@
+﻿<Application x:Class="SlopeFEA.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="/Slope;component/main/MainWindow.xaml" >
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

@@ -1,0 +1,51 @@
+﻿<Window x:Class="SlopeFEA.AxisOptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SlopeFEA"
+        Title="Axis Options"
+        Background="WhiteSmoke"
+        Height="425"
+        Width="325"
+        MinHeight="425"
+        MinWidth="325"
+        Topmost="False" 
+        WindowStartupLocation="CenterOwner" 
+        ShowInTaskbar="False" 
+        ResizeMode="CanResize"
+        WindowStyle="ToolWindow"
+        FocusManager.FocusedElement="{Binding ElementName=xMax}">
+    <Grid>
+        <GroupBox Header="X" FontWeight="Bold" Height="160" HorizontalAlignment="Stretch" Margin="10,-210,10,0" Name="xGroup" VerticalAlignment="Center">
+            <Grid>
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,-90,0,0" Name="xMax" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,-30,0,0" Name="xMin" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,30,0,0" Name="xMajor" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,90,0,0" Name="xMinor" VerticalAlignment="Center" Width="75" />
+                <Label Content="Max" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-120,-90,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="Min" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-120,-30,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="Major" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-130,30,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="# Minor/Major" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-170,90,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,-90,0,0" Name="xMaxUnits" VerticalAlignment="Center" FontSize="11"/>
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,-30,0,0" Name="xMinUnits" VerticalAlignment="Center" FontSize="11"/>
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,30,0,0" Name="xMajorUnits" VerticalAlignment="Center" FontSize="11"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Y" FontWeight="Bold" Height="160" HorizontalAlignment="Stretch" Margin="10,130,10,0" Name="yGroup" VerticalAlignment="Center">
+            <Grid>
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,-90,0,0" Name="yMax" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,-30,0,0" Name="yMin" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,30,0,0" Name="yMajor" VerticalAlignment="Center" Width="75" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,90,0,0" Name="yMinor" VerticalAlignment="Center" Width="75" />
+                <Label Content="Max" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-120,-90,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="Min" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-120,-30,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="Major" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-130,30,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="# Minor/Major" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-170,90,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,-90,0,0" Name="yMaxUnits" VerticalAlignment="Center" FontSize="11"/>
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,-30,0,0" Name="yMinUnits" VerticalAlignment="Center" FontSize="11"/>
+                <Label Content="m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,30,0,0" Name="yMajorUnits" VerticalAlignment="Center" FontSize="11"/>
+            </Grid>
+        </GroupBox>
+        <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,335,0,0" Name="ok" IsDefault="True" VerticalAlignment="Center" Width="60" Click="ok_Click" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,335,0,0" Name="cancel" IsCancel="True" VerticalAlignment="Center" Width="60" />
+    </Grid>
+</Window>
