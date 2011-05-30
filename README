@@ -86,8 +86,18 @@ REVISION HISTORY:
 +++ (MainWindow.xaml) Added Horizontal Load and Vertical Load ToolBar buttons
 +++ (MainWindow.xaml.cs) Added loadX_Click() and loadY_Click()
 +++ (SlopeCanvas.cs) Added LoadX and LoadY cases to OnMouseUp() [for switching cursor on middle mouse button pan]
-@@@ (SlopeCanvas.cs) Changed DrawMode if statement series to equivalent switch-case in OnMouseLeftButtonUp(); this required duplicating one section of code (since C# does not allow "fall-through"), but the value of DrawMode need only be checked once as opposed to 10+ times
+=== (SlopeCanvas.cs) Changed DrawMode if statement series to equivalent switch-case in OnMouseLeftButtonUp(); this required duplicating one section of code (since C# does not allow "fall-through"), but the value of DrawMode need only be checked once as opposed to 10+ times
 +++ (SlopeCanvas.cs) Added List<DrawingPoint> loadPoints and its associated initialization in the constructor
 +++ (SlopeCanvas.cs) Added DrawModes.LoadX and DrawModes.LoadY cases to OnMouseLeftButtonUp()
 +++ (CanvasData.cs) Added LineLoad class 
 +++ (CanvasData.cs) Added LoadX() and LoadY() methods to MaterialBlock class
+
+
+[30 May 2011]
+
++++ (SlopeCanvas.cs) Added List<feSubstructs> FEASubstructs property and its associated initialization
++++ (MeshGen.cs) Added side effect of setting canvas.FEASubstructs to the generated list of substructures
++++ (FEA.cs) Added Parent property to fe4NodedQuadElement and fe3NodedTriElement to make these objects aware of their parent substructure
+=== (MeshGen.cs) Modified calls to fe4NodedQuadElement() and fe3NodedTriElement() to include substruct as parent
++++ (MeshGen.cs) Added elimination of elements with centroid outside substructure in MeshGenStructured3NodedTri()
++++ (MeshGen.cs) Added element renumbering post-elimination in MeshGenStructured3NodedTri()

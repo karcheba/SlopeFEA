@@ -1,0 +1,106 @@
+*****************************************
+
+        Slope 2011 Input File
+
+        Project Name: test2
+
+*****************************************
+
+--------------------------------
+PLOTTING DATA
+--------------------------------
+
+Units = m, kPa, kN/m^3
+
+XAxisMax = 100
+XAxisMin = 0
+YAxisMax = 50
+YAxisMin = 0
+
+XMajorDivision = 10
+YMajorDivision = 10
+
+XMinorDivisions = 5
+YMinorDivisions = 5
+
+
+--------------------------------
+BOUNDARY GEOMETRY DATA
+--------------------------------
+
+Number of Boundary Points = 6
+
+-16, 1.99999999999999
+118, 1.99999999999999
+118, 48
+62, 48
+26, 22
+-16, 22
+
+
+--------------------------------
+MATERIAL TYPE DATA
+--------------------------------
+
+Number of Material Types = 1
+
+Material #1
+Name = "clay"
+Colour = #FFD8AC5A
+Phi = 5
+Coh = 50
+Gamma = 18
+Emod = 10000
+Nu = 0.45
+
+
+--------------------------------
+MATERIAL BLOCK DATA
+--------------------------------
+
+Number of Material Blocks = 1
+
+Material Block #1
+Material Type = "clay"
+Number of Boundary Points = 6
+-16, 22, True, False
+-16, 1.99999999999999, True, True
+118, 1.99999999999999, True, True
+118, 48, True, False
+62, 48, False, False
+26, 22, False, False
+Number of Line Constraints = 3
+0, 1, True, False
+2, 3, True, False
+1, 2, False, True
+
+
+--------------------------------
+GENETIC ALGORITHM PARAMETERS
+--------------------------------
+
+Population = 15
+Generations = 100
+Fittest Proportion = 0.1
+Mating Pool Proportion = 0.5
+Crossover Probability = 0.7
+Mutation Probability = 0.25
+Slice Width = 10
+
+
+--------------------------------
+FEA PARAMETERS
+--------------------------------
+
+Column Width = 4
+Row Height = 4
+
+
+--------------------------------
+ANALYSIS STATUS
+--------------------------------
+
+Analysis Type = FEA4NodedQuad
+Verified = True
+Meshed = True
+Analyzed = False

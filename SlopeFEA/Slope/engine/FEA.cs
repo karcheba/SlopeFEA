@@ -826,8 +826,10 @@ namespace SlopeFEA
     /// </summary>
     class fe3NodedTriElement
     {
+        feSubstruct parent;
+
         /// <summary>
-        /// Class constructor.
+        /// Parent unaware constructor (for use ONLY in loading existing .nod and .ele files).
         /// </summary>
         /// <param name="number">Element number.</param>
         /// <param name="n1">First node.</param>
@@ -850,6 +852,40 @@ namespace SlopeFEA
 
             if (sort) SortNodes();
         }
+
+        /// <summary>
+        /// Parent aware constructor (for use in MeshGen).
+        /// </summary>
+        /// <param name="parent">Parent substructure.</param>
+        /// <param name="number">Element number.</param>
+        /// <param name="n1">First node.</param>
+        /// <param name="n2">Second node.</param>
+        /// <param name="n3">Third node.</param>
+        /// <param name="material">Material type.</param>
+        /// <param name="sort">Flag to initially sort the points.</param>
+        public fe3NodedTriElement (feSubstruct parent, int number,
+                                    feNode n1, feNode n2, feNode n3,
+                                    MaterialType material,
+                                    bool sort)
+        {
+            this.parent = parent;
+            this.Number = number;
+            this.Material = material;
+
+            this.Nodes = new List<feNode>(3);
+            this.Nodes.Add(n1);
+            this.Nodes.Add(n2);
+            this.Nodes.Add(n3);
+
+            if (sort) SortNodes();
+        }
+
+
+        /// <summary>
+        /// Parent substructure property.
+        /// </summary>
+        public feSubstruct Parent { get { return this.parent; } }
+
 
         /// <summary>
         /// Element number property.
@@ -983,8 +1019,10 @@ namespace SlopeFEA
     /// </summary>
     class fe4NodedQuadElement
     {
+        feSubstruct parent;
+
         /// <summary>
-        /// Class constructor.
+        /// Parent unaware constructor (for use ONLY in loading existing .nod and .ele files).
         /// </summary>
         /// <param name="number">Element number.</param>
         /// <param name="n1">First node.</param>
@@ -1009,6 +1047,40 @@ namespace SlopeFEA
 
             if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
         }
+
+        /// <summary>
+        /// Parent aware constructor (for use in MeshGen).
+        /// </summary>
+        /// <param name="parent">Parent substructure</param>
+        /// <param name="number">Element number.</param>
+        /// <param name="n1">First node.</param>
+        /// <param name="n2">Second node.</param>
+        /// <param name="n3">Third node.</param>
+        /// <param name="n4">Fourth node.</param>
+        /// <param name="material">Material type.</param>
+        /// <param name="sort">Flag for intial sorting.</param>
+        public fe4NodedQuadElement (feSubstruct parent, int number,
+                                    feNode n1, feNode n2, feNode n3, feNode n4,
+                                    MaterialType material,
+                                    bool sort)
+        {
+            this.parent = parent;
+            this.Number = number;
+            this.Material = material;
+
+            this.Nodes = new List<feNode>(4);
+            this.Nodes.Add(n1);
+            this.Nodes.Add(n2);
+            this.Nodes.Add(n3);
+            this.Nodes.Add(n4);
+
+            if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
+        }
+
+        /// <summary>
+        /// Parent substructure property.
+        /// </summary>
+        public feSubstruct Parent { get { return this.parent; } }
 
         /// <summary>
         /// Element number property.

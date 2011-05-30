@@ -94,6 +94,7 @@ namespace SlopeFEA
                 substructs.Add(newSubstruct);
 
             }; // END OF CREATE SUBSTRUCTS FROM MATERIALBLOCKS LOOP
+            canvas.FEASubstructs = substructs;
 
             
             // initialize node and element counters
@@ -148,7 +149,7 @@ namespace SlopeFEA
                             node2 = substructNodes[rgt][bot];
                             node3 = substructNodes[rgt][top];
                             node4 = substructNodes[lft][top];
-                            substructElements.Add(new fe4NodedQuadElement(++quadElementCount,
+                            substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
                                 node1, node2, node3, node4,
                                 substruct.Material, false));
                         }
@@ -299,6 +300,7 @@ namespace SlopeFEA
                 {
                     nearestDist = maxDist;
                     nearestNode = null;
+                    
                     // find the nearest inserted boundary node
                     foreach (feNode node in insertBoundNodes)
                     {
@@ -426,7 +428,7 @@ namespace SlopeFEA
                                     (node1.Y + node2.Y + node3.Y) / 3.0);
                                 if (centroidNode.IsInside(substruct))
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(++quadElementCount,
+                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
                                             substructElements[i].Material, false));
                                 }
@@ -439,7 +441,7 @@ namespace SlopeFEA
                                     (node1.Y + node2.Y + node3.Y) / 3.0);
                                 if (centroidNode.IsInside(substruct))
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(++quadElementCount,
+                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
                                             substructElements[i].Material, false));
                                 }
@@ -457,7 +459,7 @@ namespace SlopeFEA
                                     (node1.Y + node2.Y + node3.Y) / 3.0);
                                 if (centroidNode.IsInside(substruct))
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(++quadElementCount,
+                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
                                             substructElements[i].Material, false));
                                 }
@@ -470,7 +472,7 @@ namespace SlopeFEA
                                     (node1.Y + node2.Y + node3.Y) / 3.0);
                                 if (centroidNode.IsInside(substruct))
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(++quadElementCount,
+                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
                                             substructElements[i].Material, false));
                                 }
@@ -650,22 +652,14 @@ namespace SlopeFEA
             //MessageBox.Show(String.Format("{0}", substructArea), "Substruct Area");
 
 
+
             // **********************************************
             // sort nodes and eliminate gaps in numbering
-            //
-            // NOTE: CONSIDER ANOTHER SORTING SCHEME TO
-            // IMPROVE PERFORMANCE OF FEA SOLVER CODE (if necessary)
-            //      POSSIBLY:
-            //          - alternating ("checkerboard")
-            //          - distance from corner (radial)
-            //          - distance from corner, alternating (radial + checker)
-            //          - IF DOMAIN IS HORIZONTALLY DOMINANT, BY X THEN Y
-            //          - IF DOMAIN IS VERTICALLY DOMINANT, BY Y THEN X
             // **********************************************
-
+            
             /* INSERTION ORDER SORT */
             //nodes.Sort(feNode.CompareNodesByNumber);
-
+            
             /* ORIGIN DISTANCE SORT */
             //nodes.Sort(feNode.CompareNodesByOriginDist);
 
@@ -879,7 +873,7 @@ namespace SlopeFEA
                         node3 = quadElements[i].Nodes[2];
 
                         // create a new tri element
-                        elements.Add(new fe3NodedTriElement(++triElementCount,
+                        elements.Add(new fe3NodedTriElement(quadElements[i].Parent, ++triElementCount,
                             node1, node2, node3,
                             quadElements[i].Material, false));
 
@@ -906,14 +900,14 @@ namespace SlopeFEA
                     // element 1
                     node2 = quadElements[0].Nodes[1];
                     node3 = quadElements[0].Nodes[2];
-                    elements.Add(new fe3NodedTriElement(++triElementCount,
+                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
                             quadElements[0].Material, false));
 
                     // element 2
                     node2 = node3;
                     node3 = quadElements[0].Nodes[3];
-                    elements.Add(new fe3NodedTriElement(++triElementCount,
+                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
                             quadElements[0].Material, false));
                 }
@@ -924,20 +918,57 @@ namespace SlopeFEA
                     // element 1
                     node2 = quadElements[0].Nodes[3];
                     node3 = quadElements[0].Nodes[0];
-                    elements.Add(new fe3NodedTriElement(++triElementCount,
+                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
                             quadElements[0].Material, false));
 
                     // element 2
                     node3 = node2;
                     node2 = quadElements[0].Nodes[2];
-                    elements.Add(new fe3NodedTriElement(++triElementCount,
+                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
                             quadElements[0].Material, false));
                 }
 
                 // delete the quad element
                 quadElements.RemoveAt(0);
+            }
+
+
+            // **********************************************
+            // eliminate elements with centroid outside
+            // their corresponding substruct
+            // **********************************************
+            feNode centroidNode;
+            foreach (feSubstruct substruct in canvas.FEASubstructs)
+            {
+                // check all elements
+                for (int i = elements.Count - 1; i >= 0; i--)
+                {
+                    // if parent is not correct, skip this element
+                    if (elements[i].Parent != substruct) continue;
+
+                    // get node references
+                    node1 = elements[i].Nodes[0];
+                    node2 = elements[i].Nodes[1];
+                    node3 = elements[i].Nodes[2];
+
+                    // compute centroid
+                    centroidNode = new feNode(0, false,
+                        (node1.X + node2.X + node3.X) / 3.0,
+                        (node1.Y + node2.Y + node3.Y) / 3.0);
+
+                    // if centroid not inside substruct, delete the element
+                    if (!centroidNode.IsInside(substruct)) elements.RemoveAt(i);
+                }
+            }
+
+            // **********************************************
+            // renumber elements in case of elimination
+            // **********************************************
+            for (int i = 0; i < elements.Count; i++)
+            {
+                elements[i].Number = i + 1;
             }
 
 

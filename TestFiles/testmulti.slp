@@ -1,0 +1,146 @@
+*****************************************
+
+        Slope 2011 Input File
+
+        Project Name: testmulti
+
+*****************************************
+
+--------------------------------
+PLOTTING DATA
+--------------------------------
+
+Units = m, kPa, kN/m^3
+
+XAxisMax = 100
+XAxisMin = 0
+YAxisMax = 50
+YAxisMin = 0
+
+XMajorDivision = 10
+YMajorDivision = 10
+
+XMinorDivisions = 5
+YMinorDivisions = 5
+
+
+--------------------------------
+BOUNDARY GEOMETRY DATA
+--------------------------------
+
+Number of Boundary Points = 7
+
+-8, 46.0000000000001
+-8, 6.00000000000004
+110, 6.00000000000004
+110, 22.0000000000001
+72, 22.0000000000001
+52.0000000000001, 38.0000000000001
+24, 46.0000000000001
+
+
+--------------------------------
+MATERIAL TYPE DATA
+--------------------------------
+
+Number of Material Types = 3
+
+Material #1
+Name = "sand"
+Colour = #FFEEF099
+Phi = 30
+Coh = 0
+Gamma = 16.5
+Emod = 100000
+Nu = 0.3
+
+Material #2
+Name = "clay"
+Colour = #FFD5AE99
+Phi = 5
+Coh = 45
+Gamma = 17
+Emod = 10000
+Nu = 0.45
+
+Material #3
+Name = "bedrock"
+Colour = #FFBECFC9
+Phi = 55
+Coh = 1000
+Gamma = 22
+Emod = 350000
+Nu = 0.35
+
+
+--------------------------------
+MATERIAL BLOCK DATA
+--------------------------------
+
+Number of Material Blocks = 3
+
+Material Block #1
+Material Type = "bedrock"
+Number of Boundary Points = 4
+-8, 6.00000000000004, True, True
+110, 6.00000000000004, True, True
+110, 14, True, False
+-8, 18.0000000000001, True, False
+Number of Line Constraints = 3
+3, 0, True, False
+1, 2, True, False
+0, 1, False, True
+
+Material Block #2
+Material Type = "clay"
+Number of Boundary Points = 4
+-8, 38.0000000000001, True, False
+52.0000000000001, 38.0000000000001, False, False
+24, 46.0000000000001, False, False
+-8, 46.0000000000001, True, False
+Number of Line Constraints = 1
+3, 0, True, False
+
+Material Block #3
+Material Type = "sand"
+Number of Boundary Points = 6
+-8, 18, True, False
+110, 14, True, False
+110, 22.0000000000001, True, False
+72, 22.0000000000001, False, False
+52, 38, False, False
+-8, 38, True, False
+Number of Line Constraints = 2
+5, 0, True, False
+1, 2, True, False
+
+
+--------------------------------
+GENETIC ALGORITHM PARAMETERS
+--------------------------------
+
+Population = 15
+Generations = 100
+Fittest Proportion = 0.1
+Mating Pool Proportion = 0.5
+Crossover Probability = 0.7
+Mutation Probability = 0.25
+Slice Width = 10
+
+
+--------------------------------
+FEA PARAMETERS
+--------------------------------
+
+Column Width = 6
+Row Height = 3
+
+
+--------------------------------
+ANALYSIS STATUS
+--------------------------------
+
+Analysis Type = FEA4NodedQuad
+Verified = True
+Meshed = True
+Analyzed = False

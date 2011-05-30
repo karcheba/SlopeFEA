@@ -89,6 +89,7 @@ namespace SlopeFEA
             // Initialize list of FEA elements
             FEATriElements = new List<fe3NodedTriElement>();
             FEAQuadElements = new List<fe4NodedQuadElement>();
+            FEASubstructs = new List<feSubstruct>();
 
             // Initialize list of surfaces
             runSurfaces = new List<DisplayCircularSurface>();
@@ -137,6 +138,7 @@ namespace SlopeFEA
 
         public List<fe3NodedTriElement> FEATriElements { get; set; }
         public List<fe4NodedQuadElement> FEAQuadElements { get; set; }
+        public List<feSubstruct> FEASubstructs { get; set; }
 
         public bool ShowMesh
         {

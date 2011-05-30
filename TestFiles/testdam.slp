@@ -1,0 +1,187 @@
+*****************************************
+
+        Slope 2011 Input File
+
+        Project Name: testdam
+
+*****************************************
+
+--------------------------------
+PLOTTING DATA
+--------------------------------
+
+Units = m, kPa, kN/m^3
+
+XAxisMax = 100
+XAxisMin = 0
+YAxisMax = 50
+YAxisMin = 0
+
+XMajorDivision = 10
+YMajorDivision = 10
+
+XMinorDivisions = 5
+YMinorDivisions = 5
+
+
+--------------------------------
+BOUNDARY GEOMETRY DATA
+--------------------------------
+
+Number of Boundary Points = 6
+
+-4, 14
+110, 14
+110, 46
+41.9999999999999, 46
+41.9999999999999, 56
+-4, 55.9999999999999
+
+
+--------------------------------
+MATERIAL TYPE DATA
+--------------------------------
+
+Number of Material Types = 4
+
+Material #1
+Name = "water"
+Colour = #FFA0F5FC
+Phi = 0
+Coh = 0
+Gamma = 10
+Emod = 0
+Nu = 0.49
+
+Material #2
+Name = "sand"
+Colour = #FFF5EFA3
+Phi = 35
+Coh = 0
+Gamma = 17
+Emod = 100000
+Nu = 0.3
+
+Material #3
+Name = "bedrock"
+Colour = #FFA7C0B7
+Phi = 55
+Coh = 1000
+Gamma = 22
+Emod = 350000
+Nu = 0.35
+
+Material #4
+Name = "concrete"
+Colour = #FFB5BBB9
+Phi = 50
+Coh = 1000
+Gamma = 24
+Emod = 26000000
+Nu = 0.25
+
+
+--------------------------------
+MATERIAL BLOCK DATA
+--------------------------------
+
+Number of Material Blocks = 6
+
+Material Block #1
+Material Type = "water"
+Number of Boundary Points = 4
+-4, 38, True, False
+39.9999999999999, 38.0000000000001, False, False
+39.9999999999999, 56, False, False
+-4, 56.0000000000001, True, False
+Number of Line Constraints = 1
+3, 0, True, False
+
+Material Block #2
+Material Type = "water"
+Number of Boundary Points = 4
+41.9999999999999, 46, False, False
+41.9999999999999, 38.0000000000001, False, False
+110, 38, True, False
+110, 46, True, False
+Number of Line Constraints = 1
+2, 3, True, False
+
+Material Block #3
+Material Type = "concrete"
+Number of Boundary Points = 7
+39.9999999999999, 38.0000000000001, False, False
+39.9999999999999, 32.0000000000001, False, False
+41.9999999999999, 32.0000000000001, False, False
+41.9999999999999, 38.0000000000001, False, False
+41.9999999999999, 46, False, False
+41.9999999999999, 56, False, False
+39.9999999999999, 56, False, False
+Number of Line Constraints = 0
+
+Material Block #4
+Material Type = "sand"
+Number of Boundary Points = 6
+-4, 26, True, False
+41.9999999999999, 26.0000000000002, False, False
+41.9999999999999, 32.0000000000001, False, False
+39.9999999999999, 32.0000000000001, False, False
+39.9999999999999, 38.0000000000001, False, False
+-4, 38, True, False
+Number of Line Constraints = 1
+5, 0, True, False
+
+Material Block #5
+Material Type = "sand"
+Number of Boundary Points = 5
+110, 26, True, False
+110, 38, True, False
+41.9999999999999, 38.0000000000001, False, False
+42, 32, False, False
+42, 26, False, False
+Number of Line Constraints = 1
+0, 1, True, False
+
+Material Block #6
+Material Type = "bedrock"
+Number of Boundary Points = 5
+-4, 14, True, True
+110, 14, True, True
+110, 26, True, False
+42, 26, False, False
+-4, 26, True, False
+Number of Line Constraints = 3
+4, 0, True, False
+1, 2, True, False
+0, 1, True, True
+
+
+--------------------------------
+GENETIC ALGORITHM PARAMETERS
+--------------------------------
+
+Population = 15
+Generations = 100
+Fittest Proportion = 0.1
+Mating Pool Proportion = 0.5
+Crossover Probability = 0.7
+Mutation Probability = 0.25
+Slice Width = 10
+
+
+--------------------------------
+FEA PARAMETERS
+--------------------------------
+
+Column Width = 8
+Row Height = 5
+
+
+--------------------------------
+ANALYSIS STATUS
+--------------------------------
+
+Analysis Type = FEA3NodedTri
+Verified = True
+Meshed = True
+Analyzed = False

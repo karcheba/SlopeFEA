@@ -1227,27 +1227,27 @@ namespace SlopeFEA
         //    }
         //}
 
-        public void UpdateLocation()
-        {
-            DrawingPoint p1 = Nodes[0], p2 = Nodes[1];
+        //public void UpdateLocation()
+        //{
+        //    DrawingPoint p1 = Nodes[0], p2 = Nodes[1];
 
-            // compute the points at which to plot the load
-            QuarterPoint1 = new Point(p1.Point.X + 0.25 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.25 * (p2.Point.Y - p1.Point.Y));
-            MidPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
-            QuarterPoint2 = new Point(p1.Point.X + 0.75 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.75 * (p2.Point.Y - p1.Point.Y));
+        //    // compute the points at which to plot the load
+        //    QuarterPoint1 = new Point(p1.Point.X + 0.25 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.25 * (p2.Point.Y - p1.Point.Y));
+        //    MidPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
+        //    QuarterPoint2 = new Point(p1.Point.X + 0.75 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.75 * (p2.Point.Y - p1.Point.Y));
 
-            fixLines[0].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y - 3.5);
-            fixLines[0].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y - 3.5);
+        //    fixLines[0].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y - 3.5);
+        //    fixLines[0].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y - 3.5);
 
-            fixLines[1].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y + 3.5);
-            fixLines[1].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y + 3.5);
+        //    fixLines[1].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y + 3.5);
+        //    fixLines[1].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y + 3.5);
 
-            fixLines[2].Points[0] = new Point(MidPoint.X - 3.5, MidPoint.Y + 7);
-            fixLines[2].Points[1] = new Point(MidPoint.X - 3.5, MidPoint.Y - 7);
+        //    fixLines[2].Points[0] = new Point(MidPoint.X - 3.5, MidPoint.Y + 7);
+        //    fixLines[2].Points[1] = new Point(MidPoint.X - 3.5, MidPoint.Y - 7);
 
-            fixLines[3].Points[0] = new Point(MidPoint.X + 3.5, MidPoint.Y + 7);
-            fixLines[3].Points[1] = new Point(MidPoint.X + 3.5, MidPoint.Y - 7);
-        }
+        //    fixLines[3].Points[0] = new Point(MidPoint.X + 3.5, MidPoint.Y + 7);
+        //    fixLines[3].Points[1] = new Point(MidPoint.X + 3.5, MidPoint.Y - 7);
+        //}
     }
 
 
