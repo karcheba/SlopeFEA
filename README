@@ -74,8 +74,14 @@ REFERENCES:
 REVISION HISTORY:
 
 [29 May 2011]
+
+{Project initialization}
 +++ Added project to git://github.com/karcheba/SlopeFEA.git
 
+{v1.0.0.0}
++++ Added .gitignore file to ignore bin/ and obj/ directories
+
+{v1.0.0.1}
 +++ (CanvasData.cs) Added LoadX and LoadY modes to DrawModes enum
 +++ (LoadX.ico) Created
 +++ (LoadY.ico) Created
@@ -95,9 +101,14 @@ REVISION HISTORY:
 
 [30 May 2011]
 
+{v1.0.0.2}
 +++ (SlopeCanvas.cs) Added List<feSubstructs> FEASubstructs property and its associated initialization
 +++ (MeshGen.cs) Added side effect of setting canvas.FEASubstructs to the generated list of substructures
 +++ (FEA.cs) Added Parent property to fe4NodedQuadElement and fe3NodedTriElement to make these objects aware of their parent substructure
 === (MeshGen.cs) Modified calls to fe4NodedQuadElement() and fe3NodedTriElement() to include substruct as parent
 +++ (MeshGen.cs) Added elimination of elements with centroid outside substructure in MeshGenStructured3NodedTri()
 +++ (MeshGen.cs) Added element renumbering post-elimination in MeshGenStructured3NodedTri()
+
+{v1.0.0.3}
+--- (All code files) Cleaned up unused usings
++++ (All code files) Added project, contact, and license information [Academic Free License v3.0] at top of file

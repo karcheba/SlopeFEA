@@ -92,7 +92,7 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 4
+Column Width = 10
 Row Height = 4
 
 
@@ -100,7 +100,7 @@ Row Height = 4
 ANALYSIS STATUS
 --------------------------------
 
-Analysis Type = FEA4NodedQuad
+Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = False
