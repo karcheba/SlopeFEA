@@ -75,3 +75,19 @@ REVISION HISTORY:
 
 [29 May 2011]
 +++ Added project to git://github.com/karcheba/SlopeFEA.git
+
++++ (CanvasData.cs) Added LoadX and LoadY modes to DrawModes enum
++++ (LoadX.ico) Created
++++ (LoadY.ico) Created
++++ (LoadX.cur) Created
++++ (LoadY.cur) Created
++++ (MainWindow.xaml) Added LoadX.cur and LoadY.cur as resources
++++ (MainWindow.xaml) Added Horizontal Load and Vertical Load MenuItems
++++ (MainWindow.xaml) Added Horizontal Load and Vertical Load ToolBar buttons
++++ (MainWindow.xaml.cs) Added loadX_Click() and loadY_Click()
++++ (SlopeCanvas.cs) Added LoadX and LoadY cases to OnMouseUp() [for switching cursor on middle mouse button pan]
+@@@ (SlopeCanvas.cs) Changed DrawMode if statement series to equivalent switch-case in OnMouseLeftButtonUp(); this required duplicating one section of code (since C# does not allow "fall-through"), but the value of DrawMode need only be checked once as opposed to 10+ times
++++ (SlopeCanvas.cs) Added List<DrawingPoint> loadPoints and its associated initialization in the constructor
++++ (SlopeCanvas.cs) Added DrawModes.LoadX and DrawModes.LoadY cases to OnMouseLeftButtonUp()
++++ (CanvasData.cs) Added LineLoad class 
++++ (CanvasData.cs) Added LoadX() and LoadY() methods to MaterialBlock class

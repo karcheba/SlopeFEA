@@ -188,7 +188,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="icons\LoadX.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\AddPoint.cur" />
     <Resource Include="icons\AddPoint.ico" />
@@ -202,6 +204,7 @@
     <Resource Include="icons\GenerateMesh.ico" />
     <Resource Include="icons\grab.cur" />
     <Resource Include="icons\hand.cur" />
+    <Resource Include="icons\LoadX.cur" />
     <Resource Include="icons\MovePoint.cur" />
     <Resource Include="icons\MovePoint.ico" />
     <Resource Include="icons\New.ico" />
@@ -271,6 +274,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\LoadY.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\LoadY.cur" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

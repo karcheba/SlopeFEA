@@ -26,8 +26,7 @@ namespace SlopeFEA
         private SlopeBoundary boundary;
         private DrawingPoint movingBoundPoint;
         private List<MaterialBlock> materialBlocks;
-        private List<DrawingPoint> addPoints;
-        private List<DrawingPoint> fixPoints;
+        private List<DrawingPoint> addPoints, fixPoints, loadPoints;
         private Polyline drawLine;
         private Point transPoint, movePoint;
         private ZoomRect zoomRect;
@@ -77,6 +76,9 @@ namespace SlopeFEA
 
             // Initialize list for fixing points
             fixPoints = new List<DrawingPoint>();
+
+            // Initialize list for load points
+            loadPoints = new List<DrawingPoint>();
 
             // Initialize list of GA parameters
             genAlgParams = new GAParams();
@@ -2162,317 +2164,469 @@ namespace SlopeFEA
 
             Point p = Mouse.GetPosition(this);
 
-
-            /*
-             * Drawing Modes
-             */
-            if (DrawMode == DrawModes.Boundaries || DrawMode == DrawModes.Materials)
+            switch (DrawMode)
             {
-                // Initiate drawing
-                if (!drawing) drawing = true;
-
-                // Snap to nearest grid point
-                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                {
-                    if (ShowMinorGrid || ShowMajorGrid)
+                case (DrawModes.Boundaries):
                     {
-                        // Convert mouse position to inches with origin @ BL
-                        double xCoord = (p.X - OriginOffsetX) / dpiX;
-                        double yCoord = ((ActualHeight - p.Y) - OriginOffsetY) / dpiY;
+                        // Initiate drawing
+                        if (!drawing) drawing = true;
 
-                        // Get units dependent scaling factor
-                        double factor;
-                        switch (this.Units)
+                        // Snap to nearest grid point
+                        if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                         {
-                            case Units.Metres: factor = 0.0254; break;
-                            case Units.Millimetres: factor = 25.4; break;
-                            case Units.Feet: factor = 1.0 / 12.0; break;
-                            default: factor = 1.0; break;
-                        }
-
-                        // Convert mouse position to actual units
-                        xCoord *= factor * Scale;
-                        yCoord *= factor * Scale;
-
-                        // Get grid spacing (major or minor)
-                        double xDiv = XMajorDivision;
-                        double yDiv = YMajorDivision;
-                        if (ShowMinorGrid)
-                        {
-                            xDiv /= XMinorDivisions;
-                            yDiv /= YMinorDivisions;
-                        }
-
-                        // Snap x coordinate
-                        double xRatio = xCoord / xDiv;
-                        double xDiff = xRatio - Math.Truncate(xRatio);
-                        xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
-                        p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
-
-                        // Snap y coordinate
-                        double yRatio = yCoord / yDiv;
-                        double yDiff = yRatio - Math.Truncate(yRatio);
-                        yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
-                        p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
-                    }
-                }
-
-                // Draw straight lines
-                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                {
-                    if (drawLine.Points.Count >= 2)
-                    {
-                        Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
-
-                        if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
-                            p.X = lastPt.X;
-                        else
-                            p.Y = lastPt.Y;
-                    }
-                }
-
-                // If it is the first point in the drawing sequence, add it to the boundary.
-                // Otherwise, fix the last point
-                if (drawLine.Points.Count == 0) drawLine.Points.Add(p);
-                else drawLine.Points[drawLine.Points.Count - 1] = p;
-
-                // Add another copy of the current point (for "rubber banding")
-                drawLine.Points.Add(p);
-
-                if (this.IsSaved) this.IsSaved = false;
-                if (this.IsVerified) this.IsVerified = false;
-            }
-
-
-            /*
-             * Pan Mode
-             */
-            if (DrawMode == DrawModes.Pan)
-            {
-                // End panning operations
-                panning = false;
-                this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
-            }
-
-
-            /*
-             * Zoom Area Mode
-             */
-            if (DrawMode == DrawModes.ZoomArea)
-            {
-                // End zooming operations
-                zooming = false;
-
-                // Zoom to highlighted region
-                if (zoomRect.Boundary.Points.Count == 4)
-                {
-                    ZoomArea(zoomRect.Boundary);
-                }
-
-                // Clean up resources
-                zoomRect.Boundary.Points.Clear();
-                Mouse.Capture(this, CaptureMode.None);
-            }
-
-            if (DrawMode == DrawModes.AddPoints)
-            {
-                DrawingPoint addPoint = boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-
-                if (addPoint == null)
-                {
-                    for (int i = 0; i < materialBlocks.Count; i++)
-                    {
-                        addPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                        if (addPoint != null) break;
-                    }
-                }
-
-                if (addPoint != null) addPoints.Add(addPoint);
-
-                if (addPoints.Count == 2)
-                {
-                    SlopeBoundary sb = addPoints[0].Parent as SlopeBoundary;
-                    MaterialBlock mb = addPoints[0].Parent as MaterialBlock;
-
-                    if (sb != null)
-                    {
-                        if (sb != (addPoints[1].Parent as SlopeBoundary))
-                        {
-                            MessageBox.Show("Points must be on the same block.", "Error");
-                        }
-                        else
-                        {
-                            sb.AddPoint(addPoints[0], addPoints[1]);
-                        }
-                    }
-                    else if (mb != null)
-                    {
-                        if (mb != (addPoints[1].Parent as MaterialBlock))
-                        {
-                            MessageBox.Show("Points must be on the same block.", "Error");
-                        }
-                        else
-                        {
-                            mb.AddPoint(addPoints[0], addPoints[1]);
-                        }
-                    }
-
-                    addPoints.Clear();
-                    ClearSelections();
-                }
-            }
-
-            if (DrawMode == DrawModes.FixX)
-            {
-                DrawingPoint fixPoint = null;
-                for (int i = 0; i < materialBlocks.Count; i++)
-                {
-                    fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                    if (fixPoint != null) break;
-                }
-
-                if (fixPoint != null) fixPoints.Add(fixPoint);
-
-                if (fixPoints.Count == 2)
-                {
-                    MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
-
-                    if (mb != null)
-                    {
-                        if (mb != (fixPoints[1].Parent as MaterialBlock))
-                        {
-                            MessageBox.Show("Points must be on the same block.", "Error");
-                        }
-                        else
-                        {
-                            mb.FixX(fixPoints[0], fixPoints[1]);
-                        }
-                    }
-
-                    fixPoints.Clear();
-                    ClearSelections();
-                }
-            }
-
-            if (DrawMode == DrawModes.FixY)
-            {
-                DrawingPoint fixPoint = null;
-                for (int i = 0; i < materialBlocks.Count; i++)
-                {
-                    fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                    if (fixPoint != null) break;
-                }
-
-                if (fixPoint != null) fixPoints.Add(fixPoint);
-
-                if (fixPoints.Count == 2)
-                {
-                    MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
-
-                    if (mb != null)
-                    {
-                        if (mb != (fixPoints[1].Parent as MaterialBlock))
-                        {
-                            MessageBox.Show("Points must be on the same block.", "Error");
-                        }
-                        else
-                        {
-                            mb.FixY(fixPoints[0], fixPoints[1]);
-                        }
-                    }
-
-                    fixPoints.Clear();
-                    ClearSelections();
-                }
-            }
-
-            if (DrawMode == DrawModes.MovePoints)
-            {
-                if (moving)
-                {
-                    moving = false;
-                    caughtCtrl = false;
-                    movingBoundPoint = null;
-                    ClearSelections();
-                }
-            }
-
-            if (DrawMode == DrawModes.Select)
-            {
-                // De-select objects if mouse is over blank canvas area
-                if (!boundary.IsMouseOver)
-                {
-                    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                    {
-                        boundary.IsSelected = false;
-
-                        if (materialBlocks.Find(delegate(MaterialBlock mb) { return mb.IsMouseOver; }) == null)
-                        {
-                            ClearMaterialSelections();
-                        }
-
-                        if (boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) == null)
-                        {
-                            ClearBoundaryPointSelections();
-                        }
-
-                        bool foundMaterialBoundPoint = false;
-                        for (int i = 0; i < materialBlocks.Count; i++)
-                        {
-                            if (materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) != null)
+                            if (ShowMinorGrid || ShowMajorGrid)
                             {
-                                foundMaterialBoundPoint = true;
-                                break;
+                                // Convert mouse position to inches with origin @ BL
+                                double xCoord = (p.X - OriginOffsetX) / dpiX;
+                                double yCoord = ((ActualHeight - p.Y) - OriginOffsetY) / dpiY;
+
+                                // Get units dependent scaling factor
+                                double factor;
+                                switch (this.Units)
+                                {
+                                    case Units.Metres: factor = 0.0254; break;
+                                    case Units.Millimetres: factor = 25.4; break;
+                                    case Units.Feet: factor = 1.0 / 12.0; break;
+                                    default: factor = 1.0; break;
+                                }
+
+                                // Convert mouse position to actual units
+                                xCoord *= factor * Scale;
+                                yCoord *= factor * Scale;
+
+                                // Get grid spacing (major or minor)
+                                double xDiv = XMajorDivision;
+                                double yDiv = YMajorDivision;
+                                if (ShowMinorGrid)
+                                {
+                                    xDiv /= XMinorDivisions;
+                                    yDiv /= YMinorDivisions;
+                                }
+
+                                // Snap x coordinate
+                                double xRatio = xCoord / xDiv;
+                                double xDiff = xRatio - Math.Truncate(xRatio);
+                                xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
+                                p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
+
+                                // Snap y coordinate
+                                double yRatio = yCoord / yDiv;
+                                double yDiff = yRatio - Math.Truncate(yRatio);
+                                yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
+                                p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                             }
                         }
-                        if (!foundMaterialBoundPoint) ClearMaterialBoundaryPointSelections();
-                    }
-                    else
-                    {
-                        ClearSelections();
-                    }
 
-                    for (int i = 0; i < materialBlocks.Count; i++)
-                    {
-                        if (materialBlocks[i].IsMouseOver)
+                        // Draw straight lines
+                        if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                         {
-                            materialBlocks[i].IsSelected = true;
-                            break;
-                        }
-                    }
-
-                    for (int i = 0; i < boundary.BoundaryPoints.Count; i++)
-                    {
-                        if (boundary.BoundaryPoints[i].IsMouseOver)
-                        {
-                            boundary.BoundaryPoints[i].IsSelected = true;
-                            break;
-                        }
-                    }
-
-                    for (int i = 0; i < materialBlocks.Count; i++)
-                    {
-                        if (materialBlocks[i].BoundaryPoints.Find(
-                            delegate(DrawingPoint bp)
+                            if (drawLine.Points.Count >= 2)
                             {
-                                if (bp.IsMouseOver)
-                                {
-                                    bp.IsSelected = true;
-                                    return true;
-                                }
-                                return false;
-                            }) != null)
+                                Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
+
+                                if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
+                                    p.X = lastPt.X;
+                                else
+                                    p.Y = lastPt.Y;
+                            }
+                        }
+
+                        // If it is the first point in the drawing sequence, add it to the boundary.
+                        // Otherwise, fix the last point
+                        if (drawLine.Points.Count == 0) drawLine.Points.Add(p);
+                        else drawLine.Points[drawLine.Points.Count - 1] = p;
+
+                        // Add another copy of the current point (for "rubber banding")
+                        drawLine.Points.Add(p);
+
+                        if (this.IsSaved) this.IsSaved = false;
+                        if (this.IsVerified) this.IsVerified = false;
+                    }
+                    break;
+
+                case (DrawModes.Materials):
+                    {
+                        // Initiate drawing
+                        if (!drawing) drawing = true;
+
+                        // Snap to nearest grid point
+                        if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                         {
-                            break;
+                            if (ShowMinorGrid || ShowMajorGrid)
+                            {
+                                // Convert mouse position to inches with origin @ BL
+                                double xCoord = (p.X - OriginOffsetX) / dpiX;
+                                double yCoord = ((ActualHeight - p.Y) - OriginOffsetY) / dpiY;
+
+                                // Get units dependent scaling factor
+                                double factor;
+                                switch (this.Units)
+                                {
+                                    case Units.Metres: factor = 0.0254; break;
+                                    case Units.Millimetres: factor = 25.4; break;
+                                    case Units.Feet: factor = 1.0 / 12.0; break;
+                                    default: factor = 1.0; break;
+                                }
+
+                                // Convert mouse position to actual units
+                                xCoord *= factor * Scale;
+                                yCoord *= factor * Scale;
+
+                                // Get grid spacing (major or minor)
+                                double xDiv = XMajorDivision;
+                                double yDiv = YMajorDivision;
+                                if (ShowMinorGrid)
+                                {
+                                    xDiv /= XMinorDivisions;
+                                    yDiv /= YMinorDivisions;
+                                }
+
+                                // Snap x coordinate
+                                double xRatio = xCoord / xDiv;
+                                double xDiff = xRatio - Math.Truncate(xRatio);
+                                xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
+                                p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
+
+                                // Snap y coordinate
+                                double yRatio = yCoord / yDiv;
+                                double yDiff = yRatio - Math.Truncate(yRatio);
+                                yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
+                                p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
+                            }
+                        }
+
+                        // Draw straight lines
+                        if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                        {
+                            if (drawLine.Points.Count >= 2)
+                            {
+                                Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
+
+                                if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
+                                    p.X = lastPt.X;
+                                else
+                                    p.Y = lastPt.Y;
+                            }
+                        }
+
+                        // If it is the first point in the drawing sequence, add it to the boundary.
+                        // Otherwise, fix the last point
+                        if (drawLine.Points.Count == 0) drawLine.Points.Add(p);
+                        else drawLine.Points[drawLine.Points.Count - 1] = p;
+
+                        // Add another copy of the current point (for "rubber banding")
+                        drawLine.Points.Add(p);
+
+                        if (this.IsSaved) this.IsSaved = false;
+                        if (this.IsVerified) this.IsVerified = false;
+                    }
+                    break;
+
+
+                case (DrawModes.Pan):
+                    {
+                        // End panning operations
+                        panning = false;
+                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
+                    }
+                    break;
+
+
+                case (DrawModes.ZoomArea):
+                    {
+                        // End zooming operations
+                        zooming = false;
+
+                        // Zoom to highlighted region
+                        if (zoomRect.Boundary.Points.Count == 4)
+                        {
+                            ZoomArea(zoomRect.Boundary);
+                        }
+
+                        // Clean up resources
+                        zoomRect.Boundary.Points.Clear();
+                        Mouse.Capture(this, CaptureMode.None);
+                    }
+                    break;
+
+
+                case (DrawModes.AddPoints):
+                    {
+                        DrawingPoint addPoint = boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+
+                        if (addPoint == null)
+                        {
+                            for (int i = 0; i < materialBlocks.Count; i++)
+                            {
+                                addPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                                if (addPoint != null) break;
+                            }
+                        }
+
+                        if (addPoint != null) addPoints.Add(addPoint);
+
+                        if (addPoints.Count == 2)
+                        {
+                            SlopeBoundary sb = addPoints[0].Parent as SlopeBoundary;
+                            MaterialBlock mb = addPoints[0].Parent as MaterialBlock;
+
+                            if (sb != null)
+                            {
+                                if (sb != (addPoints[1].Parent as SlopeBoundary))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    sb.AddPoint(addPoints[0], addPoints[1]);
+                                }
+                            }
+                            else if (mb != null)
+                            {
+                                if (mb != (addPoints[1].Parent as MaterialBlock))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    mb.AddPoint(addPoints[0], addPoints[1]);
+                                }
+                            }
+
+                            addPoints.Clear();
+                            ClearSelections();
                         }
                     }
-                }
-                else
-                {
-                    ClearMaterialSelections();
-                    ClearMaterialBoundaryPointSelections();
-                    ClearBoundaryPointSelections();
-                }
+                    break;
+
+
+                case (DrawModes.FixX):
+                    {
+                        DrawingPoint fixPoint = null;
+                        for (int i = 0; i < materialBlocks.Count; i++)
+                        {
+                            fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                            if (fixPoint != null) break;
+                        }
+
+                        if (fixPoint != null) fixPoints.Add(fixPoint);
+
+                        if (fixPoints.Count == 2)
+                        {
+                            MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
+
+                            if (mb != null)
+                            {
+                                if (mb != (fixPoints[1].Parent as MaterialBlock))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    mb.FixX(fixPoints[0], fixPoints[1]);
+                                }
+                            }
+
+                            fixPoints.Clear();
+                            ClearSelections();
+                        }
+                    }
+                    break;
+
+
+                case (DrawModes.FixY):
+                    {
+                        DrawingPoint fixPoint = null;
+                        for (int i = 0; i < materialBlocks.Count; i++)
+                        {
+                            fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                            if (fixPoint != null) break;
+                        }
+
+                        if (fixPoint != null) fixPoints.Add(fixPoint);
+
+                        if (fixPoints.Count == 2)
+                        {
+                            MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
+
+                            if (mb != null)
+                            {
+                                if (mb != (fixPoints[1].Parent as MaterialBlock))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    mb.FixY(fixPoints[0], fixPoints[1]);
+                                }
+                            }
+
+                            fixPoints.Clear();
+                            ClearSelections();
+                        }
+                    }
+                    break;
+
+
+                case (DrawModes.LoadX):
+                    {
+                        DrawingPoint loadPoint = null;
+                        for (int i = 0; i < materialBlocks.Count; i++)
+                        {
+                            loadPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                            if (loadPoint != null) break;
+                        }
+
+                        if (loadPoint != null) loadPoints.Add(loadPoint);
+
+                        if (loadPoints.Count == 2)
+                        {
+                            MaterialBlock mb = loadPoints[0].Parent as MaterialBlock;
+
+                            if (mb != null)
+                            {
+                                if (mb != (loadPoints[1].Parent as MaterialBlock))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    mb.LoadX(loadPoints[0], loadPoints[1]);
+                                }
+                            }
+
+                            loadPoints.Clear();
+                            ClearSelections();
+                        }
+                    }
+                    break;
+
+
+                case (DrawModes.LoadY):
+                    {
+                        DrawingPoint loadPoint = null;
+                        for (int i = 0; i < materialBlocks.Count; i++)
+                        {
+                            loadPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                            if (loadPoint != null) break;
+                        }
+
+                        if (loadPoint != null) loadPoints.Add(loadPoint);
+
+                        if (loadPoints.Count == 2)
+                        {
+                            MaterialBlock mb = loadPoints[0].Parent as MaterialBlock;
+
+                            if (mb != null)
+                            {
+                                if (mb != (loadPoints[1].Parent as MaterialBlock))
+                                {
+                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                }
+                                else
+                                {
+                                    mb.LoadY(loadPoints[0], loadPoints[1]);
+                                }
+                            }
+
+                            loadPoints.Clear();
+                            ClearSelections();
+                        }
+                    }
+                    break;
+
+
+                case (DrawModes.MovePoints):
+                    {
+                        if (moving)
+                        {
+                            moving = false;
+                            caughtCtrl = false;
+                            movingBoundPoint = null;
+                            ClearSelections();
+                        }
+                    }
+                    break;
+
+
+                case (DrawModes.Select):
+                    {
+                        // De-select objects if mouse is over blank canvas area
+                        if (!boundary.IsMouseOver)
+                        {
+                            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                            {
+                                boundary.IsSelected = false;
+
+                                if (materialBlocks.Find(delegate(MaterialBlock mb) { return mb.IsMouseOver; }) == null)
+                                {
+                                    ClearMaterialSelections();
+                                }
+
+                                if (boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) == null)
+                                {
+                                    ClearBoundaryPointSelections();
+                                }
+
+                                bool foundMaterialBoundPoint = false;
+                                for (int i = 0; i < materialBlocks.Count; i++)
+                                {
+                                    if (materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) != null)
+                                    {
+                                        foundMaterialBoundPoint = true;
+                                        break;
+                                    }
+                                }
+                                if (!foundMaterialBoundPoint) ClearMaterialBoundaryPointSelections();
+                            }
+                            else
+                            {
+                                ClearSelections();
+                            }
+
+                            for (int i = 0; i < materialBlocks.Count; i++)
+                            {
+                                if (materialBlocks[i].IsMouseOver)
+                                {
+                                    materialBlocks[i].IsSelected = true;
+                                    break;
+                                }
+                            }
+
+                            for (int i = 0; i < boundary.BoundaryPoints.Count; i++)
+                            {
+                                if (boundary.BoundaryPoints[i].IsMouseOver)
+                                {
+                                    boundary.BoundaryPoints[i].IsSelected = true;
+                                    break;
+                                }
+                            }
+
+                            for (int i = 0; i < materialBlocks.Count; i++)
+                            {
+                                if (materialBlocks[i].BoundaryPoints.Find(
+                                    delegate(DrawingPoint bp)
+                                    {
+                                        if (bp.IsMouseOver)
+                                        {
+                                            bp.IsSelected = true;
+                                            return true;
+                                        }
+                                        return false;
+                                    }) != null)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ClearMaterialSelections();
+                            ClearMaterialBoundaryPointSelections();
+                            ClearBoundaryPointSelections();
+                        }
+                    }
+                    break;
             }
         }
 
@@ -2717,6 +2871,12 @@ namespace SlopeFEA
                         break;
                     case DrawModes.FixY:
                         this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["rollerXCursor"])).Cursor;
+                        break;
+                    case DrawModes.LoadX:
+                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["loadXCursor"])).Cursor;
+                        break;
+                    case DrawModes.LoadY:
+                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["loadYCursor"])).Cursor;
                         break;
                     default:
                         this.Cursor = Cursors.Arrow;

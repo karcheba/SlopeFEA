@@ -18,6 +18,8 @@
             <TextBlock x:Key="movePointsCursor" Cursor="/Slope;component/icons/MovePoint.cur"/>
             <TextBlock x:Key="rollerXCursor" Cursor="/Slope;component/icons/RollerX.cur"/>
             <TextBlock x:Key="rollerYCursor" Cursor="/Slope;component/icons/RollerY.cur"/>
+			<TextBlock x:Key="loadXCursor" Cursor="/Slope;component/icons/LoadX.cur"/>
+			<TextBlock x:Key="loadYCursor" Cursor="/Slope;component/icons/LoadY.cur"/>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -158,6 +160,17 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
+					<MenuItem Header="_Horizontal Load" Click="loadX_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Slope;component/icons/LoadX.ico"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+					<MenuItem Header="_Vertical Load" Click="loadY_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Slope;component/icons/LoadY.ico"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+					<Separator/>
                     <MenuItem Header="_Delete Selected" InputGestureText="Del" Click="deleteBlock_Click">
                         <MenuItem.Icon>
                             <Image Source="/Slope;component/icons/Delete.ico"/>
@@ -428,6 +441,28 @@
                                 <TextBlock/>
                                 <TextBlock Text="Click adjacent key points on the same block to"/>
                                 <TextBlock Text="apply kinematic boundary condition in Y-direction."/>
+                            </StackPanel>
+                        </Button.ToolTip>
+                    </Button>
+					<Button Name="toolLoadX" Click="loadX_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/LoadX.ico"/>
+                        <Button.ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="Apply Horizontal Load" FontWeight="DemiBold"/>
+                                <TextBlock/>
+                                <TextBlock Text="Click adjacent key points on the same block to"/>
+                                <TextBlock Text="apply linearly varying load in x-direction."/>
+                            </StackPanel>
+                        </Button.ToolTip>
+                    </Button>
+					<Button Name="toolLoadY" Click="loadY_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/LoadY.ico"/>
+                        <Button.ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="Apply Vertical Load" FontWeight="DemiBold"/>
+                                <TextBlock/>
+                                <TextBlock Text="Click adjacent key points on the same block to"/>
+                                <TextBlock Text="apply linearly varying load in y-direction."/>
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>

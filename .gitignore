@@ -1,3 +1,4 @@
 # This file tells the .git repository which directories and file types to ignore
 bin/
 obj/
+*.suo

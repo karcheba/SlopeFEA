@@ -12,7 +12,7 @@ using System.IO;
 
 namespace SlopeFEA
 {
-    enum DrawModes { Select, Boundaries, Materials, Pan, ZoomArea, MovePoints, AddPoints, FixX, FixY };
+    enum DrawModes { Select, Boundaries, Materials, Pan, ZoomArea, MovePoints, AddPoints, FixX, FixY, LoadX, LoadY };
     enum Units { Metres, Millimetres, Feet, Inches };
     enum Scales
     {
@@ -1145,6 +1145,112 @@ namespace SlopeFEA
         }
     }
 
+
+    class LineLoad
+    {
+        private SlopeCanvas canvas;
+        private bool isLoadedX, isLoadedY;
+        private List<Polyline> loadLines;
+
+        public LineLoad(SlopeCanvas canvas,
+                                DrawingPoint p1, DrawingPoint p2,
+                                bool loadedX, bool loadedY,
+                                double xLoad, double yLoad)
+        {
+            // set parent drawing canvas
+            this.canvas = canvas;
+
+            // create list of boundary nodes for the load
+            Nodes = new List<DrawingPoint>() { p1, p2 };
+
+            // create plotting lines for constraints
+            loadLines = new List<Polyline>();
+            Polyline newLine;
+            for (int i = 0; i < 30; i++)
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.25;
+                newLine.Stroke = Brushes.Blue;
+                newLine.Points.Add(new Point());
+                newLine.Points.Add(new Point());
+                loadLines.Add(newLine);
+                canvas.Children.Add(newLine);
+            }
+        }
+
+        public List<DrawingPoint> Nodes { get; set; }
+
+        public Point QuarterPoint1 { get; set; }
+        public Point MidPoint { get; set; }
+        public Point QuarterPoint2 { get; set; }
+
+        //public bool IsFixedX
+        //{
+        //    get
+        //    {
+        //        return this.isFixedX;
+        //    }
+        //    set
+        //    {
+        //        this.isFixedX = value;
+
+        //        fixLines[2].Visibility = fixLines[3].Visibility = value ? Visibility.Visible : Visibility.Hidden;
+
+        //        if (value)
+        //        {
+        //            Nodes[0].IsFixedX = value;
+        //            Nodes[1].IsFixedX = value;
+        //        }
+        //    }
+        //}
+
+        //public bool IsFixedY
+        //{
+        //    get
+        //    {
+        //        return this.isFixedY;
+        //    }
+        //    set
+        //    {
+        //        this.isFixedY = value;
+
+        //        fixLines[0].Visibility = fixLines[1].Visibility = value ? Visibility.Visible : Visibility.Hidden;
+
+        //        if (value)
+        //        {
+        //            Nodes[0].IsFixedY = value;
+        //            Nodes[1].IsFixedY = value;
+        //        }
+        //    }
+        //}
+
+        public void UpdateLocation()
+        {
+            DrawingPoint p1 = Nodes[0], p2 = Nodes[1];
+
+            // compute the points at which to plot the load
+            QuarterPoint1 = new Point(p1.Point.X + 0.25 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.25 * (p2.Point.Y - p1.Point.Y));
+            MidPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
+            QuarterPoint2 = new Point(p1.Point.X + 0.75 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.75 * (p2.Point.Y - p1.Point.Y));
+
+            fixLines[0].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y - 3.5);
+            fixLines[0].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y - 3.5);
+
+            fixLines[1].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y + 3.5);
+            fixLines[1].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y + 3.5);
+
+            fixLines[2].Points[0] = new Point(MidPoint.X - 3.5, MidPoint.Y + 7);
+            fixLines[2].Points[1] = new Point(MidPoint.X - 3.5, MidPoint.Y - 7);
+
+            fixLines[3].Points[0] = new Point(MidPoint.X + 3.5, MidPoint.Y + 7);
+            fixLines[3].Points[1] = new Point(MidPoint.X + 3.5, MidPoint.Y - 7);
+        }
+    }
+
+
     class ZoomRect
     {
         public ZoomRect()
@@ -1475,6 +1581,14 @@ namespace SlopeFEA
                 if (!(LineConstraints[i].IsFixedX) && !(LineConstraints[i].IsFixedY))
                     LineConstraints.RemoveAt(i);
             }
+        }
+
+        public void LoadX(DrawingPoint p1, DrawingPoint p2)
+        {
+        }
+
+        public void LoadY(DrawingPoint p1, DrawingPoint p2)
+        {
         }
 
         public void Translate(Vector delta)
