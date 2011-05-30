@@ -40,7 +40,7 @@ using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
-    partial class SlopeCanvas : Canvas
+    public partial class SlopeCanvas : Canvas
     {
         private bool drawing, panning, zooming, moving, caughtCtrl;
         private bool isSaved = false, isVerified = false, isMeshed = false,
@@ -2495,7 +2495,7 @@ namespace SlopeFEA
                     break;
 
 
-                case (DrawModes.LoadX):
+                case (DrawModes.PointLoad):
                     {
                         DrawingPoint loadPoint = null;
                         for (int i = 0; i < materialBlocks.Count; i++)
@@ -2504,32 +2504,19 @@ namespace SlopeFEA
                             if (loadPoint != null) break;
                         }
 
-                        if (loadPoint != null) loadPoints.Add(loadPoint);
-
-                        if (loadPoints.Count == 2)
+                        if (loadPoint != null)
                         {
-                            MaterialBlock mb = loadPoints[0].Parent as MaterialBlock;
+                            MaterialBlock mb = loadPoint.Parent as MaterialBlock;
 
-                            if (mb != null)
-                            {
-                                if (mb != (loadPoints[1].Parent as MaterialBlock))
-                                {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
-                                }
-                                else
-                                {
-                                    mb.LoadX(loadPoints[0], loadPoints[1]);
-                                }
-                            }
+                            if (mb != null) mb.PointLoad(loadPoint);
 
-                            loadPoints.Clear();
                             ClearSelections();
                         }
                     }
                     break;
 
 
-                case (DrawModes.LoadY):
+                case (DrawModes.LineLoad):
                     {
                         DrawingPoint loadPoint = null;
                         for (int i = 0; i < materialBlocks.Count; i++)
@@ -2552,7 +2539,7 @@ namespace SlopeFEA
                                 }
                                 else
                                 {
-                                    mb.LoadY(loadPoints[0], loadPoints[1]);
+                                    mb.LineLoad(loadPoints[0], loadPoints[1]);
                                 }
                             }
 
@@ -2899,11 +2886,11 @@ namespace SlopeFEA
                     case DrawModes.FixY:
                         this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["rollerXCursor"])).Cursor;
                         break;
-                    case DrawModes.LoadX:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["loadXCursor"])).Cursor;
+                    case DrawModes.PointLoad:
+                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["pointLoadCursor"])).Cursor;
                         break;
-                    case DrawModes.LoadY:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["loadYCursor"])).Cursor;
+                    case DrawModes.LineLoad:
+                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["lineLoadCursor"])).Cursor;
                         break;
                     default:
                         this.Cursor = Cursors.Arrow;

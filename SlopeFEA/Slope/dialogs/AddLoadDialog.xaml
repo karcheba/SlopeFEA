@@ -1,0 +1,71 @@
+﻿<!--
+ /************************************************************************
+ * PROJECT:     SlopeFEA (c) 2011 Brandon Karchewski
+ *              Licensed under the Academic Free License version 3.0
+ *                  http://www.opensource.org/licenses/afl-3.0.php
+ * 
+ * CONTACT:     Brandon Karchewski
+ *              Department of Civil Engineering
+ *              McMaster University, JHE-301
+ *              1280 Main St W
+ *              Hamilton, Ontario, Canada
+ *              L8S 4L7
+ *              p: 905-525-9140 x24287
+ *              f: 905-529-9688
+ *              e: karcheba@mcmaster.ca
+ *              
+ * 
+ * SOURCE INFORMATION:
+ * 
+ * The repository for this software project is hosted on git at:
+ *      
+ *      git://github.com/karcheba/SlopeFEA
+ *      
+ * As such, the code for the project is free and open source.
+ * The relevant license is AFLv3 (see link above). See the
+ * README file in the root directory of the repository for a
+ * detailed project description, acknowledgements, references,
+ * and the revision history.
+ ************************************************************************/
+-->
+    
+<Window x:Class="SlopeFEA.dialogs.AddLoadDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Load"
+        Background="WhiteSmoke"
+        Height="425"
+        Width="300"
+        MinHeight="425"
+        MinWidth="300"
+        Topmost="False" 
+        WindowStartupLocation="CenterOwner" 
+        ShowInTaskbar="False" 
+        ResizeMode="CanResize"
+        WindowStyle="ToolWindow"
+        FocusManager.FocusedElement="{Binding ElementName=xLoad}">
+    <Grid>
+        <Label Content="Node 1:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-200,-325,0,0" VerticalAlignment="Center" FontSize="11" />
+        <Label Content="Node 2:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-200,-275,0,0" VerticalAlignment="Center" FontSize="11" />
+        <GroupBox Header="X" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="xGroup" VerticalAlignment="Center">
+            <Grid>
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,-20,0,0" Name="xLoad1" VerticalAlignment="Center" Width="75" />
+                <Label Content="Node 1 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,-20,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="kN" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="120,-20,0,0" Name="xLoad1Units" VerticalAlignment="Center" FontSize="11"/>
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,40,0,0" Name="xLoad2" VerticalAlignment="Center" Width="75" />
+                <Label Content="Node 2 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,40,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="kN" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="120,40,0,0" Name="xLoad2Units" VerticalAlignment="Center" FontSize="11"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Y" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,160,10,0" Name="yGroup" VerticalAlignment="Center">
+            <Grid>
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="0,-90,0,0" Name="yLoad" VerticalAlignment="Center" Width="75" />
+                <Label Content="Value" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-120,-90,0,0" VerticalAlignment="Center" FontSize="11" />
+                <Label Content="kN" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="100,-90,0,0" Name="yLoadUnits" VerticalAlignment="Center" FontSize="11"/>
+            </Grid>
+        </GroupBox>
+        <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,335,0,0" Name="ok" IsDefault="True" VerticalAlignment="Center" Width="60" Click="ok_Click" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,335,0,0" Name="cancel" IsCancel="True" VerticalAlignment="Center" Width="60" />
+
+    </Grid>
+</Window>

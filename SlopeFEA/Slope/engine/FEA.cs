@@ -38,7 +38,7 @@ namespace SlopeFEA
     /// <summary>
     /// feNode - Class for finite element nodes (1d, 2d, 3d)
     /// </summary>
-    class feNode : IEquatable<feNode>
+    public class feNode : IEquatable<feNode>
     {
         /// <summary>
         /// Constructor for 1d FEA node.
@@ -595,7 +595,7 @@ namespace SlopeFEA
     /// <summary>
     /// feLineConstraint - Class for applying horizontal and vertical fixities along lines.
     /// </summary>
-    class feLineConstraint
+    public class feLineConstraint
     {
         private bool isFixedX, isFixedY;
 
@@ -627,7 +627,7 @@ namespace SlopeFEA
     /// <summary>
     /// feSubstruct - Class for FEA substructs (material blocks)
     /// </summary>
-    class feSubstruct
+    public class feSubstruct
     {
         /// <summary>
         /// Class constructor.
@@ -763,7 +763,7 @@ namespace SlopeFEA
     /// <summary>
     /// fe2NodedBoundElement - Class for boundary elements (used to apply tractions).
     /// </summary>
-    class fe2NodedBoundElement
+    public class fe2NodedBoundElement
     {
         /// <summary>
         /// Class constructor.
@@ -845,7 +845,7 @@ namespace SlopeFEA
     /// <summary>
     /// fe3NodedTriElement - Class for 3-noded triangular FEA element.
     /// </summary>
-    class fe3NodedTriElement
+    public class fe3NodedTriElement
     {
         feSubstruct parent;
 
@@ -1038,7 +1038,7 @@ namespace SlopeFEA
     /// <summary>
     /// fe4NodedQuadElement - Class for 4-noded quadrilateral FEA elements.
     /// </summary>
-    class fe4NodedQuadElement
+    public class fe4NodedQuadElement
     {
         feSubstruct parent;
 

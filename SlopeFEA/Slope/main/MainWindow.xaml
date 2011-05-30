@@ -49,8 +49,8 @@
             <TextBlock x:Key="movePointsCursor" Cursor="/Slope;component/icons/MovePoint.cur"/>
             <TextBlock x:Key="rollerXCursor" Cursor="/Slope;component/icons/RollerX.cur"/>
             <TextBlock x:Key="rollerYCursor" Cursor="/Slope;component/icons/RollerY.cur"/>
-			<TextBlock x:Key="loadXCursor" Cursor="/Slope;component/icons/LoadX.cur"/>
-			<TextBlock x:Key="loadYCursor" Cursor="/Slope;component/icons/LoadY.cur"/>
+			<TextBlock x:Key="pointLoadCursor" Cursor="/Slope;component/icons/PointLoad.cur"/>
+			<TextBlock x:Key="lineLoadCursor" Cursor="/Slope;component/icons/LineLoad.cur"/>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -191,14 +191,14 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
-					<MenuItem Header="_Horizontal Load" Click="loadX_Click">
+					<MenuItem Header="_Point Load" Click="pointLoad_Click">
                         <MenuItem.Icon>
-                            <Image Source="/Slope;component/icons/LoadX.ico"/>
+                            <Image Source="/Slope;component/icons/PointLoad.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
-					<MenuItem Header="_Vertical Load" Click="loadY_Click">
+					<MenuItem Header="_Line Load" Click="lineLoad_Click">
                         <MenuItem.Icon>
-                            <Image Source="/Slope;component/icons/LoadY.ico"/>
+                            <Image Source="/Slope;component/icons/LineLoad.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
 					<Separator/>
@@ -475,25 +475,26 @@
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>
-					<Button Name="toolLoadX" Click="loadX_Click" ToolTipService.InitialShowDelay="750">
-                        <Image Source="/Slope;component/icons/LoadX.ico"/>
+					<Button Name="toolPointLoad" Click="pointLoad_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/PointLoad.ico"/>
                         <Button.ToolTip>
                             <StackPanel>
-                                <TextBlock Text="Apply Horizontal Load" FontWeight="DemiBold"/>
+                                <TextBlock Text="Apply Point Load" FontWeight="DemiBold"/>
                                 <TextBlock/>
-                                <TextBlock Text="Click adjacent key points on the same block to"/>
-                                <TextBlock Text="apply linearly varying load in x-direction."/>
+                                <TextBlock Text="Click key points to apply vertical"/>
+                                <TextBlock Text="and horizontal point loads."/>
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>
-					<Button Name="toolLoadY" Click="loadY_Click" ToolTipService.InitialShowDelay="750">
-                        <Image Source="/Slope;component/icons/LoadY.ico"/>
+					<Button Name="toolLineLoad" Click="lineLoad_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/LineLoad.ico"/>
                         <Button.ToolTip>
                             <StackPanel>
-                                <TextBlock Text="Apply Vertical Load" FontWeight="DemiBold"/>
+                                <TextBlock Text="Apply Line Load" FontWeight="DemiBold"/>
                                 <TextBlock/>
                                 <TextBlock Text="Click adjacent key points on the same block to"/>
-                                <TextBlock Text="apply linearly varying load in y-direction."/>
+                                <TextBlock Text="apply linearly varying loads in both the vertical"/>
+                                <TextBlock Text="and horizontal directions."/>
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>

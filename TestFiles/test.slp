@@ -31,8 +31,8 @@ BOUNDARY GEOMETRY DATA
 Number of Boundary Points = 6
 
 0, 40
-0, 2.23426474395577E-14
-120, 2.23426474395577E-14
+0, 2.79283092994471E-14
+120, 2.79283092994471E-14
 120, 20
 80, 20
 40, 40
@@ -63,16 +63,16 @@ Number of Material Blocks = 1
 Material Block #1
 Material Type = "sand"
 Number of Boundary Points = 6
-0, 2.23426474395577E-14, True, True
-120, 2.23426474395577E-14, True, True
+0, 2.79283092994471E-14, True, True
+120, 2.79283092994471E-14, True, True
 120, 20, True, False
 80, 20, False, False
 40, 40, False, False
 0, 40, True, False
 Number of Line Constraints = 3
-5, 0, True, False
 1, 2, True, False
 0, 1, False, True
+5, 0, True, False
 
 
 --------------------------------
@@ -101,6 +101,6 @@ ANALYSIS STATUS
 --------------------------------
 
 Analysis Type = FEA4NodedQuad
-Verified = True
-Meshed = True
+Verified = False
+Meshed = False
 Analyzed = False

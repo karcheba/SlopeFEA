@@ -124,3 +124,24 @@ REVISION HISTORY:
 {v1.0.0.3}
 --- (All code files) Cleaned up unused usings
 +++ (All code files) Added project, contact, and license information [Academic Free License v3.0] at top of file
+
+{v1.0.0.4}
++++ (AddLoadDialog.xaml) Created
+--- (LoadX.ico) Removed
+--- (LoadY.ico) Removed
++++ (PointLoad.ico) Created
++++ (LineLoad.ico) Created
+--- (LoadX.cur) Removed
+--- (LoadY.cur) Removed
++++ (PointLoad.cur) Created
++++ (LineLoad.cur) Created
+=== (CanvasData.cs) Changed LoadX and LoadY to PointLoad and LineLoad in DrawModes
+=== (MainWindow.xaml) Changed loadXCursor and loadYCursor to pointLoadCursor and lineLoadCursor
+=== (MainWindow.xaml) Modified menu and toolbar entries for applying loads
+--- (MainWindow.xaml.cs) Removed loadX_Click() and loadY_Click()
++++ (MainWindow.xaml.cs) Added pointLoad_Click() and lineLoad_Click()
+=== (SlopeCanvas.cs) Changed LoadX and LoadY cases to PointLoad and LineLoad in OnMouseUp() for reverting middle mouse pan cursor
+=== (CanvasData.cs, FEA.cs, CircularSurface.cs) Made a number of utility classes public
+=== (SlopeCanvas.cs) Changed LoadX and LoadY cases to PointLoad and LineLoad in OnMouseLeftButtonUp()
+=== (CanvasData.cs) Changed LoadX() and LoadY() to PointLoad() and LineLoad() in MaterialBlock class
++++ (CanvasData.cs) Added PointLoad and LineLoad draw modes to OnMouseLeftButtonDown() in DrawingPoint class

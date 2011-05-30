@@ -1413,7 +1413,7 @@ namespace SlopeFEA
             }
         }
 
-        private void loadX_Click(object sender, RoutedEventArgs e)
+        private void pointLoad_Click (object sender, RoutedEventArgs e)
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1427,12 +1427,12 @@ namespace SlopeFEA
             {
                 currCanvas.ClearSelections();
                 currCanvas.CancelDrawing();
-                currCanvas.DrawMode = DrawModes.LoadX;
-                currCanvas.Cursor = ((TextBlock)this.Resources["loadXCursor"]).Cursor;
+                currCanvas.DrawMode = DrawModes.PointLoad;
+                currCanvas.Cursor = ((TextBlock)this.Resources["pointLoadCursor"]).Cursor;
             }
         }
 
-        private void loadY_Click(object sender, RoutedEventArgs e)
+        private void lineLoad_Click (object sender, RoutedEventArgs e)
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1446,8 +1446,8 @@ namespace SlopeFEA
             {
                 currCanvas.ClearSelections();
                 currCanvas.CancelDrawing();
-                currCanvas.DrawMode = DrawModes.LoadY;
-                currCanvas.Cursor = ((TextBlock)this.Resources["loadYCursor"]).Cursor;
+                currCanvas.DrawMode = DrawModes.LineLoad;
+                currCanvas.Cursor = ((TextBlock)this.Resources["lineLoadCursor"]).Cursor;
             }
         }
     }

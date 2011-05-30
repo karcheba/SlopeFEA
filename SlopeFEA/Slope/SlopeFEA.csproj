@@ -98,6 +98,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dialogs\AddLoadDialog.xaml.cs">
+      <DependentUpon>AddLoadDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="dialogs\AddMaterialDialog.xaml.cs">
       <DependentUpon>AddMaterialDialog.xaml</DependentUpon>
     </Compile>
@@ -189,9 +192,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="icons\LoadX.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="icons\AddPoint.cur" />
     <Resource Include="icons\AddPoint.ico" />
     <Resource Include="icons\AssignMaterials.ico" />
@@ -204,7 +204,6 @@
     <Resource Include="icons\GenerateMesh.ico" />
     <Resource Include="icons\grab.cur" />
     <Resource Include="icons\hand.cur" />
-    <Resource Include="icons\LoadX.cur" />
     <Resource Include="icons\MovePoint.cur" />
     <Resource Include="icons\MovePoint.ico" />
     <Resource Include="icons\New.ico" />
@@ -230,6 +229,10 @@
     <Resource Include="icons\ZoomOut.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="dialogs\AddLoadDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="dialogs\AddMaterialDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -276,10 +279,16 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="icons\LoadY.ico" />
+    <Resource Include="icons\PointLoad.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="icons\LoadY.cur" />
+    <Resource Include="icons\LineLoad.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\LineLoad.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\PointLoad.cur" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

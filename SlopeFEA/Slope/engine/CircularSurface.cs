@@ -34,7 +34,7 @@ using System.Windows.Media;
 
 namespace SlopeFEA
 {
-    class DisplayCircularSurface
+    public class DisplayCircularSurface
     {
         private System.Windows.Shapes.Path surface;
         private SlopeCanvas canvas;
@@ -179,7 +179,7 @@ namespace SlopeFEA
         }
     }
 
-    class CircularSurface
+    public class CircularSurface
     {
         private double  x, y, r,
                         height, yBoundMin,

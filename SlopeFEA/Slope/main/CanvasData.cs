@@ -39,19 +39,19 @@ using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
-    enum DrawModes { Select, Boundaries, Materials, Pan, ZoomArea, MovePoints, AddPoints, FixX, FixY, LoadX, LoadY };
-    enum Units { Metres, Millimetres, Feet, Inches };
-    enum Scales
+    public enum DrawModes { Select, Boundaries, Materials, Pan, ZoomArea, MovePoints, AddPoints, FixX, FixY, PointLoad, LineLoad };
+    public enum Units { Metres, Millimetres, Feet, Inches };
+    public enum Scales
     {
         sc1000, sc800, sc600, sc500, sc400, sc300, sc200, sc150,
         sc100, sc50, sc25, sc10, sc5, sc2, sc1, Custom
     };
-    enum GridType { Major, Minor };
-    enum MeshPointType { Entrance, Exit };
-    enum SoilMovement { LtoR, RtoL, None };
-    enum AnalysisType { Bishop, RFEM, FEA3NodedTri, FEA4NodedQuad };
+    public enum GridType { Major, Minor };
+    public enum MeshPointType { Entrance, Exit };
+    public enum SoilMovement { LtoR, RtoL, None };
+    public enum AnalysisType { Bishop, RFEM, FEA3NodedTri, FEA4NodedQuad };
 
-    class GridPoint
+    public class GridPoint
     {
         private GridType type;
         private Ellipse location;
@@ -93,7 +93,7 @@ namespace SlopeFEA
         }
     }
 
-    class SlopeBoundary
+    public class SlopeBoundary
     {
         private SlopeCanvas canvas;
         private bool isSelected, showMesh = false;
@@ -807,7 +807,7 @@ namespace SlopeFEA
         }
     }
 
-    class DrawingPoint
+    public class DrawingPoint
     {
         private SlopeCanvas canvas;
         private object parent;
@@ -1043,14 +1043,16 @@ namespace SlopeFEA
                 || canvas.DrawMode == DrawModes.AddPoints
                 || canvas.DrawMode == DrawModes.MovePoints
                 || canvas.DrawMode == DrawModes.FixX
-                || canvas.DrawMode == DrawModes.FixY)
+                || canvas.DrawMode == DrawModes.FixY
+                || canvas.DrawMode == DrawModes.PointLoad
+                || canvas.DrawMode == DrawModes.LineLoad)
             {
                 this.IsSelected = true;
             }
         }
     }
 
-    class LineConstraint
+    public class LineConstraint
     {
         private SlopeCanvas canvas;
         private bool isFixedX, isFixedY;
@@ -1173,7 +1175,7 @@ namespace SlopeFEA
     }
 
 
-    class LineLoad
+    public class LineLoad
     {
         private SlopeCanvas canvas;
         private bool isLoadedX, isLoadedY;
@@ -1278,7 +1280,7 @@ namespace SlopeFEA
     }
 
 
-    class ZoomRect
+    public class ZoomRect
     {
         public ZoomRect()
         {
@@ -1292,7 +1294,7 @@ namespace SlopeFEA
         public Polygon Boundary { get; set; }
     }
 
-    class MaterialBlock
+    public class MaterialBlock
     {
         private SlopeCanvas canvas;
         private bool isSelected;
@@ -1610,11 +1612,11 @@ namespace SlopeFEA
             }
         }
 
-        public void LoadX(DrawingPoint p1, DrawingPoint p2)
+        public void PointLoad(DrawingPoint p)
         {
         }
 
-        public void LoadY(DrawingPoint p1, DrawingPoint p2)
+        public void LineLoad(DrawingPoint p1, DrawingPoint p2)
         {
         }
 
@@ -1823,7 +1825,7 @@ namespace SlopeFEA
         }
     }
 
-    class GAParams
+    public class GAParams
     {
         public GAParams()
         {
@@ -1838,7 +1840,7 @@ namespace SlopeFEA
         public double SliceWidth { get; set; }
     }
 
-    class FEAParams
+    public class FEAParams
     {
         public FEAParams ()
         {
@@ -1849,7 +1851,7 @@ namespace SlopeFEA
         public double RowHeight { get; set; }
     }
 
-    class MeshLine
+    public class MeshLine
     {
         private SlopeCanvas canvas;
         private List<MeshPoint> meshPoints;
@@ -1995,7 +1997,7 @@ namespace SlopeFEA
         }
     }
 
-    class MeshPoint
+    public class MeshPoint
     {
         private Ellipse location;
         private MaterialType material;
@@ -2081,7 +2083,7 @@ namespace SlopeFEA
         }
     }
 
-    class AnalysisMeshPoint
+    public class AnalysisMeshPoint
     {
         private Point location;
         private MaterialType material;
