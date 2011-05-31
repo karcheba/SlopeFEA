@@ -165,3 +165,9 @@ REVISION HISTORY:
 +++ (CanvasData.cs) Added plotting of normal and tangential load arrows to LineLoad.Update()
 +++ (CanvasData.cs) Added LineLoad.Update() to DrawingPoint.Move(), MaterialBlock.Translate(), and MaterialBlock.Zoom()
 +++ (CanvasData.cs) Added Delete() to LineConstraint and LineLoad and added calls to both in MaterialBlock.Delete(); also added ClearFixLines() to DrawingPoint and added calls during MaterialBlock.Delete()
++++ (SlopeCanvas.cs) Added LineConstraints.FixLines and LineLoads.LoadLines to BuildAxes()
+=== (AddLineLoadDialog.xaml.cs) Changed load units: "kN/mm" -> "kN/m" and "lbf/in" -> "lbf/ft"
++++ (SlopeCanvas.cs) Added LineLoads to UpdateUnits()
++++ (SlopeCanvas.cs) Added clearing of selections to DrawModes.FixX, DrawModes.FixY, and DrawModes.LineLoad in OnMouseLeftButtonUp()
++++ (SlopeCanvas.cs) Added LineLoads to SaveInputFile()
++++ (CanvasData.cs) Added unsave and unverify to MaterialBlock.ApplyLineLoad()

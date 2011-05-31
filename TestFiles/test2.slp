@@ -73,6 +73,7 @@ Number of Line Constraints = 3
 0, 1, True, False
 2, 3, True, False
 1, 2, False, True
+Number of Line Loads = 0
 
 
 --------------------------------
@@ -102,5 +103,5 @@ ANALYSIS STATUS
 
 Analysis Type = FEA3NodedTri
 Verified = True
-Meshed = True
+Meshed = False
 Analyzed = False

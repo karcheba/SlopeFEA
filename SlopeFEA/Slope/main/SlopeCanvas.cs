@@ -745,6 +745,17 @@ namespace SlopeFEA
                             lc.IsFixedX, lc.IsFixedY);
                     }
 
+                    tw.WriteLine("Number of Line Loads = {0}", materialBlocks[i].LineLoads.Count);
+                    foreach (LineLoad ll in materialBlocks[i].LineLoads)
+                    {
+                        index1 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[0]; });
+                        index2 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[1]; });
+                        tw.WriteLine("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+                            index1, index2,
+                            ll.IsLoadedN, ll.NLoad1, ll.NLoad2,
+                            ll.IsLoadedT, ll.TLoad1, ll.TLoad2);
+                    }
+
                     tw.WriteLine();
                 }
 
@@ -1329,11 +1340,25 @@ namespace SlopeFEA
                 this.Children.Add(materialBlocks[i].Boundary);
                 for (int j = 0; j < materialBlocks[i].BoundaryPoints.Count; j++)
                 {
+                    this.Children.Add(materialBlocks[i].BoundaryPoints[j].Dot);
                     foreach (Polyline l in materialBlocks[i].BoundaryPoints[j].FixLines)
                     {
                         this.Children.Add(l);
                     }
-                    this.Children.Add(materialBlocks[i].BoundaryPoints[j].Dot);
+                    foreach (LineConstraint lc in materialBlocks[i].LineConstraints)
+                    {
+                        foreach (Polyline l in lc.FixLines)
+                        {
+                            if (!this.Children.Contains(l)) this.Children.Add(l);
+                        }
+                    }
+                    foreach (LineLoad ll in materialBlocks[i].LineLoads)
+                    {
+                        foreach (Polyline l in ll.LoadLines)
+                        {
+                            if (!this.Children.Contains(l)) this.Children.Add(l);
+                        }
+                    }
                 }
             }
             for (int i = 0; i < FEATriElements.Count; i++)
@@ -1862,28 +1887,36 @@ namespace SlopeFEA
         public void UpdateUnits (MenuItem sender, MessageBoxResult convert)
         {
             // Set conversion factor (current units / in)
-            double distConv, pressConv, weightConv;
+            double distConv, pressConv, weightConv, lineLoadConv, pointLoadConv;
             switch (Units)
             {
                 case Units.Metres:
                     distConv = 0.0254;
                     pressConv = 0.145037738;            // psi / kPa
                     weightConv = 6.36588034748143;      // (lbf / ft^3) / (kN / m^3)
+                    pointLoadConv = 224.808943;         // lbf / kN
+                    lineLoadConv = 68.5217657222469;    // (lbf / ft) / (kN / m)
                     break;
                 case Units.Millimetres:
                     distConv = 25.4;
                     pressConv = 0.145037738;
                     weightConv = 6.36588034748143;
+                    pointLoadConv = 224.808943;
+                    lineLoadConv = 68.5217657222469;
                     break;
                 case Units.Feet:
                     distConv = 1.0 / 12.0;
                     pressConv = 1.0;
                     weightConv = 1.0;
+                    pointLoadConv = 1.0;
+                    lineLoadConv = 1.0;
                     break;
                 default:
                     distConv = 1.0;
                     pressConv = 1.0;
                     weightConv = 1.0;
+                    pointLoadConv = 1.0;
+                    lineLoadConv = 1.0;
                     break;
             }
 
@@ -1898,6 +1931,8 @@ namespace SlopeFEA
                     distConv /= 0.0254;
                     pressConv /= 0.145037738;
                     weightConv /= 6.36588034748143;
+                    pointLoadConv /= 224.808943;
+                    lineLoadConv /= 68.5217657222469;
                     break;
 
                 case "unitsMM":
@@ -1906,6 +1941,8 @@ namespace SlopeFEA
                     distConv /= 25.4;
                     pressConv /= 0.145037738;
                     weightConv /= 6.36588034748143;
+                    pointLoadConv /= 224.808943;
+                    lineLoadConv /= 68.5217657222469;
                     break;
 
                 case "unitsFT":
@@ -1960,6 +1997,17 @@ namespace SlopeFEA
                     {
                         FEAQuadElements[i].Nodes[j].X /= distConv;
                         FEAQuadElements[i].Nodes[j].Y /= distConv;
+                    }
+                }
+
+                foreach (MaterialBlock mb in MaterialBlocks)
+                {
+                    foreach (LineLoad ll in mb.LineLoads)
+                    {
+                        ll.ApplyLoad(ll.IsLoadedN,
+                            ll.NLoad1 * lineLoadConv, ll.NLoad2 * lineLoadConv,
+                            ll.IsLoadedT,
+                            ll.TLoad1 * lineLoadConv, ll.TLoad2 * lineLoadConv);
                     }
                 }
 
@@ -2391,6 +2439,11 @@ namespace SlopeFEA
                         }
 
                         if (addPoint != null) addPoints.Add(addPoint);
+                        else
+                        {
+                            addPoints.Clear();
+                            ClearSelections();
+                        }
 
                         if (addPoints.Count == 2)
                         {
@@ -2437,6 +2490,11 @@ namespace SlopeFEA
                         }
 
                         if (fixPoint != null) fixPoints.Add(fixPoint);
+                        else
+                        {
+                            fixPoints.Clear();
+                            ClearSelections();
+                        }
 
                         if (fixPoints.Count == 2)
                         {
@@ -2471,6 +2529,11 @@ namespace SlopeFEA
                         }
 
                         if (fixPoint != null) fixPoints.Add(fixPoint);
+                        else
+                        {
+                            fixPoints.Clear();
+                            ClearSelections();
+                        }
 
                         if (fixPoints.Count == 2)
                         {
@@ -2526,6 +2589,11 @@ namespace SlopeFEA
                         }
 
                         if (loadPoint != null) loadPoints.Add(loadPoint);
+                        else
+                        {
+                            loadPoints.Clear();
+                            ClearSelections();
+                        }
 
                         if (loadPoints.Count == 2)
                         {

@@ -1124,6 +1124,7 @@ namespace SlopeFEA
         }
 
         public List<DrawingPoint> Nodes { get; set; }
+        public List<Polyline> FixLines { get { return this.fixLines; } }
 
         public Point MidPoint { get; set; }
 
@@ -1267,6 +1268,11 @@ namespace SlopeFEA
         /// List of nodes property.
         /// </summary>
         public List<DrawingPoint> Nodes { get; set; }
+
+        /// <summary>
+        /// List of plotting lines property.
+        /// </summary>
+        public List<Polyline> LoadLines { get { return this.loadLines; } }
 
         /// <summary>
         /// Property for plotting location of load lines.
@@ -1804,7 +1810,12 @@ namespace SlopeFEA
                 {
                     load.Update();
                 }
-                
+
+                if (dlg.DialogResult == true)
+                {
+                    canvas.IsSaved = false;
+                    canvas.IsVerified = false;
+                }
             }
             else
             {

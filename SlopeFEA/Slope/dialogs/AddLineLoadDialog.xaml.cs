@@ -66,9 +66,9 @@ namespace SlopeFEA
             switch (canvas.Units)
             {
                 case Units.Metres: factor = 0.0254; coordUnits = "m"; loadUnits = "kN/m"; break;
-                case Units.Millimetres: factor = 25.4; coordUnits = "mm"; loadUnits = "kN/mm"; break;
+                case Units.Millimetres: factor = 25.4; coordUnits = "mm"; loadUnits = "kN/m"; break;
                 case Units.Feet: factor = 1.0 / 12.0; coordUnits = "ft"; loadUnits = "lbf/ft"; break;
-                default: factor = 1.0; coordUnits = "in"; loadUnits = "lbf/in"; break;
+                default: factor = 1.0; coordUnits = "in"; loadUnits = "lbf/ft"; break;
             }
 
             // set units labels

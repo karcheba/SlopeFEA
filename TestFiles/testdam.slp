@@ -96,6 +96,7 @@ Number of Boundary Points = 4
 -4, 56.0000000000001, True, False
 Number of Line Constraints = 1
 3, 0, True, False
+Number of Line Loads = 0
 
 Material Block #2
 Material Type = "water"
@@ -106,6 +107,7 @@ Number of Boundary Points = 4
 110, 46, True, False
 Number of Line Constraints = 1
 2, 3, True, False
+Number of Line Loads = 0
 
 Material Block #3
 Material Type = "concrete"
@@ -118,6 +120,7 @@ Number of Boundary Points = 7
 41.9999999999999, 56, False, False
 39.9999999999999, 56, False, False
 Number of Line Constraints = 0
+Number of Line Loads = 0
 
 Material Block #4
 Material Type = "sand"
@@ -130,6 +133,7 @@ Number of Boundary Points = 6
 -4, 38, True, False
 Number of Line Constraints = 1
 5, 0, True, False
+Number of Line Loads = 0
 
 Material Block #5
 Material Type = "sand"
@@ -141,6 +145,7 @@ Number of Boundary Points = 5
 42, 26, False, False
 Number of Line Constraints = 1
 0, 1, True, False
+Number of Line Loads = 0
 
 Material Block #6
 Material Type = "bedrock"
@@ -154,6 +159,7 @@ Number of Line Constraints = 3
 4, 0, True, False
 1, 2, True, False
 0, 1, True, True
+Number of Line Loads = 0
 
 
 --------------------------------
@@ -183,5 +189,5 @@ ANALYSIS STATUS
 
 Analysis Type = FEA3NodedTri
 Verified = True
-Meshed = True
+Meshed = False
 Analyzed = False
