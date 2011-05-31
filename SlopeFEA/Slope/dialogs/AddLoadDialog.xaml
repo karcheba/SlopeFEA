@@ -46,7 +46,7 @@
         FocusManager.FocusedElement="{Binding ElementName=xLoad}">
     <Grid>
         <Label Content="Node 1:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-200,-325,0,0" VerticalAlignment="Center" FontSize="11" />
-        <Label Content="Node 2:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-200,-275,0,0" VerticalAlignment="Center" FontSize="11" />
+        <Label Content="Node 2:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="15,49,215,312" VerticalAlignment="Center" FontSize="11" />
         <GroupBox Header="X" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="xGroup" VerticalAlignment="Center">
             <Grid>
                 <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,-20,0,0" Name="xLoad1" VerticalAlignment="Center" Width="75" />
@@ -66,6 +66,6 @@
         </GroupBox>
         <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,335,0,0" Name="ok" IsDefault="True" VerticalAlignment="Center" Width="60" Click="ok_Click" />
         <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,335,0,0" Name="cancel" IsCancel="True" VerticalAlignment="Center" Width="60" />
-
+        <Label Content="Label" Height="28" HorizontalAlignment="Left" Margin="104,30,0,0" Name="label1" VerticalAlignment="Top" />
     </Grid>
 </Window>
