@@ -145,3 +145,12 @@ REVISION HISTORY:
 === (SlopeCanvas.cs) Changed LoadX and LoadY cases to PointLoad and LineLoad in OnMouseLeftButtonUp()
 === (CanvasData.cs) Changed LoadX() and LoadY() to PointLoad() and LineLoad() in MaterialBlock class
 +++ (CanvasData.cs) Added PointLoad and LineLoad draw modes to OnMouseLeftButtonDown() in DrawingPoint class
+
+
+[31 May 2011]
+
+{v1.0.0.5}
+--- (AddLoadDialog.xaml, AddLoadDialog.xaml.cs) Removed
++++ (AddLineLoadDialog.xaml, AddLineLoadDialog.xaml.cs) Created
++++ (AddLineLoadDialog.xaml, AddLineLoadDialog.xaml.cs) Added functionality
++++ (CanvasData.cs) Added functionality to LineLoad class

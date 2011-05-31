@@ -1175,22 +1175,48 @@ namespace SlopeFEA
     }
 
 
+    /// <summary>
+    /// LineLoad - Class for defining linearly varying loads between two adjacent nodes.
+    /// </summary>
     public class LineLoad
     {
         private SlopeCanvas canvas;
+        private double xLoad1, xLoad2, yLoad1, yLoad2;
         private bool isLoadedX, isLoadedY;
         private List<Polyline> loadLines;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="canvas">Parent drawing canvas</param>
+        /// <param name="p1">Node 1 (assumed to be sorted CCW)</param>
+        /// <param name="p2">Node 2 (assumed to be sorted CCW)</param>
+        /// <param name="isLoadedX">Is load applied in the horizontal direction?</param>
+        /// <param name="xLoad1">Value of horizontal load at node 1.</param>
+        /// <param name="xLoad2">Value of horizontal load at node 2.</param>
+        /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
+        /// <param name="yLoad1">Value of vertical load at node 1.</param>
+        /// <param name="yLoad2">Value of vertical load at node 2.</param>
         public LineLoad(SlopeCanvas canvas,
                                 DrawingPoint p1, DrawingPoint p2,
-                                bool loadedX, bool loadedY,
-                                double xLoad, double yLoad)
+                                bool isLoadedX, 
+                                double xLoad1, double xLoad2,
+                                bool isLoadedY,
+                                double yLoad1, double yLoad2)
         {
             // set parent drawing canvas
             this.canvas = canvas;
 
             // create list of boundary nodes for the load
             Nodes = new List<DrawingPoint>() { p1, p2 };
+
+            // set load state
+            this.isLoadedX = isLoadedX;
+            this.xLoad1 = xLoad1;
+            this.xLoad2 = xLoad2;
+            this.isLoadedY = isLoadedY;
+            this.yLoad1 = yLoad1;
+            this.yLoad2 = yLoad2;
 
             // create plotting lines for constraints
             loadLines = new List<Polyline>();
@@ -1210,73 +1236,75 @@ namespace SlopeFEA
             }
         }
 
+        /// <summary>
+        /// List of nodes property.
+        /// </summary>
         public List<DrawingPoint> Nodes { get; set; }
 
+        /// <summary>
+        /// Properties for plotting location of load lines.
+        /// </summary>
         public Point QuarterPoint1 { get; set; }
         public Point MidPoint { get; set; }
         public Point QuarterPoint2 { get; set; }
 
-        //public bool IsFixedX
-        //{
-        //    get
-        //    {
-        //        return this.isFixedX;
-        //    }
-        //    set
-        //    {
-        //        this.isFixedX = value;
+        /// <summary>
+        /// Properties indicating whether a load is applied.
+        /// </summary>
+        public bool IsLoadedX { get { return this.isLoadedX; } }
+        public bool IsLoadedY { get { return this.isLoadedY; } }
 
-        //        fixLines[2].Visibility = fixLines[3].Visibility = value ? Visibility.Visible : Visibility.Hidden;
+        /// <summary>
+        /// Horizontal load values.
+        /// </summary>
+        public double XLoad1 { get { return this.xLoad1; } }
+        public double XLoad2 { get { return this.xLoad2; } }
 
-        //        if (value)
-        //        {
-        //            Nodes[0].IsFixedX = value;
-        //            Nodes[1].IsFixedX = value;
-        //        }
-        //    }
-        //}
+        /// <summary>
+        /// Vertical load values.
+        /// </summary>
+        public double YLoad1 { get { return this.yLoad1; } }
+        public double YLoad2 { get { return this.yLoad2; } }
 
-        //public bool IsFixedY
-        //{
-        //    get
-        //    {
-        //        return this.isFixedY;
-        //    }
-        //    set
-        //    {
-        //        this.isFixedY = value;
 
-        //        fixLines[0].Visibility = fixLines[1].Visibility = value ? Visibility.Visible : Visibility.Hidden;
+        /// <summary>
+        /// Function for applying loads.
+        /// </summary>
+        /// <param name="isLoadedX">Is a horizontal load applied?</param>
+        /// <param name="xLoad1">Value of horizontal load at node 1.</param>
+        /// <param name="xLoad2">Value of horizontal load at node 2.</param>
+        /// <param name="isLoadedY">Is a vertical load applied?</param>
+        /// <param name="yLoad1">Value of vertical load at node 1.</param>
+        /// <param name="yLoad2">Value of vertical load at node 2.</param>
+        public void ApplyLoad(  bool isLoadedX,
+                                double xLoad1, double xLoad2,
+                                bool isLoadedY,
+                                double yLoad1, double yLoad2)
+        {
+            this.isLoadedX = isLoadedX;
+            if (IsLoadedX)
+            {
+                this.xLoad1 = xLoad1;
+                this.xLoad2 = xLoad2;
+            }
+            else
+            {
+                this.xLoad1 = 0.0;
+                this.xLoad2 = 0.0;
+            }
 
-        //        if (value)
-        //        {
-        //            Nodes[0].IsFixedY = value;
-        //            Nodes[1].IsFixedY = value;
-        //        }
-        //    }
-        //}
-
-        //public void UpdateLocation()
-        //{
-        //    DrawingPoint p1 = Nodes[0], p2 = Nodes[1];
-
-        //    // compute the points at which to plot the load
-        //    QuarterPoint1 = new Point(p1.Point.X + 0.25 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.25 * (p2.Point.Y - p1.Point.Y));
-        //    MidPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
-        //    QuarterPoint2 = new Point(p1.Point.X + 0.75 * (p2.Point.X - p1.Point.X), p1.Point.Y + 0.75 * (p2.Point.Y - p1.Point.Y));
-
-        //    fixLines[0].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y - 3.5);
-        //    fixLines[0].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y - 3.5);
-
-        //    fixLines[1].Points[0] = new Point(MidPoint.X - 7, MidPoint.Y + 3.5);
-        //    fixLines[1].Points[1] = new Point(MidPoint.X + 7, MidPoint.Y + 3.5);
-
-        //    fixLines[2].Points[0] = new Point(MidPoint.X - 3.5, MidPoint.Y + 7);
-        //    fixLines[2].Points[1] = new Point(MidPoint.X - 3.5, MidPoint.Y - 7);
-
-        //    fixLines[3].Points[0] = new Point(MidPoint.X + 3.5, MidPoint.Y + 7);
-        //    fixLines[3].Points[1] = new Point(MidPoint.X + 3.5, MidPoint.Y - 7);
-        //}
+            this.isLoadedY = isLoadedY;
+            if (IsLoadedY)
+            {
+                this.yLoad1 = yLoad1;
+                this.yLoad2 = yLoad2;
+            }
+            else
+            {
+                this.yLoad1 = 0.0;
+                this.yLoad2 = 0.0;
+            }
+        }
     }
 
 
@@ -1301,6 +1329,7 @@ namespace SlopeFEA
         private MaterialType material;
         private List<DrawingPoint> boundaryPoints;
         private List<LineConstraint> lineConstraints;
+        private List<LineLoad> lineLoads;
 
         public MaterialBlock(SlopeCanvas canvas, Point[] pts)
         {
@@ -1326,6 +1355,7 @@ namespace SlopeFEA
             Material = new MaterialType();
 
             lineConstraints = new List<LineConstraint>();
+            lineLoads = new List<LineLoad>();
 
             SortPoints();
         }
@@ -1612,12 +1642,51 @@ namespace SlopeFEA
             }
         }
 
-        public void PointLoad(DrawingPoint p)
+        public void ApplyPointLoad(DrawingPoint p)
         {
         }
 
-        public void LineLoad(DrawingPoint p1, DrawingPoint p2)
+        public void ApplyLineLoad(DrawingPoint p1, DrawingPoint p2)
         {
+            // find point indices in list
+            int index1 = BoundaryPoints.FindIndex(delegate(DrawingPoint p) { return p == p1; });
+            int index2 = BoundaryPoints.FindIndex(delegate(DrawingPoint p) { return p == p2; });
+
+            // if points were not successfully found
+            if (index1 == -1 || index2 == -1)
+            {
+                MessageBox.Show("Points not found on block.", "Line Load Error");
+                return;
+            }
+
+            // ensure max and min as appropriate
+            if ((index1 > index2) || (index1 == 0 && index2 == BoundaryPoints.Count - 1))
+            {
+                int tmp = index1;
+                index1 = index2;
+                index2 = tmp;
+
+                DrawingPoint tmpPt = p1;
+                p1 = p2;
+                p2 = tmpPt;
+            }
+
+            // points must be adjacent and different
+            if ((index2 - index1) == 1 || (index2 == 0 && index1 == BoundaryPoints.Count - 1))
+            {
+                // check if a line load has already been defined between these two objects
+                LineLoad load = lineLoads.Find(delegate(LineLoad l) { return l.Nodes[0] == p1 && l.Nodes[1] == p2; });
+
+                // if undefined, create a new line load object
+                if (load == null) load = new LineLoad(canvas, p1, p2, false, 0, 0, false, 0, 0);
+
+                // start dialog for user input
+                
+            }
+            else
+            {
+                MessageBox.Show("Points must be different and adjacent.", "Line Load Error");
+            }
         }
 
         public void Translate(Vector delta)

@@ -98,8 +98,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="dialogs\AddLoadDialog.xaml.cs">
-      <DependentUpon>AddLoadDialog.xaml</DependentUpon>
+    <Compile Include="dialogs\AddLineLoadDialog.xaml.cs">
+      <DependentUpon>AddLineLoadDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="dialogs\AddMaterialDialog.xaml.cs">
       <DependentUpon>AddMaterialDialog.xaml</DependentUpon>
@@ -229,9 +229,9 @@
     <Resource Include="icons\ZoomOut.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="dialogs\AddLoadDialog.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="dialogs\AddLineLoadDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="dialogs\AddMaterialDialog.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -2508,7 +2508,7 @@ namespace SlopeFEA
                         {
                             MaterialBlock mb = loadPoint.Parent as MaterialBlock;
 
-                            if (mb != null) mb.PointLoad(loadPoint);
+                            if (mb != null) mb.ApplyPointLoad(loadPoint);
 
                             ClearSelections();
                         }
@@ -2539,7 +2539,7 @@ namespace SlopeFEA
                                 }
                                 else
                                 {
-                                    mb.LineLoad(loadPoints[0], loadPoints[1]);
+                                    mb.ApplyLineLoad(loadPoints[0], loadPoints[1]);
                                 }
                             }
 
