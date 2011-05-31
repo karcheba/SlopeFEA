@@ -948,6 +948,26 @@ namespace SlopeFEA
                 material.BoundaryPoints.Remove(this);
 
                 if (material.BoundaryPoints.Count == 0) material.Delete();
+
+                ClearFixLines();
+
+                // check if line constraints contain the node and delete them
+                List<LineConstraint> existingLCs = material.LineConstraints.FindAll(delegate(LineConstraint lc) { return lc.Nodes.Contains(this); });
+                foreach (LineConstraint lc in existingLCs)
+                {
+                    lc.Delete();
+                    material.LineConstraints.Remove(lc);
+                }
+                existingLCs.Clear();
+
+                // check if line loads contain the node and delete them
+                List<LineLoad> existingLLs = material.LineLoads.FindAll(delegate(LineLoad ll) { return ll.Nodes.Contains(this); });
+                foreach (LineLoad ll in existingLLs)
+                {
+                    ll.Delete();
+                    material.LineLoads.Remove(ll);
+                }
+                existingLLs.Clear();
             }
         }
 
@@ -1199,6 +1219,164 @@ namespace SlopeFEA
     }
 
 
+    public class PointLoad
+    {
+        private SlopeCanvas canvas;
+        private double xLoad, yLoad;
+        private bool isLoadedX, isLoadedY;
+        private List<Polyline> loadLines;
+        private static double Cpos = Math.Cos(0.75 * Math.PI),
+                                Spos = Math.Sin(0.75 * Math.PI),
+                                Cneg = Cpos,
+                                Sneg = -Spos;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="canvas">Parent drawing canvas</param>
+        /// <param name="node">Parent node</param>
+        /// <param name="isLoadedX">Is load applied in the horizontal direction?</param>
+        /// <param name="xLoad">Value of horizontal load</param>
+        /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
+        /// <param name="yLoad">Value of vertical load</param>
+        public PointLoad(SlopeCanvas canvas, DrawingPoint node,
+                                bool isLoadedX, double xLoad,
+                                bool isLoadedY, double yLoad)
+        {
+            // set parent drawing canvas
+            this.canvas = canvas;
+
+            // set parent node
+            this.Node = node;
+
+            // set load state
+            this.isLoadedX = isLoadedX;
+            this.xLoad = xLoad;
+            this.isLoadedY = isLoadedY;
+            this.yLoad = yLoad;
+
+            // create plotting lines for constraints
+            loadLines = new List<Polyline>();
+            Polyline newLine;
+            for (int i = 0; i < 6; i++)
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.75;
+                newLine.Stroke = Brushes.Blue;
+                newLine.Points.Add(new Point());
+                newLine.Points.Add(new Point());
+                loadLines.Add(newLine);
+                canvas.Children.Add(newLine);
+            }
+
+            Update();
+        }
+
+        /// <summary>
+        /// Parent node property.
+        /// </summary>
+        public DrawingPoint Node { get; set; }
+
+        /// <summary>
+        /// List of plotting lines property.
+        /// </summary>
+        public List<Polyline> LoadLines { get { return this.loadLines; } }
+
+        /// <summary>
+        /// Properties indicating whether a load is applied.
+        /// </summary>
+        public bool IsLoadedX { get { return this.isLoadedX; } }
+        public bool IsLoadedY { get { return this.isLoadedY; } }
+
+        /// <summary>
+        /// Horizontal load value.
+        /// </summary>
+        public double XLoad { get { return this.xLoad; } }
+
+        /// <summary>
+        /// Vertical load value.
+        /// </summary>
+        public double YLoad { get { return this.yLoad; } }
+
+
+        /// <summary>
+        /// Function for applying loads.
+        /// </summary>
+        /// <param name="isLoadedX">Is load applied in the horizontal direction?</param>
+        /// <param name="xLoad">Value of horizontal load</param>
+        /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
+        /// <param name="yLoad">Value of vertical load</param>
+        public void ApplyLoad (bool isLoadedX, double xLoad,
+                                bool isLoadedY, double yLoad)
+        {
+            this.isLoadedX = isLoadedX;
+            if (IsLoadedX) this.xLoad = xLoad;
+            else this.xLoad = 0.0;
+
+            this.isLoadedY = isLoadedY;
+            if (IsLoadedY) this.yLoad = yLoad;
+            else this.yLoad = 0.0;
+        }
+
+        /// <summary>
+        /// Updates load line visibility and location
+        /// </summary>
+        public void Update ()
+        {
+            // for applying rotations
+            double xprime, yprime;
+
+            // horizontal load arrow shaft
+            loadLines[0].Points[0] = new Point(Node.Point.X, Node.Point.Y - 10);
+            loadLines[0].Points[1] = loadLines[0].Points[0] + new Vector(40, 0);
+            // horizontal load arrow head 1
+            loadLines[1].Points[0] = loadLines[0].Points[1];
+            loadLines[1].Points[1] = new Point(12, 0);
+            xprime = loadLines[1].Points[1].X * Cpos - loadLines[1].Points[1].Y * Spos + loadLines[1].Points[0].X;
+            yprime = loadLines[1].Points[1].X * Spos + loadLines[1].Points[1].Y * Cpos + loadLines[1].Points[0].Y;
+            loadLines[1].Points[1] = new Point(xprime, yprime);
+            // horizontal load arrow head 2
+            loadLines[2].Points[0] = loadLines[0].Points[1];
+            loadLines[2].Points[1] = new Point(12, 0);
+            xprime = loadLines[2].Points[1].X * Cneg - loadLines[2].Points[1].Y * Sneg + loadLines[2].Points[0].X;
+            yprime = loadLines[2].Points[1].X * Sneg + loadLines[2].Points[1].Y * Cneg + loadLines[2].Points[0].Y;
+            loadLines[2].Points[1] = new Point(xprime, yprime);
+
+            // vertical load arrow shaft
+            loadLines[3].Points[0] = loadLines[0].Points[0];
+            loadLines[3].Points[1] = loadLines[0].Points[0] + new Vector(0, -40);
+            // vertical load arrow head 1
+            loadLines[4].Points[0] = loadLines[3].Points[1];
+            loadLines[4].Points[1] = new Point(0, -12);
+            xprime = loadLines[4].Points[1].X * Cpos - loadLines[4].Points[1].Y * Spos + loadLines[4].Points[0].X;
+            yprime = loadLines[4].Points[1].X * Spos + loadLines[4].Points[1].Y * Cpos + loadLines[4].Points[0].Y;
+            loadLines[4].Points[1] = new Point(xprime, yprime);
+            // vertical load arrow head 2
+            loadLines[5].Points[0] = loadLines[3].Points[1];
+            loadLines[5].Points[1] = new Point(0, -12);
+            xprime = loadLines[5].Points[1].X * Cneg - loadLines[5].Points[1].Y * Sneg + loadLines[5].Points[0].X;
+            yprime = loadLines[5].Points[1].X * Sneg + loadLines[5].Points[1].Y * Cneg + loadLines[5].Points[0].Y;
+            loadLines[5].Points[1] = new Point(xprime, yprime);
+
+            int i = 0;
+            for (; i < 3; i++) loadLines[i].Visibility = IsLoadedX ? Visibility.Visible : Visibility.Hidden;
+            for (; i < 6; i++) loadLines[i].Visibility = IsLoadedY ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public void Delete ()
+        {
+            foreach (Polyline line in loadLines)
+            {
+                canvas.Children.Remove(line);
+            }
+            loadLines.Clear();
+        }
+    }
+
+
     /// <summary>
     /// LineLoad - Class for defining linearly varying loads between two adjacent nodes.
     /// </summary>
@@ -1262,6 +1440,8 @@ namespace SlopeFEA
                 loadLines.Add(newLine);
                 canvas.Children.Add(newLine);
             }
+
+            Update();
         }
 
         /// <summary>
@@ -1556,42 +1736,139 @@ namespace SlopeFEA
 
         public void AddPoint(DrawingPoint p1, DrawingPoint p2)
         {
-            int index1 = 0;
-            for (int i = 0; i < BoundaryPoints.Count; i++)
+            // find point indices in list
+            int index1 = BoundaryPoints.FindIndex(delegate(DrawingPoint p) { return p == p1; });
+            int index2 = BoundaryPoints.FindIndex(delegate(DrawingPoint p) { return p == p2; });
+
+            // if points were not successfully found
+            if (index1 == -1 || index2 == -1)
             {
-                if (BoundaryPoints[i] == p1)
-                {
-                    index1 = i;
-                    break;
-                }
+                MessageBox.Show("Points not found on block.", "Fix X error");
+                return;
             }
 
-            int index2 = 0;
-            for (int i = 0; i < BoundaryPoints.Count; i++)
+            // ensure max and min as appropriate
+            if (((index1 > index2) && !(index2 == 0 && index1 == BoundaryPoints.Count - 1))
+                || (index1 == 0 && index2 == BoundaryPoints.Count - 1))
             {
-                if (BoundaryPoints[i] == p2)
-                {
-                    index2 = i;
-                    break;
-                }
+                int tmp = index1;
+                index1 = index2;
+                index2 = tmp;
+
+                DrawingPoint tmpPt = p1;
+                p1 = p2;
+                p2 = tmpPt;
             }
 
-            int maxIndex = Math.Max(index1, index2);
-            int minIndex = Math.Min(index1, index2);
-
-            if ((maxIndex - minIndex) == 1)
+            if ((index2 - index1) == 1)
             {
                 Point newPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
-                BoundaryPoints.Insert(maxIndex, new DrawingPoint(canvas, this, newPoint));
-                Boundary.Points.Insert(maxIndex, newPoint);
+                DrawingPoint newNode = new DrawingPoint(canvas, this, newPoint);
+                BoundaryPoints.Insert(index2, newNode);
+                Boundary.Points.Insert(index2, newPoint);
+
+                // if a line constraint exists between these two points, remove it and create two in its place
+                LineConstraint existingLC = this.LineConstraints.Find(delegate(LineConstraint lc) { return lc.Nodes.Contains(p1) && lc.Nodes.Contains(p2); });
+                if (existingLC != null)
+                {
+                    // match the new node fixity to the line constraint
+                    newNode.IsFixedX = existingLC.IsFixedX;
+                    newNode.IsFixedY = existingLC.IsFixedY;
+
+                    // create the two new line constraints
+                    LineConstraint newLC1 = new LineConstraint(canvas,
+                        p1, newNode, existingLC.IsFixedX, existingLC.IsFixedY);
+                    LineConstraint newLC2 = new LineConstraint(canvas,
+                        newNode, p2, existingLC.IsFixedX, existingLC.IsFixedY);
+
+                    // clear the existing plotting lines, remove the existing constraint, and add the new constraints
+                    existingLC.Delete();
+                    LineConstraints.Remove(existingLC);
+                    LineConstraints.Add(newLC1);
+                    LineConstraints.Add(newLC2);
+                }
+
+                // if a line load exists between these two points, remove it and create two in its place
+                LineLoad existingLL = this.LineLoads.Find(delegate(LineLoad ll) { return ll.Nodes.Contains(p1) && ll.Nodes.Contains(p2); });
+                if (existingLL != null)
+                {
+                    // create two new line loads
+                    LineLoad newLL1 = new LineLoad(canvas,
+                        p1, newNode,
+                        existingLL.IsLoadedN,
+                        existingLL.NLoad1, 0.5 * (existingLL.NLoad1 + existingLL.NLoad2),
+                        existingLL.IsLoadedT,
+                        existingLL.TLoad1, 0.5 * (existingLL.TLoad1 + existingLL.TLoad2));
+                    LineLoad newLL2 = new LineLoad(canvas,
+                        newNode, p2,
+                        existingLL.IsLoadedN,
+                        newLL1.NLoad2, existingLL.NLoad2,
+                        existingLL.IsLoadedT,
+                        newLL1.TLoad2, existingLL.TLoad2);
+
+                    // clear the existing plotting lines, remove the existing line load, and add the new line loads
+                    existingLL.Delete();
+                    LineLoads.Remove(existingLL);
+                    LineLoads.Add(newLL1);
+                    LineLoads.Add(newLL2);
+                }
+
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
             }
-            else if (minIndex == 0 && maxIndex == BoundaryPoints.Count - 1)
+            else if (index2 == 0 && index1 == BoundaryPoints.Count - 1)
             {
                 Point newPoint = new Point(0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y));
-                BoundaryPoints.Add(new DrawingPoint(canvas, this, newPoint));
+                DrawingPoint newNode = new DrawingPoint(canvas, this, newPoint);
+                BoundaryPoints.Add(newNode);
                 Boundary.Points.Add(newPoint);
+
+                // if a line constraint exists between these two points, remove it and create two in its place
+                LineConstraint existingLC = this.LineConstraints.Find(delegate(LineConstraint lc) { return lc.Nodes.Contains(p1) && lc.Nodes.Contains(p2); });
+                if (existingLC != null)
+                {
+                    // match the new node fixity to the line constraint
+                    newNode.IsFixedX = existingLC.IsFixedX;
+                    newNode.IsFixedY = existingLC.IsFixedY;
+
+                    // create the two new line constraints
+                    LineConstraint newLC1 = new LineConstraint(canvas,
+                        p1, newNode, existingLC.IsFixedX, existingLC.IsFixedY);
+                    LineConstraint newLC2 = new LineConstraint(canvas,
+                        newNode, p2, existingLC.IsFixedX, existingLC.IsFixedY);
+
+                    // clear the existing plotting lines, remove the existing constraint, and add the new constraints
+                    existingLC.Delete();
+                    LineConstraints.Remove(existingLC);
+                    LineConstraints.Add(newLC1);
+                    LineConstraints.Add(newLC2);
+                }
+
+                // if a line load exists between these two points, remove it and create two in its place
+                LineLoad existingLL = this.LineLoads.Find(delegate(LineLoad ll) { return ll.Nodes.Contains(p1) && ll.Nodes.Contains(p2); });
+                if (existingLL != null)
+                {
+                    // create two new line loads
+                    LineLoad newLL1 = new LineLoad(canvas,
+                        p1, newNode,
+                        existingLL.IsLoadedN,
+                        existingLL.NLoad1, 0.5 * (existingLL.NLoad1 + existingLL.NLoad2),
+                        existingLL.IsLoadedT,
+                        existingLL.TLoad1, 0.5 * (existingLL.TLoad1 + existingLL.TLoad2));
+                    LineLoad newLL2 = new LineLoad(canvas,
+                        newNode, p2,
+                        existingLL.IsLoadedN,
+                        newLL1.NLoad2, existingLL.NLoad2,
+                        existingLL.IsLoadedT,
+                        newLL1.TLoad2, existingLL.TLoad2);
+
+                    // clear the existing plotting lines, remove the existing line load, and add the new line loads
+                    existingLL.Delete();
+                    LineLoads.Remove(existingLL);
+                    LineLoads.Add(newLL1);
+                    LineLoads.Add(newLL2);
+                }
+
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
             }

@@ -31,8 +31,8 @@ BOUNDARY GEOMETRY DATA
 Number of Boundary Points = 7
 
 -8, 46.0000000000001
--8, 6.00000000000003
-110, 6.00000000000003
+-8, 6.00000000000004
+110, 6.00000000000004
 110, 22.0000000000001
 72, 22.0000000000001
 52.0000000000001, 38.0000000000001
@@ -82,8 +82,8 @@ Number of Material Blocks = 3
 Material Block #1
 Material Type = "bedrock"
 Number of Boundary Points = 4
--8, 6.00000000000003, True, True
-110, 6.00000000000003, True, True
+-8, 6.00000000000004, True, True
+110, 6.00000000000004, True, True
 110, 14, True, False
 -8, 18.0000000000001, True, False
 Number of Line Constraints = 3
@@ -115,7 +115,8 @@ Number of Boundary Points = 6
 Number of Line Constraints = 2
 5, 0, True, False
 1, 2, True, False
-Number of Line Loads = 0
+Number of Line Loads = 1
+3, 4, True, 10, 20, True, -5, -10
 
 
 --------------------------------
@@ -144,6 +145,6 @@ ANALYSIS STATUS
 --------------------------------
 
 Analysis Type = FEA4NodedQuad
-Verified = True
+Verified = False
 Meshed = False
 Analyzed = False

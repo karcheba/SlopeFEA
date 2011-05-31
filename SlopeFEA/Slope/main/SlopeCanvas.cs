@@ -939,9 +939,9 @@ namespace SlopeFEA
                     bool[] isFixedX;
                     bool[] isFixedY;
                     string materialName;
-                    int numMaterialBoundPoints, numLineConstraints;
+                    int numMaterialBoundPoints, numLineConstraints, numLineLoads;
                     double xCoord, yCoord;
-                    string[] coords, lineConstraint;
+                    string[] coords, lineConstraint, lineLoad;
 
                     for (int i = 0; i < numMaterialBlocks; i++)
                     {
@@ -982,6 +982,17 @@ namespace SlopeFEA
                                 newMaterialBlock.BoundaryPoints[int.Parse(lineConstraint[1])],
                                 lineConstraint[2] == Boolean.TrueString,
                                 lineConstraint[3] == Boolean.TrueString));
+                        }
+
+                        numLineLoads = int.Parse(tr.ReadLine().Split('=')[1]);
+                        for (int j = 0; j < numLineLoads; j++)
+                        {
+                            lineLoad = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            newMaterialBlock.LineLoads.Add(new LineLoad(this,
+                                newMaterialBlock.BoundaryPoints[int.Parse(lineLoad[0])],
+                                newMaterialBlock.BoundaryPoints[int.Parse(lineLoad[1])],
+                                lineLoad[2] == Boolean.TrueString, double.Parse(lineLoad[3]), double.Parse(lineLoad[4]),
+                                lineLoad[5] == Boolean.TrueString, double.Parse(lineLoad[6]), double.Parse(lineLoad[7])));
                         }
 
                         newMaterialType = materialTypes.Find(delegate(MaterialType mt) { return mt.Name == materialName; });

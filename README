@@ -171,3 +171,6 @@ REVISION HISTORY:
 +++ (SlopeCanvas.cs) Added clearing of selections to DrawModes.FixX, DrawModes.FixY, and DrawModes.LineLoad in OnMouseLeftButtonUp()
 +++ (SlopeCanvas.cs) Added LineLoads to SaveInputFile()
 +++ (CanvasData.cs) Added unsave and unverify to MaterialBlock.ApplyLineLoad()
++++ (CanvasData.cs) Added LineLoads to OpenInputFile()
++++ (CanvasData.cs) Added check for existing line constraints and line loads to MaterialBlock.AddPoint() and DrawingPoint.Delete()
++++ (CanvasData.cs) Added PointLoad class
