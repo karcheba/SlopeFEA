@@ -40,22 +40,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace SlopeFEA.dialogs
+namespace SlopeFEA
 {
     /// <summary>
     /// Interaction logic for AddLoadDialog.xaml
     /// </summary>
-    public partial class AddLoadDialog : Window
+    public partial class AddLineLoadDialog : Window
     {
         private SlopeCanvas canvas;
+        private LineLoad load;
 
-        public AddLoadDialog (Window owner, LineLoad load)
+        public AddLineLoadDialog (SlopeCanvas canvas, LineLoad load)
         {
             InitializeComponent();
 
-            this.Owner = owner;
+            this.canvas = canvas;
+            this.load = load;
+            //this.Owner = (Window)((Grid)((TabControl)((Grid)canvas.Parent).Parent).Parent).Parent;
 
-            canvas = (SlopeCanvas)((Grid)((TabControl)((Grid)this.Owner.Content).Children[2]).SelectedContent).Children[2];
+            //canvas = (SlopeCanvas)((Grid)((TabControl)((Grid)this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
             // get units dependent scaling factor and strings
             double factor;
@@ -71,10 +74,10 @@ namespace SlopeFEA.dialogs
             // set units labels
             node1Units.Content = coordUnits;
             node2Units.Content = coordUnits;
-            xLoad1Units.Content = loadUnits;
-            xLoad2Units.Content = loadUnits;
-            yLoad1Units.Content = loadUnits;
-            yLoad2Units.Content = loadUnits;
+            nLoad1Units.Content = loadUnits;
+            nLoad2Units.Content = loadUnits;
+            tLoad1Units.Content = loadUnits;
+            tLoad2Units.Content = loadUnits;
 
             // set node coordinates
             double xCoord, yCoord;
@@ -86,21 +89,81 @@ namespace SlopeFEA.dialogs
             coords2.Content = String.Format("({0}, {1})", Math.Round(xCoord, 2), Math.Round(yCoord, 2));
 
             // set existing load values (if present)
-            isLoadedX.IsChecked = xLoad1.IsEnabled = xLoad2.IsEnabled = load.IsLoadedX;
-            xLoad1.Text = String.Format("{0}", Math.Round(load.XLoad1, 2));
-            xLoad2.Text = String.Format("{0}", Math.Round(load.XLoad2, 2));
-            isLoadedY.IsChecked = yLoad1.IsEnabled = yLoad2.IsEnabled = load.IsLoadedY;
-            yLoad1.Text = String.Format("{0}", Math.Round(load.YLoad1, 2));
-            yLoad2.Text = String.Format("{0}", Math.Round(load.YLoad2, 2));
+            isLoadedN.IsChecked = nLoad1.IsEnabled = nLoad2.IsEnabled = load.IsLoadedN;
+            nLoad1.Text = String.Format("{0}", Math.Round(load.NLoad1, 2));
+            nLoad2.Text = String.Format("{0}", Math.Round(load.NLoad2, 2));
+            isLoadedT.IsChecked = tLoad1.IsEnabled = tLoad2.IsEnabled = load.IsLoadedT;
+            tLoad1.Text = String.Format("{0}", Math.Round(load.TLoad1, 2));
+            tLoad2.Text = String.Format("{0}", Math.Round(load.TLoad2, 2));
         }
 
         private void ok_Click (object sender, RoutedEventArgs e)
         {
-            
+            double nLoad1Val = 0, nLoad2Val = 0, tLoad1Val = 0, tLoad2Val = 0;
+            bool isLoadedNVal = (bool)isLoadedN.IsChecked;
+            bool isLoadedTVal = (bool)isLoadedT.IsChecked;
+
+            if (isLoadedNVal)
+            {
+                if (!double.TryParse(nLoad1.Text, out nLoad1Val))
+                {
+                    MessageBox.Show("Normal load at node 1 must have a numeric value.", "Data Error");
+                    return;
+                }
+
+                if (!double.TryParse(nLoad2.Text, out nLoad2Val))
+                {
+                    MessageBox.Show("Normal load at node 2 must have a numeric value.", "Data Error");
+                    return;
+                }
+            }
+
+            if (isLoadedTVal)
+            {
+                if (!double.TryParse(tLoad1.Text, out tLoad1Val))
+                {
+                    MessageBox.Show("Tangential load at node 1 must have a numeric value.", "Data Error");
+                    return;
+                }
+
+                if (!double.TryParse(tLoad2.Text, out tLoad2Val))
+                {
+                    MessageBox.Show("Tangential load at node 2 must have a numeric value.", "Data Error");
+                    return;
+                }
+            }
+
+            load.ApplyLoad(isLoadedNVal, nLoad1Val, nLoad2Val,
+                            isLoadedTVal, tLoad1Val, tLoad2Val);
 
             canvas.IsSaved = false;
 
             this.DialogResult = true;
+        }
+
+
+        private void isLoadedN_Checked (object sender, RoutedEventArgs e)
+        {
+            nLoad1.IsEnabled = true;
+            nLoad2.IsEnabled = true;
+        }
+
+        private void isLoadedN_Unchecked (object sender, RoutedEventArgs e)
+        {
+            nLoad1.IsEnabled = false;
+            nLoad2.IsEnabled = false;
+        }
+
+        private void isLoadedT_Checked (object sender, RoutedEventArgs e)
+        {
+            tLoad1.IsEnabled = true;
+            tLoad2.IsEnabled = true;
+        }
+
+        private void isLoadedT_Unchecked (object sender, RoutedEventArgs e)
+        {
+            tLoad1.IsEnabled = false;
+            tLoad2.IsEnabled = false;
         }
     }
 }

@@ -154,3 +154,14 @@ REVISION HISTORY:
 +++ (AddLineLoadDialog.xaml, AddLineLoadDialog.xaml.cs) Created
 +++ (AddLineLoadDialog.xaml, AddLineLoadDialog.xaml.cs) Added functionality
 +++ (CanvasData.cs) Added functionality to LineLoad class
+
+{v1.0.0.6}
+=== (AddLineLoadDialog.xaml) Changed X and Y load groups to N (normal) and T (tangential)
+=== (CanvasData.cs) Changed X and Y load properties to N and T in LineLoad
+--- (CanvasData.cs) Removed QuarterPoint plotting locations and associated Polylines from LineLoad [will only plot one normal and one tangential arrow at centre]
+=== (AddLineLoadDialog.xaml.cs) Changed X and Y load actions to N and T
++++ (CanvasData.cs) Added Update() to LineLoad and dialog calling functionality to MaterialBlock.ApplyLineLoad()
++++ (AddLineLoadDialog.xaml.cs) Added Checked and Unchecked events for N and T checkboxes
++++ (CanvasData.cs) Added plotting of normal and tangential load arrows to LineLoad.Update()
++++ (CanvasData.cs) Added LineLoad.Update() to DrawingPoint.Move(), MaterialBlock.Translate(), and MaterialBlock.Zoom()
++++ (CanvasData.cs) Added Delete() to LineConstraint and LineLoad and added calls to both in MaterialBlock.Delete(); also added ClearFixLines() to DrawingPoint and added calls during MaterialBlock.Delete()

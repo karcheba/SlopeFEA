@@ -951,6 +951,15 @@ namespace SlopeFEA
             }
         }
 
+        public void ClearFixLines ()
+        {
+            foreach (Polyline line in fixLines)
+            {
+                canvas.Children.Remove(line);
+            }
+            fixLines.Clear();
+        }
+
         public void Translate(Vector delta)
         {
             point += delta;
@@ -1028,6 +1037,11 @@ namespace SlopeFEA
                 foreach (LineConstraint lc in material.LineConstraints)
                 {
                     if (lc.Nodes.Contains(this)) lc.UpdateLocation();
+                }
+
+                foreach (LineLoad ll in material.LineLoads)
+                {
+                    if (ll.Nodes.Contains(this)) ll.Update();
                 }
             }
         }
@@ -1172,6 +1186,15 @@ namespace SlopeFEA
             fixLines[3].Points[0] = new Point(MidPoint.X + 3.5, MidPoint.Y + 7);
             fixLines[3].Points[1] = new Point(MidPoint.X + 3.5, MidPoint.Y - 7);
         }
+
+        public void Delete ()
+        {
+            foreach (Polyline line in fixLines)
+            {
+                canvas.Children.Remove(line);
+            }
+            fixLines.Clear();
+        }
     }
 
 
@@ -1181,9 +1204,13 @@ namespace SlopeFEA
     public class LineLoad
     {
         private SlopeCanvas canvas;
-        private double xLoad1, xLoad2, yLoad1, yLoad2;
-        private bool isLoadedX, isLoadedY;
+        private double nLoad1, nLoad2, tLoad1, tLoad2;
+        private bool isLoadedN, isLoadedT;
         private List<Polyline> loadLines;
+        private static double Cpos = Math.Cos(0.75 * Math.PI),
+                                Spos = Math.Sin(0.75 * Math.PI),
+                                Cneg = Cpos,
+                                Sneg = -Spos;
 
         /// <summary>
         /// Constructor
@@ -1191,18 +1218,18 @@ namespace SlopeFEA
         /// <param name="canvas">Parent drawing canvas</param>
         /// <param name="p1">Node 1 (assumed to be sorted CCW)</param>
         /// <param name="p2">Node 2 (assumed to be sorted CCW)</param>
-        /// <param name="isLoadedX">Is load applied in the horizontal direction?</param>
-        /// <param name="xLoad1">Value of horizontal load at node 1.</param>
-        /// <param name="xLoad2">Value of horizontal load at node 2.</param>
-        /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
-        /// <param name="yLoad1">Value of vertical load at node 1.</param>
-        /// <param name="yLoad2">Value of vertical load at node 2.</param>
+        /// <param name="isLoadedN">Is load applied in the normal direction?</param>
+        /// <param name="nLoad1">Value of normal load at node 1.</param>
+        /// <param name="nLoad2">Value of normal load at node 2.</param>
+        /// <param name="isLoadedT">Is load applied in the tangential direction?</param>
+        /// <param name="tLoad1">Value of tangential load at node 1.</param>
+        /// <param name="tLoad2">Value of tangential load at node 2.</param>
         public LineLoad(SlopeCanvas canvas,
                                 DrawingPoint p1, DrawingPoint p2,
-                                bool isLoadedX, 
-                                double xLoad1, double xLoad2,
-                                bool isLoadedY,
-                                double yLoad1, double yLoad2)
+                                bool isLoadedN, 
+                                double nLoad1, double nLoad2,
+                                bool isLoadedT,
+                                double tLoad1, double tLoad2)
         {
             // set parent drawing canvas
             this.canvas = canvas;
@@ -1211,17 +1238,17 @@ namespace SlopeFEA
             Nodes = new List<DrawingPoint>() { p1, p2 };
 
             // set load state
-            this.isLoadedX = isLoadedX;
-            this.xLoad1 = xLoad1;
-            this.xLoad2 = xLoad2;
-            this.isLoadedY = isLoadedY;
-            this.yLoad1 = yLoad1;
-            this.yLoad2 = yLoad2;
+            this.isLoadedN = isLoadedN;
+            this.nLoad1 = nLoad1;
+            this.nLoad2 = nLoad2;
+            this.isLoadedT = isLoadedT;
+            this.tLoad1 = tLoad1;
+            this.tLoad2 = tLoad2;
 
             // create plotting lines for constraints
             loadLines = new List<Polyline>();
             Polyline newLine;
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 6; i++)
             {
                 newLine = new Polyline();
                 newLine.Visibility = Visibility.Hidden;
@@ -1242,68 +1269,132 @@ namespace SlopeFEA
         public List<DrawingPoint> Nodes { get; set; }
 
         /// <summary>
-        /// Properties for plotting location of load lines.
+        /// Property for plotting location of load lines.
         /// </summary>
-        public Point QuarterPoint1 { get; set; }
         public Point MidPoint { get; set; }
-        public Point QuarterPoint2 { get; set; }
 
         /// <summary>
         /// Properties indicating whether a load is applied.
         /// </summary>
-        public bool IsLoadedX { get { return this.isLoadedX; } }
-        public bool IsLoadedY { get { return this.isLoadedY; } }
+        public bool IsLoadedN { get { return this.isLoadedN; } }
+        public bool IsLoadedT { get { return this.isLoadedT; } }
 
         /// <summary>
-        /// Horizontal load values.
+        /// Normal load values.
         /// </summary>
-        public double XLoad1 { get { return this.xLoad1; } }
-        public double XLoad2 { get { return this.xLoad2; } }
+        public double NLoad1 { get { return this.nLoad1; } }
+        public double NLoad2 { get { return this.nLoad2; } }
 
         /// <summary>
-        /// Vertical load values.
+        /// Tangential load values.
         /// </summary>
-        public double YLoad1 { get { return this.yLoad1; } }
-        public double YLoad2 { get { return this.yLoad2; } }
+        public double TLoad1 { get { return this.tLoad1; } }
+        public double TLoad2 { get { return this.tLoad2; } }
 
 
         /// <summary>
         /// Function for applying loads.
         /// </summary>
-        /// <param name="isLoadedX">Is a horizontal load applied?</param>
-        /// <param name="xLoad1">Value of horizontal load at node 1.</param>
-        /// <param name="xLoad2">Value of horizontal load at node 2.</param>
-        /// <param name="isLoadedY">Is a vertical load applied?</param>
-        /// <param name="yLoad1">Value of vertical load at node 1.</param>
-        /// <param name="yLoad2">Value of vertical load at node 2.</param>
-        public void ApplyLoad(  bool isLoadedX,
-                                double xLoad1, double xLoad2,
-                                bool isLoadedY,
-                                double yLoad1, double yLoad2)
+        /// <param name="isLoadedN">Is a normal load applied?</param>
+        /// <param name="nLoad1">Value of normal load at node 1.</param>
+        /// <param name="nLoad2">Value of normal load at node 2.</param>
+        /// <param name="isLoadedT">Is a tangential load applied?</param>
+        /// <param name="tLoad1">Value of tangential load at node 1.</param>
+        /// <param name="tLoad2">Value of tangential load at node 2.</param>
+        public void ApplyLoad ( bool isLoadedN,
+                                double nLoad1, double nLoad2,
+                                bool isLoadedT,
+                                double tLoad1, double tLoad2)
         {
-            this.isLoadedX = isLoadedX;
-            if (IsLoadedX)
+            this.isLoadedN = isLoadedN;
+            if (IsLoadedN)
             {
-                this.xLoad1 = xLoad1;
-                this.xLoad2 = xLoad2;
+                this.nLoad1 = nLoad1;
+                this.nLoad2 = nLoad2;
             }
             else
             {
-                this.xLoad1 = 0.0;
-                this.xLoad2 = 0.0;
+                this.nLoad1 = 0.0;
+                this.nLoad2 = 0.0;
             }
 
-            this.isLoadedY = isLoadedY;
-            if (IsLoadedY)
+            this.isLoadedT = isLoadedT;
+            if (IsLoadedT)
             {
-                this.yLoad1 = yLoad1;
-                this.yLoad2 = yLoad2;
+                this.tLoad1 = tLoad1;
+                this.tLoad2 = tLoad2;
             }
             else
             {
-                this.yLoad1 = 0.0;
-                this.yLoad2 = 0.0;
+                this.tLoad1 = 0.0;
+                this.tLoad2 = 0.0;
             }
+        }
+
+        /// <summary>
+        /// Updates load line visibility and location
+        /// </summary>
+        public void Update ()
+        {
+            // midpoint of line segment
+            MidPoint = new Point(0.5 * (Nodes[1].Point.X + Nodes[0].Point.X), 0.5 * (Nodes[1].Point.Y + Nodes[0].Point.Y));
+
+            // unit tangential and normal vectors
+            Vector tang = new Vector(Nodes[1].Point.X - Nodes[0].Point.X, Nodes[1].Point.Y - Nodes[0].Point.Y),
+                norm = new Vector(-tang.Y, tang.X);
+            tang /= tang.Length;
+            norm /= norm.Length;
+
+            // point about which to plot the load lines
+            Point plotPoint = MidPoint + 30 * norm;
+
+            // for rotating points
+            double xprime, yprime;
+
+            // normal load arrow shaft
+            loadLines[0].Points[0] = plotPoint - 15 * norm;
+            loadLines[0].Points[1] = plotPoint + 15 * norm;
+            // normal load arrow head 1
+            loadLines[1].Points[0] = loadLines[0].Points[1];
+            loadLines[1].Points[1] = (Point)(8 * norm);
+            xprime = loadLines[1].Points[1].X * Cpos - loadLines[1].Points[1].Y * Spos + loadLines[1].Points[0].X;
+            yprime = loadLines[1].Points[1].X * Spos + loadLines[1].Points[1].Y * Cpos + loadLines[1].Points[0].Y;
+            loadLines[1].Points[1] = new Point(xprime, yprime);
+            // normal load arrow head 2
+            loadLines[2].Points[0] = loadLines[0].Points[1];
+            loadLines[2].Points[1] = (Point)(8 * norm);
+            xprime = loadLines[2].Points[1].X * Cneg - loadLines[2].Points[1].Y * Sneg + loadLines[2].Points[0].X;
+            yprime = loadLines[2].Points[1].X * Sneg + loadLines[2].Points[1].Y * Cneg + loadLines[2].Points[0].Y;
+            loadLines[2].Points[1] = new Point(xprime, yprime);
+
+            // tangential load arrow shaft
+            loadLines[3].Points[0] = plotPoint - 15 * tang;
+            loadLines[3].Points[1] = plotPoint + 15 * tang;
+            // tangential load arrow head 1
+            loadLines[4].Points[0] = loadLines[3].Points[1];
+            loadLines[4].Points[1] = (Point)(8 * tang);
+            xprime = loadLines[4].Points[1].X * Cpos - loadLines[4].Points[1].Y * Spos + loadLines[4].Points[0].X;
+            yprime = loadLines[4].Points[1].X * Spos + loadLines[4].Points[1].Y * Cpos + loadLines[4].Points[0].Y;
+            loadLines[4].Points[1] = new Point(xprime, yprime);
+            // tangential load arrow head 2
+            loadLines[5].Points[0] = loadLines[3].Points[1];
+            loadLines[5].Points[1] = (Point)(8 * tang);
+            xprime = loadLines[5].Points[1].X * Cneg - loadLines[5].Points[1].Y * Sneg + loadLines[5].Points[0].X;
+            yprime = loadLines[5].Points[1].X * Sneg + loadLines[5].Points[1].Y * Cneg + loadLines[5].Points[0].Y;
+            loadLines[5].Points[1] = new Point(xprime, yprime);
+
+            int i=0;
+            for (; i < 3; i++) loadLines[i].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
+            for (; i < 6; i++) loadLines[i].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public void Delete ()
+        {
+            foreach (Polyline line in loadLines)
+            {
+                canvas.Children.Remove(line);
+            }
+            loadLines.Clear();
         }
     }
 
@@ -1379,6 +1470,7 @@ namespace SlopeFEA
         public Polygon Boundary { get; set; }
         public List<DrawingPoint> BoundaryPoints { get { return this.boundaryPoints; } }
         public List<LineConstraint> LineConstraints { get { return this.lineConstraints; } }
+        public List<LineLoad> LineLoads { get { return this.lineLoads; } }
 
         public MaterialType Material
         {
@@ -1435,11 +1527,24 @@ namespace SlopeFEA
         public void Delete()
         {
             canvas.Children.Remove(this.Boundary);
+
             for (int i = 0; i < boundaryPoints.Count; i++)
             {
                 canvas.Children.Remove(boundaryPoints[i].Dot);
+                boundaryPoints[i].ClearFixLines();
             }
             Boundary.Points.Clear();
+
+            foreach (LineConstraint lc in LineConstraints)
+            {
+                lc.Delete();
+            }
+
+            foreach (LineLoad ll in LineLoads)
+            {
+                ll.Delete();
+            }
+
             canvas.MaterialBlocks.Remove(this);
         }
 
@@ -1678,9 +1783,27 @@ namespace SlopeFEA
                 LineLoad load = lineLoads.Find(delegate(LineLoad l) { return l.Nodes[0] == p1 && l.Nodes[1] == p2; });
 
                 // if undefined, create a new line load object
-                if (load == null) load = new LineLoad(canvas, p1, p2, false, 0, 0, false, 0, 0);
+                if (load == null)
+                {
+                    load = new LineLoad(canvas, p1, p2, false, 0, 0, false, 0, 0);
+                    lineLoads.Add(load);
+                }
 
                 // start dialog for user input
+                AddLineLoadDialog dlg = new AddLineLoadDialog(canvas, load);
+                dlg.ShowDialog();
+
+                // if there is no load in normal or tangential direction, delete the load ...
+                if (!load.IsLoadedN && !load.IsLoadedT)
+                {
+                    lineLoads.Remove(load);
+                }
+
+                // ... otherwise update its visibility and plotting location
+                else
+                {
+                    load.Update();
+                }
                 
             }
             else
@@ -1705,6 +1828,11 @@ namespace SlopeFEA
             {
                 lc.UpdateLocation();
             }
+
+            foreach (LineLoad ll in LineLoads)
+            {
+                ll.Update();
+            }
         }
 
         public void Zoom(double factor, Point centre)
@@ -1722,6 +1850,11 @@ namespace SlopeFEA
             foreach (LineConstraint lc in LineConstraints)
             {
                 lc.UpdateLocation();
+            }
+
+            foreach (LineLoad ll in LineLoads)
+            {
+                ll.Update();
             }
         }
 

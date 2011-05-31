@@ -102,5 +102,5 @@ ANALYSIS STATUS
 
 Analysis Type = FEA4NodedQuad
 Verified = True
-Meshed = True
+Meshed = False
 Analyzed = False

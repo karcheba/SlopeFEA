@@ -29,10 +29,10 @@
  ************************************************************************/
 -->
     
-<Window x:Class="SlopeFEA.dialogs.AddLoadDialog"
+<Window x:Class="SlopeFEA.AddLineLoadDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Load"
+        Title="Add Line Load"
         Background="WhiteSmoke"
         Height="425"
         Width="300"
@@ -43,37 +43,37 @@
         ShowInTaskbar="False" 
         ResizeMode="CanResize"
         WindowStyle="ToolWindow"
-        FocusManager.FocusedElement="{Binding ElementName=xLoad}">
+        FocusManager.FocusedElement="{Binding ElementName=isLoadedN}">
     <Grid>
-        <Label Content="Node 1:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-200,-325,0,0" VerticalAlignment="Center" FontSize="11" />
-        <Label Content="Node 2:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="15,49,215,312" VerticalAlignment="Center" FontSize="11" />
-        <GroupBox Header="X" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="xGroup" VerticalAlignment="Center">
+        <Label Content="Node 1:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-150,-325,0,0" VerticalAlignment="Center" FontSize="11" />
+        <Label Content="Node 2:" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-150,-275,0,0" VerticalAlignment="Center" FontSize="11" />
+        <Label Content="(0, 0)" Height="25" HorizontalAlignment="Center" Margin="0,-325,0,0" Name="coords1" VerticalAlignment="Center" />
+        <Label Content="(0, 0)" Height="25" HorizontalAlignment="Center" Margin="0,-275,0,0" Name="coords2" VerticalAlignment="Center" />
+        <Label Content="m" Height="25" HorizontalAlignment="Center" Margin="150,-325,0,0" Name="node1Units" VerticalAlignment="Center"/>
+        <Label Content="m" Height="25" HorizontalAlignment="Center" Margin="150,-275,0,0" Name="node2Units" VerticalAlignment="Center" />
+        <GroupBox Header="N (+ve outward)" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="nGroup" VerticalAlignment="Center">
             <Grid>
-                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,-20,0,0" Name="xLoad1" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <CheckBox Content="Is Loaded" Height="16" HorizontalAlignment="Center" Margin="0,-70,0,0" Name="isLoadedN" VerticalAlignment="Center" Checked="isLoadedN_Checked" Unchecked="isLoadedN_Unchecked" />
                 <Label Content="Node 1 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,-20,0,0" VerticalAlignment="Center" FontSize="11" />
-                <Label Content="kN" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="120,-20,0,0" Name="xLoad1Units" VerticalAlignment="Center" FontSize="11"/>
-                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,40,0,0" Name="xLoad2" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,-20,0,0" Name="nLoad1" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <Label Content="kN/m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="150,-20,0,0" Name="nLoad1Units" VerticalAlignment="Center" FontSize="11"/>
                 <Label Content="Node 2 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,40,0,0" VerticalAlignment="Center" FontSize="11" />
-                <Label Content="kN" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="120,40,0,0" Name="xLoad2Units" VerticalAlignment="Center" FontSize="11"/>
-                <CheckBox Content="Is Loaded" Height="16" HorizontalAlignment="Left" Margin="80,6,0,0" Name="isLoadedX" VerticalAlignment="Top" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,40,0,0" Name="nLoad2" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <Label Content="kN/m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="150,40,0,0" Name="nLoad2Units" VerticalAlignment="Center" FontSize="11"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Y" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,160,10,0" Name="yGroup" VerticalAlignment="Center">
+        <GroupBox Header="T (+ve CCW)" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,160,10,0" Name="tGroup" VerticalAlignment="Center">
             <Grid>
-                <TextBox FontWeight="Normal" Height="23" HorizontalAlignment="Center" IsEnabled="False" Margin="96,29,75,45" Name="yLoad1" VerticalAlignment="Center" Width="75" />
-                <Label Content="Node 1 Load" FontSize="11" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="17,28,156,44" VerticalAlignment="Center" />
-                <Label Content="kN" FontSize="11" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="171,28,51,44" Name="yLoad1Units" VerticalAlignment="Center" />
-                <TextBox FontWeight="Normal" Height="23" HorizontalAlignment="Center" IsEnabled="False" Margin="96,59,75,15" Name="yLoad2" VerticalAlignment="Center" Width="75" />
-                <Label Content="Node 2 Load" FontSize="11" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="17,58,156,14" VerticalAlignment="Center" />
-                <Label Content="kN" FontSize="11" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="171,58,51,14" Name="yLoad2Units" VerticalAlignment="Center" />
-                <CheckBox Content="Is Loaded" Height="16" HorizontalAlignment="Left" Margin="80,8,0,0" Name="isLoadedY" VerticalAlignment="Top" />
+                <CheckBox Content="Is Loaded" Height="16" HorizontalAlignment="Center" Margin="0,-70,0,0" Name="isLoadedT" VerticalAlignment="Center" Checked="isLoadedT_Checked" Unchecked="isLoadedT_Unchecked" />
+                <Label Content="Node 1 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,-20,0,0" VerticalAlignment="Center" FontSize="11" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,-20,0,0" Name="tLoad1" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <Label Content="kN/m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="150,-20,0,0" Name="tLoad1Units" VerticalAlignment="Center" FontSize="11"/>
+                <Label Content="Node 2 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,40,0,0" VerticalAlignment="Center" FontSize="11" />
+                <TextBox Height="23" FontWeight="Normal" HorizontalAlignment="Center" Margin="20,40,0,0" Name="tLoad2" VerticalAlignment="Center" Width="75" IsEnabled="False" />
+                <Label Content="kN/m" Height="25" FontWeight="Normal" HorizontalAlignment="Center" Margin="150,40,0,0" Name="tLoad2Units" VerticalAlignment="Center" FontSize="11"/>
             </Grid>
         </GroupBox>
         <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,335,0,0" Name="ok" IsDefault="True" VerticalAlignment="Center" Width="60" Click="ok_Click" />
         <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,335,0,0" Name="cancel" IsCancel="True" VerticalAlignment="Center" Width="60" />
-        <Label Content="(0, 0)" Height="28" HorizontalAlignment="Left" Margin="96,15,0,0" Name="coords1" VerticalAlignment="Top" />
-        <Label Content="(0, 0)" Height="28" HorizontalAlignment="Left" Margin="96,46,0,0" Name="coords2" VerticalAlignment="Top" />
-        <Label Content="m" HorizontalAlignment="Left" Margin="187,18,0,340" Name="node1Units" />
-        <Label Content="m" Height="28" HorizontalAlignment="Left" Margin="187,49,0,0" Name="node2Units" VerticalAlignment="Top" />
     </Grid>
 </Window>
