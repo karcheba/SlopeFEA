@@ -182,7 +182,7 @@ namespace SlopeFEA
                 if (canvas.IsMeshed)
                 {
                     this.showMesh = value;
-                    foreach (MeshLine ml in meshLines) ml.IsVisible = value;
+                    meshLines.ForEach(delegate(MeshLine ml) { ml.IsVisible = value; });
                 }
                 else
                 {
@@ -591,7 +591,7 @@ namespace SlopeFEA
 
         public void ClearMesh()
         {
-            foreach (MeshLine ml in meshLines) ml.Delete();
+            meshLines.ForEach(delegate(MeshLine ml) { ml.Delete(); });
             meshLines.Clear();
         }
 
@@ -659,7 +659,7 @@ namespace SlopeFEA
 
         public void Translate(Vector delta)
         {
-            foreach (MeshLine ml in meshLines) ml.Translate(delta);
+            meshLines.ForEach(delegate(MeshLine ml) { ml.Translate(delta); });
 
             Point p;
             for (int i = 0; i < Boundary.Points.Count; i++)
@@ -674,7 +674,7 @@ namespace SlopeFEA
 
         public void Zoom(double factor, Point centre)
         {
-            foreach (MeshLine ml in meshLines) ml.Zoom(factor, centre);
+            meshLines.ForEach(delegate(MeshLine ml) { ml.Zoom(factor, centre); });
 
             Point p;
             for (int i = 0; i < Boundary.Points.Count; i++)
@@ -977,39 +977,24 @@ namespace SlopeFEA
 
                 // check if line constraints contain the node and delete them
                 List<LineConstraint> existingLCs = material.LineConstraints.FindAll(delegate(LineConstraint lc) { return lc.Nodes.Contains(this); });
-                foreach (LineConstraint lc in existingLCs)
-                {
-                    lc.Delete();
-                    material.LineConstraints.Remove(lc);
-                }
+                existingLCs.ForEach(delegate(LineConstraint lc) { lc.Delete(); material.LineConstraints.Remove(lc); });
                 existingLCs.Clear();
 
                 // check if line loads contain the node and delete them
                 List<LineLoad> existingLLs = material.LineLoads.FindAll(delegate(LineLoad ll) { return ll.Nodes.Contains(this); });
-                foreach (LineLoad ll in existingLLs)
-                {
-                    ll.Delete();
-                    material.LineLoads.Remove(ll);
-                }
+                existingLLs.ForEach(delegate(LineLoad ll) { ll.Delete(); material.LineLoads.Remove(ll); });
                 existingLLs.Clear();
 
                 // check if point loads contain the node and delete them
                 List<PointLoad> existingPLs = material.PointLoads.FindAll(delegate(PointLoad pl) { return pl.Node == this; });
-                foreach (PointLoad pl in existingPLs)
-                {
-                    pl.Delete();
-                    material.PointLoads.Remove(pl);
-                }
+                existingPLs.ForEach(delegate(PointLoad pl) { pl.Delete(); material.PointLoads.Remove(pl); });
                 existingPLs.Clear();
             }
         }
 
         public void ClearFixLines ()
         {
-            foreach (Polyline line in fixLines)
-            {
-                canvas.Children.Remove(line);
-            }
+            fixLines.ForEach(delegate(Polyline line) { canvas.Children.Remove(line); });
             fixLines.Clear();
         }
 
@@ -1087,20 +1072,12 @@ namespace SlopeFEA
             {
                 material.Boundary.Points[boundPointIndex] = point;
 
-                foreach (LineConstraint lc in material.LineConstraints)
-                {
-                    if (lc.Nodes.Contains(this)) lc.UpdateLocation();
-                }
-
-                foreach (LineLoad ll in material.LineLoads)
-                {
-                    if (ll.Nodes.Contains(this)) ll.Update();
-                }
-
-                foreach (PointLoad pl in material.PointLoads)
-                {
-                    if (pl.Node == this) pl.Update();
-                }
+                material.LineConstraints.ForEach(
+                    delegate(LineConstraint lc) { if (lc.Nodes.Contains(this))lc.UpdateLocation(); });
+                material.LineLoads.ForEach(
+                    delegate(LineLoad ll) { if (ll.Nodes.Contains(this))ll.Update(); });
+                material.PointLoads.ForEach(
+                    delegate(PointLoad pl) { if (pl.Node == this)pl.Update(); });
             }
         }
 
@@ -1248,10 +1225,7 @@ namespace SlopeFEA
 
         public void Delete ()
         {
-            foreach (Polyline line in fixLines)
-            {
-                canvas.Children.Remove(line);
-            }
+            fixLines.ForEach(delegate(Polyline line) { canvas.Children.Remove(line); });
             fixLines.Clear();
         }
     }
@@ -1407,10 +1381,7 @@ namespace SlopeFEA
 
         public void Delete ()
         {
-            foreach (Polyline line in loadLines)
-            {
-                canvas.Children.Remove(line);
-            }
+            loadLines.ForEach(delegate(Polyline line) { canvas.Children.Remove(line); });
             loadLines.Clear();
         }
     }
@@ -1617,10 +1588,7 @@ namespace SlopeFEA
 
         public void Delete ()
         {
-            foreach (Polyline line in loadLines)
-            {
-                canvas.Children.Remove(line);
-            }
+            loadLines.ForEach(delegate(Polyline line) { canvas.Children.Remove(line); });
             loadLines.Clear();
         }
     }
@@ -1772,15 +1740,9 @@ namespace SlopeFEA
             }
             Boundary.Points.Clear();
 
-            foreach (LineConstraint lc in LineConstraints)
-            {
-                lc.Delete();
-            }
-
-            foreach (LineLoad ll in LineLoads)
-            {
-                ll.Delete();
-            }
+            LineConstraints.ForEach(delegate(LineConstraint lc) { lc.Delete(); });
+            LineLoads.ForEach(delegate(LineLoad ll) { ll.Delete(); });
+            PointLoads.ForEach(delegate(PointLoad pl) { pl.Delete(); });
 
             canvas.MaterialBlocks.Remove(this);
         }
@@ -1961,13 +1923,8 @@ namespace SlopeFEA
                 bool fix = !p1.IsFixedX;
                 p1.IsFixedX = fix;
 
-                if (!fix)
-                {
-                    foreach (LineConstraint lc in LineConstraints)
-                    {
-                        if (lc.Nodes.Contains(p1)) lc.IsFixedX = fix;
-                    }
-                }
+                if (!fix) LineConstraints.ForEach(
+                    delegate(LineConstraint lc) { if (lc.Nodes.Contains(p1))lc.IsFixedX = fix; });
 
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
@@ -2036,13 +1993,8 @@ namespace SlopeFEA
                 bool fix = !p1.IsFixedY;
                 p1.IsFixedY = fix;
 
-                if (!fix)
-                {
-                    foreach (LineConstraint lc in LineConstraints)
-                    {
-                        if (lc.Nodes.Contains(p1)) lc.IsFixedY = fix;
-                    }
-                }
+                if (!fix) LineConstraints.ForEach(
+                    delegate(LineConstraint lc) { if (lc.Nodes.Contains(p1))lc.IsFixedY = fix; });
 
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
@@ -2196,20 +2148,9 @@ namespace SlopeFEA
                 boundaryPoints[i].Translate(delta);
             }
 
-            foreach (LineConstraint lc in LineConstraints)
-            {
-                lc.UpdateLocation();
-            }
-
-            foreach (LineLoad ll in LineLoads)
-            {
-                ll.Update();
-            }
-
-            foreach (PointLoad pl in PointLoads)
-            {
-                pl.Update();
-            }
+            LineConstraints.ForEach(delegate(LineConstraint lc) { lc.UpdateLocation(); });
+            LineLoads.ForEach(delegate(LineLoad ll) { ll.Update(); });
+            PointLoads.ForEach(delegate(PointLoad pl) { pl.Update(); });
         }
 
         public void Zoom(double factor, Point centre)
@@ -2224,28 +2165,14 @@ namespace SlopeFEA
                 boundaryPoints[i].Zoom(factor, centre);
             }
 
-            foreach (LineConstraint lc in LineConstraints)
-            {
-                lc.UpdateLocation();
-            }
-
-            foreach (LineLoad ll in LineLoads)
-            {
-                ll.Update();
-            }
-
-            foreach (PointLoad pl in PointLoads)
-            {
-                pl.Update();
-            }
+            LineConstraints.ForEach(delegate(LineConstraint lc) { lc.UpdateLocation(); });
+            LineLoads.ForEach(delegate(LineLoad ll) { ll.Update(); });
+            PointLoads.ForEach(delegate(PointLoad pl) { pl.Update(); });
         }
 
         private void MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
-            if (canvas.DrawMode == DrawModes.Select)
-            {
-                this.IsSelected = true;
-            }
+            if (canvas.DrawMode == DrawModes.Select) this.IsSelected = true;
         }
 
         public int CheckIntersecting()
@@ -2547,14 +2474,13 @@ namespace SlopeFEA
             set
             {
                 line.Visibility = value ? Visibility.Visible : Visibility.Hidden;
-
-                foreach (MeshPoint mp in meshPoints) mp.IsVisible = value;
+                meshPoints.ForEach(delegate(MeshPoint mp) { mp.IsVisible = value; });
             }
         }
 
         public void Delete()
         {
-            foreach (MeshPoint mp in meshPoints) canvas.Children.Remove(mp.Location);
+            meshPoints.ForEach(delegate(MeshPoint mp) { canvas.Children.Remove(mp.Location); });
             meshPoints.Clear();
 
             canvas.Children.Remove(line);
@@ -2562,7 +2488,7 @@ namespace SlopeFEA
 
         public void Translate(Vector delta)
         {
-            foreach (MeshPoint mp in meshPoints) mp.Translate(delta);
+            meshPoints.ForEach(delegate(MeshPoint mp) { mp.Translate(delta); });
 
             line.X1 += delta.X;
             line.X2 += delta.X;
@@ -2572,7 +2498,7 @@ namespace SlopeFEA
 
         public void Zoom(double factor, Point centre)
         {
-            foreach (MeshPoint mp in meshPoints) mp.Zoom(factor, centre);
+            meshPoints.ForEach(delegate(MeshPoint mp) { mp.Zoom(factor, centre); });
 
             line.X1 = centre.X + factor * (line.X1 - centre.X);
             line.X2 = centre.X + factor * (line.X2 - centre.X);

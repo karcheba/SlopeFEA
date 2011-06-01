@@ -50,9 +50,15 @@ namespace SlopeFEA
         {
             this.Number = number;
             this.IsBoundary = false;
+
             this.X = x;
             this.Y = 0.0;
             this.Z = 0.0;
+
+            this.XLoad = 0.0;
+            this.YLoad = 0.0;
+            this.ZLoad = 0.0;
+
             this.IsFixedX = false;
             this.IsFixedY = false;
             this.IsFixedZ = false;
@@ -72,9 +78,15 @@ namespace SlopeFEA
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
+
             this.X = x;
             this.Y = y;
             this.Z = 0.0;
+
+            this.XLoad = 0.0;
+            this.YLoad = 0.0;
+            this.ZLoad = 0.0;
+
             this.IsFixedX = false;
             this.IsFixedY = false;
             this.IsFixedZ = false;
@@ -96,9 +108,15 @@ namespace SlopeFEA
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
+
             this.X = x;
             this.Y = y;
             this.Z = z;
+
+            this.XLoad = 0.0;
+            this.YLoad = 0.0;
+            this.ZLoad = 0.0;
+
             this.IsFixedX = false;
             this.IsFixedY = false;
             this.IsFixedZ = false;
@@ -126,6 +144,11 @@ namespace SlopeFEA
         public double X { get; set; }
 
         /// <summary>
+        /// X-direction point load property.
+        /// </summary>
+        public double XLoad { get; set; }
+
+        /// <summary>
         /// Global x-fixity property.
         /// </summary>
         public bool IsFixedX { get; set; }
@@ -136,6 +159,11 @@ namespace SlopeFEA
         public double Y { get; set; }
 
         /// <summary>
+        /// Y-direction point load property.
+        /// </summary>
+        public double YLoad { get; set; }
+
+        /// <summary>
         /// Global y-fixity property.
         /// </summary>
         public bool IsFixedY { get; set; }
@@ -144,6 +172,11 @@ namespace SlopeFEA
         /// Global z-coordinate property.
         /// </summary>
         public double Z { get; set; }
+
+        /// <summary>
+        /// Z-direction point load property.
+        /// </summary>
+        public double ZLoad { get; set; }
 
         /// <summary>
         /// Global z-fixity property.
@@ -174,6 +207,10 @@ namespace SlopeFEA
                 this.Y = m.Y;
                 this.Z = m.Z;
             }
+
+            this.XLoad += m.XLoad;
+            this.YLoad += m.YLoad;
+            this.ZLoad += m.ZLoad;
 
             this.IsBoundary = this.IsBoundary || m.IsBoundary;
             this.IsLocked = this.IsLocked || m.IsLocked;
@@ -623,6 +660,37 @@ namespace SlopeFEA
         public bool IsFixedY { get { return this.isFixedY; } }
     }
 
+    /// <summary>
+    /// fePointLoad - Class for applying point loads to nodes
+    /// </summary>
+    public class fePointLoad
+    {
+        private double xLoad, yLoad;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="node">Parent node</param>
+        /// <param name="isLoadedX">Is the node loaded in the horizontal direction?</param>
+        /// <param name="xLoad">Value of horizontal load</param>
+        /// <param name="isLoadedY">Is the node loaded in the vertical direction?</param>
+        /// <param name="yLoad">Value of vertical load</param>
+        public fePointLoad (Point node,
+                            bool isLoadedX, double xLoad,
+                            bool isLoadedY, double yLoad)
+        {
+            this.Point = node;
+
+            this.xLoad = isLoadedX ? xLoad : 0.0;
+            this.yLoad = isLoadedY ? yLoad : 0.0;
+        }
+
+        public Point Point { get; set; }
+
+        public double XLoad { get { return this.xLoad; } }
+        public double YLoad { get { return this.yLoad; } }
+    }
+
 
     /// <summary>
     /// feLineLoad - Class for applying linearly varying loads
@@ -649,7 +717,7 @@ namespace SlopeFEA
                                 double tLoad1, double tLoad2)
         {
             // create list of boundary nodes for the load
-            Points = new List<Point>() { n2, n2 };
+            Points = new List<Point>() { n1, n2 };
 
             // set load state
             if (isLoadedN)
@@ -712,6 +780,7 @@ namespace SlopeFEA
             this.IsFixedY = new List<bool>();
             this.LineConstraints = new List<feLineConstraint>();
             this.LineLoads = new List<feLineLoad>();
+            this.PointLoads = new List<fePointLoad>();
         }
 
         /// <summary>
@@ -733,6 +802,11 @@ namespace SlopeFEA
         /// Line load list property.
         /// </summary>
         public List<feLineLoad> LineLoads { get; set; }
+
+        /// <summary>
+        /// Point load list property.
+        /// </summary>
+        public List<fePointLoad> PointLoads { get; set; }
 
         /// <summary>
         /// Boundary point x-fixity property.

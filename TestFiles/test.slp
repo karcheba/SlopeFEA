@@ -30,13 +30,13 @@ BOUNDARY GEOMETRY DATA
 
 Number of Boundary Points = 7
 
--14, 48
--14, 3.99999999999999
-112, 3.99999999999999
+-14.0000000000001, 48
+-14.0000000000001, 3.99999999999997
+112, 3.99999999999997
 112, 24
 72, 24
-54, 36
-22, 48
+52, 38
+16, 48
 
 
 --------------------------------
@@ -59,27 +59,50 @@ Nu = 0.33
 MATERIAL BLOCK DATA
 --------------------------------
 
-Number of Material Blocks = 1
+Number of Material Blocks = 3
 
 Material Block #1
 Material Type = "sand"
-Number of Boundary Points = 8
--14, 3.99999999999999, True, True
-112, 3.99999999999999, True, True
+Number of Boundary Points = 4
+-4, 38, False, False
+52, 38, False, False
+16, 48, False, False
+-4, 48, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 1
+2, 3, True, -20, -10, False, 0, 0
+Number of Point Loads = 1
+3, False, 0, True, -50
+
+Material Block #2
+Material Type = "sand"
+Number of Boundary Points = 5
+-14, 4.00000000000002, True, True
+-4, 4.00000000000002, False, True
+-4, 38, False, False
+-4, 48, False, False
+-14, 48, True, False
+Number of Line Constraints = 2
+4, 0, True, False
+0, 1, False, True
+Number of Line Loads = 0
+Number of Point Loads = 1
+3, False, 0, True, -20
+
+Material Block #3
+Material Type = "sand"
+Number of Boundary Points = 6
+-4, 4.00000000000002, False, True
+112, 4.00000000000002, True, True
 112, 24, True, False
 72, 24, False, False
-54, 36, False, False
-22, 48, False, False
-4, 48, False, False
--14, 48, True, False
-Number of Line Constraints = 3
-7, 0, True, False
+52, 38, False, False
+-4, 38, False, False
+Number of Line Constraints = 2
 1, 2, True, False
 0, 1, False, True
-Number of Line Loads = 1
-5, 6, True, -10, 0, True, -10, 0
-Number of Point Loads = 1
-6, True, -10, True, -10
+Number of Line Loads = 0
+Number of Point Loads = 0
 
 
 --------------------------------
@@ -99,15 +122,15 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 5
-Row Height = 2.5
+Column Width = 10
+Row Height = 10
 
 
 --------------------------------
 ANALYSIS STATUS
 --------------------------------
 
-Analysis Type = FEA4NodedQuad
+Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = False

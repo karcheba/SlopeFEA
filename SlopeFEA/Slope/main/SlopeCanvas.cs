@@ -181,14 +181,11 @@ namespace SlopeFEA
                     {
                         boundary.ShowMesh = value;
 
-                        foreach (fe3NodedTriElement element in FEATriElements)
-                        {
-                            element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden;
-                        }
-                        foreach (fe4NodedQuadElement element in FEAQuadElements)
-                        {
-                            element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden;
-                        }
+                        FEATriElements.ForEach(delegate(fe3NodedTriElement element)
+                        { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; });
+
+                        FEAQuadElements.ForEach(delegate(fe4NodedQuadElement element)
+                        { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; });
                     }
                     else
                     {
@@ -1149,6 +1146,7 @@ namespace SlopeFEA
 
             this.IsSaved = true;
 
+            BuildAxes();
             CentreAndFitExtents(true);
         }
 
@@ -1365,45 +1363,56 @@ namespace SlopeFEA
 
             // Add drawing Polygon objects back on top
             this.Children.Add(boundary.Boundary);
-            for (int i = 0; i < boundary.BoundaryPoints.Count; i++) this.Children.Add(boundary.BoundaryPoints[i].Dot);
-            for (int i = 0; i < materialBlocks.Count; i++)
-            {
-                this.Children.Add(materialBlocks[i].Boundary);
-                for (int j = 0; j < materialBlocks[i].BoundaryPoints.Count; j++)
+            boundary.BoundaryPoints.ForEach(delegate(DrawingPoint dp) { this.Children.Add(dp.Dot); });
+            materialBlocks.ForEach(
+                delegate(MaterialBlock mb)
                 {
-                    this.Children.Add(materialBlocks[i].BoundaryPoints[j].Dot);
-                    foreach (Polyline l in materialBlocks[i].BoundaryPoints[j].FixLines)
-                    {
-                        this.Children.Add(l);
-                    }
-                    foreach (LineConstraint lc in materialBlocks[i].LineConstraints)
-                    {
-                        foreach (Polyline l in lc.FixLines)
+                    this.Children.Add(mb.Boundary);
+                    mb.BoundaryPoints.ForEach(
+                        delegate(DrawingPoint dp) { this.Children.Add(dp.Dot); });
+                });
+
+            FEATriElements.ForEach(
+                delegate(fe3NodedTriElement element) { this.Children.Add(element.Boundary); });
+            FEAQuadElements.ForEach(
+                delegate(fe4NodedQuadElement element) { this.Children.Add(element.Boundary); });
+
+            materialBlocks.ForEach(
+                delegate(MaterialBlock mb)
+                {
+                    mb.BoundaryPoints.ForEach(
+                        delegate(DrawingPoint dp)
                         {
-                            if (!this.Children.Contains(l)) this.Children.Add(l);
-                        }
-                    }
-                    foreach (LineLoad ll in materialBlocks[i].LineLoads)
-                    {
-                        foreach (Polyline l in ll.LoadLines)
+                            dp.FixLines.ForEach(delegate(Polyline l) { this.Children.Add(l); });
+                        });
+
+                    mb.LineConstraints.ForEach(
+                        delegate(LineConstraint lc)
                         {
-                            if (!this.Children.Contains(l)) this.Children.Add(l);
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < FEATriElements.Count; i++)
-            {
-                this.Children.Add(FEATriElements[i].Boundary);
-            }
-            for (int i = 0; i < FEAQuadElements.Count; i++)
-            {
-                this.Children.Add(FEAQuadElements[i].Boundary);
-            }
+                            lc.FixLines.ForEach(
+                                delegate(Polyline l) { if (!this.Children.Contains(l)) this.Children.Add(l); });
+                        });
+
+                    mb.LineLoads.ForEach(
+                        delegate(LineLoad ll)
+                        {
+                            ll.LoadLines.ForEach(
+                                delegate(Polyline l) { if (!this.Children.Contains(l)) this.Children.Add(l); });
+                        });
+
+                    mb.PointLoads.ForEach(
+                        delegate(PointLoad pl)
+                        {
+                            pl.LoadLines.ForEach(
+                                delegate(Polyline l) { if (!this.Children.Contains(l))this.Children.Add(l); });
+                        });
+                });
+            
+
             this.Children.Add(drawLine);
             this.Children.Add(zoomRect.Boundary);
             if (criticalSurface != null) this.Children.Add(criticalSurface.Surface);
-            for (int i = 0; i < runSurfaces.Count; i++) this.Children.Add(runSurfaces[i].Surface);
+            runSurfaces.ForEach(delegate(DisplayCircularSurface rs) { this.Children.Add(rs.Surface); });
 
             if (!createMajor)
             {
@@ -2002,34 +2011,31 @@ namespace SlopeFEA
                 XMajorDivision /= distConv;
                 YMajorDivision /= distConv;
 
-                for (int i = 0; i < materialTypes.Count; i++)
-                {
-                    MaterialTypes[i].Cohesion *= pressConv;
-                    MaterialTypes[i].Gamma *= weightConv;
-                    MaterialTypes[i].Emod *= pressConv;
-                }
+                materialTypes.ForEach(
+                    delegate(MaterialType mt)
+                    {
+                        mt.Cohesion *= pressConv;
+                        mt.Gamma *= weightConv;
+                        mt.Emod *= pressConv;
+                    });
 
                 genAlgParams.SliceWidth /= distConv;
                 feaParams.ElementSize /= distConv;
                 feaParams.ColWidth /= distConv;
                 feaParams.RowHeight /= distConv;
 
-                for (int i = 0; i < FEATriElements.Count; i++)
-                {
-                    for (int j = 0; j < FEATriElements[i].Nodes.Count; j++)
+                FEATriElements.ForEach(
+                    delegate(fe3NodedTriElement e)
                     {
-                        FEATriElements[i].Nodes[j].X /= distConv;
-                        FEATriElements[i].Nodes[j].Y /= distConv;
-                    }
-                }
-                for (int i = 0; i < FEAQuadElements.Count; i++)
-                {
-                    for (int j = 0; j < FEAQuadElements[i].Nodes.Count; j++)
+                        e.Nodes.ForEach(
+                            delegate(feNode node) { node.X /= distConv; node.Y /= distConv; });
+                    });
+                FEAQuadElements.ForEach(
+                    delegate(fe4NodedQuadElement e)
                     {
-                        FEAQuadElements[i].Nodes[j].X /= distConv;
-                        FEAQuadElements[i].Nodes[j].Y /= distConv;
-                    }
-                }
+                        e.Nodes.ForEach(
+                            delegate(feNode node) { node.X /= distConv; node.Y /= distConv; });
+                    });
 
                 foreach (MaterialBlock mb in MaterialBlocks)
                 {
@@ -2039,6 +2045,12 @@ namespace SlopeFEA
                             ll.NLoad1 * lineLoadConv, ll.NLoad2 * lineLoadConv,
                             ll.IsLoadedT,
                             ll.TLoad1 * lineLoadConv, ll.TLoad2 * lineLoadConv);
+                    }
+
+                    foreach (PointLoad pl in mb.PointLoads)
+                    {
+                        pl.ApplyLoad(pl.IsLoadedX, pl.XLoad * pointLoadConv,
+                            pl.IsLoadedY, pl.YLoad * pointLoadConv);
                     }
                 }
 
@@ -2091,11 +2103,15 @@ namespace SlopeFEA
             using (TextReader tr = new StreamReader(nodeFile))
             {
                 int numNodes = int.Parse(tr.ReadLine());
+                feNode newNode;
                 for (int i = 0; i < numNodes; i++)
                 {
                     split = tr.ReadLine().Split('\t');
-                    nodes.Add(new feNode(int.Parse(split[0]), false,
-                        double.Parse(split[1]), double.Parse(split[2])));
+                    newNode = new feNode(int.Parse(split[0]), false,
+                        double.Parse(split[1]), double.Parse(split[2]));
+                    newNode.XLoad = double.Parse(split[3]);
+                    newNode.YLoad = double.Parse(split[4]);
+                    nodes.Add(newNode);
                 }
             }
 
@@ -2189,11 +2205,15 @@ namespace SlopeFEA
             using (TextReader tr = new StreamReader(nodeFile))
             {
                 int numNodes = int.Parse(tr.ReadLine());
+                feNode newNode;
                 for (int i = 0; i < numNodes; i++)
                 {
                     split = tr.ReadLine().Split('\t');
-                    nodes.Add(new feNode(int.Parse(split[0]), false,
-                        double.Parse(split[1]), double.Parse(split[2])));
+                    newNode = new feNode(int.Parse(split[0]), false,
+                        double.Parse(split[1]), double.Parse(split[2]));
+                    newNode.XLoad = double.Parse(split[3]);
+                    newNode.YLoad = double.Parse(split[4]);
+                    nodes.Add(newNode);
                 }
             }
 

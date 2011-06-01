@@ -1055,6 +1055,8 @@ namespace SlopeFEA
 
                     ClosableCanvasTabItem currTab = windowManager.SelectedItem as ClosableCanvasTabItem;
                     currCanvas.SaveInputFile((string)currTab.Tag);
+
+                    currCanvas.BuildAxes();
                 }
             }
         }

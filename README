@@ -189,4 +189,13 @@ REVISION HISTORY:
 +++ (FEA.cs) Added feLineLoad class
 +++ (FEA.cs) Added NLoads and TLoads and appropriate initializations to fe2NodedBoundElement class
 === (FEA.cs) Modified Nodes initialization in fe3NodedTriElement() and fe4NodedQuadElement() to a single line initialization instead of initialization followed by 3-4 calls to Add()
-+++ (MeshGen.cs) Began adding creation of boundary elements from lineloads in MeshGenStructured4NodedQuad()
++++ (MeshGen.cs) Began adding creation of boundary elements from line loads in MeshGenStructured4NodedQuad()
++++ (MeshGen.cs) Completed creation of boundary elements from line loads in MeshGenStructured4NodedQuad()
++++ (FEA.cs) Added point load properties to feNode
++++ (FEA.cs) Created fePointLoad class
++++ (MeshGen.cs) Added indication of point loads at vertex nodes
++++ (SlopeCanvas.cs) Added loading of point load values to LoadFEA3NodedTriMesh() and LoadFEA4NodedQuadMesh()
++++ (CanvasData.cs) Added deletion of point loads to MaterialBlock.Delete()
++++ (SlopeCanvas.cs) Added updating of point loads to UpdateUnits()
++++ (SlopeCanvas.cs) Added plotting of point loads to BuildAxes()
+=== (SlopeCanvas.cs) Modified order of plotting so that loads and fixities always get plotted on top
