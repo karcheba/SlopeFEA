@@ -625,6 +625,76 @@ namespace SlopeFEA
 
 
     /// <summary>
+    /// feLineLoad - Class for applying linearly varying loads
+    /// </summary>
+    public class feLineLoad
+    {
+        private double nLoad1, nLoad2, tLoad1, tLoad2;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="n1">Node 1 (assumed to be sorted CCW)</param>
+        /// <param name="n2">Node 2 (assumed to be sorted CCW)</param>
+        /// <param name="isLoadedN">Is load applied in the normal direction?</param>
+        /// <param name="nLoad1">Value of normal load at node 1.</param>
+        /// <param name="nLoad2">Value of normal load at node 2.</param>
+        /// <param name="isLoadedT">Is load applied in the tangential direction?</param>
+        /// <param name="tLoad1">Value of tangential load at node 1.</param>
+        /// <param name="tLoad2">Value of tangential load at node 2.</param>
+        public feLineLoad (Point n1, Point n2,
+                                bool isLoadedN, 
+                                double nLoad1, double nLoad2,
+                                bool isLoadedT,
+                                double tLoad1, double tLoad2)
+        {
+            // create list of boundary nodes for the load
+            Points = new List<Point>() { n2, n2 };
+
+            // set load state
+            if (isLoadedN)
+            {
+                this.nLoad1 = nLoad1;
+                this.nLoad2 = nLoad2;
+            }
+            else
+            {
+                this.nLoad1 = 0.0;
+                this.nLoad2 = 0.0;
+            }
+
+            if (isLoadedT)
+            {
+                this.tLoad1 = tLoad1;
+                this.tLoad2 = tLoad2;
+            }
+            else
+            {
+                this.tLoad1 = 0.0;
+                this.tLoad2 = 0.0;
+            }
+        }
+
+        /// <summary>
+        /// List of nodes property.
+        /// </summary>
+        public List<Point> Points { get; set; }
+
+        /// <summary>
+        /// Normal load values.
+        /// </summary>
+        public double NLoad1 { get { return this.nLoad1; } }
+        public double NLoad2 { get { return this.nLoad2; } }
+
+        /// <summary>
+        /// Tangential load values.
+        /// </summary>
+        public double TLoad1 { get { return this.tLoad1; } }
+        public double TLoad2 { get { return this.tLoad2; } }
+    }
+
+
+    /// <summary>
     /// feSubstruct - Class for FEA substructs (material blocks)
     /// </summary>
     public class feSubstruct
@@ -641,6 +711,7 @@ namespace SlopeFEA
             this.IsFixedX = new List<bool>();
             this.IsFixedY = new List<bool>();
             this.LineConstraints = new List<feLineConstraint>();
+            this.LineLoads = new List<feLineLoad>();
         }
 
         /// <summary>
@@ -657,6 +728,11 @@ namespace SlopeFEA
         /// Line constraint list property.
         /// </summary>
         public List<feLineConstraint> LineConstraints { get; set; }
+
+        /// <summary>
+        /// Line load list property.
+        /// </summary>
+        public List<feLineLoad> LineLoads { get; set; }
 
         /// <summary>
         /// Boundary point x-fixity property.
@@ -771,14 +847,20 @@ namespace SlopeFEA
         /// <param name="number">Element number.</param>
         /// <param name="n1">Member node 1.</param>
         /// <param name="n2">Member node 2.</param>
+        /// <param name="nLoad1">Normal direction load at node 1.</param>
+        /// <param name="nLoad2">Normal direction load at node 2.</param>
+        /// <param name="tLoad1">Tangential direction load at node 1.</param>
+        /// <param name="tLoad2">Tangential direction load at node 2.</param>
         public fe2NodedBoundElement (int number,
-                                        feNode n1, feNode n2)
+                                        feNode n1, feNode n2,
+                                        double nLoad1, double nLoad2,
+                                        double tLoad1, double tLoad2)
         {
             this.Number = number;
 
-            this.Nodes = new List<feNode>(2);
-            this.Nodes.Add(n1);
-            this.Nodes.Add(n2);
+            this.Nodes = new List<feNode>() { n1, n2 };
+            this.NLoads = new List<double>() { nLoad1, nLoad2 };
+            this.TLoads = new List<double>() { tLoad1, tLoad2 };
         }
 
         /// <summary>
@@ -790,6 +872,16 @@ namespace SlopeFEA
         /// List of member nodes property.
         /// </summary>
         public List<feNode> Nodes { get; set; }
+
+        /// <summary>
+        /// List of normal direction loads (+ve outward for CCW node ordering).
+        /// </summary>
+        public List<double> NLoads { get; set; }
+
+        /// <summary>
+        /// List of tangential direction loads (+ve in CCW direction, i.e. from node1 to node2)
+        /// </summary>
+        public List<double> TLoads { get; set; }
 
         /// <summary>
         /// Accessor property for element length.
@@ -866,10 +958,7 @@ namespace SlopeFEA
             this.Number = number;
             this.Material = material;
 
-            this.Nodes = new List<feNode>(3);
-            this.Nodes.Add(n1);
-            this.Nodes.Add(n2);
-            this.Nodes.Add(n3);
+            this.Nodes = new List<feNode>() { n1, n2, n3 };
 
             if (sort) SortNodes();
         }
@@ -893,10 +982,7 @@ namespace SlopeFEA
             this.Number = number;
             this.Material = material;
 
-            this.Nodes = new List<feNode>(3);
-            this.Nodes.Add(n1);
-            this.Nodes.Add(n2);
-            this.Nodes.Add(n3);
+            this.Nodes = new List<feNode>() { n1, n2, n3 };
 
             if (sort) SortNodes();
         }
@@ -1060,11 +1146,7 @@ namespace SlopeFEA
             this.Number = number;
             this.Material = material;
 
-            this.Nodes = new List<feNode>(4);
-            this.Nodes.Add(n1);
-            this.Nodes.Add(n2);
-            this.Nodes.Add(n3);
-            this.Nodes.Add(n4);
+            this.Nodes = new List<feNode>() { n1, n2, n3, n4 };
 
             if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
         }
@@ -1089,11 +1171,7 @@ namespace SlopeFEA
             this.Number = number;
             this.Material = material;
 
-            this.Nodes = new List<feNode>(4);
-            this.Nodes.Add(n1);
-            this.Nodes.Add(n2);
-            this.Nodes.Add(n3);
-            this.Nodes.Add(n4);
+            this.Nodes = new List<feNode>() { n1, n2, n3, n4 };
 
             if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
         }

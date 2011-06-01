@@ -181,3 +181,12 @@ REVISION HISTORY:
 +++ (CanvasData.cs) Added PointLoad.Delete() to DrawingPoint.Delete()
 === (CanvasData.cs) Modified SlopeBoundary.SortPoints() and MaterialBlock.SortPoints() since actual polygon points were not being sorted correctly with PointCollection.Reverse()
 === (CanvasData.cs) Modified LineLoad.Update() and PointLoad.Update() to indicate direction of loading
+
+
+[01 June 2011]
+
+{v1.0.0.7}
++++ (FEA.cs) Added feLineLoad class
++++ (FEA.cs) Added NLoads and TLoads and appropriate initializations to fe2NodedBoundElement class
+=== (FEA.cs) Modified Nodes initialization in fe3NodedTriElement() and fe4NodedQuadElement() to a single line initialization instead of initialization followed by 3-4 calls to Add()
++++ (MeshGen.cs) Began adding creation of boundary elements from lineloads in MeshGenStructured4NodedQuad()

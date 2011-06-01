@@ -110,6 +110,18 @@ namespace SlopeFEA
                         lc.IsFixedX, lc.IsFixedY));
                 }
 
+                // create line loads
+                foreach(LineLoad ll in block.LineLoads)
+                {
+                    index1 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[0]; });
+                    index2 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[1]; });
+
+                    newSubstruct.LineLoads.Add(new feLineLoad(
+                        newSubstruct.Points[index1], newSubstruct.Points[index2],
+                        ll.IsLoadedN, ll.NLoad1, ll.NLoad2,
+                        ll.IsLoadedT, ll.TLoad1, ll.TLoad2));
+                }
+
                 // ensure vertices are ordered counterclockwise
                 newSubstruct.SortPoints();
 
@@ -121,7 +133,7 @@ namespace SlopeFEA
 
             
             // initialize node and element counters
-            int nodeCount = 0, quadElementCount = 0;
+            int nodeCount = 0, quadElementCount = 0, boundElementCount = 0;
 
             // for merging nodes at the same location
             double tolerDist = 1e-8 * Math.Sqrt(Math.Pow(colWidth, 2) + Math.Pow(rowHeight, 2));
@@ -192,7 +204,6 @@ namespace SlopeFEA
                 double dist;
                 feNode vertexNode;
                 bool foundVertex;
-                //foreach (Point p in substruct.Points)
                 for (int i = 0; i < substruct.Points.Count; i++)
                 {
                     // create locked node at the vertex
@@ -237,17 +248,40 @@ namespace SlopeFEA
                 // and locking them
                 // **********************************************
                 Point p0 = substruct.Points[substruct.Points.Count - 1], p1;
-                double xn, yn, tolerCross = 1e-8;
+                double xn, yn, tolerCross = 1e-8, dNLoad = 0, dTLoad = 0, distLL = 0, interpLL = 0;
                 feNode boundNode;
                 int numNodes;
                 bool fixX = substruct.IsFixedX[substruct.IsFixedX.Count - 1],
                     fixY = substruct.IsFixedY[substruct.IsFixedY.Count - 1];
                 feLineConstraint lc;
+                feLineLoad ll;
+                fe2NodedBoundElement newBoundElement = null;
                 for (int i = 0; i < substruct.Points.Count; i++)
                 {
                     p1 = substruct.Points[i];
 
                     lc = substruct.LineConstraints.Find(delegate(feLineConstraint l) { return l.Points.Contains(p0) && l.Points.Contains(p1); });
+                    ll = substruct.LineLoads.Find(delegate(feLineLoad l) { return l.Points.Contains(p0) && l.Points.Contains(p1); });
+
+                    if (ll != null)
+                    {
+                        vertexNode = null;
+                        foreach (List<feNode> column in substructNodes)
+                        {
+                            vertexNode = column.Find(delegate(feNode node)
+                            {
+                                return Math.Abs(node.X - p0.X) < tolerDist && Math.Abs(node.Y - p0.Y) < tolerDist;
+                            });
+                            if (vertexNode != null) break;
+                        }
+
+                        newBoundElement = new fe2NodedBoundElement(++boundElementCount,
+                            vertexNode, null, ll.NLoad1, 0, ll.TLoad1, 0);
+
+                        dNLoad = ll.NLoad2 - ll.NLoad1;
+                        dTLoad = ll.TLoad2 - ll.TLoad1;
+                        distLL = Math.Sqrt(Math.Pow(ll.Points[1].X - ll.Points[0].X, 2) + Math.Pow(ll.Points[1].Y - ll.Points[0].Y, 2));
+                    }
 
                     fixX = (lc != null) && (lc.IsFixedX);
                     fixY = (lc != null) && (lc.IsFixedY);
@@ -296,11 +330,46 @@ namespace SlopeFEA
                     // insert locked boundary nodes
                     for (int j = 1; j < numNodes; j++)
                     {
-                        boundNode = new feNode(++nodeCount, true, p0.X + j * dx, p0.Y + j * dy);
+                        xn = p0.X + j * dx; yn = p0.Y + j * dy;
+                        boundNode = new feNode(++nodeCount, true, xn, yn);
                         boundNode.IsLocked = true;
                         boundNode.IsFixedX = fixX;
                         boundNode.IsFixedY = fixY;
                         insertBoundNodes.Add(boundNode);
+
+                        if (ll != null)
+                        {
+                            newBoundElement.Nodes[1] = boundNode;
+
+                            interpLL = Math.Sqrt(Math.Pow(xn - ll.Points[0].X, 2) + Math.Pow(yn - ll.Points[0].Y, 2)) / distLL;
+
+                            newBoundElement.NLoads[1] = ll.NLoad1 + dNLoad * interpLL;
+                            newBoundElement.TLoads[1] = ll.TLoad1 + dTLoad * interpLL;
+
+                            boundElements.Add(newBoundElement);
+
+                            newBoundElement = new fe2NodedBoundElement(++boundElementCount,
+                                boundNode, null, newBoundElement.NLoads[1], 0, newBoundElement.TLoads[1], 0);
+                        }
+                    }
+
+                    if (ll != null)
+                    {
+                        vertexNode = null;
+                        foreach (List<feNode> column in substructNodes)
+                        {
+                            vertexNode = column.Find(delegate(feNode node)
+                            {
+                                return Math.Abs(node.X - p1.X) < tolerDist && Math.Abs(node.Y - p1.Y) < tolerDist;
+                            });
+                            if (vertexNode != null) break;
+                        }
+
+                        newBoundElement.Nodes[1] = vertexNode;
+                        newBoundElement.NLoads[1] = ll.NLoad2;
+                        newBoundElement.TLoads[1] = ll.TLoad2;
+
+                        boundElements.Add(newBoundElement);
                     }
 
                     // step forward
