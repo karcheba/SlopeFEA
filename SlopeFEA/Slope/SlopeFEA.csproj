@@ -104,6 +104,9 @@
     <Compile Include="dialogs\AddMaterialDialog.xaml.cs">
       <DependentUpon>AddMaterialDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="dialogs\AddPointLoadDialog.xaml.cs">
+      <DependentUpon>AddPointLoadDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="main\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -241,6 +244,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="dialogs\AddPointLoadDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="dialogs\AssignMaterialDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

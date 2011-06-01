@@ -756,6 +756,16 @@ namespace SlopeFEA
                             ll.IsLoadedT, ll.TLoad1, ll.TLoad2);
                     }
 
+                    tw.WriteLine("Number of Point Loads = {0}", materialBlocks[i].PointLoads.Count);
+                    foreach (PointLoad pl in materialBlocks[i].PointLoads)
+                    {
+                        index1 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == pl.Node; });
+                        tw.WriteLine("{0}, {1}, {2}, {3}, {4}",
+                            index1,
+                            pl.IsLoadedX, pl.XLoad,
+                            pl.IsLoadedY, pl.YLoad);
+                    }
+
                     tw.WriteLine();
                 }
 
@@ -939,9 +949,9 @@ namespace SlopeFEA
                     bool[] isFixedX;
                     bool[] isFixedY;
                     string materialName;
-                    int numMaterialBoundPoints, numLineConstraints, numLineLoads;
+                    int numMaterialBoundPoints, numLineConstraints, numLineLoads, numPointLoads;
                     double xCoord, yCoord;
-                    string[] coords, lineConstraint, lineLoad;
+                    string[] coords, lineConstraint, lineLoad, pointLoad;
 
                     for (int i = 0; i < numMaterialBlocks; i++)
                     {
@@ -993,6 +1003,16 @@ namespace SlopeFEA
                                 newMaterialBlock.BoundaryPoints[int.Parse(lineLoad[1])],
                                 lineLoad[2] == Boolean.TrueString, double.Parse(lineLoad[3]), double.Parse(lineLoad[4]),
                                 lineLoad[5] == Boolean.TrueString, double.Parse(lineLoad[6]), double.Parse(lineLoad[7])));
+                        }
+
+                        numPointLoads = int.Parse(tr.ReadLine().Split('=')[1]);
+                        for (int j = 0; j < numPointLoads; j++)
+                        {
+                            pointLoad = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            newMaterialBlock.PointLoads.Add(new PointLoad(this,
+                                newMaterialBlock.BoundaryPoints[int.Parse(pointLoad[0])],
+                                pointLoad[1] == Boolean.TrueString, double.Parse(pointLoad[2]),
+                                pointLoad[3] == Boolean.TrueString, double.Parse(pointLoad[4])));
                         }
 
                         newMaterialType = materialTypes.Find(delegate(MaterialType mt) { return mt.Name == materialName; });
@@ -3003,7 +3023,8 @@ namespace SlopeFEA
                 else if (DrawMode == DrawModes.Materials)
                 {
                     // Add new material block
-                    materialBlocks.Add(new MaterialBlock(this, points));
+                    MaterialBlock newMaterialBlock = new MaterialBlock(this, points);
+                    materialBlocks.Add(newMaterialBlock);
                 }
             }
 

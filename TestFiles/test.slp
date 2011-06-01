@@ -12,9 +12,9 @@ PLOTTING DATA
 
 Units = m, kPa, kN/m^3
 
-XAxisMax = 120
+XAxisMax = 100
 XAxisMin = 0
-YAxisMax = 40
+YAxisMax = 50
 YAxisMin = 0
 
 XMajorDivision = 10
@@ -28,14 +28,15 @@ YMinorDivisions = 5
 BOUNDARY GEOMETRY DATA
 --------------------------------
 
-Number of Boundary Points = 6
+Number of Boundary Points = 7
 
-0, 40
-0, -5.07787441808129E-14
-120, -5.07787441808129E-14
-120, 20
-80, 20
-40, 40
+-14, 48
+-14, 3.99999999999999
+112, 3.99999999999999
+112, 24
+72, 24
+54, 36
+22, 48
 
 
 --------------------------------
@@ -46,12 +47,12 @@ Number of Material Types = 1
 
 Material #1
 Name = "sand"
-Colour = #FFF0DB86
+Colour = #FFEDF196
 Phi = 30
 Coh = 0
-Gamma = 17
+Gamma = 16
 Emod = 100000
-Nu = 0.35
+Nu = 0.33
 
 
 --------------------------------
@@ -62,21 +63,23 @@ Number of Material Blocks = 1
 
 Material Block #1
 Material Type = "sand"
-Number of Boundary Points = 7
-0, -5.07787441808129E-14, True, True
-120, -5.07787441808129E-14, True, True
-120, 20, True, False
-80, 20, False, False
-60, 30, False, False
-40, 40, False, False
-0, 40, True, False
+Number of Boundary Points = 8
+-14, 3.99999999999999, True, True
+112, 3.99999999999999, True, True
+112, 24, True, False
+72, 24, False, False
+54, 36, False, False
+22, 48, False, False
+4, 48, False, False
+-14, 48, True, False
 Number of Line Constraints = 3
-0, 1, False, True
-6, 0, True, False
+7, 0, True, False
 1, 2, True, False
-Number of Line Loads = 2
-3, 4, True, 10, 15, True, -10, 0
-4, 5, True, 15, 20, True, 0, 10
+0, 1, False, True
+Number of Line Loads = 1
+5, 6, True, -10, 0, True, -10, 0
+Number of Point Loads = 1
+6, True, -10, True, -10
 
 
 --------------------------------
@@ -96,8 +99,8 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 15
-Row Height = 7.5
+Column Width = 5
+Row Height = 2.5
 
 
 --------------------------------

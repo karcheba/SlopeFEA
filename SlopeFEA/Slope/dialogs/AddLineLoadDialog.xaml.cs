@@ -28,17 +28,7 @@
  ************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
@@ -56,9 +46,6 @@ namespace SlopeFEA
 
             this.canvas = canvas;
             this.load = load;
-            //this.Owner = (Window)((Grid)((TabControl)((Grid)canvas.Parent).Parent).Parent).Parent;
-
-            //canvas = (SlopeCanvas)((Grid)((TabControl)((Grid)this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
             // get units dependent scaling factor and strings
             double factor;

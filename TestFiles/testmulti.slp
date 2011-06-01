@@ -91,6 +91,7 @@ Number of Line Constraints = 3
 1, 2, True, False
 0, 1, False, True
 Number of Line Loads = 0
+Number of Point Loads = 0
 
 Material Block #2
 Material Type = "clay"
@@ -102,6 +103,7 @@ Number of Boundary Points = 4
 Number of Line Constraints = 1
 3, 0, True, False
 Number of Line Loads = 0
+Number of Point Loads = 0
 
 Material Block #3
 Material Type = "sand"
@@ -117,6 +119,7 @@ Number of Line Constraints = 2
 1, 2, True, False
 Number of Line Loads = 1
 3, 4, True, 10, 20, True, -5, -10
+Number of Point Loads = 0
 
 
 --------------------------------
@@ -145,6 +148,6 @@ ANALYSIS STATUS
 --------------------------------
 
 Analysis Type = FEA4NodedQuad
-Verified = False
-Meshed = False
+Verified = True
+Meshed = True
 Analyzed = False

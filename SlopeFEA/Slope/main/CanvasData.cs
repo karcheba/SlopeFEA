@@ -270,7 +270,14 @@ namespace SlopeFEA
             if (this.Area < 0)
             {
                 this.BoundaryPoints.Reverse();
-                this.Boundary.Points.Reverse();
+
+                PointCollection pts = this.Boundary.Points;
+                PointCollection revPts = new PointCollection();
+                for (int i = pts.Count - 1; i >= 0; i--)
+                {
+                    revPts.Add(pts[i]);
+                }
+                this.Boundary.Points = revPts;
             }
         }
 
@@ -934,7 +941,16 @@ namespace SlopeFEA
 
                 canvas.Children.Remove(this.Dot);
                 boundary.BoundaryPoints.Remove(this);
-                if (boundary.BoundaryPoints.Count == 0) boundary.Delete();
+
+                if (boundary.BoundaryPoints.Count <= 2)
+                {
+                    while (boundary.BoundaryPoints.Count > 0)
+                    {
+                        boundary.BoundaryPoints[0].Delete();
+                    }
+                    boundary.Boundary.Points.Clear();
+                    boundary.Delete();
+                }
             }
 
             if (material != null)
@@ -947,7 +963,15 @@ namespace SlopeFEA
                 canvas.Children.Remove(this.Dot);
                 material.BoundaryPoints.Remove(this);
 
-                if (material.BoundaryPoints.Count == 0) material.Delete();
+                if (material.BoundaryPoints.Count <= 2)
+                {
+                    while (material.BoundaryPoints.Count > 0)
+                    {
+                        material.BoundaryPoints[0].Delete();
+                    }
+                    material.Boundary.Points.Clear();
+                    material.Delete();
+                }
 
                 ClearFixLines();
 
@@ -968,6 +992,15 @@ namespace SlopeFEA
                     material.LineLoads.Remove(ll);
                 }
                 existingLLs.Clear();
+
+                // check if point loads contain the node and delete them
+                List<PointLoad> existingPLs = material.PointLoads.FindAll(delegate(PointLoad pl) { return pl.Node == this; });
+                foreach (PointLoad pl in existingPLs)
+                {
+                    pl.Delete();
+                    material.PointLoads.Remove(pl);
+                }
+                existingPLs.Clear();
             }
         }
 
@@ -1048,7 +1081,7 @@ namespace SlopeFEA
                 l.Points[1] = p;
             }
 
-            // update associated polygons and line constraints
+            // update associated polygons, line constraints, line loads, and point loads
             if (boundary != null) boundary.Boundary.Points[boundPointIndex] = point;
             else if (material != null)
             {
@@ -1062,6 +1095,11 @@ namespace SlopeFEA
                 foreach (LineLoad ll in material.LineLoads)
                 {
                     if (ll.Nodes.Contains(this)) ll.Update();
+                }
+
+                foreach (PointLoad pl in material.PointLoads)
+                {
+                    if (pl.Node == this) pl.Update();
                 }
             }
         }
@@ -1328,35 +1366,36 @@ namespace SlopeFEA
         {
             // for applying rotations
             double xprime, yprime;
+            bool posXLoad = XLoad >= 0, posYLoad = YLoad >= 0;
 
             // horizontal load arrow shaft
-            loadLines[0].Points[0] = new Point(Node.Point.X, Node.Point.Y - 10);
+            loadLines[0].Points[0] = new Point(Node.Point.X - 20, Node.Point.Y);
             loadLines[0].Points[1] = loadLines[0].Points[0] + new Vector(40, 0);
             // horizontal load arrow head 1
-            loadLines[1].Points[0] = loadLines[0].Points[1];
-            loadLines[1].Points[1] = new Point(12, 0);
+            loadLines[1].Points[0] = posXLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
+            loadLines[1].Points[1] = posXLoad ? new Point(12, 0) : new Point(-12, 0);
             xprime = loadLines[1].Points[1].X * Cpos - loadLines[1].Points[1].Y * Spos + loadLines[1].Points[0].X;
             yprime = loadLines[1].Points[1].X * Spos + loadLines[1].Points[1].Y * Cpos + loadLines[1].Points[0].Y;
             loadLines[1].Points[1] = new Point(xprime, yprime);
             // horizontal load arrow head 2
-            loadLines[2].Points[0] = loadLines[0].Points[1];
-            loadLines[2].Points[1] = new Point(12, 0);
+            loadLines[2].Points[0] = posXLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
+            loadLines[2].Points[1] = posXLoad ? new Point(12, 0) : new Point(-12, 0);
             xprime = loadLines[2].Points[1].X * Cneg - loadLines[2].Points[1].Y * Sneg + loadLines[2].Points[0].X;
             yprime = loadLines[2].Points[1].X * Sneg + loadLines[2].Points[1].Y * Cneg + loadLines[2].Points[0].Y;
             loadLines[2].Points[1] = new Point(xprime, yprime);
 
             // vertical load arrow shaft
-            loadLines[3].Points[0] = loadLines[0].Points[0];
-            loadLines[3].Points[1] = loadLines[0].Points[0] + new Vector(0, -40);
+            loadLines[3].Points[0] = new Point(Node.Point.X, Node.Point.Y + 20);
+            loadLines[3].Points[1] = loadLines[3].Points[0] + new Vector(0, -40);
             // vertical load arrow head 1
-            loadLines[4].Points[0] = loadLines[3].Points[1];
-            loadLines[4].Points[1] = new Point(0, -12);
+            loadLines[4].Points[0] = posYLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
+            loadLines[4].Points[1] = posYLoad ? new Point(0, -12) : new Point(0, 12);
             xprime = loadLines[4].Points[1].X * Cpos - loadLines[4].Points[1].Y * Spos + loadLines[4].Points[0].X;
             yprime = loadLines[4].Points[1].X * Spos + loadLines[4].Points[1].Y * Cpos + loadLines[4].Points[0].Y;
             loadLines[4].Points[1] = new Point(xprime, yprime);
             // vertical load arrow head 2
-            loadLines[5].Points[0] = loadLines[3].Points[1];
-            loadLines[5].Points[1] = new Point(0, -12);
+            loadLines[5].Points[0] = posYLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
+            loadLines[5].Points[1] = posYLoad ? new Point(0, -12) : new Point(0, 12);
             xprime = loadLines[5].Points[1].X * Cneg - loadLines[5].Points[1].Y * Sneg + loadLines[5].Points[0].X;
             yprime = loadLines[5].Points[1].X * Sneg + loadLines[5].Points[1].Y * Cneg + loadLines[5].Points[0].Y;
             loadLines[5].Points[1] = new Point(xprime, yprime);
@@ -1536,19 +1575,21 @@ namespace SlopeFEA
 
             // for rotating points
             double xprime, yprime;
+            bool posNLoad = 0.5 * (NLoad1 + NLoad2) >= 0,
+                posTLoad = 0.5 * (TLoad1 + TLoad2) >= 0;
 
             // normal load arrow shaft
             loadLines[0].Points[0] = plotPoint - 15 * norm;
             loadLines[0].Points[1] = plotPoint + 15 * norm;
             // normal load arrow head 1
-            loadLines[1].Points[0] = loadLines[0].Points[1];
-            loadLines[1].Points[1] = (Point)(8 * norm);
+            loadLines[1].Points[0] = posNLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
+            loadLines[1].Points[1] = posNLoad ? (Point)(8 * norm) : (Point)(-8 * norm);
             xprime = loadLines[1].Points[1].X * Cpos - loadLines[1].Points[1].Y * Spos + loadLines[1].Points[0].X;
             yprime = loadLines[1].Points[1].X * Spos + loadLines[1].Points[1].Y * Cpos + loadLines[1].Points[0].Y;
             loadLines[1].Points[1] = new Point(xprime, yprime);
             // normal load arrow head 2
-            loadLines[2].Points[0] = loadLines[0].Points[1];
-            loadLines[2].Points[1] = (Point)(8 * norm);
+            loadLines[2].Points[0] = posNLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
+            loadLines[2].Points[1] = posNLoad ? (Point)(8 * norm) : (Point)(-8 * norm);
             xprime = loadLines[2].Points[1].X * Cneg - loadLines[2].Points[1].Y * Sneg + loadLines[2].Points[0].X;
             yprime = loadLines[2].Points[1].X * Sneg + loadLines[2].Points[1].Y * Cneg + loadLines[2].Points[0].Y;
             loadLines[2].Points[1] = new Point(xprime, yprime);
@@ -1557,14 +1598,14 @@ namespace SlopeFEA
             loadLines[3].Points[0] = plotPoint - 15 * tang;
             loadLines[3].Points[1] = plotPoint + 15 * tang;
             // tangential load arrow head 1
-            loadLines[4].Points[0] = loadLines[3].Points[1];
-            loadLines[4].Points[1] = (Point)(8 * tang);
+            loadLines[4].Points[0] = posTLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
+            loadLines[4].Points[1] = posTLoad ? (Point)(8 * tang) : (Point)(-8 * tang);
             xprime = loadLines[4].Points[1].X * Cpos - loadLines[4].Points[1].Y * Spos + loadLines[4].Points[0].X;
             yprime = loadLines[4].Points[1].X * Spos + loadLines[4].Points[1].Y * Cpos + loadLines[4].Points[0].Y;
             loadLines[4].Points[1] = new Point(xprime, yprime);
             // tangential load arrow head 2
-            loadLines[5].Points[0] = loadLines[3].Points[1];
-            loadLines[5].Points[1] = (Point)(8 * tang);
+            loadLines[5].Points[0] = posTLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
+            loadLines[5].Points[1] = posTLoad ? (Point)(8 * tang) : (Point)(-8 * tang);
             xprime = loadLines[5].Points[1].X * Cneg - loadLines[5].Points[1].Y * Sneg + loadLines[5].Points[0].X;
             yprime = loadLines[5].Points[1].X * Sneg + loadLines[5].Points[1].Y * Cneg + loadLines[5].Points[0].Y;
             loadLines[5].Points[1] = new Point(xprime, yprime);
@@ -1607,6 +1648,7 @@ namespace SlopeFEA
         private List<DrawingPoint> boundaryPoints;
         private List<LineConstraint> lineConstraints;
         private List<LineLoad> lineLoads;
+        private List<PointLoad> pointLoads;
 
         public MaterialBlock(SlopeCanvas canvas, Point[] pts)
         {
@@ -1633,6 +1675,7 @@ namespace SlopeFEA
 
             lineConstraints = new List<LineConstraint>();
             lineLoads = new List<LineLoad>();
+            pointLoads = new List<PointLoad>();
 
             SortPoints();
         }
@@ -1657,6 +1700,7 @@ namespace SlopeFEA
         public List<DrawingPoint> BoundaryPoints { get { return this.boundaryPoints; } }
         public List<LineConstraint> LineConstraints { get { return this.lineConstraints; } }
         public List<LineLoad> LineLoads { get { return this.lineLoads; } }
+        public List<PointLoad> PointLoads { get { return this.pointLoads; } }
 
         public MaterialType Material
         {
@@ -1705,8 +1749,15 @@ namespace SlopeFEA
         {
             if (this.Area < 0)
             {
-                this.Boundary.Points.Reverse();
                 this.BoundaryPoints.Reverse();
+
+                PointCollection pts = this.Boundary.Points;
+                PointCollection revPts = new PointCollection();
+                for (int i = pts.Count - 1; i >= 0; i--)
+                {
+                    revPts.Add(pts[i]);
+                }
+                this.Boundary.Points = revPts;
             }
         }
 
@@ -2032,6 +2083,38 @@ namespace SlopeFEA
 
         public void ApplyPointLoad(DrawingPoint p)
         {
+            // check if a point load has already been defined at this point
+            PointLoad load = pointLoads.Find(delegate(PointLoad pl) { return pl.Node == p; });
+
+            // if undefined, create a new point load object
+            if (load == null)
+            {
+                load = new PointLoad(canvas, p, false, 0, false, 0);
+                pointLoads.Add(load);
+            }
+
+            // start dialog for user input
+            AddPointLoadDialog dlg = new AddPointLoadDialog(canvas, load);
+            dlg.ShowDialog();
+
+            // if there is no load in horizontal or vertical direction, delete the load ...
+            if (!load.IsLoadedX && !load.IsLoadedY)
+            {
+                load.Delete();
+                pointLoads.Remove(load);
+            }
+
+            // ... otherwise update its visibility and plotting location
+            else
+            {
+                load.Update();
+            }
+
+            if (dlg.DialogResult == true)
+            {
+                canvas.IsSaved = false;
+                canvas.IsVerified = false;
+            }
         }
 
         public void ApplyLineLoad(DrawingPoint p1, DrawingPoint p2)
@@ -2079,6 +2162,7 @@ namespace SlopeFEA
                 // if there is no load in normal or tangential direction, delete the load ...
                 if (!load.IsLoadedN && !load.IsLoadedT)
                 {
+                    load.Delete();
                     lineLoads.Remove(load);
                 }
 
@@ -2121,6 +2205,11 @@ namespace SlopeFEA
             {
                 ll.Update();
             }
+
+            foreach (PointLoad pl in PointLoads)
+            {
+                pl.Update();
+            }
         }
 
         public void Zoom(double factor, Point centre)
@@ -2143,6 +2232,11 @@ namespace SlopeFEA
             foreach (LineLoad ll in LineLoads)
             {
                 ll.Update();
+            }
+
+            foreach (PointLoad pl in PointLoads)
+            {
+                pl.Update();
             }
         }
 

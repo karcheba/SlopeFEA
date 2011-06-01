@@ -174,3 +174,10 @@ REVISION HISTORY:
 +++ (CanvasData.cs) Added LineLoads to OpenInputFile()
 +++ (CanvasData.cs) Added check for existing line constraints and line loads to MaterialBlock.AddPoint() and DrawingPoint.Delete()
 +++ (CanvasData.cs) Added PointLoad class
++++ (AddPointLoadDialog.xaml, AddPointLoadDialog.xaml.cs) Created
++++ (CanvasData.cs) Added functionality to MaterialBlock.ApplyPointLoad()
++++ (CanvasData.cs) Added PointLoad.Update() to DrawingPoint.Move(), MaterialBlock.Translate(), and MaterialBlock.Zoom()
+=== (CanvasData.cs) Changed DrawingPoint.Delete() so that if parent material block or boundary has 2 or fewer points, all remaining points and the block will be deleted
++++ (CanvasData.cs) Added PointLoad.Delete() to DrawingPoint.Delete()
+=== (CanvasData.cs) Modified SlopeBoundary.SortPoints() and MaterialBlock.SortPoints() since actual polygon points were not being sorted correctly with PointCollection.Reverse()
+=== (CanvasData.cs) Modified LineLoad.Update() and PointLoad.Update() to indicate direction of loading
