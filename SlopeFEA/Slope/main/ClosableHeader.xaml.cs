@@ -34,7 +34,7 @@ using System.Windows.Controls;
 /// </summary>
 public partial class ClosableHeader : UserControl
 {
-    public ClosableHeader()
+    public ClosableHeader ()
     {
         InitializeComponent();
     }

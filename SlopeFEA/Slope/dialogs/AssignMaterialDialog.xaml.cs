@@ -41,22 +41,22 @@ namespace SlopeFEA
         private SlopeCanvas canvas;
         private MaterialType selectedMaterial;
 
-        public AssignMaterialDialog(Window owner)
+        public AssignMaterialDialog ( Window owner )
         {
             InitializeComponent();
 
             this.Owner = owner;
 
-            canvas = (SlopeCanvas)((Grid)((TabControl)((Grid)this.Owner.Content).Children[2]).SelectedContent).Children[2];
+            canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
-            for (int i = 0; i < canvas.MaterialTypes.Count; i++)
+            for ( int i = 0 ; i < canvas.MaterialTypes.Count ; i++ )
             {
-                materialList.Items.Add(canvas.MaterialTypes[i]);
+                materialList.Items.Add( canvas.MaterialTypes[i] );
             }
 
             materialList.SelectedIndex = 0;
 
-            switch (canvas.Units)
+            switch ( canvas.Units )
             {
                 case Units.Metres:
                     cohUnits.Content = emodUnits.Content = "kPa";
@@ -79,22 +79,22 @@ namespace SlopeFEA
 
         public MaterialType SelectedMaterial { get { return selectedMaterial; } }
 
-        private void materialList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void materialList_SelectionChanged ( object sender, SelectionChangedEventArgs e )
         {
             selectedMaterial = materialList.SelectedItem as MaterialType;
 
-            if (selectedMaterial != null)
+            if ( selectedMaterial != null )
             {
                 colour.Fill = selectedMaterial.Fill;
-                phi.Text = String.Format("{0}", Math.Round(selectedMaterial.Phi, 2));
-                coh.Text = String.Format("{0}", Math.Round(selectedMaterial.Cohesion, 2));
-                gamma.Text = String.Format("{0}", Math.Round(selectedMaterial.Gamma, 2));
-                emod.Text = String.Format("{0}", Math.Round(selectedMaterial.Emod, 2));
-                nu.Text = String.Format("{0}", Math.Round(selectedMaterial.Nu, 2));
+                phi.Text = String.Format( "{0}", Math.Round( selectedMaterial.Phi, 2 ) );
+                coh.Text = String.Format( "{0}", Math.Round( selectedMaterial.Cohesion, 2 ) );
+                gamma.Text = String.Format( "{0}", Math.Round( selectedMaterial.Gamma, 2 ) );
+                emod.Text = String.Format( "{0}", Math.Round( selectedMaterial.Emod, 2 ) );
+                nu.Text = String.Format( "{0}", Math.Round( selectedMaterial.Nu, 2 ) );
             }
         }
 
-        private void ok_Click(object sender, RoutedEventArgs e)
+        private void ok_Click ( object sender, RoutedEventArgs e )
         {
             this.DialogResult = true;
         }

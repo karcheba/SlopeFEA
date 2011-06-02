@@ -40,7 +40,7 @@ namespace SlopeFEA
         private SlopeCanvas canvas;
         private LineLoad load;
 
-        public AddLineLoadDialog (SlopeCanvas canvas, LineLoad load)
+        public AddLineLoadDialog ( SlopeCanvas canvas, LineLoad load )
         {
             InitializeComponent();
 
@@ -50,7 +50,7 @@ namespace SlopeFEA
             // get units dependent scaling factor and strings
             double factor;
             string coordUnits, loadUnits;
-            switch (canvas.Units)
+            switch ( canvas.Units )
             {
                 case Units.Metres: factor = 0.0254; coordUnits = "m"; loadUnits = "kN/m"; break;
                 case Units.Millimetres: factor = 25.4; coordUnits = "mm"; loadUnits = "kN/m"; break;
@@ -70,58 +70,58 @@ namespace SlopeFEA
             double xCoord, yCoord;
             xCoord = (load.Nodes[0].Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Nodes[0].Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords1.Content = String.Format("({0}, {1})", Math.Round(xCoord, 2), Math.Round(yCoord, 2));
+            coords1.Content = String.Format( "({0}, {1})", Math.Round( xCoord, 2 ), Math.Round( yCoord, 2 ) );
             xCoord = (load.Nodes[1].Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Nodes[1].Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords2.Content = String.Format("({0}, {1})", Math.Round(xCoord, 2), Math.Round(yCoord, 2));
+            coords2.Content = String.Format( "({0}, {1})", Math.Round( xCoord, 2 ), Math.Round( yCoord, 2 ) );
 
             // set existing load values (if present)
             isLoadedN.IsChecked = nLoad1.IsEnabled = nLoad2.IsEnabled = load.IsLoadedN;
-            nLoad1.Text = String.Format("{0}", Math.Round(load.NLoad1, 2));
-            nLoad2.Text = String.Format("{0}", Math.Round(load.NLoad2, 2));
+            nLoad1.Text = String.Format( "{0}", Math.Round( load.NLoad1, 2 ) );
+            nLoad2.Text = String.Format( "{0}", Math.Round( load.NLoad2, 2 ) );
             isLoadedT.IsChecked = tLoad1.IsEnabled = tLoad2.IsEnabled = load.IsLoadedT;
-            tLoad1.Text = String.Format("{0}", Math.Round(load.TLoad1, 2));
-            tLoad2.Text = String.Format("{0}", Math.Round(load.TLoad2, 2));
+            tLoad1.Text = String.Format( "{0}", Math.Round( load.TLoad1, 2 ) );
+            tLoad2.Text = String.Format( "{0}", Math.Round( load.TLoad2, 2 ) );
         }
 
-        private void ok_Click (object sender, RoutedEventArgs e)
+        private void ok_Click ( object sender, RoutedEventArgs e )
         {
             double nLoad1Val = 0, nLoad2Val = 0, tLoad1Val = 0, tLoad2Val = 0;
-            bool isLoadedNVal = (bool)isLoadedN.IsChecked;
-            bool isLoadedTVal = (bool)isLoadedT.IsChecked;
+            bool isLoadedNVal = (bool) isLoadedN.IsChecked;
+            bool isLoadedTVal = (bool) isLoadedT.IsChecked;
 
-            if (isLoadedNVal)
+            if ( isLoadedNVal )
             {
-                if (!double.TryParse(nLoad1.Text, out nLoad1Val))
+                if ( !double.TryParse( nLoad1.Text, out nLoad1Val ) )
                 {
-                    MessageBox.Show("Normal load at node 1 must have a numeric value.", "Data Error");
+                    MessageBox.Show( "Normal load at node 1 must have a numeric value.", "Data Error" );
                     return;
                 }
 
-                if (!double.TryParse(nLoad2.Text, out nLoad2Val))
+                if ( !double.TryParse( nLoad2.Text, out nLoad2Val ) )
                 {
-                    MessageBox.Show("Normal load at node 2 must have a numeric value.", "Data Error");
+                    MessageBox.Show( "Normal load at node 2 must have a numeric value.", "Data Error" );
                     return;
                 }
             }
 
-            if (isLoadedTVal)
+            if ( isLoadedTVal )
             {
-                if (!double.TryParse(tLoad1.Text, out tLoad1Val))
+                if ( !double.TryParse( tLoad1.Text, out tLoad1Val ) )
                 {
-                    MessageBox.Show("Tangential load at node 1 must have a numeric value.", "Data Error");
+                    MessageBox.Show( "Tangential load at node 1 must have a numeric value.", "Data Error" );
                     return;
                 }
 
-                if (!double.TryParse(tLoad2.Text, out tLoad2Val))
+                if ( !double.TryParse( tLoad2.Text, out tLoad2Val ) )
                 {
-                    MessageBox.Show("Tangential load at node 2 must have a numeric value.", "Data Error");
+                    MessageBox.Show( "Tangential load at node 2 must have a numeric value.", "Data Error" );
                     return;
                 }
             }
 
-            load.ApplyLoad(isLoadedNVal, nLoad1Val, nLoad2Val,
-                            isLoadedTVal, tLoad1Val, tLoad2Val);
+            load.ApplyLoad( isLoadedNVal, nLoad1Val, nLoad2Val,
+                            isLoadedTVal, tLoad1Val, tLoad2Val );
 
             canvas.IsSaved = false;
 
@@ -129,25 +129,25 @@ namespace SlopeFEA
         }
 
 
-        private void isLoadedN_Checked (object sender, RoutedEventArgs e)
+        private void isLoadedN_Checked ( object sender, RoutedEventArgs e )
         {
             nLoad1.IsEnabled = true;
             nLoad2.IsEnabled = true;
         }
 
-        private void isLoadedN_Unchecked (object sender, RoutedEventArgs e)
+        private void isLoadedN_Unchecked ( object sender, RoutedEventArgs e )
         {
             nLoad1.IsEnabled = false;
             nLoad2.IsEnabled = false;
         }
 
-        private void isLoadedT_Checked (object sender, RoutedEventArgs e)
+        private void isLoadedT_Checked ( object sender, RoutedEventArgs e )
         {
             tLoad1.IsEnabled = true;
             tLoad2.IsEnabled = true;
         }
 
-        private void isLoadedT_Unchecked (object sender, RoutedEventArgs e)
+        private void isLoadedT_Unchecked ( object sender, RoutedEventArgs e )
         {
             tLoad1.IsEnabled = false;
             tLoad2.IsEnabled = false;

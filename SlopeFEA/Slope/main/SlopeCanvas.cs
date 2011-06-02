@@ -74,7 +74,7 @@ namespace SlopeFEA
             analysisWorker = new BackgroundWorker();
             InitializeBackgroundWorker();
 
-            this.SizeChanged += new SizeChangedEventHandler(SlopeCanvas_SizeChanged);
+            this.SizeChanged += new SizeChangedEventHandler( SlopeCanvas_SizeChanged );
 
             // For drawing boundaries and material blocks
             drawLine = new Polyline();
@@ -82,7 +82,7 @@ namespace SlopeFEA
             drawLine.Opacity = 0.9;
 
             // For displaying analysis boundaries
-            boundary = new SlopeBoundary(this);
+            boundary = new SlopeBoundary( this );
 
             // Initialize material block list
             materialBlocks = new List<MaterialBlock>();
@@ -94,7 +94,10 @@ namespace SlopeFEA
             gridPoints = new List<GridPoint>();
 
             // Initialize material type list
-            materialTypes = new List<MaterialType>();
+            MaterialType nullMaterial = new MaterialType();
+            nullMaterial.Fill = Brushes.GhostWhite;
+            nullMaterial.Name = "NULL";
+            materialTypes = new List<MaterialType>() { nullMaterial };
 
             // Initialize list for adding a drawing point
             addPoints = new List<DrawingPoint>();
@@ -125,9 +128,9 @@ namespace SlopeFEA
             analysisWorker.WorkerSupportsCancellation = true;
             analysisWorker.WorkerReportsProgress = true;
 
-            analysisWorker.DoWork += new DoWorkEventHandler(analysisWorker_DoWork);
-            analysisWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(analysisWorker_RunWorkerCompleted);
-            analysisWorker.ProgressChanged += new ProgressChangedEventHandler(analysisWorker_ProgressChanged);
+            analysisWorker.DoWork += new DoWorkEventHandler( analysisWorker_DoWork );
+            analysisWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler( analysisWorker_RunWorkerCompleted );
+            analysisWorker.ProgressChanged += new ProgressChangedEventHandler( analysisWorker_ProgressChanged );
         }
 
 
@@ -173,19 +176,17 @@ namespace SlopeFEA
             }
             set
             {
-                if (value != this.showMesh)
+                if ( value != this.showMesh )
                 {
                     this.showMesh = value;
 
-                    if (this.IsMeshed)
+                    if ( this.IsMeshed )
                     {
                         boundary.ShowMesh = value;
 
-                        FEATriElements.ForEach(delegate(fe3NodedTriElement element)
-                        { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; });
+                        FEATriElements.ForEach( delegate( fe3NodedTriElement element ) { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; } );
 
-                        FEAQuadElements.ForEach(delegate(fe4NodedQuadElement element)
-                        { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; });
+                        FEAQuadElements.ForEach( delegate( fe4NodedQuadElement element ) { element.Boundary.Visibility = value ? Visibility.Visible : Visibility.Hidden; } );
                     }
                     else
                     {
@@ -203,11 +204,11 @@ namespace SlopeFEA
             }
             set
             {
-                if (value != this.showCritical)
+                if ( value != this.showCritical )
                 {
                     this.showCritical = value;
 
-                    if (this.IsAnalyzed && criticalSurface != null)
+                    if ( this.IsAnalyzed && criticalSurface != null )
                     {
                         criticalSurface.IsVisible = value;
                     }
@@ -225,18 +226,18 @@ namespace SlopeFEA
             }
             set
             {
-                if (this.isVerified != value)
+                if ( this.isVerified != value )
                 {
                     this.isVerified = value;
 
-                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-                    Menu mainMenu = (Menu)((DockPanel)((Grid)((TabControl)parentTab.Parent).Parent).Children[0]).Children[0];
-                    MenuItem analyzeMenu = (MenuItem)mainMenu.Items[3];
-                    MenuItem generateMesh = (MenuItem)analyzeMenu.Items[3];
+                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+                    Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) parentTab.Parent).Parent).Children[0]).Children[0];
+                    MenuItem analyzeMenu = (MenuItem) mainMenu.Items[3];
+                    MenuItem generateMesh = (MenuItem) analyzeMenu.Items[3];
 
                     generateMesh.IsEnabled = value;
 
-                    if (!value)
+                    if ( !value )
                     {
                         this.IsMeshed = value;
                         this.IsAnalyzed = value;
@@ -244,60 +245,60 @@ namespace SlopeFEA
                         // Check if mesh or analysis output files exist and move them
                         // to a new file name (so they are not overwritten or confused
                         // with new analysis on the updated input)
-                        if (FilePath != null)
+                        if ( FilePath != null )
                         {
-                            string[] split = FilePath.Split('.');
-                            if (split.Length > 1 && split[split.Length - 1] == "slp")
+                            string[] split = FilePath.Split( '.' );
+                            if ( split.Length > 1 && split[split.Length - 1] == "slp" )
                             {
                                 string[] meshsplit = new string[split.Length];
-                                split.CopyTo(meshsplit, 0);
+                                split.CopyTo( meshsplit, 0 );
                                 meshsplit[meshsplit.Length - 1] = "msh";
-                                string oldmeshpath = string.Join(".", meshsplit);
+                                string oldmeshpath = string.Join( ".", meshsplit );
 
                                 string[] bishsplit = new string[split.Length];
-                                split.CopyTo(bishsplit, 0);
+                                split.CopyTo( bishsplit, 0 );
                                 bishsplit[bishsplit.Length - 1] = "bish";
-                                string oldbishpath = string.Join(".", bishsplit);
+                                string oldbishpath = string.Join( ".", bishsplit );
 
                                 string[] rfemsplit = new string[split.Length];
-                                split.CopyTo(rfemsplit, 0);
+                                split.CopyTo( rfemsplit, 0 );
                                 rfemsplit[rfemsplit.Length - 1] = "rfem";
-                                string oldrfempath = string.Join(".", rfemsplit);
+                                string oldrfempath = string.Join( ".", rfemsplit );
 
                                 int oldcount = 0;
 
                                 // If a mesh or analysis file exists...
-                                if (File.Exists(oldmeshpath) || File.Exists(oldbishpath) || File.Exists(oldrfempath))
+                                if ( File.Exists( oldmeshpath ) || File.Exists( oldbishpath ) || File.Exists( oldrfempath ) )
                                 {
                                     // ...affix a counter to the filenames...
-                                    meshsplit[0] = String.Format("{0}_old{1}", meshsplit[0], oldcount);
-                                    string newmeshpath = string.Join(".", meshsplit);
+                                    meshsplit[0] = String.Format( "{0}_old{1}", meshsplit[0], oldcount );
+                                    string newmeshpath = string.Join( ".", meshsplit );
 
-                                    bishsplit[0] = String.Format("{0}_old{1}", bishsplit[0], oldcount);
-                                    string newbishpath = string.Join(".", bishsplit);
+                                    bishsplit[0] = String.Format( "{0}_old{1}", bishsplit[0], oldcount );
+                                    string newbishpath = string.Join( ".", bishsplit );
 
-                                    rfemsplit[0] = String.Format("{0}_old{1}", rfemsplit[0], oldcount);
-                                    string newrfempath = string.Join(".", rfemsplit);
+                                    rfemsplit[0] = String.Format( "{0}_old{1}", rfemsplit[0], oldcount );
+                                    string newrfempath = string.Join( ".", rfemsplit );
 
                                     // ...and check if other previous analysis files exist...
-                                    while (File.Exists(newmeshpath) || File.Exists(newbishpath) || File.Exists(newrfempath))
+                                    while ( File.Exists( newmeshpath ) || File.Exists( newbishpath ) || File.Exists( newrfempath ) )
                                     {
                                         oldcount++;
 
-                                        meshsplit[0] = String.Format("{0}{1}", meshsplit[0].Substring(0, meshsplit[0].Length - 1), oldcount);
-                                        newmeshpath = string.Join(".", meshsplit);
+                                        meshsplit[0] = String.Format( "{0}{1}", meshsplit[0].Substring( 0, meshsplit[0].Length - 1 ), oldcount );
+                                        newmeshpath = string.Join( ".", meshsplit );
 
-                                        bishsplit[0] = String.Format("{0}{1}", bishsplit[0].Substring(0, bishsplit[0].Length - 1), oldcount);
-                                        newbishpath = string.Join(".", bishsplit);
+                                        bishsplit[0] = String.Format( "{0}{1}", bishsplit[0].Substring( 0, bishsplit[0].Length - 1 ), oldcount );
+                                        newbishpath = string.Join( ".", bishsplit );
 
-                                        rfemsplit[0] = String.Format("{0}{1}", rfemsplit[0].Substring(0, rfemsplit.Length - 1), oldcount);
-                                        newrfempath = string.Join(".", rfemsplit);
+                                        rfemsplit[0] = String.Format( "{0}{1}", rfemsplit[0].Substring( 0, rfemsplit.Length - 1 ), oldcount );
+                                        newrfempath = string.Join( ".", rfemsplit );
                                     }
 
                                     // ...finally move previous analysis file to new filename
-                                    if (File.Exists(oldmeshpath)) File.Move(oldmeshpath, newmeshpath);
-                                    if (File.Exists(oldbishpath)) File.Move(oldbishpath, newbishpath);
-                                    if (File.Exists(oldrfempath)) File.Move(oldrfempath, newrfempath);
+                                    if ( File.Exists( oldmeshpath ) ) File.Move( oldmeshpath, newmeshpath );
+                                    if ( File.Exists( oldbishpath ) ) File.Move( oldbishpath, newbishpath );
+                                    if ( File.Exists( oldrfempath ) ) File.Move( oldrfempath, newrfempath );
                                 }
                             }
                         }
@@ -314,61 +315,61 @@ namespace SlopeFEA
             }
             set
             {
-                if (this.isMeshed != value)
+                if ( this.isMeshed != value )
                 {
                     this.isMeshed = value;
 
-                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-                    Menu mainMenu = (Menu)((DockPanel)((Grid)((TabControl)parentTab.Parent).Parent).Children[0]).Children[0];
-                    MenuItem analyzeMenu = (MenuItem)mainMenu.Items[3];
-                    MenuItem runAnalysis = (MenuItem)analyzeMenu.Items[0];
+                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+                    Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) parentTab.Parent).Parent).Children[0]).Children[0];
+                    MenuItem analyzeMenu = (MenuItem) mainMenu.Items[3];
+                    MenuItem runAnalysis = (MenuItem) analyzeMenu.Items[0];
 
                     runAnalysis.IsEnabled = value;
 
-                    MenuItem clearMesh = (MenuItem)analyzeMenu.Items[4];
+                    MenuItem clearMesh = (MenuItem) analyzeMenu.Items[4];
 
                     clearMesh.IsEnabled = value;
 
-                    MenuItem viewMenu = (MenuItem)mainMenu.Items[1];
-                    MenuItem showMesh = (MenuItem)viewMenu.Items[11];
+                    MenuItem viewMenu = (MenuItem) mainMenu.Items[1];
+                    MenuItem showMesh = (MenuItem) viewMenu.Items[11];
 
                     showMesh.IsChecked = value;
                     showMesh.IsEnabled = value;
 
-                    if (!value)
+                    if ( !value )
                     {
                         this.Boundary.ClearMesh();
 
-                        for (int i = 0; i < this.FEAQuadElements.Count; i++)
+                        for ( int i = 0 ; i < this.FEAQuadElements.Count ; i++ )
                         {
-                            this.Children.Remove(this.FEAQuadElements[i].Boundary);
+                            this.Children.Remove( this.FEAQuadElements[i].Boundary );
                         }
                         this.FEAQuadElements.Clear();
 
-                        for (int i = 0; i < this.FEATriElements.Count; i++)
+                        for ( int i = 0 ; i < this.FEATriElements.Count ; i++ )
                         {
-                            this.Children.Remove(this.FEATriElements[i].Boundary);
+                            this.Children.Remove( this.FEATriElements[i].Boundary );
                         }
                         this.FEATriElements.Clear();
 
-                        string[] path = FilePath.Split('.');
+                        string[] path = FilePath.Split( '.' );
                         path[path.Length - 1] = "nod";
-                        File.Delete(string.Join(".", path));
+                        File.Delete( string.Join( ".", path ) );
                         path[path.Length - 1] = "ele";
-                        File.Delete(string.Join(".", path));
+                        File.Delete( string.Join( ".", path ) );
                         path[path.Length - 1] = "mtl";
-                        File.Delete(string.Join(".", path));
+                        File.Delete( string.Join( ".", path ) );
                         path[path.Length - 1] = "bel";
-                        File.Delete(string.Join(".", path));
+                        File.Delete( string.Join( ".", path ) );
 
                         this.IsAnalyzed = false;
 
-                        if (criticalSurface != null) criticalSurface.Delete();
+                        if ( criticalSurface != null ) criticalSurface.Delete();
 
-                        while (runSurfaces.Count > 0)
+                        while ( runSurfaces.Count > 0 )
                         {
                             runSurfaces[0].Delete();
-                            runSurfaces.RemoveAt(0);
+                            runSurfaces.RemoveAt( 0 );
                         }
                     }
                 }
@@ -383,26 +384,26 @@ namespace SlopeFEA
             }
             set
             {
-                if (this.isAnalyzing != value)
+                if ( this.isAnalyzing != value )
                 {
                     this.isAnalyzing = value;
 
-                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-                    Menu mainMenu = (Menu)((DockPanel)((Grid)((TabControl)parentTab.Parent).Parent).Children[0]).Children[0];
-                    MenuItem analyzeMenu = (MenuItem)mainMenu.Items[3];
-                    MenuItem runAnalysis = (MenuItem)analyzeMenu.Items[0];
-                    MenuItem stopAnalysis = (MenuItem)analyzeMenu.Items[1];
+                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+                    Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) parentTab.Parent).Parent).Children[0]).Children[0];
+                    MenuItem analyzeMenu = (MenuItem) mainMenu.Items[3];
+                    MenuItem runAnalysis = (MenuItem) analyzeMenu.Items[0];
+                    MenuItem stopAnalysis = (MenuItem) analyzeMenu.Items[1];
 
                     runAnalysis.IsEnabled = !value;
                     stopAnalysis.IsEnabled = value;
 
-                    MenuItem generateMesh = (MenuItem)analyzeMenu.Items[3];
-                    MenuItem clearMesh = (MenuItem)analyzeMenu.Items[4];
+                    MenuItem generateMesh = (MenuItem) analyzeMenu.Items[3];
+                    MenuItem clearMesh = (MenuItem) analyzeMenu.Items[4];
 
                     generateMesh.IsEnabled = !value;
                     clearMesh.IsEnabled = !value;
 
-                    if (value) CentreAndFitExtents(true);
+                    if ( value ) CentreAndFitExtents( true );
 
                     analysisProgress.Visibility = value ? Visibility.Visible : Visibility.Hidden;
                     hideCanvasRect.Visibility = value ? Visibility.Visible : Visibility.Hidden;
@@ -418,13 +419,13 @@ namespace SlopeFEA
             }
             set
             {
-                if (this.isAnalyzed != value)
+                if ( this.isAnalyzed != value )
                 {
                     this.isAnalyzed = value;
 
-                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-                    Menu mainMenu = (Menu)((DockPanel)((Grid)((TabControl)parentTab.Parent).Parent).Children[0]).Children[0];
-                    MenuItem outputMenu = (MenuItem)mainMenu.Items[4];
+                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+                    Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) parentTab.Parent).Parent).Children[0]).Children[0];
+                    MenuItem outputMenu = (MenuItem) mainMenu.Items[4];
 
                     outputMenu.IsEnabled = value;
                 }
@@ -439,7 +440,7 @@ namespace SlopeFEA
             }
             set
             {
-                if (AnalysisType != value)
+                if ( AnalysisType != value )
                 {
                     this.analysisType = value;
                     this.IsSaved = false;
@@ -468,16 +469,16 @@ namespace SlopeFEA
             }
             set
             {
-                if (this.isSaved != value)
+                if ( this.isSaved != value )
                 {
                     this.isSaved = value;
 
-                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
+                    ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
 
                     string path = parentTab.Tag as string;
-                    if (path != null)
+                    if ( path != null )
                     {
-                        string[] pathSplit = path.Split('\\');
+                        string[] pathSplit = path.Split( '\\' );
                         string header = value ? pathSplit[pathSplit.Length - 1] : pathSplit[pathSplit.Length - 1] + "*";
                         parentTab.Title = header;
                     }
@@ -555,36 +556,36 @@ namespace SlopeFEA
 
         public void RunAnalysis ()
         {
-            switch (AnalysisType)
+            switch ( AnalysisType )
             {
                 case AnalysisType.Bishop:
                     this.IsAnalyzing = true;
 
-                    if (boundary.SaveMesh())
+                    if ( boundary.SaveMesh() )
                     {
                         analysisWorker.RunWorkerAsync();
                     }
                     else
                     {
-                        MessageBox.Show("Error generating .msh file.", "Error");
+                        MessageBox.Show( "Error generating .msh file.", "Error" );
                     }
                     break;
 
                 case AnalysisType.RFEM:
                     this.IsAnalyzing = true;
 
-                    if (boundary.SaveMesh())
+                    if ( boundary.SaveMesh() )
                     {
                         analysisWorker.RunWorkerAsync();
                     }
                     else
                     {
-                        MessageBox.Show("Error generating .msh file.", "Error");
+                        MessageBox.Show( "Error generating .msh file.", "Error" );
                     }
                     break;
 
                 default:
-                    MessageBox.Show("Run FEA code.", "FEA Analysis");
+                    MessageBox.Show( "Run FEA code.", "FEA Analysis" );
                     break;
             }
         }
@@ -601,34 +602,34 @@ namespace SlopeFEA
         }
 
 
-        public void SaveInputFile (string path)
+        public void SaveInputFile ( string path )
         {
-            if (path == null) return;
+            if ( path == null ) return;
 
             FilePath = path;
 
-            using (TextWriter tw = new StreamWriter(path))
+            using ( TextWriter tw = new StreamWriter( path ) )
             {
-                tw.WriteLine("*****************************************");
+                tw.WriteLine( "*****************************************" );
                 tw.WriteLine();
-                tw.WriteLine("        Slope 2011 Input File");
+                tw.WriteLine( "        Slope 2011 Input File" );
                 tw.WriteLine();
-                string[] projectnamesplit = path.Split(new char[] { '\\', '.' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] projectnamesplit = path.Split( new char[] { '\\', '.' }, StringSplitOptions.RemoveEmptyEntries );
                 string projectname = projectnamesplit[projectnamesplit.Length - 2];
-                tw.WriteLine("        Project Name: {0}", projectname);
+                tw.WriteLine( "        Project Name: {0}", projectname );
                 tw.WriteLine();
-                tw.WriteLine("*****************************************");
+                tw.WriteLine( "*****************************************" );
                 tw.WriteLine();
 
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("PLOTTING DATA");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "PLOTTING DATA" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
 
                 // Get units dependent scaling factor and label
                 double factor;
                 string units;
-                switch (Units)
+                switch ( Units )
                 {
                     case Units.Metres: units = "m, kPa, kN/m^3"; factor = 0.0254; break;
                     case Units.Millimetres: units = "mm, kPa, kN/m^3"; factor = 25.4; break;
@@ -636,184 +637,184 @@ namespace SlopeFEA
                     default: units = "in, psi, pcf"; factor = 1; break;
                 }
 
-                tw.WriteLine("Units = {0}", units);
+                tw.WriteLine( "Units = {0}", units );
 
                 tw.WriteLine();
 
-                tw.WriteLine("XAxisMax = {0}", XAxisMax);
-                tw.WriteLine("XAxisMin = {0}", XAxisMin);
-                tw.WriteLine("YAxisMax = {0}", YAxisMax);
-                tw.WriteLine("YAxisMin = {0}", YAxisMin);
+                tw.WriteLine( "XAxisMax = {0}", XAxisMax );
+                tw.WriteLine( "XAxisMin = {0}", XAxisMin );
+                tw.WriteLine( "YAxisMax = {0}", YAxisMax );
+                tw.WriteLine( "YAxisMin = {0}", YAxisMin );
 
                 tw.WriteLine();
 
-                tw.WriteLine("XMajorDivision = {0}", XMajorDivision);
-                tw.WriteLine("YMajorDivision = {0}", YMajorDivision);
+                tw.WriteLine( "XMajorDivision = {0}", XMajorDivision );
+                tw.WriteLine( "YMajorDivision = {0}", YMajorDivision );
 
                 tw.WriteLine();
 
-                tw.WriteLine("XMinorDivisions = {0}", XMinorDivisions);
-                tw.WriteLine("YMinorDivisions = {0}", YMinorDivisions);
+                tw.WriteLine( "XMinorDivisions = {0}", XMinorDivisions );
+                tw.WriteLine( "YMinorDivisions = {0}", YMinorDivisions );
 
                 tw.WriteLine();
                 tw.WriteLine();
 
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("BOUNDARY GEOMETRY DATA");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "BOUNDARY GEOMETRY DATA" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
-                tw.WriteLine("Number of Boundary Points = {0}", boundary.BoundaryPoints.Count);
+                tw.WriteLine( "Number of Boundary Points = {0}", boundary.BoundaryPoints.Count );
 
                 tw.WriteLine();
 
                 double xCoord, yCoord;
                 Point p;
 
-                for (int i = 0; i < boundary.BoundaryPoints.Count; i++)
+                for ( int i = 0 ; i < boundary.BoundaryPoints.Count ; i++ )
                 {
                     p = boundary.BoundaryPoints[i].Point;
 
                     xCoord = (p.X - OriginOffsetX) / dpiX * factor * Scale;
                     yCoord = (ActualHeight - p.Y - OriginOffsetY) / dpiY * factor * Scale;
 
-                    tw.WriteLine("{0}, {1}", xCoord, yCoord);
+                    tw.WriteLine( "{0}, {1}", xCoord, yCoord );
                 }
 
                 tw.WriteLine();
-                if (boundary.BoundaryPoints.Count > 0) tw.WriteLine();
+                if ( boundary.BoundaryPoints.Count > 0 ) tw.WriteLine();
 
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("MATERIAL TYPE DATA");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "MATERIAL TYPE DATA" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
-                tw.WriteLine("Number of Material Types = {0}", materialTypes.Count);
+                tw.WriteLine( "Number of Material Types = {0}", materialTypes.Count - 1 );
 
                 tw.WriteLine();
 
-                for (int i = 0; i < materialTypes.Count; i++)
+                for ( int i = 0 ; i < materialTypes.Count - 1 ; i++ )
                 {
-                    tw.WriteLine("Material #{0}", i + 1);
-                    tw.WriteLine("Name = \"{0}\"", materialTypes[i].Name);
-                    tw.WriteLine("Colour = {0}", materialTypes[i].Fill);
-                    tw.WriteLine("Phi = {0}", materialTypes[i].Phi);
-                    tw.WriteLine("Coh = {0}", materialTypes[i].Cohesion);
-                    tw.WriteLine("Gamma = {0}", materialTypes[i].Gamma);
-                    tw.WriteLine("Emod = {0}", materialTypes[i].Emod);
-                    tw.WriteLine("Nu = {0}", materialTypes[i].Nu);
+                    tw.WriteLine( "Material #{0}", i + 1 );
+                    tw.WriteLine( "Name = \"{0}\"", materialTypes[i].Name );
+                    tw.WriteLine( "Colour = {0}", materialTypes[i].Fill );
+                    tw.WriteLine( "Phi = {0}", materialTypes[i].Phi );
+                    tw.WriteLine( "Coh = {0}", materialTypes[i].Cohesion );
+                    tw.WriteLine( "Gamma = {0}", materialTypes[i].Gamma );
+                    tw.WriteLine( "Emod = {0}", materialTypes[i].Emod );
+                    tw.WriteLine( "Nu = {0}", materialTypes[i].Nu );
 
                     tw.WriteLine();
                 }
 
                 tw.WriteLine();
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("MATERIAL BLOCK DATA");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "MATERIAL BLOCK DATA" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
-                tw.WriteLine("Number of Material Blocks = {0}", materialBlocks.Count);
+                tw.WriteLine( "Number of Material Blocks = {0}", materialBlocks.Count );
 
                 tw.WriteLine();
 
-                for (int i = 0; i < materialBlocks.Count; i++)
+                for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                 {
-                    tw.WriteLine("Material Block #{0}", i + 1);
-                    tw.WriteLine("Material Type = \"{0}\"", materialBlocks[i].Material);
-                    tw.WriteLine("Number of Boundary Points = {0}", materialBlocks[i].BoundaryPoints.Count);
+                    tw.WriteLine( "Material Block #{0}", i + 1 );
+                    tw.WriteLine( "Material Type = \"{0}\"", materialBlocks[i].Material );
+                    tw.WriteLine( "Number of Boundary Points = {0}", materialBlocks[i].BoundaryPoints.Count );
 
-                    for (int j = 0; j < materialBlocks[i].BoundaryPoints.Count; j++)
+                    for ( int j = 0 ; j < materialBlocks[i].BoundaryPoints.Count ; j++ )
                     {
                         p = materialBlocks[i].BoundaryPoints[j].Point;
 
                         xCoord = (p.X - OriginOffsetX) / dpiX * factor * Scale;
                         yCoord = (ActualHeight - p.Y - OriginOffsetY) / dpiY * factor * Scale;
 
-                        tw.WriteLine("{0}, {1}, {2}, {3}", xCoord, yCoord,
+                        tw.WriteLine( "{0}, {1}, {2}, {3}", xCoord, yCoord,
                             materialBlocks[i].BoundaryPoints[j].IsFixedX,
-                            materialBlocks[i].BoundaryPoints[j].IsFixedY);
+                            materialBlocks[i].BoundaryPoints[j].IsFixedY );
                     }
 
-                    tw.WriteLine("Number of Line Constraints = {0}", materialBlocks[i].LineConstraints.Count);
+                    tw.WriteLine( "Number of Line Constraints = {0}", materialBlocks[i].LineConstraints.Count );
                     int index1, index2;
-                    foreach (LineConstraint lc in materialBlocks[i].LineConstraints)
+                    foreach ( LineConstraint lc in materialBlocks[i].LineConstraints )
                     {
-                        index1 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == lc.Nodes[0]; });
-                        index2 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == lc.Nodes[1]; });
-                        tw.WriteLine("{0}, {1}, {2}, {3}",
+                        index1 = materialBlocks[i].BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == lc.Nodes[0]; } );
+                        index2 = materialBlocks[i].BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == lc.Nodes[1]; } );
+                        tw.WriteLine( "{0}, {1}, {2}, {3}",
                             index1, index2,
-                            lc.IsFixedX, lc.IsFixedY);
+                            lc.IsFixedX, lc.IsFixedY );
                     }
 
-                    tw.WriteLine("Number of Line Loads = {0}", materialBlocks[i].LineLoads.Count);
-                    foreach (LineLoad ll in materialBlocks[i].LineLoads)
+                    tw.WriteLine( "Number of Line Loads = {0}", materialBlocks[i].LineLoads.Count );
+                    foreach ( LineLoad ll in materialBlocks[i].LineLoads )
                     {
-                        index1 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[0]; });
-                        index2 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[1]; });
-                        tw.WriteLine("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+                        index1 = materialBlocks[i].BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[0]; } );
+                        index2 = materialBlocks[i].BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[1]; } );
+                        tw.WriteLine( "{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
                             index1, index2,
                             ll.IsLoadedN, ll.NLoad1, ll.NLoad2,
-                            ll.IsLoadedT, ll.TLoad1, ll.TLoad2);
+                            ll.IsLoadedT, ll.TLoad1, ll.TLoad2 );
                     }
 
-                    tw.WriteLine("Number of Point Loads = {0}", materialBlocks[i].PointLoads.Count);
-                    foreach (PointLoad pl in materialBlocks[i].PointLoads)
+                    tw.WriteLine( "Number of Point Loads = {0}", materialBlocks[i].PointLoads.Count );
+                    foreach ( PointLoad pl in materialBlocks[i].PointLoads )
                     {
-                        index1 = materialBlocks[i].BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == pl.Node; });
-                        tw.WriteLine("{0}, {1}, {2}, {3}, {4}",
+                        index1 = materialBlocks[i].BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == pl.Node; } );
+                        tw.WriteLine( "{0}, {1}, {2}, {3}, {4}",
                             index1,
                             pl.IsLoadedX, pl.XLoad,
-                            pl.IsLoadedY, pl.YLoad);
+                            pl.IsLoadedY, pl.YLoad );
                     }
 
                     tw.WriteLine();
                 }
 
                 tw.WriteLine();
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("GENETIC ALGORITHM PARAMETERS");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "GENETIC ALGORITHM PARAMETERS" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
 
-                tw.WriteLine("Population = {0}", genAlgParams.Population);
-                tw.WriteLine("Generations = {0}", genAlgParams.Generations);
-                tw.WriteLine("Fittest Proportion = {0}", genAlgParams.FittestProportion);
-                tw.WriteLine("Mating Pool Proportion = {0}", genAlgParams.MatingPoolProportion);
-                tw.WriteLine("Crossover Probability = {0}", genAlgParams.CrossoverProbability);
-                tw.WriteLine("Mutation Probability = {0}", genAlgParams.MutationProbability);
-                tw.WriteLine("Slice Width = {0}", genAlgParams.SliceWidth);
-
-                tw.WriteLine();
-                tw.WriteLine();
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("FEA PARAMETERS");
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine();
-
-                tw.WriteLine("Column Width = {0}", feaParams.ColWidth);
-                tw.WriteLine("Row Height = {0}", feaParams.RowHeight);
+                tw.WriteLine( "Population = {0}", genAlgParams.Population );
+                tw.WriteLine( "Generations = {0}", genAlgParams.Generations );
+                tw.WriteLine( "Fittest Proportion = {0}", genAlgParams.FittestProportion );
+                tw.WriteLine( "Mating Pool Proportion = {0}", genAlgParams.MatingPoolProportion );
+                tw.WriteLine( "Crossover Probability = {0}", genAlgParams.CrossoverProbability );
+                tw.WriteLine( "Mutation Probability = {0}", genAlgParams.MutationProbability );
+                tw.WriteLine( "Slice Width = {0}", genAlgParams.SliceWidth );
 
                 tw.WriteLine();
                 tw.WriteLine();
-
-                tw.WriteLine("--------------------------------");
-                tw.WriteLine("ANALYSIS STATUS");
-                tw.WriteLine("--------------------------------");
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "FEA PARAMETERS" );
+                tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
 
-                tw.WriteLine("Analysis Type = {0}", AnalysisType);
-                tw.WriteLine("Verified = {0}", this.IsVerified);
-                tw.WriteLine("Meshed = {0}", this.IsMeshed);
-                tw.WriteLine("Analyzed = {0}", this.IsAnalyzed);
+                tw.WriteLine( "Column Width = {0}", feaParams.ColWidth );
+                tw.WriteLine( "Row Height = {0}", feaParams.RowHeight );
+
+                tw.WriteLine();
+                tw.WriteLine();
+
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "ANALYSIS STATUS" );
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine();
+
+                tw.WriteLine( "Analysis Type = {0}", AnalysisType );
+                tw.WriteLine( "Verified = {0}", this.IsVerified );
+                tw.WriteLine( "Meshed = {0}", this.IsMeshed );
+                tw.WriteLine( "Analyzed = {0}", this.IsAnalyzed );
             }
 
             this.IsSaved = true;
         }
 
-        public void OpenInputFile (string path)
+        public void OpenInputFile ( string path )
         {
-            if (path == null) return;
+            if ( path == null ) return;
 
             FilePath = path;
 
-            using (TextReader tr = new StreamReader(path))
+            using ( TextReader tr = new StreamReader( path ) )
             {
                 tr.ReadLine();      // *****************************************
                 tr.ReadLine();      //
@@ -828,9 +829,9 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                string units = tr.ReadLine().Split(new char[] { '=', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1].ToLower();
+                string units = tr.ReadLine().Split( new char[] { '=', ',', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1].ToLower();
                 double factor;
-                switch (units)
+                switch ( units )
                 {
                     case "m":
                         Units = Units.Metres;
@@ -852,20 +853,20 @@ namespace SlopeFEA
 
                 tr.ReadLine();
 
-                XAxisMax = double.Parse(tr.ReadLine().Split('=')[1]);
-                XAxisMin = double.Parse(tr.ReadLine().Split('=')[1]);
-                YAxisMax = double.Parse(tr.ReadLine().Split('=')[1]);
-                YAxisMin = double.Parse(tr.ReadLine().Split('=')[1]);
+                XAxisMax = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                XAxisMin = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                YAxisMax = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                YAxisMin = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();
 
-                XMajorDivision = double.Parse(tr.ReadLine().Split('=')[1]);
-                YMajorDivision = double.Parse(tr.ReadLine().Split('=')[1]);
+                XMajorDivision = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                YMajorDivision = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();
 
-                XMinorDivisions = int.Parse(tr.ReadLine().Split('=')[1]);
-                YMinorDivisions = int.Parse(tr.ReadLine().Split('=')[1]);
+                XMinorDivisions = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                YMinorDivisions = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 BuildAxes();
 
@@ -876,24 +877,24 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                int numBoundPoints = int.Parse(tr.ReadLine().Split('=')[1]);
+                int numBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();
 
-                if (numBoundPoints > 0)
+                if ( numBoundPoints > 0 )
                 {
                     Point[] boundPoints = new Point[numBoundPoints + 1];
                     double xCoord, yCoord;
                     string[] coords;
-                    for (int i = 0; i < numBoundPoints; i++)
+                    for ( int i = 0 ; i < numBoundPoints ; i++ )
                     {
-                        coords = tr.ReadLine().Split(',');
-                        xCoord = double.Parse(coords[0]);
-                        yCoord = double.Parse(coords[1]);
+                        coords = tr.ReadLine().Split( ',' );
+                        xCoord = double.Parse( coords[0] );
+                        yCoord = double.Parse( coords[1] );
                         boundPoints[i].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                         boundPoints[i].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                     }
-                    boundary = new SlopeBoundary(this, boundPoints);
+                    boundary = new SlopeBoundary( this, boundPoints );
 
                     tr.ReadLine();
                 }
@@ -904,28 +905,28 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                int numMaterials = int.Parse(tr.ReadLine().Split('=')[1]);
+                int numMaterials = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();
 
                 MaterialType newMaterial;
-                for (int i = 0; i < numMaterials; i++)
+                for ( int i = 0 ; i < numMaterials ; i++ )
                 {
                     tr.ReadLine();
 
                     newMaterial = new MaterialType();
-                    newMaterial.Name = tr.ReadLine().Split(new char[] { '\"' }, StringSplitOptions.RemoveEmptyEntries)[1];
-                    newMaterial.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(
-                        tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]));
-                    newMaterial.Phi = double.Parse(tr.ReadLine().Split('=')[1]);
-                    newMaterial.Cohesion = double.Parse(tr.ReadLine().Split('=')[1]);
-                    newMaterial.Gamma = double.Parse(tr.ReadLine().Split('=')[1]);
-                    newMaterial.Emod = double.Parse(tr.ReadLine().Split('=')[1]);
-                    newMaterial.Nu = double.Parse(tr.ReadLine().Split('=')[1]);
+                    newMaterial.Name = tr.ReadLine().Split( new char[] { '\"' }, StringSplitOptions.RemoveEmptyEntries )[1];
+                    newMaterial.Fill = new SolidColorBrush( (Color) ColorConverter.ConvertFromString(
+                        tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1] ) );
+                    newMaterial.Phi = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                    newMaterial.Cohesion = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                    newMaterial.Gamma = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                    newMaterial.Emod = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                    newMaterial.Nu = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                     tr.ReadLine();
 
-                    materialTypes.Add(newMaterial);
+                    materialTypes.Insert( this.materialTypes.Count - 1, newMaterial );
                 }
 
                 tr.ReadLine();      //
@@ -934,11 +935,11 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                int numMaterialBlocks = int.Parse(tr.ReadLine().Split('=')[1]);
+                int numMaterialBlocks = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();
 
-                if (numMaterialBlocks > 0)
+                if ( numMaterialBlocks > 0 )
                 {
                     MaterialBlock newMaterialBlock;
                     MaterialType newMaterialType;
@@ -950,73 +951,73 @@ namespace SlopeFEA
                     double xCoord, yCoord;
                     string[] coords, lineConstraint, lineLoad, pointLoad;
 
-                    for (int i = 0; i < numMaterialBlocks; i++)
+                    for ( int i = 0 ; i < numMaterialBlocks ; i++ )
                     {
                         tr.ReadLine();
 
-                        materialName = tr.ReadLine().Split(new char[] { '\"' }, StringSplitOptions.RemoveEmptyEntries)[1];
+                        materialName = tr.ReadLine().Split( new char[] { '\"' }, StringSplitOptions.RemoveEmptyEntries )[1];
 
-                        numMaterialBoundPoints = int.Parse(tr.ReadLine().Split('=')[1]);
+                        numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                         materialBoundPoints = new Point[numMaterialBoundPoints + 1];
                         isFixedX = new bool[numMaterialBoundPoints + 1];
                         isFixedY = new bool[numMaterialBoundPoints + 1];
 
-                        for (int j = 0; j < numMaterialBoundPoints; j++)
+                        for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {
-                            coords = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            xCoord = double.Parse(coords[0]);
-                            yCoord = double.Parse(coords[1]);
+                            coords = tr.ReadLine().Split( new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries );
+                            xCoord = double.Parse( coords[0] );
+                            yCoord = double.Parse( coords[1] );
                             materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                             isFixedX[j] = coords[2] == Boolean.TrueString;
                             isFixedY[j] = coords[3] == Boolean.TrueString;
                         }
 
-                        newMaterialBlock = new MaterialBlock(this, materialBoundPoints);
-                        for (int j = 0; j < numMaterialBoundPoints; j++)
+                        newMaterialBlock = new MaterialBlock( this, materialBoundPoints );
+                        for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {
                             newMaterialBlock.BoundaryPoints[j].IsFixedX = isFixedX[j];
                             newMaterialBlock.BoundaryPoints[j].IsFixedY = isFixedY[j];
                         }
 
-                        numLineConstraints = int.Parse(tr.ReadLine().Split('=')[1]);
-                        for (int j = 0; j < numLineConstraints; j++)
+                        numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numLineConstraints ; j++ )
                         {
-                            lineConstraint = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            newMaterialBlock.LineConstraints.Add(new LineConstraint(this,
-                                newMaterialBlock.BoundaryPoints[int.Parse(lineConstraint[0])],
-                                newMaterialBlock.BoundaryPoints[int.Parse(lineConstraint[1])],
+                            lineConstraint = tr.ReadLine().Split( new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries );
+                            newMaterialBlock.LineConstraints.Add( new LineConstraint( this,
+                                newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )],
+                                newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )],
                                 lineConstraint[2] == Boolean.TrueString,
-                                lineConstraint[3] == Boolean.TrueString));
+                                lineConstraint[3] == Boolean.TrueString ) );
                         }
 
-                        numLineLoads = int.Parse(tr.ReadLine().Split('=')[1]);
-                        for (int j = 0; j < numLineLoads; j++)
+                        numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numLineLoads ; j++ )
                         {
-                            lineLoad = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            newMaterialBlock.LineLoads.Add(new LineLoad(this,
-                                newMaterialBlock.BoundaryPoints[int.Parse(lineLoad[0])],
-                                newMaterialBlock.BoundaryPoints[int.Parse(lineLoad[1])],
-                                lineLoad[2] == Boolean.TrueString, double.Parse(lineLoad[3]), double.Parse(lineLoad[4]),
-                                lineLoad[5] == Boolean.TrueString, double.Parse(lineLoad[6]), double.Parse(lineLoad[7])));
+                            lineLoad = tr.ReadLine().Split( new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries );
+                            newMaterialBlock.LineLoads.Add( new LineLoad( this,
+                                newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[0] )],
+                                newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[1] )],
+                                lineLoad[2] == Boolean.TrueString, double.Parse( lineLoad[3] ), double.Parse( lineLoad[4] ),
+                                lineLoad[5] == Boolean.TrueString, double.Parse( lineLoad[6] ), double.Parse( lineLoad[7] ) ) );
                         }
 
-                        numPointLoads = int.Parse(tr.ReadLine().Split('=')[1]);
-                        for (int j = 0; j < numPointLoads; j++)
+                        numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numPointLoads ; j++ )
                         {
-                            pointLoad = tr.ReadLine().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            newMaterialBlock.PointLoads.Add(new PointLoad(this,
-                                newMaterialBlock.BoundaryPoints[int.Parse(pointLoad[0])],
-                                pointLoad[1] == Boolean.TrueString, double.Parse(pointLoad[2]),
-                                pointLoad[3] == Boolean.TrueString, double.Parse(pointLoad[4])));
+                            pointLoad = tr.ReadLine().Split( new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries );
+                            newMaterialBlock.PointLoads.Add( new PointLoad( this,
+                                newMaterialBlock.BoundaryPoints[int.Parse( pointLoad[0] )],
+                                pointLoad[1] == Boolean.TrueString, double.Parse( pointLoad[2] ),
+                                pointLoad[3] == Boolean.TrueString, double.Parse( pointLoad[4] ) ) );
                         }
 
-                        newMaterialType = materialTypes.Find(delegate(MaterialType mt) { return mt.Name == materialName; });
+                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
 
-                        if (newMaterialType != null) newMaterialBlock.Material = newMaterialType;
+                        if ( newMaterialType != null ) newMaterialBlock.Material = newMaterialType;
 
-                        materialBlocks.Add(newMaterialBlock);
+                        materialBlocks.Add( newMaterialBlock );
 
                         tr.ReadLine();
                     }
@@ -1028,13 +1029,13 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                genAlgParams.Population = int.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.Generations = int.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.FittestProportion = double.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.MatingPoolProportion = double.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.CrossoverProbability = double.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.MutationProbability = double.Parse(tr.ReadLine().Split('=')[1]);
-                genAlgParams.SliceWidth = double.Parse(tr.ReadLine().Split('=')[1]);
+                genAlgParams.Population = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.Generations = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.FittestProportion = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.MatingPoolProportion = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.CrossoverProbability = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.MutationProbability = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                genAlgParams.SliceWidth = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();      //
                 tr.ReadLine();      //
@@ -1043,8 +1044,8 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                feaParams.ColWidth = double.Parse(tr.ReadLine().Split('=')[1]);
-                feaParams.RowHeight = double.Parse(tr.ReadLine().Split('=')[1]);
+                feaParams.ColWidth = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.RowHeight = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();      //
                 tr.ReadLine();      //
@@ -1053,9 +1054,9 @@ namespace SlopeFEA
                 tr.ReadLine();      // --------------------------------
                 tr.ReadLine();      //
 
-                string analysistype = tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[2];
+                string analysistype = tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[2];
 
-                switch (analysistype)
+                switch ( analysistype )
                 {
                     case "Bishop": AnalysisType = AnalysisType.Bishop; break;
                     case "RFEM": AnalysisType = AnalysisType.RFEM; break;
@@ -1063,53 +1064,53 @@ namespace SlopeFEA
                     default: AnalysisType = AnalysisType.FEA3NodedTri; break;
                 }
 
-                this.IsVerified = tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]
+                this.IsVerified = tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1]
                                         == Boolean.TrueString;
 
-                this.IsMeshed = tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]
+                this.IsMeshed = tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1]
                                         == Boolean.TrueString;
 
 
 
-                this.IsAnalyzed = tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]
+                this.IsAnalyzed = tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1]
                                         == Boolean.TrueString;
 
                 this.ShowCritical = this.IsAnalyzed;
             }
 
-            ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-            TabControl windowManager = (TabControl)parentTab.Parent;
+            ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+            TabControl windowManager = (TabControl) parentTab.Parent;
 
-            if (this.IsMeshed)
+            if ( this.IsMeshed )
             {
-                switch (AnalysisType)
+                switch ( AnalysisType )
                 {
-                    case AnalysisType.Bishop: boundary.GenerateMesh(boundary.XMin, boundary.XMax); break;
-                    case AnalysisType.RFEM: boundary.GenerateMesh(boundary.XMin, boundary.XMax); break;
+                    case AnalysisType.Bishop: boundary.GenerateMesh( boundary.XMin, boundary.XMax ); break;
+                    case AnalysisType.RFEM: boundary.GenerateMesh( boundary.XMin, boundary.XMax ); break;
                     case AnalysisType.FEA3NodedTri: LoadFEA3NodedTriMesh(); break;
                     default: LoadFEA4NodedQuadMesh(); break;
                 }
 
             }
 
-            if (this.IsAnalyzed)
+            if ( this.IsAnalyzed )
             {
-                string[] pathsplit = FilePath.Split('.');
+                string[] pathsplit = FilePath.Split( '.' );
                 pathsplit[pathsplit.Length - 1] = "bish";
-                string bishpath = string.Join(".", pathsplit);
+                string bishpath = string.Join( ".", pathsplit );
 
-                if (File.Exists(bishpath))
+                if ( File.Exists( bishpath ) )
                 {
-                    Menu mainMenu = (Menu)((DockPanel)((Grid)windowManager.Parent).Children[0]).Children[0];
-                    MenuItem outputMenu = (MenuItem)mainMenu.Items[4];
-                    MenuItem showCritical = (MenuItem)outputMenu.Items[0];
+                    Menu mainMenu = (Menu) ((DockPanel) ((Grid) windowManager.Parent).Children[0]).Children[0];
+                    MenuItem outputMenu = (MenuItem) mainMenu.Items[4];
+                    MenuItem showCritical = (MenuItem) outputMenu.Items[0];
 
-                    List<string> contents = new List<string>(File.ReadAllLines(bishpath));
+                    List<string> contents = new List<string>( File.ReadAllLines( bishpath ) );
 
-                    int icritical = contents.FindIndex(delegate(string s) { return s.Contains("MOST CRITICAL SURFACE"); });
+                    int icritical = contents.FindIndex( delegate( string s ) { return s.Contains( "MOST CRITICAL SURFACE" ); } );
 
                     double factor;
-                    switch (Units)
+                    switch ( Units )
                     {
                         case Units.Metres: factor = 0.0254; break;
                         case Units.Millimetres: factor = 25.4; break;
@@ -1118,11 +1119,11 @@ namespace SlopeFEA
                     }
 
                     // Read in global critical surface geometry
-                    double radius = double.Parse(contents[icritical + 4].Split('=')[1]);
-                    double xEnter = double.Parse(contents[icritical + 5].Split('=')[1]);
-                    double yEnter = double.Parse(contents[icritical + 6].Split('=')[1]);
-                    double xExit = double.Parse(contents[icritical + 7].Split('=')[1]);
-                    double yExit = double.Parse(contents[icritical + 8].Split('=')[1]);
+                    double radius = double.Parse( contents[icritical + 4].Split( '=' )[1] );
+                    double xEnter = double.Parse( contents[icritical + 5].Split( '=' )[1] );
+                    double yEnter = double.Parse( contents[icritical + 6].Split( '=' )[1] );
+                    double xExit = double.Parse( contents[icritical + 7].Split( '=' )[1] );
+                    double yExit = double.Parse( contents[icritical + 8].Split( '=' )[1] );
 
                     // Convert to screen pixel units
                     radius = radius / (factor * Scale) * dpiX;
@@ -1132,8 +1133,8 @@ namespace SlopeFEA
                     yExit = ActualHeight - (yExit / (factor * Scale) * dpiY + OriginOffsetY);
 
                     // Create new surface
-                    criticalSurface = new DisplayCircularSurface(this,
-                        new Point(xEnter, yEnter), new Point(xExit, yExit), radius);
+                    criticalSurface = new DisplayCircularSurface( this,
+                        new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius );
 
                     // Indicate that it is the global critical surface with thicker line
                     criticalSurface.IsGlobalCritical = true;
@@ -1147,7 +1148,7 @@ namespace SlopeFEA
             this.IsSaved = true;
 
             BuildAxes();
-            CentreAndFitExtents(true);
+            CentreAndFitExtents( true );
         }
 
 
@@ -1159,7 +1160,7 @@ namespace SlopeFEA
             // Compute plot scaling factors [(pixels/inch) / (actual units/screen unit)]
             double xFactor = dpiX / Scale;
             double yFactor = dpiY / Scale;
-            switch (Units)
+            switch ( Units )
             {
                 // Apply unit modification factor (screen units/inch)
                 case Units.Metres: xFactor /= 0.0254; yFactor /= 0.0254; break;
@@ -1182,58 +1183,58 @@ namespace SlopeFEA
             xAxisBorder.BorderBrush = Brushes.DimGray;
             xAxisBorder.VerticalAlignment = VerticalAlignment.Stretch;
             xAxisBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
-            xAxisBorder.BorderThickness = new Thickness(1);
-            xAxisBorder.Margin = new Thickness(0);
-            xAxis.Children.Add(xAxisBorder);
+            xAxisBorder.BorderThickness = new Thickness( 1 );
+            xAxisBorder.Margin = new Thickness( 0 );
+            xAxis.Children.Add( xAxisBorder );
 
             // Add appropriate units label
             TextBlock xLabel = new TextBlock();
             string units;
-            switch (this.Units)
+            switch ( this.Units )
             {
                 case Units.Metres: units = "m"; break;
                 case Units.Millimetres: units = "mm"; break;
                 case Units.Feet: units = "ft"; break;
                 default: units = "in"; break;
             }
-            xLabel.Text = String.Format("X ({0})", units);
+            xLabel.Text = String.Format( "X ({0})", units );
             xLabel.FontSize = 10;
             xLabel.VerticalAlignment = VerticalAlignment.Bottom;
             xLabel.HorizontalAlignment = HorizontalAlignment.Left;
-            xLabel.Margin = new Thickness(10, 0, 0, 7);
-            xAxis.Children.Add(xLabel);
+            xLabel.Margin = new Thickness( 10, 0, 0, 7 );
+            xAxis.Children.Add( xLabel );
 
             Line majorLine, minorLine;      // For boxing axis lines and labels
             TextBlock majorLabel;
 
             // Add major and minor axis lines and labels to major divisions
-            for (double xMajor = XAxisMin; xMajor <= XAxisMax; xMajor += XMajorDivision)
+            for ( double xMajor = XAxisMin ; xMajor <= XAxisMax ; xMajor += XMajorDivision )
             {
                 majorLine = new Line();
                 majorLine.Stroke = Brushes.Black;
                 majorLine.X1 = majorLine.X2 = xMajor * xFactor + OriginOffsetX;
                 majorLine.Y1 = 0;
                 majorLine.Y2 = 25;
-                xAxis.Children.Add(majorLine);
+                xAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format("{0}", Math.Round(xMajor, 2));
+                majorLabel.Text = String.Format( "{0}", Math.Round( xMajor, 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Top;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Left;
-                majorLabel.Margin = new Thickness(majorLine.X1 + 5, 13, 0, 0);
-                xAxis.Children.Add(majorLabel);
+                majorLabel.Margin = new Thickness( majorLine.X1 + 5, 13, 0, 0 );
+                xAxis.Children.Add( majorLabel );
 
-                if (Math.Abs(xMajor - this.XAxisMax) > 1e-3)
+                if ( Math.Abs( xMajor - this.XAxisMax ) > 1e-3 )
                 {
-                    for (int ixMinor = 1; ixMinor < XMinorDivisions; ixMinor++)
+                    for ( int ixMinor = 1 ; ixMinor < XMinorDivisions ; ixMinor++ )
                     {
                         minorLine = new Line();
                         minorLine.Stroke = Brushes.Black;
                         minorLine.X1 = minorLine.X2 = majorLine.X1 + ixMinor * xMinor * xFactor;
                         minorLine.Y1 = 0;
                         minorLine.Y2 = 10;
-                        xAxis.Children.Add(minorLine);
+                        xAxis.Children.Add( minorLine );
                     }
                 }
             }
@@ -1248,51 +1249,51 @@ namespace SlopeFEA
             yAxisBorder.BorderBrush = Brushes.DimGray;
             yAxisBorder.VerticalAlignment = VerticalAlignment.Stretch;
             yAxisBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
-            yAxisBorder.BorderThickness = new Thickness(1);
-            yAxisBorder.Margin = new Thickness(0);
-            yAxis.Children.Add(yAxisBorder);
+            yAxisBorder.BorderThickness = new Thickness( 1 );
+            yAxisBorder.Margin = new Thickness( 0 );
+            yAxis.Children.Add( yAxisBorder );
 
             // Add appropriate units label
             TextBlock yLabel = new TextBlock();
-            yLabel.Text = String.Format("Y\n({0})", units);
+            yLabel.Text = String.Format( "Y\n({0})", units );
             yLabel.FontSize = 10;
             yLabel.TextAlignment = TextAlignment.Right;
             yLabel.VerticalAlignment = VerticalAlignment.Bottom;
             yLabel.HorizontalAlignment = HorizontalAlignment.Right;
-            yLabel.Margin = new Thickness(0, 0, 35, 10);
-            yAxis.Children.Add(yLabel);
+            yLabel.Margin = new Thickness( 0, 0, 35, 10 );
+            yAxis.Children.Add( yLabel );
 
             // Add major and minor axis lines and labels to major divisions
             // (NB: Actual units origin @ (0, ActualHeight) which is BL corner
             //      while screen pixels origin @ (0,0) which is TL corner
-            for (double yMajor = YAxisMin; yMajor <= YAxisMax; yMajor += YMajorDivision)
+            for ( double yMajor = YAxisMin ; yMajor <= YAxisMax ; yMajor += YMajorDivision )
             {
                 majorLine = new Line();
                 majorLine.Stroke = Brushes.Black;
                 majorLine.Y1 = majorLine.Y2 = ActualHeight - (yMajor * yFactor + OriginOffsetY);
                 majorLine.X1 = 65;
                 majorLine.X2 = 40;
-                yAxis.Children.Add(majorLine);
+                yAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format("{0}", Math.Round(yMajor, 2));
+                majorLabel.Text = String.Format( "{0}", Math.Round( yMajor, 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Bottom;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Right;
                 majorLabel.TextAlignment = TextAlignment.Right;
-                majorLabel.Margin = new Thickness(0, 0, 15, ActualHeight - majorLine.Y1 + 3);
-                yAxis.Children.Add(majorLabel);
+                majorLabel.Margin = new Thickness( 0, 0, 15, ActualHeight - majorLine.Y1 + 3 );
+                yAxis.Children.Add( majorLabel );
 
-                if (Math.Abs(yMajor - YAxisMax) > 1e-3)
+                if ( Math.Abs( yMajor - YAxisMax ) > 1e-3 )
                 {
-                    for (int iyMinor = 1; iyMinor < YMinorDivisions; iyMinor++)
+                    for ( int iyMinor = 1 ; iyMinor < YMinorDivisions ; iyMinor++ )
                     {
                         minorLine = new Line();
                         minorLine.Stroke = Brushes.Black;
                         minorLine.Y1 = minorLine.Y2 = majorLine.Y1 - iyMinor * yMinor * yFactor;
                         minorLine.X1 = 65;
                         minorLine.X2 = 55;
-                        yAxis.Children.Add(minorLine);
+                        yAxis.Children.Add( minorLine );
                     }
                 }
             }
@@ -1313,14 +1314,14 @@ namespace SlopeFEA
                                         ? true : false;
 
             // Create major and minor grid points
-            if (createMajor)
+            if ( createMajor )
             {
-                for (double x = XAxisMin; x <= XAxisMax; x += xMinor)
+                for ( double x = XAxisMin ; x <= XAxisMax ; x += xMinor )
                 {
-                    for (double y = YAxisMin; y <= YAxisMax; y += yMinor)
+                    for ( double y = YAxisMin ; y <= YAxisMax ; y += yMinor )
                     {
                         // Create and add the grid point
-                        p = new Point(x * xFactor + OriginOffsetX, ActualHeight - (y * yFactor + OriginOffsetY));
+                        p = new Point( x * xFactor + OriginOffsetX, ActualHeight - (y * yFactor + OriginOffsetY) );
 
                         // Determine if it is a major or minor grid point
                         // and tag it appropriately
@@ -1329,20 +1330,20 @@ namespace SlopeFEA
 
                         gp = null;
                         // If x and y major ratios are both whole numbers, it is a major grid point
-                        if (Math.Abs(xRatio - Math.Truncate(xRatio)) < 1e-3
-                            && Math.Abs(yRatio - Math.Truncate(yRatio)) < 1e-3)
+                        if ( Math.Abs( xRatio - Math.Truncate( xRatio ) ) < 1e-3
+                            && Math.Abs( yRatio - Math.Truncate( yRatio ) ) < 1e-3 )
                         {
-                            gp = new GridPoint(p, GridType.Major);
+                            gp = new GridPoint( p, GridType.Major );
                         }
-                        else if (createMinor)
+                        else if ( createMinor )
                         {
-                            gp = new GridPoint(p, GridType.Minor);
+                            gp = new GridPoint( p, GridType.Minor );
                         }
 
-                        if (gp != null)
+                        if ( gp != null )
                         {
                             // Set appropriate visibility
-                            if (ShowMinorGrid || (ShowMajorGrid && gp.Type == GridType.Major))
+                            if ( ShowMinorGrid || (ShowMajorGrid && gp.Type == GridType.Major) )
                             {
                                 gp.IsVisible = true;
                             }
@@ -1352,75 +1353,69 @@ namespace SlopeFEA
                             }
 
 
-                            gridPoints.Add(gp);
+                            gridPoints.Add( gp );
 
                             // Add grid point to canvas
-                            this.Children.Add(gp.Location);
+                            this.Children.Add( gp.Location );
                         }
                     }
                 }
             }
 
             // Add drawing Polygon objects back on top
-            this.Children.Add(boundary.Boundary);
-            boundary.BoundaryPoints.ForEach(delegate(DrawingPoint dp) { this.Children.Add(dp.Dot); });
+            this.Children.Add( boundary.Boundary );
+            boundary.BoundaryPoints.ForEach( delegate( DrawingPoint dp ) { this.Children.Add( dp.Dot ); } );
             materialBlocks.ForEach(
-                delegate(MaterialBlock mb)
-                {
-                    this.Children.Add(mb.Boundary);
+                delegate( MaterialBlock mb ) {
+                    this.Children.Add( mb.Boundary );
                     mb.BoundaryPoints.ForEach(
-                        delegate(DrawingPoint dp) { this.Children.Add(dp.Dot); });
-                });
+                        delegate( DrawingPoint dp ) { this.Children.Add( dp.Dot ); } );
+                } );
 
             FEATriElements.ForEach(
-                delegate(fe3NodedTriElement element) { this.Children.Add(element.Boundary); });
+                delegate( fe3NodedTriElement element ) { this.Children.Add( element.Boundary ); } );
             FEAQuadElements.ForEach(
-                delegate(fe4NodedQuadElement element) { this.Children.Add(element.Boundary); });
+                delegate( fe4NodedQuadElement element ) { this.Children.Add( element.Boundary ); } );
 
             materialBlocks.ForEach(
-                delegate(MaterialBlock mb)
-                {
+                delegate( MaterialBlock mb ) {
                     mb.BoundaryPoints.ForEach(
-                        delegate(DrawingPoint dp)
-                        {
-                            dp.FixLines.ForEach(delegate(Polyline l) { this.Children.Add(l); });
-                        });
+                        delegate( DrawingPoint dp ) {
+                            dp.FixLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } );
+                        } );
 
                     mb.LineConstraints.ForEach(
-                        delegate(LineConstraint lc)
-                        {
+                        delegate( LineConstraint lc ) {
                             lc.FixLines.ForEach(
-                                delegate(Polyline l) { if (!this.Children.Contains(l)) this.Children.Add(l); });
-                        });
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
+                        } );
 
                     mb.LineLoads.ForEach(
-                        delegate(LineLoad ll)
-                        {
+                        delegate( LineLoad ll ) {
                             ll.LoadLines.ForEach(
-                                delegate(Polyline l) { if (!this.Children.Contains(l)) this.Children.Add(l); });
-                        });
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
+                        } );
 
                     mb.PointLoads.ForEach(
-                        delegate(PointLoad pl)
-                        {
+                        delegate( PointLoad pl ) {
                             pl.LoadLines.ForEach(
-                                delegate(Polyline l) { if (!this.Children.Contains(l))this.Children.Add(l); });
-                        });
-                });
-            
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) )this.Children.Add( l ); } );
+                        } );
+                } );
 
-            this.Children.Add(drawLine);
-            this.Children.Add(zoomRect.Boundary);
-            if (criticalSurface != null) this.Children.Add(criticalSurface.Surface);
-            runSurfaces.ForEach(delegate(DisplayCircularSurface rs) { this.Children.Add(rs.Surface); });
 
-            if (!createMajor)
+            this.Children.Add( drawLine );
+            this.Children.Add( zoomRect.Boundary );
+            if ( criticalSurface != null ) this.Children.Add( criticalSurface.Surface );
+            runSurfaces.ForEach( delegate( DisplayCircularSurface rs ) { this.Children.Add( rs.Surface ); } );
+
+            if ( !createMajor )
             {
-                MessageBox.Show("Too many grid points to display.\nSnapping still active.", "Display Optimization");
+                MessageBox.Show( "Too many grid points to display.\nSnapping still active.", "Display Optimization" );
             }
-            else if (!createMinor)
+            else if ( !createMinor )
             {
-                MessageBox.Show("Too many minor grid points to display.\nMajor grid points still shown.\nSnapping still active.", "Display Optimization");
+                MessageBox.Show( "Too many minor grid points to display.\nMajor grid points still shown.\nSnapping still active.", "Display Optimization" );
             }
         }
 
@@ -1428,7 +1423,7 @@ namespace SlopeFEA
         /// <summary>
         /// Apply translation to canvas and axes content
         /// </summary>
-        public void Translate (Vector delta)
+        public void Translate ( Vector delta )
         {
             /*
              * Update plotting origin (in pixels)
@@ -1444,33 +1439,33 @@ namespace SlopeFEA
             TextBlock tb;
 
             // Update coordinates of x axis objects
-            for (int i = 2; i < xAxis.Children.Count; i++)
+            for ( int i = 2 ; i < xAxis.Children.Count ; i++ )
             {
-                if (xAxis.Children[i] is Line)
+                if ( xAxis.Children[i] is Line )
                 {
 
                     line = xAxis.Children[i] as Line;
                     line.X1 = line.X2 += delta.X;
                 }
-                else if (xAxis.Children[i] is TextBlock)
+                else if ( xAxis.Children[i] is TextBlock )
                 {
                     tb = xAxis.Children[i] as TextBlock;
-                    tb.Margin = new Thickness(tb.Margin.Left + delta.X, tb.Margin.Top, 0, 0);
+                    tb.Margin = new Thickness( tb.Margin.Left + delta.X, tb.Margin.Top, 0, 0 );
                 }
             }
 
             // Update coordinates of y axis objects
-            for (int i = 2; i < yAxis.Children.Count; i++)
+            for ( int i = 2 ; i < yAxis.Children.Count ; i++ )
             {
-                if (yAxis.Children[i] is Line)
+                if ( yAxis.Children[i] is Line )
                 {
                     line = yAxis.Children[i] as Line;
                     line.Y1 = line.Y2 += delta.Y;
                 }
-                else if (yAxis.Children[i] is TextBlock)
+                else if ( yAxis.Children[i] is TextBlock )
                 {
                     tb = yAxis.Children[i] as TextBlock;
-                    tb.Margin = new Thickness(0, 0, tb.Margin.Right, tb.Margin.Bottom - delta.Y);
+                    tb.Margin = new Thickness( 0, 0, tb.Margin.Right, tb.Margin.Bottom - delta.Y );
                 }
             }
 
@@ -1479,33 +1474,33 @@ namespace SlopeFEA
              */
 
             // Update grid point locations
-            for (int i = 0; i < gridPoints.Count; i++)
+            for ( int i = 0 ; i < gridPoints.Count ; i++ )
             {
-                gridPoints[i].Translate(delta);
+                gridPoints[i].Translate( delta );
             }
 
             // Update boundary shape
-            boundary.Translate(delta);
+            boundary.Translate( delta );
 
             // Update material blocks
-            for (int i = 0; i < materialBlocks.Count; i++)
+            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
             {
-                materialBlocks[i].Translate(delta);
+                materialBlocks[i].Translate( delta );
             }
 
             // Update FEA elements
-            for (int i = 0; i < FEATriElements.Count; i++)
+            for ( int i = 0 ; i < FEATriElements.Count ; i++ )
             {
-                FEATriElements[i].Translate(delta);
+                FEATriElements[i].Translate( delta );
             }
-            for (int i = 0; i < FEAQuadElements.Count; i++)
+            for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
             {
-                FEAQuadElements[i].Translate(delta);
+                FEAQuadElements[i].Translate( delta );
             }
 
             // Update drawing line
             Point p;
-            for (int i = 0; i < drawLine.Points.Count; i++)
+            for ( int i = 0 ; i < drawLine.Points.Count ; i++ )
             {
                 p = drawLine.Points[i];
                 p.X += delta.X;
@@ -1514,10 +1509,10 @@ namespace SlopeFEA
             }
 
             // Update critical surface
-            if (criticalSurface != null) criticalSurface.Translate(delta);
+            if ( criticalSurface != null ) criticalSurface.Translate( delta );
 
             // Update run surfaces
-            for (int i = 0; i < runSurfaces.Count; i++) runSurfaces[i].Translate(delta);
+            for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Translate( delta );
         }
 
 
@@ -1526,9 +1521,9 @@ namespace SlopeFEA
         /// </summary>
         public void UpdateGridDisplay ()
         {
-            for (int i = 0; i < gridPoints.Count; i++)
+            for ( int i = 0 ; i < gridPoints.Count ; i++ )
             {
-                if (ShowMinorGrid || (ShowMajorGrid && gridPoints[i].Type == GridType.Major))
+                if ( ShowMinorGrid || (ShowMajorGrid && gridPoints[i].Type == GridType.Major) )
                 {
                     gridPoints[i].IsVisible = true;
                 }
@@ -1545,16 +1540,16 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="factor">scaling factor for zoom</param>
         /// <param name="centre">central reference point</param>
-        public void Zoom (double factor, Point centre)
+        public void Zoom ( double factor, Point centre )
         {
             // Update plotting scale
             Scale /= factor;
 
             // Modify status bar display of scale
             StatusBar status =
-                (StatusBar)((DockPanel)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
-            StatusBarItem statusLabel = (StatusBarItem)status.Items[2];
-            statusLabel.Content = String.Format("Scale = {0} : 1", Math.Round(Scale, 2));
+                (StatusBar) ((DockPanel) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
+            StatusBarItem statusLabel = (StatusBarItem) status.Items[2];
+            statusLabel.Content = String.Format( "Scale = {0} : 1", Math.Round( Scale, 2 ) );
 
             // Update plotting origin (in pixels)
             OriginOffsetX = centre.X + factor * (OriginOffsetX - centre.X);
@@ -1568,32 +1563,32 @@ namespace SlopeFEA
             TextBlock tb;
 
             // Zoom x axis components
-            for (int i = 2; i < xAxis.Children.Count; i++)
+            for ( int i = 2 ; i < xAxis.Children.Count ; i++ )
             {
-                if (xAxis.Children[i] is Line)
+                if ( xAxis.Children[i] is Line )
                 {
                     line = xAxis.Children[i] as Line;
                     line.X1 = line.X2 = centre.X + factor * (line.X2 - centre.X);
                 }
-                else if (xAxis.Children[i] is TextBlock)
+                else if ( xAxis.Children[i] is TextBlock )
                 {
                     tb = xAxis.Children[i] as TextBlock;
-                    tb.Margin = new Thickness(centre.X + factor * (tb.Margin.Left - centre.X), tb.Margin.Top, 0, 0);
+                    tb.Margin = new Thickness( centre.X + factor * (tb.Margin.Left - centre.X), tb.Margin.Top, 0, 0 );
                 }
             }
 
             // Zoom y axis components
-            for (int i = 2; i < yAxis.Children.Count; i++)
+            for ( int i = 2 ; i < yAxis.Children.Count ; i++ )
             {
-                if (yAxis.Children[i] is Line)
+                if ( yAxis.Children[i] is Line )
                 {
                     line = yAxis.Children[i] as Line;
                     line.Y1 = line.Y2 = centre.Y + factor * (line.Y2 - centre.Y);
                 }
-                else if (yAxis.Children[i] is TextBlock)
+                else if ( yAxis.Children[i] is TextBlock )
                 {
                     tb = yAxis.Children[i] as TextBlock;
-                    tb.Margin = new Thickness(0, 0, tb.Margin.Right, (yAxis.ActualHeight - centre.Y) - factor * (yAxis.ActualHeight - tb.Margin.Bottom - centre.Y));
+                    tb.Margin = new Thickness( 0, 0, tb.Margin.Right, (yAxis.ActualHeight - centre.Y) - factor * (yAxis.ActualHeight - tb.Margin.Bottom - centre.Y) );
                 }
             }
 
@@ -1602,33 +1597,33 @@ namespace SlopeFEA
              */
 
             // Zoom grid point locations
-            for (int i = 0; i < gridPoints.Count; i++)
+            for ( int i = 0 ; i < gridPoints.Count ; i++ )
             {
-                gridPoints[i].Zoom(factor, centre);
+                gridPoints[i].Zoom( factor, centre );
             }
 
             // Zoom boundary shape
-            boundary.Zoom(factor, centre);
+            boundary.Zoom( factor, centre );
 
             // Zoom material blocks
-            for (int i = 0; i < materialBlocks.Count; i++)
+            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
             {
-                materialBlocks[i].Zoom(factor, centre);
+                materialBlocks[i].Zoom( factor, centre );
             }
 
             // Zoom FEA elements
-            for (int i = 0; i < FEATriElements.Count; i++)
+            for ( int i = 0 ; i < FEATriElements.Count ; i++ )
             {
-                FEATriElements[i].Zoom(factor, centre);
+                FEATriElements[i].Zoom( factor, centre );
             }
-            for (int i = 0; i < FEAQuadElements.Count; i++)
+            for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
             {
-                FEAQuadElements[i].Zoom(factor, centre);
+                FEAQuadElements[i].Zoom( factor, centre );
             }
 
             // Zoom drawing line
             Point p;
-            for (int i = 0; i < drawLine.Points.Count; i++)
+            for ( int i = 0 ; i < drawLine.Points.Count ; i++ )
             {
                 p = drawLine.Points[i];
                 p.X = centre.X + factor * (p.X - centre.X);
@@ -1637,10 +1632,10 @@ namespace SlopeFEA
             }
 
             // Zoom critical surface
-            if (criticalSurface != null) criticalSurface.Zoom(factor, centre);
+            if ( criticalSurface != null ) criticalSurface.Zoom( factor, centre );
 
             // Zoom run surfaces
-            for (int i = 0; i < runSurfaces.Count; i++) runSurfaces[i].Zoom(factor, centre);
+            for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Zoom( factor, centre );
         }
 
 
@@ -1650,7 +1645,7 @@ namespace SlopeFEA
         /// translation and scaling factors)
         /// </summary>
         /// <param name="zoom">true = centre view AND fit extents, false = just centre view</param>
-        public void CentreAndFitExtents (bool zoom)
+        public void CentreAndFitExtents ( bool zoom )
         {
             // Get initial values for extents from plotting axes
             // (NB: Drawing is allowed outside this range and this
@@ -1662,7 +1657,7 @@ namespace SlopeFEA
 
             // Get units dependent scaling factor
             double factor;
-            switch (Units)
+            switch ( Units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -1679,17 +1674,17 @@ namespace SlopeFEA
             // Check boundary drawing object for points outside
             // specified axis extents
             bool foundExtents = false;
-            foreach (Point p in boundary.Boundary.Points)
+            foreach ( Point p in boundary.Boundary.Points )
             {
-                if (p.X > xMaxPix) { xMaxPix = p.X; foundExtents = true; }
-                else if (p.X < xMinPix) { xMinPix = p.X; foundExtents = true; }
+                if ( p.X > xMaxPix ) { xMaxPix = p.X; foundExtents = true; }
+                else if ( p.X < xMinPix ) { xMinPix = p.X; foundExtents = true; }
 
-                if (p.Y < yMaxPix) { yMaxPix = p.Y; foundExtents = true; }
-                else if (p.Y > yMinPix) { yMinPix = p.Y; foundExtents = true; }
+                if ( p.Y < yMaxPix ) { yMaxPix = p.Y; foundExtents = true; }
+                else if ( p.Y > yMinPix ) { yMinPix = p.Y; foundExtents = true; }
             }
 
             // Convert extents back to pixels if they are outside specified extents
-            if (foundExtents)
+            if ( foundExtents )
             {
                 xMax = (xMaxPix - OriginOffsetX) * (factor / dpiX) * Scale;
                 xMin = (xMinPix - OriginOffsetX) * (factor / dpiX) * Scale;
@@ -1698,21 +1693,21 @@ namespace SlopeFEA
             }
 
             // Compute centre of desired window and centre of current window
-            Point fitCentre = new Point(0.5 * (xMaxPix + xMinPix), 0.5 * (yMaxPix + yMinPix));
-            Point canvCentre = new Point(0.5 * ActualWidth, 0.5 * ActualHeight);
+            Point fitCentre = new Point( 0.5 * (xMaxPix + xMinPix), 0.5 * (yMaxPix + yMinPix) );
+            Point canvCentre = new Point( 0.5 * ActualWidth, 0.5 * ActualHeight );
 
             // Shift points to desired centre
-            Translate(canvCentre - fitCentre);
+            Translate( canvCentre - fitCentre );
 
-            if (zoom)
+            if ( zoom )
             {
                 // Compute desired scale (fit all content with minimum of 100 pixels of padding)
                 double canvasWidth = (ActualWidth - 100) / dpiX * factor;
                 double canvasHeight = (ActualHeight - 100) / dpiY * factor;
-                double reqScale = Math.Max((xMax - xMin) / canvasWidth, (yMax - yMin) / canvasHeight);
+                double reqScale = Math.Max( (xMax - xMin) / canvasWidth, (yMax - yMin) / canvasHeight );
 
                 // Zoom by factor to achieve required scale with centre of window as focus point
-                Zoom(Scale / reqScale, new Point(0.5 * ActualWidth, 0.5 * ActualHeight));
+                Zoom( Scale / reqScale, new Point( 0.5 * ActualWidth, 0.5 * ActualHeight ) );
             }
         }
 
@@ -1720,21 +1715,21 @@ namespace SlopeFEA
         /// <summary>
         /// Zooms the window to fit the rectangle specified by zoomBounds
         /// </summary>
-        public void ZoomArea (Polygon zoomBounds)
+        public void ZoomArea ( Polygon zoomBounds )
         {
             // Compute centre of zoom region and centre of canvas
             Point fitCentre =
-                new Point(0.5 * (zoomBounds.Points[0].X + zoomBounds.Points[2].X),
-                            0.5 * (zoomBounds.Points[0].Y + zoomBounds.Points[2].Y));
+                new Point( 0.5 * (zoomBounds.Points[0].X + zoomBounds.Points[2].X),
+                            0.5 * (zoomBounds.Points[0].Y + zoomBounds.Points[2].Y) );
 
-            Point canvCentre = new Point(0.5 * ActualWidth, 0.5 * ActualHeight);
+            Point canvCentre = new Point( 0.5 * ActualWidth, 0.5 * ActualHeight );
 
             // Shift points so centres are coincident
-            Translate(canvCentre - fitCentre);
+            Translate( canvCentre - fitCentre );
 
             // Get units dependent scaling factor
             double factor;
-            switch (Units)
+            switch ( Units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -1743,18 +1738,18 @@ namespace SlopeFEA
             }
 
             // Compute zoom region dimensions (in actual units)
-            double realWidth = Math.Abs(zoomBounds.Points[0].X - zoomBounds.Points[2].X) * (factor / dpiX) * Scale;
-            double realHeight = Math.Abs(zoomBounds.Points[0].Y - zoomBounds.Points[2].Y) * (factor / dpiY) * Scale;
+            double realWidth = Math.Abs( zoomBounds.Points[0].X - zoomBounds.Points[2].X ) * (factor / dpiX) * Scale;
+            double realHeight = Math.Abs( zoomBounds.Points[0].Y - zoomBounds.Points[2].Y ) * (factor / dpiY) * Scale;
 
             // Compute canvas size (in screen units)
             double canvasWidth = ActualWidth / dpiX * factor;
             double canvasHeight = ActualHeight / dpiY * factor;
 
             // Compute required scale (actual units/screen units)
-            double reqScale = Math.Max(realWidth / canvasWidth, realHeight / canvasHeight);
+            double reqScale = Math.Max( realWidth / canvasWidth, realHeight / canvasHeight );
 
             // Zoom by appropriate factor centred on canvas centre
-            Zoom(Scale / reqScale, new Point(0.5 * ActualWidth, 0.5 * ActualHeight));
+            Zoom( Scale / reqScale, new Point( 0.5 * ActualWidth, 0.5 * ActualHeight ) );
         }
 
 
@@ -1772,13 +1767,13 @@ namespace SlopeFEA
         public void DeleteSelectedItems ()
         {
 
-            if (boundary.IsSelected)
+            if ( boundary.IsSelected )
             {
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show("Are you sure you want to delete analysis boundaries and all material blocks?",
-                                            "Delete Analysis Boundaries", MessageBoxButton.YesNo);
+                confirmed = MessageBox.Show( "Are you sure you want to delete analysis boundaries and all material blocks?",
+                                            "Delete Analysis Boundaries", MessageBoxButton.YesNo );
 
-                if (confirmed == MessageBoxResult.Yes)
+                if ( confirmed == MessageBoxResult.Yes )
                 {
                     RemoveBoundary();
                 }
@@ -1786,18 +1781,18 @@ namespace SlopeFEA
                 return;
             }
 
-            List<MaterialBlock> deletedBlocks = materialBlocks.FindAll(delegate(MaterialBlock mb) { return mb.IsSelected; });
-            if (deletedBlocks.Count > 0)
+            List<MaterialBlock> deletedBlocks = materialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.IsSelected; } );
+            if ( deletedBlocks.Count > 0 )
             {
                 string countMsg = deletedBlocks.Count == 1 ? " this material block" : " these " + deletedBlocks.Count + " material blocks";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show(String.Format("Are you sure you want to delete{0}?", countMsg),
-                                            "Delete Material Blocks", MessageBoxButton.YesNo);
+                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?", countMsg ),
+                                            "Delete Material Blocks", MessageBoxButton.YesNo );
 
-                if (confirmed == MessageBoxResult.Yes)
+                if ( confirmed == MessageBoxResult.Yes )
                 {
-                    for (int i = 0; i < deletedBlocks.Count; i++)
+                    for ( int i = 0 ; i < deletedBlocks.Count ; i++ )
                     {
                         deletedBlocks[i].Delete();
                     }
@@ -1809,18 +1804,18 @@ namespace SlopeFEA
                 return;
             }
 
-            List<DrawingPoint> deletedBoundPoints = boundary.BoundaryPoints.FindAll(delegate(DrawingPoint bp) { return bp.IsSelected; });
-            if (deletedBoundPoints.Count > 0)
+            List<DrawingPoint> deletedBoundPoints = boundary.BoundaryPoints.FindAll( delegate( DrawingPoint bp ) { return bp.IsSelected; } );
+            if ( deletedBoundPoints.Count > 0 )
             {
                 string countMsg = deletedBoundPoints.Count == 1 ? " this boundary point" : " these " + deletedBoundPoints.Count + " boundary points";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show(String.Format("Are you sure you want to delete{0}?", countMsg),
-                                            "Delete Boundary Points", MessageBoxButton.YesNo);
+                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?", countMsg ),
+                                            "Delete Boundary Points", MessageBoxButton.YesNo );
 
-                if (confirmed == MessageBoxResult.Yes)
+                if ( confirmed == MessageBoxResult.Yes )
                 {
-                    for (int i = 0; i < deletedBoundPoints.Count; i++)
+                    for ( int i = 0 ; i < deletedBoundPoints.Count ; i++ )
                     {
                         deletedBoundPoints[i].Delete();
                     }
@@ -1832,21 +1827,21 @@ namespace SlopeFEA
                 return;
             }
 
-            for (int i = 0; i < materialBlocks.Count; i++)
+            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
             {
-                deletedBoundPoints.InsertRange(0, materialBlocks[i].BoundaryPoints.FindAll(delegate(DrawingPoint bp) { return bp.IsSelected; }));
+                deletedBoundPoints.InsertRange( 0, materialBlocks[i].BoundaryPoints.FindAll( delegate( DrawingPoint bp ) { return bp.IsSelected; } ) );
             }
-            if (deletedBoundPoints.Count > 0)
+            if ( deletedBoundPoints.Count > 0 )
             {
                 string countMsg = deletedBoundPoints.Count == 1 ? " this material boundary point" : " these " + deletedBoundPoints.Count + " material boundary points";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show(String.Format("Are you sure you want to delete{0}?", countMsg),
-                                            "Delete Material Boundary Points", MessageBoxButton.YesNo);
+                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?", countMsg ),
+                                            "Delete Material Boundary Points", MessageBoxButton.YesNo );
 
-                if (confirmed == MessageBoxResult.Yes)
+                if ( confirmed == MessageBoxResult.Yes )
                 {
-                    for (int i = 0; i < deletedBoundPoints.Count; i++)
+                    for ( int i = 0 ; i < deletedBoundPoints.Count ; i++ )
                     {
                         deletedBoundPoints[i].Delete();
                     }
@@ -1872,13 +1867,13 @@ namespace SlopeFEA
             caughtCtrl = false;
 
             drawLine.Points.Clear();
-            this.Children.Remove(drawLine);
-            this.Children.Add(drawLine);
+            this.Children.Remove( drawLine );
+            this.Children.Add( drawLine );
         }
 
         public void ClearMaterialSelections ()
         {
-            for (int i = 0; i < materialBlocks.Count; i++)
+            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
             {
                 materialBlocks[i].IsSelected = false;
             }
@@ -1886,7 +1881,7 @@ namespace SlopeFEA
 
         public void ClearBoundaryPointSelections ()
         {
-            for (int i = 0; i < boundary.BoundaryPoints.Count; i++)
+            for ( int i = 0 ; i < boundary.BoundaryPoints.Count ; i++ )
             {
                 boundary.BoundaryPoints[i].IsSelected = false;
             }
@@ -1894,9 +1889,9 @@ namespace SlopeFEA
 
         public void ClearMaterialBoundaryPointSelections ()
         {
-            for (int i = 0; i < materialBlocks.Count; i++)
+            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
             {
-                for (int j = 0; j < materialBlocks[i].BoundaryPoints.Count; j++)
+                for ( int j = 0 ; j < materialBlocks[i].BoundaryPoints.Count ; j++ )
                 {
                     materialBlocks[i].BoundaryPoints[j].IsSelected = false;
                 }
@@ -1924,11 +1919,11 @@ namespace SlopeFEA
         /// MessageBoxResult.Yes - convert numerical unit values
         /// MessageBoxResult.No - leave numerical values, adjust scale
         /// </param>
-        public void UpdateUnits (MenuItem sender, MessageBoxResult convert)
+        public void UpdateUnits ( MenuItem sender, MessageBoxResult convert )
         {
             // Set conversion factor (current units / in)
             double distConv, pressConv, weightConv, lineLoadConv, pointLoadConv;
-            switch (Units)
+            switch ( Units )
             {
                 case Units.Metres:
                     distConv = 0.0254;
@@ -1963,7 +1958,7 @@ namespace SlopeFEA
             // Set new units and update conversion factor
             // convFact -> [(current units / in) / (new units / in)]
             string unitsLabel;
-            switch (sender.Name)
+            switch ( sender.Name )
             {
                 case "unitsM":
                     Units = Units.Metres;
@@ -1998,11 +1993,11 @@ namespace SlopeFEA
             }
 
             // Update axis units labels
-            ((TextBlock)xAxis.Children[1]).Text = String.Format("X ({0})", unitsLabel);
-            ((TextBlock)yAxis.Children[1]).Text = String.Format("Y\n({0})", unitsLabel);
+            ((TextBlock) xAxis.Children[1]).Text = String.Format( "X ({0})", unitsLabel );
+            ((TextBlock) yAxis.Children[1]).Text = String.Format( "Y\n({0})", unitsLabel );
 
             // If conversion is desired, convert appropriate values
-            if (convert == MessageBoxResult.Yes)
+            if ( convert == MessageBoxResult.Yes )
             {
                 XAxisMax /= distConv;
                 XAxisMin /= distConv;
@@ -2012,12 +2007,11 @@ namespace SlopeFEA
                 YMajorDivision /= distConv;
 
                 materialTypes.ForEach(
-                    delegate(MaterialType mt)
-                    {
+                    delegate( MaterialType mt ) {
                         mt.Cohesion *= pressConv;
                         mt.Gamma *= weightConv;
                         mt.Emod *= pressConv;
-                    });
+                    } );
 
                 genAlgParams.SliceWidth /= distConv;
                 feaParams.ElementSize /= distConv;
@@ -2025,32 +2019,30 @@ namespace SlopeFEA
                 feaParams.RowHeight /= distConv;
 
                 FEATriElements.ForEach(
-                    delegate(fe3NodedTriElement e)
-                    {
+                    delegate( fe3NodedTriElement e ) {
                         e.Nodes.ForEach(
-                            delegate(feNode node) { node.X /= distConv; node.Y /= distConv; });
-                    });
+                            delegate( feNode node ) { node.X /= distConv; node.Y /= distConv; } );
+                    } );
                 FEAQuadElements.ForEach(
-                    delegate(fe4NodedQuadElement e)
-                    {
+                    delegate( fe4NodedQuadElement e ) {
                         e.Nodes.ForEach(
-                            delegate(feNode node) { node.X /= distConv; node.Y /= distConv; });
-                    });
+                            delegate( feNode node ) { node.X /= distConv; node.Y /= distConv; } );
+                    } );
 
-                foreach (MaterialBlock mb in MaterialBlocks)
+                foreach ( MaterialBlock mb in MaterialBlocks )
                 {
-                    foreach (LineLoad ll in mb.LineLoads)
+                    foreach ( LineLoad ll in mb.LineLoads )
                     {
-                        ll.ApplyLoad(ll.IsLoadedN,
+                        ll.ApplyLoad( ll.IsLoadedN,
                             ll.NLoad1 * lineLoadConv, ll.NLoad2 * lineLoadConv,
                             ll.IsLoadedT,
-                            ll.TLoad1 * lineLoadConv, ll.TLoad2 * lineLoadConv);
+                            ll.TLoad1 * lineLoadConv, ll.TLoad2 * lineLoadConv );
                     }
 
-                    foreach (PointLoad pl in mb.PointLoads)
+                    foreach ( PointLoad pl in mb.PointLoads )
                     {
-                        pl.ApplyLoad(pl.IsLoadedX, pl.XLoad * pointLoadConv,
-                            pl.IsLoadedY, pl.YLoad * pointLoadConv);
+                        pl.ApplyLoad( pl.IsLoadedX, pl.XLoad * pointLoadConv,
+                            pl.IsLoadedY, pl.YLoad * pointLoadConv );
                     }
                 }
 
@@ -2064,10 +2056,10 @@ namespace SlopeFEA
                 Scale *= distConv;
 
                 StatusBar status =
-                (StatusBar)((DockPanel)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
-                StatusBarItem statusLabel = (StatusBarItem)status.Items[2];
+                (StatusBar) ((DockPanel) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
+                StatusBarItem statusLabel = (StatusBarItem) status.Items[2];
 
-                statusLabel.Content = String.Format("Scale = {0}:1", Math.Round(Scale, 2));
+                statusLabel.Content = String.Format( "Scale = {0}:1", Math.Round( Scale, 2 ) );
             }
 
             this.IsSaved = false;
@@ -2080,54 +2072,54 @@ namespace SlopeFEA
         public void LoadFEA3NodedTriMesh ()
         {
             // load file path
-            string[] path = FilePath.Split('.');
+            string[] path = FilePath.Split( '.' );
 
             // get node file name
             path[path.Length - 1] = "nod";
-            string nodeFile = string.Join(".", path);
+            string nodeFile = string.Join( ".", path );
 
             // get element file name
             path[path.Length - 1] = "ele";
-            string elementFile = string.Join(".", path);
+            string elementFile = string.Join( ".", path );
 
             // ensure that these files exist
-            if (!File.Exists(nodeFile) || !File.Exists(elementFile))
+            if ( !File.Exists( nodeFile ) || !File.Exists( elementFile ) )
             {
-                if (!File.Exists(nodeFile)) MessageBox.Show("Error: .nod file not found");
-                if (!File.Exists(elementFile)) MessageBox.Show("Error: .ele file not found");
+                if ( !File.Exists( nodeFile ) ) MessageBox.Show( "Error: .nod file not found" );
+                if ( !File.Exists( elementFile ) ) MessageBox.Show( "Error: .ele file not found" );
                 return;
             }
 
             List<feNode> nodes = new List<feNode>();
             string[] split;
-            using (TextReader tr = new StreamReader(nodeFile))
+            using ( TextReader tr = new StreamReader( nodeFile ) )
             {
-                int numNodes = int.Parse(tr.ReadLine());
+                int numNodes = int.Parse( tr.ReadLine() );
                 feNode newNode;
-                for (int i = 0; i < numNodes; i++)
+                for ( int i = 0 ; i < numNodes ; i++ )
                 {
-                    split = tr.ReadLine().Split('\t');
-                    newNode = new feNode(int.Parse(split[0]), false,
-                        double.Parse(split[1]), double.Parse(split[2]));
-                    newNode.XLoad = double.Parse(split[3]);
-                    newNode.YLoad = double.Parse(split[4]);
-                    nodes.Add(newNode);
+                    split = tr.ReadLine().Split( '\t' );
+                    newNode = new feNode( int.Parse( split[0] ), false,
+                        double.Parse( split[1] ), double.Parse( split[2] ) );
+                    newNode.XLoad = double.Parse( split[3] );
+                    newNode.YLoad = double.Parse( split[4] );
+                    nodes.Add( newNode );
                 }
             }
 
             List<fe3NodedTriElement> elements = new List<fe3NodedTriElement>();
-            using (TextReader tr = new StreamReader(elementFile))
+            using ( TextReader tr = new StreamReader( elementFile ) )
             {
                 tr.ReadLine();
-                int numElements = int.Parse(tr.ReadLine());
-                for (int i = 0; i < numElements; i++)
+                int numElements = int.Parse( tr.ReadLine() );
+                for ( int i = 0 ; i < numElements ; i++ )
                 {
-                    split = tr.ReadLine().Split('\t');
-                    elements.Add(new fe3NodedTriElement(int.Parse(split[0]),
-                        nodes[int.Parse(split[1]) - 1],
-                        nodes[int.Parse(split[2]) - 1],
-                        nodes[int.Parse(split[3]) - 1],
-                        MaterialTypes[int.Parse(split[4])], false));
+                    split = tr.ReadLine().Split( '\t' );
+                    elements.Add( new fe3NodedTriElement( int.Parse( split[0] ),
+                        nodes[int.Parse( split[1] ) - 1],
+                        nodes[int.Parse( split[2] ) - 1],
+                        nodes[int.Parse( split[3] ) - 1],
+                        MaterialTypes[int.Parse( split[4] )], false ) );
                 }
             }
 
@@ -2144,7 +2136,7 @@ namespace SlopeFEA
 
             // get units dependent scaling factor
             double factor;
-            switch (units)
+            switch ( units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -2154,22 +2146,23 @@ namespace SlopeFEA
 
             Polygon newPolygon;
             double x, y;
-            for (int i = 0; i < elements.Count; i++)
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
                 newPolygon = new Polygon();
+                newPolygon.StrokeThickness = 0.6;
                 newPolygon.Stroke = Brushes.Black;
                 newPolygon.Opacity = /*1.0*/ 0.8;
                 newPolygon.Fill = /*Brushes.White*/ elements[i].Material.Fill;
 
-                foreach (feNode node in elements[i].Nodes)
+                foreach ( feNode node in elements[i].Nodes )
                 {
                     x = node.X / (scale * factor) * dpiX + originX;
                     y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                    newPolygon.Points.Add(new Point(x, y));
+                    newPolygon.Points.Add( new Point( x, y ) );
                 }
 
                 elements[i].Boundary = newPolygon;
-                this.Children.Add(newPolygon);
+                this.Children.Add( newPolygon );
             }
 
             ShowMesh = true;
@@ -2182,55 +2175,55 @@ namespace SlopeFEA
         public void LoadFEA4NodedQuadMesh ()
         {
             // load file path
-            string[] path = FilePath.Split('.');
+            string[] path = FilePath.Split( '.' );
 
             // get node file name
             path[path.Length - 1] = "nod";
-            string nodeFile = string.Join(".", path);
+            string nodeFile = string.Join( ".", path );
 
             // get element file name
             path[path.Length - 1] = "ele";
-            string elementFile = string.Join(".", path);
+            string elementFile = string.Join( ".", path );
 
             // ensure that these files exist
-            if (!File.Exists(nodeFile) || !File.Exists(elementFile))
+            if ( !File.Exists( nodeFile ) || !File.Exists( elementFile ) )
             {
-                if (!File.Exists(nodeFile)) MessageBox.Show("Error: .nod file not found");
-                if (!File.Exists(elementFile)) MessageBox.Show("Error: .ele file not found");
+                if ( !File.Exists( nodeFile ) ) MessageBox.Show( "Error: .nod file not found" );
+                if ( !File.Exists( elementFile ) ) MessageBox.Show( "Error: .ele file not found" );
                 return;
             }
 
             List<feNode> nodes = new List<feNode>();
             string[] split;
-            using (TextReader tr = new StreamReader(nodeFile))
+            using ( TextReader tr = new StreamReader( nodeFile ) )
             {
-                int numNodes = int.Parse(tr.ReadLine());
+                int numNodes = int.Parse( tr.ReadLine() );
                 feNode newNode;
-                for (int i = 0; i < numNodes; i++)
+                for ( int i = 0 ; i < numNodes ; i++ )
                 {
-                    split = tr.ReadLine().Split('\t');
-                    newNode = new feNode(int.Parse(split[0]), false,
-                        double.Parse(split[1]), double.Parse(split[2]));
-                    newNode.XLoad = double.Parse(split[3]);
-                    newNode.YLoad = double.Parse(split[4]);
-                    nodes.Add(newNode);
+                    split = tr.ReadLine().Split( '\t' );
+                    newNode = new feNode( int.Parse( split[0] ), false,
+                        double.Parse( split[1] ), double.Parse( split[2] ) );
+                    newNode.XLoad = double.Parse( split[3] );
+                    newNode.YLoad = double.Parse( split[4] );
+                    nodes.Add( newNode );
                 }
             }
 
             List<fe4NodedQuadElement> elements = new List<fe4NodedQuadElement>();
-            using (TextReader tr = new StreamReader(elementFile))
+            using ( TextReader tr = new StreamReader( elementFile ) )
             {
                 tr.ReadLine();
-                int numElements = int.Parse(tr.ReadLine());
-                for (int i = 0; i < numElements; i++)
+                int numElements = int.Parse( tr.ReadLine() );
+                for ( int i = 0 ; i < numElements ; i++ )
                 {
-                    split = tr.ReadLine().Split('\t');
-                    elements.Add(new fe4NodedQuadElement(int.Parse(split[0]),
-                        nodes[int.Parse(split[1]) - 1],
-                        nodes[int.Parse(split[2]) - 1],
-                        nodes[int.Parse(split[3]) - 1],
-                        nodes[int.Parse(split[4]) - 1],
-                        MaterialTypes[int.Parse(split[5])], false));
+                    split = tr.ReadLine().Split( '\t' );
+                    elements.Add( new fe4NodedQuadElement( int.Parse( split[0] ),
+                        nodes[int.Parse( split[1] ) - 1],
+                        nodes[int.Parse( split[2] ) - 1],
+                        nodes[int.Parse( split[3] ) - 1],
+                        nodes[int.Parse( split[4] ) - 1],
+                        MaterialTypes[int.Parse( split[5] )], false ) );
                 }
             }
 
@@ -2247,7 +2240,7 @@ namespace SlopeFEA
 
             // get units dependent scaling factor
             double factor;
-            switch (units)
+            switch ( units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -2257,22 +2250,23 @@ namespace SlopeFEA
 
             Polygon newPolygon;
             double x, y;
-            for (int i = 0; i < elements.Count; i++)
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
                 newPolygon = new Polygon();
+                newPolygon.StrokeThickness = 0.6;
                 newPolygon.Stroke = Brushes.Black;
                 newPolygon.Opacity = /*1.0*/ 0.8;
                 newPolygon.Fill = /*Brushes.White*/ elements[i].Material.Fill;
 
-                foreach (feNode node in elements[i].Nodes)
+                foreach ( feNode node in elements[i].Nodes )
                 {
                     x = node.X / (scale * factor) * dpiX + originX;
                     y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                    newPolygon.Points.Add(new Point(x, y));
+                    newPolygon.Points.Add( new Point( x, y ) );
                 }
 
                 elements[i].Boundary = newPolygon;
-                this.Children.Add(newPolygon);
+                this.Children.Add( newPolygon );
             }
 
             ShowMesh = true;
@@ -2284,23 +2278,23 @@ namespace SlopeFEA
         // OVERRIDES
         // ----------------------------------
 
-        protected override void OnMouseLeftButtonUp (MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonUp ( MouseButtonEventArgs e )
         {
-            base.OnMouseLeftButtonUp(e);
+            base.OnMouseLeftButtonUp( e );
 
-            Point p = Mouse.GetPosition(this);
+            Point p = Mouse.GetPosition( this );
 
-            switch (DrawMode)
+            switch ( DrawMode )
             {
                 case (DrawModes.Boundaries):
                     {
                         // Initiate drawing
-                        if (!drawing) drawing = true;
+                        if ( !drawing ) drawing = true;
 
                         // Snap to nearest grid point
-                        if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                        if ( Keyboard.IsKeyDown( Key.LeftCtrl ) || Keyboard.IsKeyDown( Key.RightCtrl ) )
                         {
-                            if (ShowMinorGrid || ShowMajorGrid)
+                            if ( ShowMinorGrid || ShowMajorGrid )
                             {
                                 // Convert mouse position to inches with origin @ BL
                                 double xCoord = (p.X - OriginOffsetX) / dpiX;
@@ -2308,7 +2302,7 @@ namespace SlopeFEA
 
                                 // Get units dependent scaling factor
                                 double factor;
-                                switch (this.Units)
+                                switch ( this.Units )
                                 {
                                     case Units.Metres: factor = 0.0254; break;
                                     case Units.Millimetres: factor = 25.4; break;
@@ -2323,7 +2317,7 @@ namespace SlopeFEA
                                 // Get grid spacing (major or minor)
                                 double xDiv = XMajorDivision;
                                 double yDiv = YMajorDivision;
-                                if (ShowMinorGrid)
+                                if ( ShowMinorGrid )
                                 {
                                     xDiv /= XMinorDivisions;
                                     yDiv /= YMinorDivisions;
@@ -2331,26 +2325,26 @@ namespace SlopeFEA
 
                                 // Snap x coordinate
                                 double xRatio = xCoord / xDiv;
-                                double xDiff = xRatio - Math.Truncate(xRatio);
-                                xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
+                                double xDiff = xRatio - Math.Truncate( xRatio );
+                                xCoord += Math.Abs( xDiff ) < 0.5 ? -xDiff * xDiv : Math.Sign( xDiff ) * (1 - Math.Abs( xDiff )) * xDiv;
                                 p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
 
                                 // Snap y coordinate
                                 double yRatio = yCoord / yDiv;
-                                double yDiff = yRatio - Math.Truncate(yRatio);
-                                yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
+                                double yDiff = yRatio - Math.Truncate( yRatio );
+                                yCoord += Math.Abs( yDiff ) < 0.5 ? -yDiff * yDiv : Math.Sign( yDiff ) * (1 - Math.Abs( yDiff )) * yDiv;
                                 p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                             }
                         }
 
                         // Draw straight lines
-                        if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                        if ( Keyboard.IsKeyDown( Key.LeftShift ) || Keyboard.IsKeyDown( Key.RightShift ) )
                         {
-                            if (drawLine.Points.Count >= 2)
+                            if ( drawLine.Points.Count >= 2 )
                             {
                                 Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
 
-                                if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
+                                if ( Math.Abs( lastPt.X - p.X ) < Math.Abs( lastPt.Y - p.Y ) )
                                     p.X = lastPt.X;
                                 else
                                     p.Y = lastPt.Y;
@@ -2359,26 +2353,26 @@ namespace SlopeFEA
 
                         // If it is the first point in the drawing sequence, add it to the boundary.
                         // Otherwise, fix the last point
-                        if (drawLine.Points.Count == 0) drawLine.Points.Add(p);
+                        if ( drawLine.Points.Count == 0 ) drawLine.Points.Add( p );
                         else drawLine.Points[drawLine.Points.Count - 1] = p;
 
                         // Add another copy of the current point (for "rubber banding")
-                        drawLine.Points.Add(p);
+                        drawLine.Points.Add( p );
 
-                        if (this.IsSaved) this.IsSaved = false;
-                        if (this.IsVerified) this.IsVerified = false;
+                        if ( this.IsSaved ) this.IsSaved = false;
+                        if ( this.IsVerified ) this.IsVerified = false;
                     }
                     break;
 
                 case (DrawModes.Materials):
                     {
                         // Initiate drawing
-                        if (!drawing) drawing = true;
+                        if ( !drawing ) drawing = true;
 
                         // Snap to nearest grid point
-                        if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                        if ( Keyboard.IsKeyDown( Key.LeftCtrl ) || Keyboard.IsKeyDown( Key.RightCtrl ) )
                         {
-                            if (ShowMinorGrid || ShowMajorGrid)
+                            if ( ShowMinorGrid || ShowMajorGrid )
                             {
                                 // Convert mouse position to inches with origin @ BL
                                 double xCoord = (p.X - OriginOffsetX) / dpiX;
@@ -2386,7 +2380,7 @@ namespace SlopeFEA
 
                                 // Get units dependent scaling factor
                                 double factor;
-                                switch (this.Units)
+                                switch ( this.Units )
                                 {
                                     case Units.Metres: factor = 0.0254; break;
                                     case Units.Millimetres: factor = 25.4; break;
@@ -2401,7 +2395,7 @@ namespace SlopeFEA
                                 // Get grid spacing (major or minor)
                                 double xDiv = XMajorDivision;
                                 double yDiv = YMajorDivision;
-                                if (ShowMinorGrid)
+                                if ( ShowMinorGrid )
                                 {
                                     xDiv /= XMinorDivisions;
                                     yDiv /= YMinorDivisions;
@@ -2409,26 +2403,26 @@ namespace SlopeFEA
 
                                 // Snap x coordinate
                                 double xRatio = xCoord / xDiv;
-                                double xDiff = xRatio - Math.Truncate(xRatio);
-                                xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
+                                double xDiff = xRatio - Math.Truncate( xRatio );
+                                xCoord += Math.Abs( xDiff ) < 0.5 ? -xDiff * xDiv : Math.Sign( xDiff ) * (1 - Math.Abs( xDiff )) * xDiv;
                                 p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
 
                                 // Snap y coordinate
                                 double yRatio = yCoord / yDiv;
-                                double yDiff = yRatio - Math.Truncate(yRatio);
-                                yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
+                                double yDiff = yRatio - Math.Truncate( yRatio );
+                                yCoord += Math.Abs( yDiff ) < 0.5 ? -yDiff * yDiv : Math.Sign( yDiff ) * (1 - Math.Abs( yDiff )) * yDiv;
                                 p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                             }
                         }
 
                         // Draw straight lines
-                        if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                        if ( Keyboard.IsKeyDown( Key.LeftShift ) || Keyboard.IsKeyDown( Key.RightShift ) )
                         {
-                            if (drawLine.Points.Count >= 2)
+                            if ( drawLine.Points.Count >= 2 )
                             {
                                 Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
 
-                                if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
+                                if ( Math.Abs( lastPt.X - p.X ) < Math.Abs( lastPt.Y - p.Y ) )
                                     p.X = lastPt.X;
                                 else
                                     p.Y = lastPt.Y;
@@ -2437,14 +2431,14 @@ namespace SlopeFEA
 
                         // If it is the first point in the drawing sequence, add it to the boundary.
                         // Otherwise, fix the last point
-                        if (drawLine.Points.Count == 0) drawLine.Points.Add(p);
+                        if ( drawLine.Points.Count == 0 ) drawLine.Points.Add( p );
                         else drawLine.Points[drawLine.Points.Count - 1] = p;
 
                         // Add another copy of the current point (for "rubber banding")
-                        drawLine.Points.Add(p);
+                        drawLine.Points.Add( p );
 
-                        if (this.IsSaved) this.IsSaved = false;
-                        if (this.IsVerified) this.IsVerified = false;
+                        if ( this.IsSaved ) this.IsSaved = false;
+                        if ( this.IsVerified ) this.IsVerified = false;
                     }
                     break;
 
@@ -2453,7 +2447,7 @@ namespace SlopeFEA
                     {
                         // End panning operations
                         panning = false;
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
                     }
                     break;
 
@@ -2464,63 +2458,63 @@ namespace SlopeFEA
                         zooming = false;
 
                         // Zoom to highlighted region
-                        if (zoomRect.Boundary.Points.Count == 4)
+                        if ( zoomRect.Boundary.Points.Count == 4 )
                         {
-                            ZoomArea(zoomRect.Boundary);
+                            ZoomArea( zoomRect.Boundary );
                         }
 
                         // Clean up resources
                         zoomRect.Boundary.Points.Clear();
-                        Mouse.Capture(this, CaptureMode.None);
+                        Mouse.Capture( this, CaptureMode.None );
                     }
                     break;
 
 
                 case (DrawModes.AddPoints):
                     {
-                        DrawingPoint addPoint = boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
+                        DrawingPoint addPoint = boundary.BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
 
-                        if (addPoint == null)
+                        if ( addPoint == null )
                         {
-                            for (int i = 0; i < materialBlocks.Count; i++)
+                            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                             {
-                                addPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                                if (addPoint != null) break;
+                                addPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+                                if ( addPoint != null ) break;
                             }
                         }
 
-                        if (addPoint != null) addPoints.Add(addPoint);
+                        if ( addPoint != null ) addPoints.Add( addPoint );
                         else
                         {
                             addPoints.Clear();
                             ClearSelections();
                         }
 
-                        if (addPoints.Count == 2)
+                        if ( addPoints.Count == 2 )
                         {
                             SlopeBoundary sb = addPoints[0].Parent as SlopeBoundary;
                             MaterialBlock mb = addPoints[0].Parent as MaterialBlock;
 
-                            if (sb != null)
+                            if ( sb != null )
                             {
-                                if (sb != (addPoints[1].Parent as SlopeBoundary))
+                                if ( sb != (addPoints[1].Parent as SlopeBoundary) )
                                 {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                    MessageBox.Show( "Points must be on the same block.", "Error" );
                                 }
                                 else
                                 {
-                                    sb.AddPoint(addPoints[0], addPoints[1]);
+                                    sb.AddPoint( addPoints[0], addPoints[1] );
                                 }
                             }
-                            else if (mb != null)
+                            else if ( mb != null )
                             {
-                                if (mb != (addPoints[1].Parent as MaterialBlock))
+                                if ( mb != (addPoints[1].Parent as MaterialBlock) )
                                 {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                    MessageBox.Show( "Points must be on the same block.", "Error" );
                                 }
                                 else
                                 {
-                                    mb.AddPoint(addPoints[0], addPoints[1]);
+                                    mb.AddPoint( addPoints[0], addPoints[1] );
                                 }
                             }
 
@@ -2534,32 +2528,32 @@ namespace SlopeFEA
                 case (DrawModes.FixX):
                     {
                         DrawingPoint fixPoint = null;
-                        for (int i = 0; i < materialBlocks.Count; i++)
+                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                         {
-                            fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                            if (fixPoint != null) break;
+                            fixPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+                            if ( fixPoint != null ) break;
                         }
 
-                        if (fixPoint != null) fixPoints.Add(fixPoint);
+                        if ( fixPoint != null ) fixPoints.Add( fixPoint );
                         else
                         {
                             fixPoints.Clear();
                             ClearSelections();
                         }
 
-                        if (fixPoints.Count == 2)
+                        if ( fixPoints.Count == 2 )
                         {
                             MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
 
-                            if (mb != null)
+                            if ( mb != null )
                             {
-                                if (mb != (fixPoints[1].Parent as MaterialBlock))
+                                if ( mb != (fixPoints[1].Parent as MaterialBlock) )
                                 {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                    MessageBox.Show( "Points must be on the same block.", "Error" );
                                 }
                                 else
                                 {
-                                    mb.FixX(fixPoints[0], fixPoints[1]);
+                                    mb.FixX( fixPoints[0], fixPoints[1] );
                                 }
                             }
 
@@ -2573,32 +2567,32 @@ namespace SlopeFEA
                 case (DrawModes.FixY):
                     {
                         DrawingPoint fixPoint = null;
-                        for (int i = 0; i < materialBlocks.Count; i++)
+                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                         {
-                            fixPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                            if (fixPoint != null) break;
+                            fixPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+                            if ( fixPoint != null ) break;
                         }
 
-                        if (fixPoint != null) fixPoints.Add(fixPoint);
+                        if ( fixPoint != null ) fixPoints.Add( fixPoint );
                         else
                         {
                             fixPoints.Clear();
                             ClearSelections();
                         }
 
-                        if (fixPoints.Count == 2)
+                        if ( fixPoints.Count == 2 )
                         {
                             MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
 
-                            if (mb != null)
+                            if ( mb != null )
                             {
-                                if (mb != (fixPoints[1].Parent as MaterialBlock))
+                                if ( mb != (fixPoints[1].Parent as MaterialBlock) )
                                 {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                    MessageBox.Show( "Points must be on the same block.", "Error" );
                                 }
                                 else
                                 {
-                                    mb.FixY(fixPoints[0], fixPoints[1]);
+                                    mb.FixY( fixPoints[0], fixPoints[1] );
                                 }
                             }
 
@@ -2612,17 +2606,17 @@ namespace SlopeFEA
                 case (DrawModes.PointLoad):
                     {
                         DrawingPoint loadPoint = null;
-                        for (int i = 0; i < materialBlocks.Count; i++)
+                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                         {
-                            loadPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                            if (loadPoint != null) break;
+                            loadPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+                            if ( loadPoint != null ) break;
                         }
 
-                        if (loadPoint != null)
+                        if ( loadPoint != null )
                         {
                             MaterialBlock mb = loadPoint.Parent as MaterialBlock;
 
-                            if (mb != null) mb.ApplyPointLoad(loadPoint);
+                            if ( mb != null ) mb.ApplyPointLoad( loadPoint );
 
                             ClearSelections();
                         }
@@ -2633,32 +2627,32 @@ namespace SlopeFEA
                 case (DrawModes.LineLoad):
                     {
                         DrawingPoint loadPoint = null;
-                        for (int i = 0; i < materialBlocks.Count; i++)
+                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                         {
-                            loadPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; });
-                            if (loadPoint != null) break;
+                            loadPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+                            if ( loadPoint != null ) break;
                         }
 
-                        if (loadPoint != null) loadPoints.Add(loadPoint);
+                        if ( loadPoint != null ) loadPoints.Add( loadPoint );
                         else
                         {
                             loadPoints.Clear();
                             ClearSelections();
                         }
 
-                        if (loadPoints.Count == 2)
+                        if ( loadPoints.Count == 2 )
                         {
                             MaterialBlock mb = loadPoints[0].Parent as MaterialBlock;
 
-                            if (mb != null)
+                            if ( mb != null )
                             {
-                                if (mb != (loadPoints[1].Parent as MaterialBlock))
+                                if ( mb != (loadPoints[1].Parent as MaterialBlock) )
                                 {
-                                    MessageBox.Show("Points must be on the same block.", "Error");
+                                    MessageBox.Show( "Points must be on the same block.", "Error" );
                                 }
                                 else
                                 {
-                                    mb.ApplyLineLoad(loadPoints[0], loadPoints[1]);
+                                    mb.ApplyLineLoad( loadPoints[0], loadPoints[1] );
                                 }
                             }
 
@@ -2671,7 +2665,7 @@ namespace SlopeFEA
 
                 case (DrawModes.MovePoints):
                     {
-                        if (moving)
+                        if ( moving )
                         {
                             moving = false;
                             caughtCtrl = false;
@@ -2685,68 +2679,67 @@ namespace SlopeFEA
                 case (DrawModes.Select):
                     {
                         // De-select objects if mouse is over blank canvas area
-                        if (!boundary.IsMouseOver)
+                        if ( !boundary.IsMouseOver )
                         {
-                            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                            if ( Keyboard.IsKeyDown( Key.LeftShift ) || Keyboard.IsKeyDown( Key.RightShift ) )
                             {
                                 boundary.IsSelected = false;
 
-                                if (materialBlocks.Find(delegate(MaterialBlock mb) { return mb.IsMouseOver; }) == null)
+                                if ( materialBlocks.Find( delegate( MaterialBlock mb ) { return mb.IsMouseOver; } ) == null )
                                 {
                                     ClearMaterialSelections();
                                 }
 
-                                if (boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) == null)
+                                if ( boundary.BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } ) == null )
                                 {
                                     ClearBoundaryPointSelections();
                                 }
 
                                 bool foundMaterialBoundPoint = false;
-                                for (int i = 0; i < materialBlocks.Count; i++)
+                                for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                                 {
-                                    if (materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver; }) != null)
+                                    if ( materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } ) != null )
                                     {
                                         foundMaterialBoundPoint = true;
                                         break;
                                     }
                                 }
-                                if (!foundMaterialBoundPoint) ClearMaterialBoundaryPointSelections();
+                                if ( !foundMaterialBoundPoint ) ClearMaterialBoundaryPointSelections();
                             }
                             else
                             {
                                 ClearSelections();
                             }
 
-                            for (int i = 0; i < materialBlocks.Count; i++)
+                            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                             {
-                                if (materialBlocks[i].IsMouseOver)
+                                if ( materialBlocks[i].IsMouseOver )
                                 {
                                     materialBlocks[i].IsSelected = true;
                                     break;
                                 }
                             }
 
-                            for (int i = 0; i < boundary.BoundaryPoints.Count; i++)
+                            for ( int i = 0 ; i < boundary.BoundaryPoints.Count ; i++ )
                             {
-                                if (boundary.BoundaryPoints[i].IsMouseOver)
+                                if ( boundary.BoundaryPoints[i].IsMouseOver )
                                 {
                                     boundary.BoundaryPoints[i].IsSelected = true;
                                     break;
                                 }
                             }
 
-                            for (int i = 0; i < materialBlocks.Count; i++)
+                            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                             {
-                                if (materialBlocks[i].BoundaryPoints.Find(
-                                    delegate(DrawingPoint bp)
-                                    {
-                                        if (bp.IsMouseOver)
+                                if ( materialBlocks[i].BoundaryPoints.Find(
+                                    delegate( DrawingPoint bp ) {
+                                        if ( bp.IsMouseOver )
                                         {
                                             bp.IsSelected = true;
                                             return true;
                                         }
                                         return false;
-                                    }) != null)
+                                    } ) != null )
                                 {
                                     break;
                                 }
@@ -2763,24 +2756,24 @@ namespace SlopeFEA
             }
         }
 
-        protected override void OnMouseMove (MouseEventArgs e)
+        protected override void OnMouseMove ( MouseEventArgs e )
         {
-            base.OnMouseMove(e);
+            base.OnMouseMove( e );
 
-            Point p = Mouse.GetPosition(this);
+            Point p = Mouse.GetPosition( this );
 
             /*
              * Draw Boundaries / Material Blocks Mode
              */
-            if (drawing)
+            if ( drawing )
             {
-                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                if ( Keyboard.IsKeyDown( Key.LeftShift ) || Keyboard.IsKeyDown( Key.RightShift ) )
                 {
-                    if (drawLine.Points.Count >= 2)
+                    if ( drawLine.Points.Count >= 2 )
                     {
                         Point lastPt = drawLine.Points[drawLine.Points.Count - 2];
 
-                        if (Math.Abs(lastPt.X - p.X) < Math.Abs(lastPt.Y - p.Y))
+                        if ( Math.Abs( lastPt.X - p.X ) < Math.Abs( lastPt.Y - p.Y ) )
                             p.X = lastPt.X;
                         else
                             p.Y = lastPt.Y;
@@ -2796,14 +2789,14 @@ namespace SlopeFEA
              * Pan Mode
              * (NB: This is also activated during any mode with the middle mouse button)
              */
-            if ((DrawMode == DrawModes.Pan && Mouse.LeftButton == MouseButtonState.Pressed)
-                || Mouse.MiddleButton == MouseButtonState.Pressed)
+            if ( (DrawMode == DrawModes.Pan && Mouse.LeftButton == MouseButtonState.Pressed)
+                || Mouse.MiddleButton == MouseButtonState.Pressed )
             {
                 // Initialize panning operations
-                if (!panning)
+                if ( !panning )
                 {
                     panning = true;
-                    this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["grabCursor"])).Cursor;
+                    this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["grabCursor"])).Cursor;
 
                     // Set reference point for panning translation
                     transPoint = p;
@@ -2811,7 +2804,7 @@ namespace SlopeFEA
                 else
                 {
                     // Translate canvas and axes
-                    Translate(p - transPoint);
+                    Translate( p - transPoint );
 
                     // Update reference point
                     transPoint = p;
@@ -2822,21 +2815,21 @@ namespace SlopeFEA
             /*
              * Zoom Area Mode
              */
-            if (this.DrawMode == DrawModes.ZoomArea && Mouse.LeftButton == MouseButtonState.Pressed)
+            if ( this.DrawMode == DrawModes.ZoomArea && Mouse.LeftButton == MouseButtonState.Pressed )
             {
                 // Initialize zooming operation
-                if (!zooming)
+                if ( !zooming )
                 {
                     zooming = true;
-                    Mouse.Capture(this, CaptureMode.SubTree);
+                    Mouse.Capture( this, CaptureMode.SubTree );
 
                     // Add corner points to zoom rectangle
                     // (NB: Polygon was opted for over Rectangle since
                     //      coordinate updates require fewer operations)
-                    zoomRect.Boundary.Points.Add(p);
-                    zoomRect.Boundary.Points.Add(p);
-                    zoomRect.Boundary.Points.Add(p);
-                    zoomRect.Boundary.Points.Add(p);
+                    zoomRect.Boundary.Points.Add( p );
+                    zoomRect.Boundary.Points.Add( p );
+                    zoomRect.Boundary.Points.Add( p );
+                    zoomRect.Boundary.Points.Add( p );
                 }
                 else
                 {
@@ -2863,9 +2856,9 @@ namespace SlopeFEA
 
             // Get status bar label references for updating coordinates
             StatusBar status =
-                (StatusBar)((DockPanel)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
-            StatusBarItem xCoordLabel = (StatusBarItem)status.Items[0];
-            StatusBarItem yCoordLabel = (StatusBarItem)status.Items[1];
+                (StatusBar) ((DockPanel) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
+            StatusBarItem xCoordLabel = (StatusBarItem) status.Items[0];
+            StatusBarItem yCoordLabel = (StatusBarItem) status.Items[1];
 
             // Convert mouse coords to inches with origin @ BL corner
             double xCoord = (p.X - OriginOffsetX) / dpiX;
@@ -2874,7 +2867,7 @@ namespace SlopeFEA
             // Get units dependent scaling factor and label
             double factor;
             string units;
-            switch (Units)
+            switch ( Units )
             {
                 case Units.Metres: units = "m"; factor = 0.0254; break;
                 case Units.Millimetres: units = "mm"; factor = 25.4; break;
@@ -2887,14 +2880,14 @@ namespace SlopeFEA
             yCoord *= factor * Scale;
 
             // Snap to nearest grid point
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            if ( Keyboard.IsKeyDown( Key.LeftCtrl ) || Keyboard.IsKeyDown( Key.RightCtrl ) )
             {
-                if (ShowMinorGrid || ShowMajorGrid)
+                if ( ShowMinorGrid || ShowMajorGrid )
                 {
                     // Get grid spacing (major or minor)
                     double xDiv = XMajorDivision;
                     double yDiv = YMajorDivision;
-                    if (ShowMinorGrid)
+                    if ( ShowMinorGrid )
                     {
                         xDiv /= XMinorDivisions;
                         yDiv /= YMinorDivisions;
@@ -2902,56 +2895,56 @@ namespace SlopeFEA
 
                     // Snap x coordinate
                     double xRatio = xCoord / xDiv;
-                    double xDiff = xRatio - Math.Truncate(xRatio);
-                    xCoord += Math.Abs(xDiff) < 0.5 ? -xDiff * xDiv : Math.Sign(xDiff) * (1 - Math.Abs(xDiff)) * xDiv;
+                    double xDiff = xRatio - Math.Truncate( xRatio );
+                    xCoord += Math.Abs( xDiff ) < 0.5 ? -xDiff * xDiv : Math.Sign( xDiff ) * (1 - Math.Abs( xDiff )) * xDiv;
                     p.X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
 
                     // Snap y coordinate
                     double yRatio = yCoord / yDiv;
-                    double yDiff = yRatio - Math.Truncate(yRatio);
-                    yCoord += Math.Abs(yDiff) < 0.5 ? -yDiff * yDiv : Math.Sign(yDiff) * (1 - Math.Abs(yDiff)) * yDiv;
+                    double yDiff = yRatio - Math.Truncate( yRatio );
+                    yCoord += Math.Abs( yDiff ) < 0.5 ? -yDiff * yDiv : Math.Sign( yDiff ) * (1 - Math.Abs( yDiff )) * yDiv;
                     p.Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                 }
             }
 
-            if (DrawMode == DrawModes.MovePoints && Mouse.LeftButton == MouseButtonState.Pressed)
+            if ( DrawMode == DrawModes.MovePoints && Mouse.LeftButton == MouseButtonState.Pressed )
             {
-                if (movingBoundPoint == null)
+                if ( movingBoundPoint == null )
                 {
-                    movingBoundPoint = boundary.BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver && bp.IsSelected; });
+                    movingBoundPoint = boundary.BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver && bp.IsSelected; } );
                 }
 
-                if (movingBoundPoint == null)
+                if ( movingBoundPoint == null )
                 {
-                    for (int i = 0; i < materialBlocks.Count; i++)
+                    for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                     {
-                        movingBoundPoint = materialBlocks[i].BoundaryPoints.Find(delegate(DrawingPoint bp) { return bp.IsMouseOver && bp.IsSelected; });
-                        if (movingBoundPoint != null) break;
+                        movingBoundPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver && bp.IsSelected; } );
+                        if ( movingBoundPoint != null ) break;
                     }
                 }
 
-                if (movingBoundPoint != null)
+                if ( movingBoundPoint != null )
                 {
-                    if (!moving)
+                    if ( !moving )
                     {
                         moving = true;
                         movePoint = movingBoundPoint.Point;
                     }
                     else
                     {
-                        movingBoundPoint.Move(p - movePoint);
+                        movingBoundPoint.Move( p - movePoint );
                         movePoint = p;
 
-                        if (this.IsSaved) this.IsSaved = false;
-                        if (this.IsVerified) this.IsVerified = false;
+                        if ( this.IsSaved ) this.IsSaved = false;
+                        if ( this.IsVerified ) this.IsVerified = false;
 
-                        if ((Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                            && (ShowMinorGrid || ShowMajorGrid))
+                        if ( (Keyboard.IsKeyDown( Key.LeftCtrl ) || Keyboard.IsKeyDown( Key.RightCtrl ))
+                            && (ShowMinorGrid || ShowMajorGrid) )
                         {
-                            if (!caughtCtrl)
+                            if ( !caughtCtrl )
                             {
-                                p = this.PointToScreen(p);
-                                NativeMethods.SetCursorPos((int)p.X, (int)p.Y);
+                                p = this.PointToScreen( p );
+                                NativeMethods.SetCursorPos( (int) p.X, (int) p.Y );
                                 caughtCtrl = true;
                             }
                         }
@@ -2961,55 +2954,55 @@ namespace SlopeFEA
             }
 
             // Update status bar labels
-            string label = String.Format("X = {0} {1}", Math.Round(xCoord, 2), units);
+            string label = String.Format( "X = {0} {1}", Math.Round( xCoord, 2 ), units );
             xCoordLabel.Content = label;
-            label = String.Format("Y = {0} {1}", Math.Round(yCoord, 2), units);
+            label = String.Format( "Y = {0} {1}", Math.Round( yCoord, 2 ), units );
             yCoordLabel.Content = label;
         }
 
-        protected override void OnMouseUp (MouseButtonEventArgs e)
+        protected override void OnMouseUp ( MouseButtonEventArgs e )
         {
-            base.OnMouseUp(e);
+            base.OnMouseUp( e );
 
             /*
              * Pan Mode (drawing mode independent middle mouse button version)
              */
-            if (e.ChangedButton == MouseButton.Middle)
+            if ( e.ChangedButton == MouseButton.Middle )
             {
                 // End panning operations
                 panning = false;
 
-                switch (DrawMode)
+                switch ( DrawMode )
                 {
                     case DrawModes.Boundaries:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["drawCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["drawCursor"])).Cursor;
                         break;
                     case DrawModes.Materials:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["drawCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["drawCursor"])).Cursor;
                         break;
                     case DrawModes.Pan:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["handCursor"])).Cursor;
                         break;
                     case DrawModes.ZoomArea:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["zoomAreaCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["zoomAreaCursor"])).Cursor;
                         break;
                     case DrawModes.MovePoints:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["movePointsCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["movePointsCursor"])).Cursor;
                         break;
                     case DrawModes.AddPoints:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["addPointsCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["addPointsCursor"])).Cursor;
                         break;
                     case DrawModes.FixX:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["rollerYCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["rollerYCursor"])).Cursor;
                         break;
                     case DrawModes.FixY:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["rollerXCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["rollerXCursor"])).Cursor;
                         break;
                     case DrawModes.PointLoad:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["pointLoadCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["pointLoadCursor"])).Cursor;
                         break;
                     case DrawModes.LineLoad:
-                        this.Cursor = ((TextBlock)(((MainWindow)((Grid)((TabControl)((TabItem)((Grid)this.Parent).Parent).Parent).Parent).Parent).Resources["lineLoadCursor"])).Cursor;
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["lineLoadCursor"])).Cursor;
                         break;
                     default:
                         this.Cursor = Cursors.Arrow;
@@ -3018,33 +3011,33 @@ namespace SlopeFEA
             }
         }
 
-        protected override void OnMouseRightButtonUp (MouseButtonEventArgs e)
+        protected override void OnMouseRightButtonUp ( MouseButtonEventArgs e )
         {
-            base.OnMouseRightButtonUp(e);
+            base.OnMouseRightButtonUp( e );
 
             /*
              * Draw Boundaries Mode
              */
 
-            if (drawing)
+            if ( drawing )
             {
                 // Get array of drawing points
                 Point[] points = new Point[drawLine.Points.Count];
-                drawLine.Points.CopyTo(points, 0);
+                drawLine.Points.CopyTo( points, 0 );
 
-                if (DrawMode == DrawModes.Boundaries)
+                if ( DrawMode == DrawModes.Boundaries )
                 {
                     // Remove existing boundary
-                    this.Children.Remove(boundary.Boundary);
+                    this.Children.Remove( boundary.Boundary );
 
                     // Add new boundary
-                    boundary = new SlopeBoundary(this, points);
+                    boundary = new SlopeBoundary( this, points );
                 }
-                else if (DrawMode == DrawModes.Materials)
+                else if ( DrawMode == DrawModes.Materials )
                 {
                     // Add new material block
-                    MaterialBlock newMaterialBlock = new MaterialBlock(this, points);
-                    materialBlocks.Add(newMaterialBlock);
+                    MaterialBlock newMaterialBlock = new MaterialBlock( this, points );
+                    materialBlocks.Add( newMaterialBlock );
                 }
             }
 
@@ -3058,30 +3051,30 @@ namespace SlopeFEA
             this.Cursor = Cursors.Arrow;
             DrawMode = DrawModes.Select;
 
-            TabItem tabParent = (TabItem)((Grid)this.Parent).Parent;
-            TabControl windowManager = (TabControl)tabParent.Parent;
+            TabItem tabParent = (TabItem) ((Grid) this.Parent).Parent;
+            TabControl windowManager = (TabControl) tabParent.Parent;
             windowManager.SelectedItem = null;
             windowManager.SelectedItem = tabParent;
         }
 
-        protected override void OnMouseWheel (MouseWheelEventArgs e)
+        protected override void OnMouseWheel ( MouseWheelEventArgs e )
         {
-            base.OnMouseWheel(e);
+            base.OnMouseWheel( e );
 
             // Update mouse scroll sentinel
             mouseDelta += e.Delta;
 
             // Zoom in (centred on mouse position)
-            while (mouseDelta >= 120)
+            while ( mouseDelta >= 120 )
             {
-                Zoom(1.1, e.GetPosition(this));
+                Zoom( 1.1, e.GetPosition( this ) );
                 mouseDelta -= 120;
             }
 
             // Zoom out (centred on mouse position)
-            while (mouseDelta <= -120)
+            while ( mouseDelta <= -120 )
             {
-                Zoom(1 / 1.1, e.GetPosition(this));
+                Zoom( 1 / 1.1, e.GetPosition( this ) );
                 mouseDelta += 120;
             }
         }
@@ -3093,10 +3086,10 @@ namespace SlopeFEA
         // ----------------------------------
 
 
-        private void SlopeCanvas_SizeChanged (object sender, SizeChangedEventArgs e)
+        private void SlopeCanvas_SizeChanged ( object sender, SizeChangedEventArgs e )
         {
             // This only occurs once, immediately after canvas intialization
-            if (!IsScaled)
+            if ( !IsScaled )
             {
                 // Obtain DPI values for scaling
                 System.Windows.Forms.Button dummy = new System.Windows.Forms.Button();
@@ -3108,7 +3101,7 @@ namespace SlopeFEA
 
                 // Get units dependent scaling factor
                 double factor;
-                switch (Units)
+                switch ( Units )
                 {
                     case Units.Metres: factor = 0.0254; break;
                     case Units.Millimetres: factor = 25.4; break;
@@ -3119,23 +3112,23 @@ namespace SlopeFEA
                 // Compute required initial scale
                 double canvasWidth = (ActualWidth - 100) / dpiX * factor;
                 double canvasHeight = (ActualHeight - 100) / dpiY * factor;
-                Scale = Math.Max((XAxisMax - XAxisMin) / canvasWidth, (YAxisMax - YAxisMin) / canvasHeight);
+                Scale = Math.Max( (XAxisMax - XAxisMin) / canvasWidth, (YAxisMax - YAxisMin) / canvasHeight );
 
                 // Get axis references
-                xAxis = (Grid)((Grid)this.Parent).Children[0];
-                yAxis = (Grid)((Grid)this.Parent).Children[1];
+                xAxis = (Grid) ((Grid) this.Parent).Children[0];
+                yAxis = (Grid) ((Grid) this.Parent).Children[1];
 
                 // Get progress bar reference
-                analysisProgress = (ProgressBar)((Grid)this.Parent).Children[3];
+                analysisProgress = (ProgressBar) ((Grid) this.Parent).Children[3];
 
                 // Get hide canvas rectangle reference
-                hideCanvasRect = (Rectangle)((Grid)this.Parent).Children[4];
+                hideCanvasRect = (Rectangle) ((Grid) this.Parent).Children[4];
 
                 // Construct axes and grid
                 BuildAxes();
 
                 // Centre and fit view
-                CentreAndFitExtents(true);
+                CentreAndFitExtents( true );
 
                 IsScaled = true;
             }
@@ -3147,45 +3140,45 @@ namespace SlopeFEA
                 Line line;      // For unboxing axis lines
 
                 // Update coordinates of y axis lines
-                for (int i = 2; i < yAxis.Children.Count; i++)
+                for ( int i = 2 ; i < yAxis.Children.Count ; i++ )
                 {
-                    if (yAxis.Children[i] is Line)
+                    if ( yAxis.Children[i] is Line )
                     {
                         line = yAxis.Children[i] as Line;
                         line.Y1 = line.Y2 += deltaY;
                     }
                 }
 
-                Vector delta = new Vector(0, deltaY);
+                Vector delta = new Vector( 0, deltaY );
 
                 // Update grid point locations
-                for (int i = 0; i < gridPoints.Count; i++)
+                for ( int i = 0 ; i < gridPoints.Count ; i++ )
                 {
-                    gridPoints[i].Translate(delta);
+                    gridPoints[i].Translate( delta );
                 }
 
                 // Update boundary shape
-                boundary.Translate(delta);
+                boundary.Translate( delta );
 
                 // Update material blocks
-                for (int i = 0; i < materialBlocks.Count; i++)
+                for ( int i = 0 ; i < materialBlocks.Count ; i++ )
                 {
-                    materialBlocks[i].Translate(delta);
+                    materialBlocks[i].Translate( delta );
                 }
 
                 // Update FEA elements
-                for (int i = 0; i < FEAQuadElements.Count; i++)
+                for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
                 {
-                    FEAQuadElements[i].Translate(delta);
+                    FEAQuadElements[i].Translate( delta );
                 }
-                for (int i = 0; i < FEATriElements.Count; i++)
+                for ( int i = 0 ; i < FEATriElements.Count ; i++ )
                 {
-                    FEATriElements[i].Translate(delta);
+                    FEATriElements[i].Translate( delta );
                 }
 
                 // Update drawing line
                 Point p;
-                for (int i = 0; i < drawLine.Points.Count; i++)
+                for ( int i = 0 ; i < drawLine.Points.Count ; i++ )
                 {
                     p = drawLine.Points[i];
                     p.Y += deltaY;
@@ -3193,10 +3186,10 @@ namespace SlopeFEA
                 }
 
                 // Update critical surface
-                if (criticalSurface != null) criticalSurface.Translate(delta);
+                if ( criticalSurface != null ) criticalSurface.Translate( delta );
 
                 // Update run surfaces
-                for (int i = 0; i < runSurfaces.Count; i++) runSurfaces[i].Translate(delta);
+                for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Translate( delta );
             }
         }
 
@@ -3205,49 +3198,49 @@ namespace SlopeFEA
         // ANALYSIS WORKER EVENTS
         // ----------------------------------
 
-        private void analysisWorker_DoWork (object sender, DoWorkEventArgs e)
+        private void analysisWorker_DoWork ( object sender, DoWorkEventArgs e )
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            e.Result = GenAlg(this, worker, e);
+            e.Result = GenAlg( this, worker, e );
         }
 
-        private void analysisWorker_RunWorkerCompleted (object sender, RunWorkerCompletedEventArgs e)
+        private void analysisWorker_RunWorkerCompleted ( object sender, RunWorkerCompletedEventArgs e )
         {
-            if (e.Error != null) MessageBox.Show(e.Error.Message);
-            else if (e.Cancelled) MessageBox.Show("Cancelled");
+            if ( e.Error != null ) MessageBox.Show( e.Error.Message );
+            else if ( e.Cancelled ) MessageBox.Show( "Cancelled" );
             else
             {
-                ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem)((Grid)this.Parent).Parent;
-                TabControl windowManager = (TabControl)parentTab.Parent;
-                Menu mainMenu = (Menu)((DockPanel)((Grid)windowManager.Parent).Children[0]).Children[0];
-                MenuItem outputMenu = (MenuItem)mainMenu.Items[4];
-                MenuItem showCritical = (MenuItem)outputMenu.Items[0];
+                ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;
+                TabControl windowManager = (TabControl) parentTab.Parent;
+                Menu mainMenu = (Menu) ((DockPanel) ((Grid) windowManager.Parent).Children[0]).Children[0];
+                MenuItem outputMenu = (MenuItem) mainMenu.Items[4];
+                MenuItem showCritical = (MenuItem) outputMenu.Items[0];
 
                 windowManager.SelectedItem = parentTab;
 
                 this.IsAnalyzed = true;
 
-                SaveInputFile(FilePath);
+                SaveInputFile( FilePath );
 
-                string[] pathsplit = FilePath.Split('.');
+                string[] pathsplit = FilePath.Split( '.' );
 
                 double globalMinSF = 1000, localMinSF = 1000;
-                if (pathsplit.Length > 1)
+                if ( pathsplit.Length > 1 )
                 {
-                    switch (AnalysisType)
+                    switch ( AnalysisType )
                     {
                         case AnalysisType.Bishop: pathsplit[pathsplit.Length - 1] = "bish"; break;
                         default: pathsplit[pathsplit.Length - 1] = "rfem"; break;
                     }
 
-                    string path = string.Join(".", pathsplit);
+                    string path = string.Join( ".", pathsplit );
 
-                    if (File.Exists(path))
+                    if ( File.Exists( path ) )
                     {
                         // Get units dependent scaling factor
                         double factor;
-                        switch (Units)
+                        switch ( Units )
                         {
                             case Units.Metres: factor = 0.0254; break;
                             case Units.Millimetres: factor = 25.4; break;
@@ -3256,23 +3249,23 @@ namespace SlopeFEA
                         }
 
                         // Read in all existing output file contents
-                        List<string> contents = new List<string>(File.ReadAllLines(path));
+                        List<string> contents = new List<string>( File.ReadAllLines( path ) );
 
                         // Delete previous surfaces
-                        if (criticalSurface != null) criticalSurface.Delete();
-                        for (int i = 0; i < runSurfaces.Count; i++) runSurfaces[i].Delete();
+                        if ( criticalSurface != null ) criticalSurface.Delete();
+                        for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Delete();
                         runSurfaces.Clear();
 
                         // Find line with global critical surface
-                        int icritical = contents.FindIndex(delegate(string s) { return s.Contains("MOST CRITICAL SURFACE"); });
+                        int icritical = contents.FindIndex( delegate( string s ) { return s.Contains( "MOST CRITICAL SURFACE" ); } );
 
                         // Read in global critical surface geometry
-                        double radius = double.Parse(contents[icritical + 4].Split('=')[1]);
-                        double xEnter = double.Parse(contents[icritical + 5].Split('=')[1]);
-                        double yEnter = double.Parse(contents[icritical + 6].Split('=')[1]);
-                        double xExit = double.Parse(contents[icritical + 7].Split('=')[1]);
-                        double yExit = double.Parse(contents[icritical + 8].Split('=')[1]);
-                        globalMinSF = double.Parse(contents[icritical + 9].Split('=')[1]);
+                        double radius = double.Parse( contents[icritical + 4].Split( '=' )[1] );
+                        double xEnter = double.Parse( contents[icritical + 5].Split( '=' )[1] );
+                        double yEnter = double.Parse( contents[icritical + 6].Split( '=' )[1] );
+                        double xExit = double.Parse( contents[icritical + 7].Split( '=' )[1] );
+                        double yExit = double.Parse( contents[icritical + 8].Split( '=' )[1] );
+                        globalMinSF = double.Parse( contents[icritical + 9].Split( '=' )[1] );
 
                         // Convert to screen pixel units
                         radius = radius / (factor * Scale) * dpiX;
@@ -3282,8 +3275,8 @@ namespace SlopeFEA
                         yExit = ActualHeight - (yExit / (factor * Scale) * dpiY + OriginOffsetY);
 
                         // Create new surface
-                        criticalSurface = new DisplayCircularSurface(this,
-                            new Point(xEnter, yEnter), new Point(xExit, yExit), radius);
+                        criticalSurface = new DisplayCircularSurface( this,
+                            new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius );
 
                         // Indicate that it is the global critical surface with thicker line
                         criticalSurface.IsGlobalCritical = true;
@@ -3291,23 +3284,23 @@ namespace SlopeFEA
                         this.ShowCritical = true;
 
                         // Find line with number of runs and read this line
-                        int iruncount = contents.FindIndex(delegate(string s) { return s.Contains("Number of Runs = "); });
-                        int runs = int.Parse(contents[iruncount].Split('=')[1]);
+                        int iruncount = contents.FindIndex( delegate( string s ) { return s.Contains( "Number of Runs = " ); } );
+                        int runs = int.Parse( contents[iruncount].Split( '=' )[1] );
 
                         // Get current run data
-                        string runheader = String.Format("Run #{0}", runs);
-                        int irunline = contents.FindIndex(delegate(string s) { return s.Contains(runheader); });
+                        string runheader = String.Format( "Run #{0}", runs );
+                        int irunline = contents.FindIndex( delegate( string s ) { return s.Contains( runheader ); } );
 
                         // Read in local minimum surface data
-                        string[] surfacedata = contents[irunline + 3].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] surfacedata = contents[irunline + 3].Split( new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries );
 
                         // Read in surface geometry
-                        radius = double.Parse(surfacedata[2]);
-                        xEnter = double.Parse(surfacedata[3]);
-                        yEnter = double.Parse(surfacedata[4]);
-                        xExit = double.Parse(surfacedata[5]);
-                        yExit = double.Parse(surfacedata[6]);
-                        localMinSF = double.Parse(surfacedata[7]);
+                        radius = double.Parse( surfacedata[2] );
+                        xEnter = double.Parse( surfacedata[3] );
+                        yEnter = double.Parse( surfacedata[4] );
+                        xExit = double.Parse( surfacedata[5] );
+                        yExit = double.Parse( surfacedata[6] );
+                        localMinSF = double.Parse( surfacedata[7] );
 
                         // Convert to screen pixel units
                         radius = radius / (factor * Scale) * dpiX;
@@ -3317,22 +3310,22 @@ namespace SlopeFEA
                         yExit = ActualHeight - (yExit / (factor * Scale) * dpiY + OriginOffsetY);
 
                         // Add to list of current run surfaces
-                        runSurfaces.Add(new DisplayCircularSurface(this,
-                            new Point(xEnter, yEnter), new Point(xExit, yExit), radius));
+                        runSurfaces.Add( new DisplayCircularSurface( this,
+                            new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius ) );
 
                         // Indicate that it is a local critical surface with thicker line
                         runSurfaces[0].IsLocalCritical = true;
 
                         // Repeat for the rest of the current run surfaces
-                        for (int i = 4; i < 13; i++)
+                        for ( int i = 4 ; i < 13 ; i++ )
                         {
-                            surfacedata = contents[irunline + i].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            surfacedata = contents[irunline + i].Split( new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries );
 
-                            radius = double.Parse(surfacedata[2]);
-                            xEnter = double.Parse(surfacedata[3]);
-                            yEnter = double.Parse(surfacedata[4]);
-                            xExit = double.Parse(surfacedata[5]);
-                            yExit = double.Parse(surfacedata[6]);
+                            radius = double.Parse( surfacedata[2] );
+                            xEnter = double.Parse( surfacedata[3] );
+                            yEnter = double.Parse( surfacedata[4] );
+                            xExit = double.Parse( surfacedata[5] );
+                            yExit = double.Parse( surfacedata[6] );
 
                             radius = radius / (factor * Scale) * dpiX;
                             xEnter = xEnter / (factor * Scale) * dpiX + OriginOffsetX;
@@ -3340,14 +3333,14 @@ namespace SlopeFEA
                             xExit = xExit / (factor * Scale) * dpiX + OriginOffsetX;
                             yExit = ActualHeight - (yExit / (factor * Scale) * dpiY + OriginOffsetY);
 
-                            runSurfaces.Add(new DisplayCircularSurface(this,
-                            new Point(xEnter, yEnter), new Point(xExit, yExit), radius));
+                            runSurfaces.Add( new DisplayCircularSurface( this,
+                            new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius ) );
                         }
                     }
                 }
 
-                MessageBox.Show(String.Format("Global Minimum Fs = {0}\n\nLocal Minimum Fs = {1}",
-                    globalMinSF, localMinSF), "Analysis Complete");
+                MessageBox.Show( String.Format( "Global Minimum Fs = {0}\n\nLocal Minimum Fs = {1}",
+                    globalMinSF, localMinSF ), "Analysis Complete" );
             }
 
             analysisProgress.Value = 0;
@@ -3355,7 +3348,7 @@ namespace SlopeFEA
             this.IsAnalyzing = false;
         }
 
-        private void analysisWorker_ProgressChanged (object sender, ProgressChangedEventArgs e)
+        private void analysisWorker_ProgressChanged ( object sender, ProgressChangedEventArgs e )
         {
             analysisProgress.Value = e.ProgressPercentage;
         }

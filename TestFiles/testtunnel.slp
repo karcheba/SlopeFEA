@@ -1,0 +1,208 @@
+*****************************************
+
+        Slope 2011 Input File
+
+        Project Name: testtunnel
+
+*****************************************
+
+--------------------------------
+PLOTTING DATA
+--------------------------------
+
+Units = m, kPa, kN/m^3
+
+XAxisMax = 80
+XAxisMin = 0
+YAxisMax = 50
+YAxisMin = -10
+
+XMajorDivision = 10
+YMajorDivision = 10
+
+XMinorDivisions = 10
+YMinorDivisions = 10
+
+
+--------------------------------
+BOUNDARY GEOMETRY DATA
+--------------------------------
+
+Number of Boundary Points = 4
+
+0, -9.99999999999995
+80.0000000000001, -9.99999999999995
+80, 50
+0, 50
+
+
+--------------------------------
+MATERIAL TYPE DATA
+--------------------------------
+
+Number of Material Types = 3
+
+Material #1
+Name = "bedrock"
+Colour = #FFCBE2C9
+Phi = 50
+Coh = 1000
+Gamma = 22
+Emod = 350000
+Nu = 0.35
+
+Material #2
+Name = "concrete"
+Colour = #FFB7B9D7
+Phi = 50
+Coh = 1000
+Gamma = 24
+Emod = 350000
+Nu = 0.25
+
+Material #3
+Name = "sand"
+Colour = #FFF9F5C1
+Phi = 35
+Coh = 0
+Gamma = 17
+Emod = 100000
+Nu = 0.33
+
+
+--------------------------------
+MATERIAL BLOCK DATA
+--------------------------------
+
+Number of Material Blocks = 6
+
+Material Block #1
+Material Type = "sand"
+Number of Boundary Points = 9
+0, 6.41091190159489E-15, True, False
+40, 6.41091190159489E-15, False, False
+40, 20, False, False
+29.9999999999999, 20, False, False
+29.9999999999999, 35, False, False
+40, 35, False, False
+40, 50, False, False
+30, 50, False, False
+0, 50, True, False
+Number of Line Constraints = 1
+8, 0, True, False
+Number of Line Loads = 1
+6, 7, True, -100, -100, False, 0, 0
+Number of Point Loads = 0
+
+Material Block #2
+Material Type = "sand"
+Number of Boundary Points = 9
+40, 50, False, False
+40, 35, False, False
+50, 35, False, False
+50, 20, False, False
+40, 20, False, False
+40, 6.41091190159489E-15, False, False
+80.0000000000001, 6.41091190159489E-15, True, False
+80, 50, True, False
+50, 50, False, False
+Number of Line Constraints = 1
+6, 7, True, False
+Number of Line Loads = 1
+8, 0, True, -100, -100, False, 0, 0
+Number of Point Loads = 0
+
+Material Block #3
+Material Type = "concrete"
+Number of Boundary Points = 8
+29.9999999999999, 35, False, False
+29.9999999999999, 20, False, False
+40, 20, False, False
+40, 21, False, False
+31, 21, False, False
+31, 34, False, False
+40, 34, False, False
+40, 35, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 3
+5, 6, True, -10, -10, False, 0, 0
+4, 5, True, -10, -10, False, 0, 0
+3, 4, True, -10, -10, False, 0, 0
+Number of Point Loads = 0
+
+Material Block #4
+Material Type = "concrete"
+Number of Boundary Points = 8
+40, 35, False, False
+40, 34, False, False
+49, 34, False, False
+49, 21, False, False
+40, 21, False, False
+40, 20, False, False
+50, 20, False, False
+50, 35, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 3
+3, 4, True, -10, -10, False, 0, 0
+2, 3, True, -10, -10, False, 0, 0
+1, 2, True, -10, -10, False, 0, 0
+Number of Point Loads = 0
+
+Material Block #5
+Material Type = "NULL"
+Number of Boundary Points = 6
+40, 34, False, False
+31, 34, False, False
+31, 21, False, False
+40, 21, False, False
+49, 21, False, False
+49, 34, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #6
+Material Type = "bedrock"
+Number of Boundary Points = 5
+0, -9.99999999999995, True, True
+80.0000000000001, -9.99999999999995, True, True
+80.0000000000001, 6.41091190159489E-15, True, False
+40, 6.41091190159489E-15, False, False
+0, 6.41091190159489E-15, True, False
+Number of Line Constraints = 3
+4, 0, True, False
+1, 2, True, False
+0, 1, True, True
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+
+--------------------------------
+GENETIC ALGORITHM PARAMETERS
+--------------------------------
+
+Population = 15
+Generations = 100
+Fittest Proportion = 0.1
+Mating Pool Proportion = 0.5
+Crossover Probability = 0.7
+Mutation Probability = 0.25
+Slice Width = 10
+
+
+--------------------------------
+FEA PARAMETERS
+--------------------------------
+
+Column Width = 1
+Row Height = 1
+
+
+--------------------------------
+ANALYSIS STATUS
+--------------------------------
+
+Analysis Type = FEA4NodedQuad
+Verified = True
+Meshed = True
+Analyzed = False

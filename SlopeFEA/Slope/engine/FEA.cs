@@ -45,8 +45,8 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="number">Node number.</param>
         /// <param name="x">Global coordinate.</param>
-        public feNode (int number,
-                        double x)
+        public feNode ( int number,
+                        double x )
         {
             this.Number = number;
             this.IsBoundary = false;
@@ -71,10 +71,10 @@ namespace SlopeFEA
         /// <param name="isBoundary">Indicates if the node is on a substruct boundary.</param>
         /// <param name="x">Global x-coordinate.</param>
         /// <param name="y">Global y-coordinate.</param>
-        public feNode (int number,
+        public feNode ( int number,
                         bool isBoundary,
                         double x,
-                        double y)
+                        double y )
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
@@ -100,11 +100,11 @@ namespace SlopeFEA
         /// <param name="x">Global x-coordinate.</param>
         /// <param name="y">Global y-coordinate.</param>
         /// <param name="z">Global z-coordinate.</param>
-        public feNode (int number,
+        public feNode ( int number,
                         bool isBoundary,
                         double x,
                         double y,
-                        double z)
+                        double z )
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
@@ -193,9 +193,9 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="m">Node to be merged with this node.</param>
         /// <param name="mergeCoords">If true, take average coordinates; if false, take coordinates of m.</param>
-        public void Merge (feNode m, bool mergeCoords)
+        public void Merge ( feNode m, bool mergeCoords )
         {
-            if (mergeCoords)
+            if ( mergeCoords )
             {
                 this.X = 0.5 * (this.X + m.X);
                 this.Y = 0.5 * (this.Y + m.Y);
@@ -214,7 +214,7 @@ namespace SlopeFEA
 
             this.IsBoundary = this.IsBoundary || m.IsBoundary;
             this.IsLocked = this.IsLocked || m.IsLocked;
-            this.Number = Math.Min(this.Number, m.Number);
+            this.Number = Math.Min( this.Number, m.Number );
             this.IsFixedX = this.IsFixedX || m.IsFixedX;
             this.IsFixedY = this.IsFixedY || m.IsFixedY;
             this.IsFixedZ = this.IsFixedZ || m.IsFixedZ;
@@ -236,38 +236,38 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="substruct">The substructure (block of material) polygon to check.</param>
         /// <returns>true if inside, false otherwise.</returns>
-        public bool IsInside (feSubstruct substruct)
+        public bool IsInside ( feSubstruct substruct )
         {
             // return true in special case of a boundary node
             // (for efficiency and to reduce errors due to floating point
             // representation of coordinates)
-            if (this.IsBoundary) return true;
+            if ( this.IsBoundary ) return true;
 
             // initialize local variables
             Point p1, p2;
             bool inside = false;
 
             // node cannot be inside a straight line
-            if (substruct.Points.Count < 3) return inside;
+            if ( substruct.Points.Count < 3 ) return inside;
 
             // polygon boundary iterators
-            Point oldPoint = new Point(substruct.Points[substruct.Points.Count - 1].X,
-                substruct.Points[substruct.Points.Count - 1].Y);
+            Point oldPoint = new Point( substruct.Points[substruct.Points.Count - 1].X,
+                substruct.Points[substruct.Points.Count - 1].Y );
             Point newPoint;
 
             // loop through boundary checking if line drawn from this
             // node to infinity along the y axis is intersected by
             // each line segment of the polygon
-            for (int i = 0; i < substruct.Points.Count; i++)
+            for ( int i = 0 ; i < substruct.Points.Count ; i++ )
             {
                 // update iterator
-                newPoint = new Point(substruct.Points[i].X, substruct.Points[i].Y);
+                newPoint = new Point( substruct.Points[i].X, substruct.Points[i].Y );
 
                 // if the node lies exactly at a vertex, it is inside ...
-                if (newPoint.X == this.X && newPoint.Y == this.Y) return true;
+                if ( newPoint.X == this.X && newPoint.Y == this.Y ) return true;
 
                 // ... otherwise set left and right points accordingly
-                else if (newPoint.X > oldPoint.X)
+                else if ( newPoint.X > oldPoint.X )
                 {
                     p1 = oldPoint;
                     p2 = newPoint;
@@ -281,8 +281,8 @@ namespace SlopeFEA
                 // if the line segment straddles the y-axis and
                 // the intersection occurs on the positive side of
                 // this node, flip the winding bit
-                if ((newPoint.X < this.X) == (this.X <= oldPoint.X)
-                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X))
+                if ( (newPoint.X < this.X) == (this.X <= oldPoint.X)
+                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X) )
                 {
                     inside = !inside;
                 }
@@ -299,23 +299,23 @@ namespace SlopeFEA
         /// Determines if this node is inside the given fe3NodedTriElement.
         /// (see documentation/commentary for feSubstruct input overload)
         /// </summary>
-        public bool IsInside (fe3NodedTriElement element)
+        public bool IsInside ( fe3NodedTriElement element )
         {
             Point p1, p2;
 
             bool inside = false;
 
-            if (element.Nodes.Count < 3) return inside;
+            if ( element.Nodes.Count < 3 ) return inside;
 
-            Point oldPoint = new Point(element.Nodes[element.Nodes.Count - 1].X,
-                element.Nodes[element.Nodes.Count - 1].Y);
+            Point oldPoint = new Point( element.Nodes[element.Nodes.Count - 1].X,
+                element.Nodes[element.Nodes.Count - 1].Y );
 
             Point newPoint;
-            for (int i = 0; i < element.Nodes.Count; i++)
+            for ( int i = 0 ; i < element.Nodes.Count ; i++ )
             {
-                newPoint = new Point(element.Nodes[i].X, element.Nodes[i].Y);
+                newPoint = new Point( element.Nodes[i].X, element.Nodes[i].Y );
 
-                if (newPoint.X > oldPoint.X)
+                if ( newPoint.X > oldPoint.X )
                 {
                     p1 = oldPoint;
                     p2 = newPoint;
@@ -326,8 +326,8 @@ namespace SlopeFEA
                     p2 = oldPoint;
                 }
 
-                if ((newPoint.X <= this.X) == (this.X <= oldPoint.X)
-                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X))
+                if ( (newPoint.X <= this.X) == (this.X <= oldPoint.X)
+                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X) )
                 {
                     inside = !inside;
                 }
@@ -344,24 +344,24 @@ namespace SlopeFEA
         /// Determines if this node is inside the given fe4NodedQuadElement.
         /// (see documentation/commentary for feSubstruct input overload)
         /// </summary>
-        public bool IsInside (fe4NodedQuadElement element)
+        public bool IsInside ( fe4NodedQuadElement element )
         {
             Point p1, p2;
 
             bool inside = false;
 
-            if (element.Nodes.Count < 3) return inside;
+            if ( element.Nodes.Count < 3 ) return inside;
 
-            Point oldPoint = new Point(element.Nodes[element.Nodes.Count - 1].X,
-                element.Nodes[element.Nodes.Count - 1].Y);
+            Point oldPoint = new Point( element.Nodes[element.Nodes.Count - 1].X,
+                element.Nodes[element.Nodes.Count - 1].Y );
 
             Point newPoint;
-            for (int i = 0; i < element.Nodes.Count; i++)
+            for ( int i = 0 ; i < element.Nodes.Count ; i++ )
             {
-                newPoint = new Point(element.Nodes[i].X, element.Nodes[i].Y);
+                newPoint = new Point( element.Nodes[i].X, element.Nodes[i].Y );
 
-                if (newPoint.X == this.X && newPoint.Y == this.Y) return true;
-                else if (newPoint.X > oldPoint.X)
+                if ( newPoint.X == this.X && newPoint.Y == this.Y ) return true;
+                else if ( newPoint.X > oldPoint.X )
                 {
                     p1 = oldPoint;
                     p2 = newPoint;
@@ -372,8 +372,8 @@ namespace SlopeFEA
                     p2 = oldPoint;
                 }
 
-                if ((newPoint.X < this.X) == (this.X <= oldPoint.X)
-                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X))
+                if ( (newPoint.X < this.X) == (this.X <= oldPoint.X)
+                    && (this.Y - p1.Y) * (p2.X - p1.X) < (p2.Y - p1.Y) * (this.X - p1.X) )
                 {
                     inside = !inside;
                 }
@@ -392,9 +392,9 @@ namespace SlopeFEA
         /// <param name="n1">First node.</param>
         /// <param name="n2">Second node.</param>
         /// <returns>Linear distance between the nodes.</returns>
-        public static double Dist (feNode n1, feNode n2)
+        public static double Dist ( feNode n1, feNode n2 )
         {
-            return Math.Sqrt(Math.Pow(n1.X - n2.X, 2) + Math.Pow(n1.Y - n2.Y, 2) + Math.Pow(n1.Z - n2.Z, 2));
+            return Math.Sqrt( Math.Pow( n1.X - n2.X, 2 ) + Math.Pow( n1.Y - n2.Y, 2 ) + Math.Pow( n1.Z - n2.Z, 2 ) );
         }
 
 
@@ -404,11 +404,11 @@ namespace SlopeFEA
         /// <param name="n0">First node.</param>
         /// <param name="n1">Second node.</param>
         /// <returns>1 if n0 is greater, 0 if they are equal, -1 if n1 is greater</returns>
-        public static int CompareNodesByNumber (feNode n0, feNode n1)
+        public static int CompareNodesByNumber ( feNode n0, feNode n1 )
         {
-            if (n0 == null)
+            if ( n0 == null )
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -421,7 +421,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -430,8 +430,8 @@ namespace SlopeFEA
                 // if both are not null, compare by node number
                 else
                 {
-                    if (n0.Number > n1.Number) return 1;
-                    else if (n0.Number == n1.Number) return 0;
+                    if ( n0.Number > n1.Number ) return 1;
+                    else if ( n0.Number == n1.Number ) return 0;
                     else return -1;
                 }
             }
@@ -445,11 +445,11 @@ namespace SlopeFEA
         /// <param name="n0">First node.</param>
         /// <param name="n1">Second node.</param>
         /// <returns>1 if n0 is greater, 0 if they are equal, -1 if n1 is greater</returns>
-        public static int CompareNodesHorizontally (feNode n0, feNode n1)
+        public static int CompareNodesHorizontally ( feNode n0, feNode n1 )
         {
-            if (n0 == null)
+            if ( n0 == null )
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -462,7 +462,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -474,16 +474,16 @@ namespace SlopeFEA
                     double toler = 1e-3;
 
                     // check if nodes are on same approximate vertical line
-                    if (Math.Abs(n0.X - n1.X) < toler)
+                    if ( Math.Abs( n0.X - n1.X ) < toler )
                     {
                         // compare by y-coord
-                        if (Math.Abs(n0.Y - n1.Y) < toler) return 0;
-                        else if (n0.Y > n1.Y) return 1;
+                        if ( Math.Abs( n0.Y - n1.Y ) < toler ) return 0;
+                        else if ( n0.Y > n1.Y ) return 1;
                         else return -1;
                     }
 
                     // otherwise, compare by x-coord alone
-                    else if (n0.X > n1.X)
+                    else if ( n0.X > n1.X )
                     {
                         return 1;
                     }
@@ -504,11 +504,11 @@ namespace SlopeFEA
         /// <param name="n0">First node.</param>
         /// <param name="n1">Second node.</param>
         /// <returns>1 if n0 is greater, 0 if they are equal, -1 if n1 is greater</returns>
-        public static int CompareNodesVertically (feNode n0, feNode n1)
+        public static int CompareNodesVertically ( feNode n0, feNode n1 )
         {
-            if (n0 == null)
+            if ( n0 == null )
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -521,7 +521,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -533,16 +533,16 @@ namespace SlopeFEA
                     double toler = 1e-3;
 
                     // check if nodes are on same approximate horizontal line
-                    if (Math.Abs(n0.Y - n1.Y) < toler)
+                    if ( Math.Abs( n0.Y - n1.Y ) < toler )
                     {
                         // compare by x-coord
-                        if (Math.Abs(n0.X - n1.X) < toler) return 0;
-                        else if (n0.X > n1.X) return 1;
+                        if ( Math.Abs( n0.X - n1.X ) < toler ) return 0;
+                        else if ( n0.X > n1.X ) return 1;
                         else return -1;
                     }
 
                     // otherwise, compare by y-coord alone
-                    else if (n0.Y > n1.Y)
+                    else if ( n0.Y > n1.Y )
                     {
                         return 1;
                     }
@@ -562,11 +562,11 @@ namespace SlopeFEA
         /// <param name="n0">First node.</param>
         /// <param name="n1">Second node.</param>
         /// <returns>1 if n0 is greater, 0 if they are equal, -1 if n1 is greater</returns>
-        public static int CompareNodesByOriginDist (feNode n0, feNode n1)
+        public static int CompareNodesByOriginDist ( feNode n0, feNode n1 )
         {
-            if (n0 == null)
+            if ( n0 == null )
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -579,7 +579,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (n1 == null)
+                if ( n1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -592,8 +592,8 @@ namespace SlopeFEA
                     double origDist0 = (n0.X * n0.X) + (n0.Y * n0.Y) + (n0.Z * n0.Z);
                     double origDist1 = (n1.X * n1.X) + (n1.Y * n1.Y) + (n1.Z * n1.Z);
 
-                    if (origDist0 > origDist1) return 1;
-                    else if (origDist0 == origDist1) return 0;
+                    if ( origDist0 > origDist1 ) return 1;
+                    else if ( origDist0 == origDist1 ) return 0;
                     else return -1;
                 }
             }
@@ -613,18 +613,18 @@ namespace SlopeFEA
         /// Override for object comparison.
         /// </summary>
         /// <returns>true if objects referenced are the same, false otherwise.</returns>
-        public override bool Equals (object obj)
+        public override bool Equals ( object obj )
         {
-            return base.Equals(obj);
+            return base.Equals( obj );
         }
 
         /// <summary>
         /// Override for IEquatable interface.
         /// </summary>
         /// <returns>true if objects referenced are the same, false otherwise.</returns>
-        public bool Equals (feNode other)
+        public bool Equals ( feNode other )
         {
-            return System.Object.Equals(this, other);
+            return System.Object.Equals( this, other );
         }
     }
 
@@ -643,8 +643,8 @@ namespace SlopeFEA
         /// <param name="n2">Second node.</param>
         /// <param name="fixX">true if x-displacement is fixed, false otherwise.</param>
         /// <param name="fixY">true if y-displacement is fixed, false otherwise.</param>
-        public feLineConstraint(Point n1, Point n2,
-                                bool fixX, bool fixY)
+        public feLineConstraint ( Point n1, Point n2,
+                                bool fixX, bool fixY )
         {
             // create list of boundary nodes for the constraint
             Points = new List<Point>() { n1, n2 };
@@ -675,9 +675,9 @@ namespace SlopeFEA
         /// <param name="xLoad">Value of horizontal load</param>
         /// <param name="isLoadedY">Is the node loaded in the vertical direction?</param>
         /// <param name="yLoad">Value of vertical load</param>
-        public fePointLoad (Point node,
+        public fePointLoad ( Point node,
                             bool isLoadedX, double xLoad,
-                            bool isLoadedY, double yLoad)
+                            bool isLoadedY, double yLoad )
         {
             this.Point = node;
 
@@ -710,17 +710,17 @@ namespace SlopeFEA
         /// <param name="isLoadedT">Is load applied in the tangential direction?</param>
         /// <param name="tLoad1">Value of tangential load at node 1.</param>
         /// <param name="tLoad2">Value of tangential load at node 2.</param>
-        public feLineLoad (Point n1, Point n2,
-                                bool isLoadedN, 
+        public feLineLoad ( Point n1, Point n2,
+                                bool isLoadedN,
                                 double nLoad1, double nLoad2,
                                 bool isLoadedT,
-                                double tLoad1, double tLoad2)
+                                double tLoad1, double tLoad2 )
         {
             // create list of boundary nodes for the load
             Points = new List<Point>() { n1, n2 };
 
             // set load state
-            if (isLoadedN)
+            if ( isLoadedN )
             {
                 this.nLoad1 = nLoad1;
                 this.nLoad2 = nLoad2;
@@ -731,7 +731,7 @@ namespace SlopeFEA
                 this.nLoad2 = 0.0;
             }
 
-            if (isLoadedT)
+            if ( isLoadedT )
             {
                 this.tLoad1 = tLoad1;
                 this.tLoad2 = tLoad2;
@@ -771,7 +771,7 @@ namespace SlopeFEA
         /// Class constructor.
         /// </summary>
         /// <param name="material">The type of material contained in the block.</param>
-        public feSubstruct (MaterialType material)
+        public feSubstruct ( MaterialType material )
         {
             this.Material = material;
 
@@ -826,7 +826,7 @@ namespace SlopeFEA
             get
             {
                 double xmin = Points[0].X;
-                for (int i = 1; i < Points.Count; i++) xmin = Math.Min(xmin, Points[i].X);
+                for ( int i = 1 ; i < Points.Count ; i++ ) xmin = Math.Min( xmin, Points[i].X );
                 return xmin;
             }
         }
@@ -839,7 +839,7 @@ namespace SlopeFEA
             get
             {
                 double xmax = Points[0].X;
-                for (int i = 1; i < Points.Count; i++) xmax = Math.Max(xmax, Points[i].X);
+                for ( int i = 1 ; i < Points.Count ; i++ ) xmax = Math.Max( xmax, Points[i].X );
                 return xmax;
             }
         }
@@ -852,7 +852,7 @@ namespace SlopeFEA
             get
             {
                 double ymin = Points[0].Y;
-                for (int i = 1; i < Points.Count; i++) ymin = Math.Min(ymin, Points[i].Y);
+                for ( int i = 1 ; i < Points.Count ; i++ ) ymin = Math.Min( ymin, Points[i].Y );
                 return ymin;
             }
         }
@@ -865,7 +865,7 @@ namespace SlopeFEA
             get
             {
                 double ymax = Points[0].Y;
-                for (int i = 1; i < Points.Count; i++) ymax = Math.Max(ymax, Points[i].Y);
+                for ( int i = 1 ; i < Points.Count ; i++ ) ymax = Math.Max( ymax, Points[i].Y );
                 return ymax;
             }
         }
@@ -886,11 +886,11 @@ namespace SlopeFEA
             get
             {
                 double a = Points[Points.Count - 1].X * Points[0].Y - Points[0].X * Points[Points.Count - 1].Y;
-                for (int i = 1; i < Points.Count; i++)
+                for ( int i = 1 ; i < Points.Count ; i++ )
                 {
                     a += Points[i - 1].X * Points[i].Y - Points[i].X * Points[i - 1].Y;
                 }
-                return 0.5*a;
+                return 0.5 * a;
             }
         }
 
@@ -899,7 +899,7 @@ namespace SlopeFEA
         /// </summary>
         public void SortPoints ()
         {
-            if (this.Area < 0)
+            if ( this.Area < 0 )
             {
                 Points.Reverse();
                 IsFixedX.Reverse();
@@ -909,7 +909,7 @@ namespace SlopeFEA
 
     }
 
-    
+
     /// <summary>
     /// fe2NodedBoundElement - Class for boundary elements (used to apply tractions).
     /// </summary>
@@ -925,10 +925,10 @@ namespace SlopeFEA
         /// <param name="nLoad2">Normal direction load at node 2.</param>
         /// <param name="tLoad1">Tangential direction load at node 1.</param>
         /// <param name="tLoad2">Tangential direction load at node 2.</param>
-        public fe2NodedBoundElement (int number,
+        public fe2NodedBoundElement ( int number,
                                         feNode n1, feNode n2,
                                         double nLoad1, double nLoad2,
-                                        double tLoad1, double tLoad2)
+                                        double tLoad1, double tLoad2 )
         {
             this.Number = number;
 
@@ -964,7 +964,7 @@ namespace SlopeFEA
         {
             get
             {
-                return Math.Sqrt(Math.Pow(Nodes[0].X - Nodes[1].X, 2) + Math.Pow(Nodes[0].Y - Nodes[1].Y, 2));
+                return Math.Sqrt( Math.Pow( Nodes[0].X - Nodes[1].X, 2 ) + Math.Pow( Nodes[0].Y - Nodes[1].Y, 2 ) );
             }
         }
 
@@ -974,11 +974,11 @@ namespace SlopeFEA
         /// <param name="e0">First element.</param>
         /// <param name="e1">Second element.</param>
         /// <returns>1 if first element is greater, 0 if they are equal, -1 if second element is greater.</returns>
-        public static int CompareElementsByNumber (fe2NodedBoundElement e0, fe2NodedBoundElement e1)
+        public static int CompareElementsByNumber ( fe2NodedBoundElement e0, fe2NodedBoundElement e1 )
         {
-            if (e0 == null)
+            if ( e0 == null )
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -991,7 +991,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -1000,8 +1000,8 @@ namespace SlopeFEA
                 // if both are not null, compare by node number
                 else
                 {
-                    if (e0.Number > e1.Number) return 1;
-                    else if (e0.Number == e1.Number) return 0;
+                    if ( e0.Number > e1.Number ) return 1;
+                    else if ( e0.Number == e1.Number ) return 0;
                     else return -1;
                 }
             }
@@ -1024,17 +1024,17 @@ namespace SlopeFEA
         /// <param name="n3">Third node.</param>
         /// <param name="material">Material type.</param>
         /// <param name="sort">Flag to initially sort the points.</param>
-        public fe3NodedTriElement (int number,
+        public fe3NodedTriElement ( int number,
                                     feNode n1, feNode n2, feNode n3,
                                     MaterialType material,
-                                    bool sort)
+                                    bool sort )
         {
             this.Number = number;
             this.Material = material;
 
             this.Nodes = new List<feNode>() { n1, n2, n3 };
 
-            if (sort) SortNodes();
+            if ( sort ) SortNodes();
         }
 
         /// <summary>
@@ -1047,10 +1047,10 @@ namespace SlopeFEA
         /// <param name="n3">Third node.</param>
         /// <param name="material">Material type.</param>
         /// <param name="sort">Flag to initially sort the points.</param>
-        public fe3NodedTriElement (feSubstruct parent, int number,
+        public fe3NodedTriElement ( feSubstruct parent, int number,
                                     feNode n1, feNode n2, feNode n3,
                                     MaterialType material,
-                                    bool sort)
+                                    bool sort )
         {
             this.parent = parent;
             this.Number = number;
@@ -1058,7 +1058,7 @@ namespace SlopeFEA
 
             this.Nodes = new List<feNode>() { n1, n2, n3 };
 
-            if (sort) SortNodes();
+            if ( sort ) SortNodes();
         }
 
 
@@ -1114,7 +1114,7 @@ namespace SlopeFEA
         /// </summary>
         public void SortNodes ()
         {
-            if (this.Area < 0)
+            if ( this.Area < 0 )
             {
                 feNode tmp = Nodes[1];
                 Nodes[1] = Nodes[2];
@@ -1128,11 +1128,11 @@ namespace SlopeFEA
         /// <param name="e0">First element.</param>
         /// <param name="e1">Second element.</param>
         /// <returns>1 if first element is greater, 0 if they are equal, -1 if second element is greater.</returns>
-        public static int CompareElementsByNumber (fe3NodedTriElement e0, fe3NodedTriElement e1)
+        public static int CompareElementsByNumber ( fe3NodedTriElement e0, fe3NodedTriElement e1 )
         {
-            if (e0 == null)
+            if ( e0 == null )
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -1145,7 +1145,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -1154,8 +1154,8 @@ namespace SlopeFEA
                 // if both are not null, compare by node number
                 else
                 {
-                    if (e0.Number > e1.Number) return 1;
-                    else if (e0.Number == e1.Number) return 0;
+                    if ( e0.Number > e1.Number ) return 1;
+                    else if ( e0.Number == e1.Number ) return 0;
                     else return -1;
                 }
             }
@@ -1165,10 +1165,10 @@ namespace SlopeFEA
         /// Translates the graphics coordinates of the boundary polygon.
         /// </summary>
         /// <param name="delta">Translation vector.</param>
-        public void Translate (Vector delta)
+        public void Translate ( Vector delta )
         {
             Point p;
-            for (int i = 0; i < Boundary.Points.Count; i++)
+            for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
             {
                 p = Boundary.Points[i];
                 p.X += delta.X;
@@ -1182,10 +1182,10 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="factor">Scaling factor.</param>
         /// <param name="centre">Centre of graphics canvas.</param>
-        public void Zoom (double factor, Point centre)
+        public void Zoom ( double factor, Point centre )
         {
             Point p;
-            for (int i = 0; i < Boundary.Points.Count; i++)
+            for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
             {
                 p = Boundary.Points[i];
                 p.X = centre.X + factor * (p.X - centre.X);
@@ -1212,17 +1212,17 @@ namespace SlopeFEA
         /// <param name="n4">Fourth node.</param>
         /// <param name="material">Material type.</param>
         /// <param name="sort">Flag for intial sorting.</param>
-        public fe4NodedQuadElement (int number,
+        public fe4NodedQuadElement ( int number,
                                     feNode n1, feNode n2, feNode n3, feNode n4,
                                     MaterialType material,
-                                    bool sort)
+                                    bool sort )
         {
             this.Number = number;
             this.Material = material;
 
             this.Nodes = new List<feNode>() { n1, n2, n3, n4 };
 
-            if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
+            if ( sort ) SortNodes( false ); // do not check for repeated nodes on initial creation
         }
 
         /// <summary>
@@ -1236,10 +1236,10 @@ namespace SlopeFEA
         /// <param name="n4">Fourth node.</param>
         /// <param name="material">Material type.</param>
         /// <param name="sort">Flag for intial sorting.</param>
-        public fe4NodedQuadElement (feSubstruct parent, int number,
+        public fe4NodedQuadElement ( feSubstruct parent, int number,
                                     feNode n1, feNode n2, feNode n3, feNode n4,
                                     MaterialType material,
-                                    bool sort)
+                                    bool sort )
         {
             this.parent = parent;
             this.Number = number;
@@ -1247,7 +1247,7 @@ namespace SlopeFEA
 
             this.Nodes = new List<feNode>() { n1, n2, n3, n4 };
 
-            if (sort) SortNodes(false); // do not check for repeated nodes on initial creation
+            if ( sort ) SortNodes( false ); // do not check for repeated nodes on initial creation
         }
 
         /// <summary>
@@ -1291,11 +1291,11 @@ namespace SlopeFEA
             get
             {
                 double a = Nodes[Nodes.Count - 1].X * Nodes[0].Y - Nodes[0].X * Nodes[Nodes.Count - 1].Y;
-                for (int i = 1; i < Nodes.Count; i++)
+                for ( int i = 1 ; i < Nodes.Count ; i++ )
                 {
                     a += Nodes[i - 1].X * Nodes[i].Y - Nodes[i].X * Nodes[i - 1].Y;
                 }
-                return 0.5*a;
+                return 0.5 * a;
             }
         }
 
@@ -1303,18 +1303,18 @@ namespace SlopeFEA
         /// Sort nodes in CCW order (and ensure repeated node is alpha and omega).
         /// </summary>
         /// <param name="checkRepeat">Flag for repeated node check.</param>
-        public void SortNodes (bool checkRepeat)
+        public void SortNodes ( bool checkRepeat )
         {
-            if (checkRepeat)
+            if ( checkRepeat )
             {
                 // loop through nodes checking for repeated nodes
                 int repeatCount = 0;
                 List<int> repeatIndex = new List<int>();
-                for (int i = 0; i < Nodes.Count; i++)
+                for ( int i = 0 ; i < Nodes.Count ; i++ )
                 {
-                    if (Nodes.Count(delegate(feNode node) { return node == Nodes[i]; }) > 1)
+                    if ( Nodes.Count( delegate( feNode node ) { return node == Nodes[i]; } ) > 1 )
                     {
-                        repeatIndex.Add(i);
+                        repeatIndex.Add( i );
                         repeatCount++;
                     }
                 }
@@ -1322,7 +1322,7 @@ namespace SlopeFEA
                 // if there was a repeated node, swap indices ensuring
                 // references to repeated node are first and last in
                 // node list
-                if (repeatCount > 0)
+                if ( repeatCount > 0 )
                 {
                     feNode tmp = Nodes[0];
                     Nodes[0] = Nodes[repeatIndex[0]];
@@ -1335,7 +1335,7 @@ namespace SlopeFEA
             }
 
             // check CCW order
-            if (this.Area < 0) Nodes.Reverse();
+            if ( this.Area < 0 ) Nodes.Reverse();
         }
 
 
@@ -1345,11 +1345,11 @@ namespace SlopeFEA
         /// <param name="e0">First element.</param>
         /// <param name="e1">Second element.</param>
         /// <returns>1 if first element is greater, 0 if they are equal, -1 if second element is greater.</returns>
-        public static int CompareElementsByNumber (fe4NodedQuadElement e0, fe4NodedQuadElement e1)
+        public static int CompareElementsByNumber ( fe4NodedQuadElement e0, fe4NodedQuadElement e1 )
         {
-            if (e0 == null)
+            if ( e0 == null )
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if both are null, they are equal
                     return 0;
@@ -1362,7 +1362,7 @@ namespace SlopeFEA
             }
             else
             {
-                if (e1 == null)
+                if ( e1 == null )
                 {
                     // if n0 is not null and n1 is null, n0 is greater
                     return 1;
@@ -1371,8 +1371,8 @@ namespace SlopeFEA
                 // if both are not null, compare by node number
                 else
                 {
-                    if (e0.Number > e1.Number) return 1;
-                    else if (e0.Number == e1.Number) return 0;
+                    if ( e0.Number > e1.Number ) return 1;
+                    else if ( e0.Number == e1.Number ) return 0;
                     else return -1;
                 }
             }
@@ -1382,10 +1382,10 @@ namespace SlopeFEA
         /// Translates boundary polygon graphics coordinates.
         /// </summary>
         /// <param name="delta">Translation vector.</param>
-        public void Translate (Vector delta)
+        public void Translate ( Vector delta )
         {
             Point p;
-            for (int i = 0; i < Boundary.Points.Count; i++)
+            for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
             {
                 p = Boundary.Points[i];
                 p.X += delta.X;
@@ -1399,10 +1399,10 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="factor">Scaling factor.</param>
         /// <param name="centre">Plotting canvas centre.</param>
-        public void Zoom (double factor, Point centre)
+        public void Zoom ( double factor, Point centre )
         {
             Point p;
-            for (int i = 0; i < Boundary.Points.Count; i++)
+            for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
             {
                 p = Boundary.Points[i];
                 p.X = centre.X + factor * (p.X - centre.X);

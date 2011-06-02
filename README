@@ -199,3 +199,5 @@ REVISION HISTORY:
 +++ (SlopeCanvas.cs) Added updating of point loads to UpdateUnits()
 +++ (SlopeCanvas.cs) Added plotting of point loads to BuildAxes()
 === (SlopeCanvas.cs) Modified order of plotting so that loads and fixities always get plotted on top
+=== (CanvasData.cs) Modified LineLoad.Update() to plot three lines instead of just one
++++ (Multiple files) Added in-built NULL material; when this material is assigned to a block, the mesh generator skips the block

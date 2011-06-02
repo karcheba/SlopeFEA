@@ -40,7 +40,7 @@ namespace SlopeFEA
 {
     partial class SlopeCanvas : Canvas
     {
-        public static List<fe4NodedQuadElement> MeshGenStructured4NodedQuad (SlopeCanvas canvas, double colWidth, double rowHeight, bool output)
+        public static List<fe4NodedQuadElement> MeshGenStructured4NodedQuad ( SlopeCanvas canvas, double colWidth, double rowHeight, bool output )
         {
             // load material blocks from parent SlopeCanvas
             List<MaterialBlock> blocks = canvas.MaterialBlocks;
@@ -69,7 +69,7 @@ namespace SlopeFEA
 
             // get units dependent scaling factor
             double factor;
-            switch (units)
+            switch ( units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -81,78 +81,81 @@ namespace SlopeFEA
             // create list of feSubstructs from MaterialBlocks
             // *****************************************
             feSubstruct newSubstruct;
-            List<feSubstruct> substructs = new List<feSubstruct>(blocks.Count);
-            foreach (MaterialBlock block in blocks)
+            List<feSubstruct> substructs = new List<feSubstruct>( blocks.Count );
+            foreach ( MaterialBlock block in blocks )
             {
+                // skip NULL material blocks
+                if ( block.Material.Name == "NULL" ) continue;
+
                 // create new feSubStruct and insert MaterialType
-                newSubstruct = new feSubstruct(block.Material);
+                newSubstruct = new feSubstruct( block.Material );
 
                 // insert vertices converted to true coords
-                foreach (DrawingPoint p in block.BoundaryPoints)
+                foreach ( DrawingPoint p in block.BoundaryPoints )
                 {
                     newSubstruct.Points.Add(
-                        new Point((p.Point.X - originX) / dpiX * factor * scale,
-                                    (yHeight - p.Point.Y - originY) / dpiY * factor * scale));
+                        new Point( (p.Point.X - originX) / dpiX * factor * scale,
+                                    (yHeight - p.Point.Y - originY) / dpiY * factor * scale ) );
 
-                    newSubstruct.IsFixedX.Add(p.IsFixedX);
-                    newSubstruct.IsFixedY.Add(p.IsFixedY);
+                    newSubstruct.IsFixedX.Add( p.IsFixedX );
+                    newSubstruct.IsFixedY.Add( p.IsFixedY );
                 }
 
                 // create line constraints
                 int index1, index2;
-                foreach (LineConstraint lc in block.LineConstraints)
+                foreach ( LineConstraint lc in block.LineConstraints )
                 {
-                    index1 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == lc.Nodes[0]; });
-                    index2 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == lc.Nodes[1]; });
+                    index1 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == lc.Nodes[0]; } );
+                    index2 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == lc.Nodes[1]; } );
 
-                    newSubstruct.LineConstraints.Add(new feLineConstraint(
+                    newSubstruct.LineConstraints.Add( new feLineConstraint(
                         newSubstruct.Points[index1], newSubstruct.Points[index2],
-                        lc.IsFixedX, lc.IsFixedY));
+                        lc.IsFixedX, lc.IsFixedY ) );
                 }
 
                 // create line loads
-                foreach(LineLoad ll in block.LineLoads)
+                foreach ( LineLoad ll in block.LineLoads )
                 {
-                    index1 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[0]; });
-                    index2 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == ll.Nodes[1]; });
+                    index1 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[0]; } );
+                    index2 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[1]; } );
 
-                    newSubstruct.LineLoads.Add(new feLineLoad(
+                    newSubstruct.LineLoads.Add( new feLineLoad(
                         newSubstruct.Points[index1], newSubstruct.Points[index2],
                         ll.IsLoadedN, ll.NLoad1, ll.NLoad2,
-                        ll.IsLoadedT, ll.TLoad1, ll.TLoad2));
+                        ll.IsLoadedT, ll.TLoad1, ll.TLoad2 ) );
                 }
 
                 // create point loads
-                foreach (PointLoad pl in block.PointLoads)
+                foreach ( PointLoad pl in block.PointLoads )
                 {
-                    index1 = block.BoundaryPoints.FindIndex(delegate(DrawingPoint pt) { return pt == pl.Node; });
+                    index1 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == pl.Node; } );
 
-                    newSubstruct.PointLoads.Add(new fePointLoad(
+                    newSubstruct.PointLoads.Add( new fePointLoad(
                         newSubstruct.Points[index1],
                         pl.IsLoadedX, pl.XLoad,
-                        pl.IsLoadedY, pl.YLoad));
+                        pl.IsLoadedY, pl.YLoad ) );
                 }
 
                 // ensure vertices are ordered counterclockwise
                 newSubstruct.SortPoints();
 
                 // add to list of substructs
-                substructs.Add(newSubstruct);
+                substructs.Add( newSubstruct );
 
             }; // END OF CREATE SUBSTRUCTS FROM MATERIALBLOCKS LOOP
             canvas.FEASubstructs = substructs;
 
-            
+
             // initialize node and element counters
             int nodeCount = 0, quadElementCount = 0, boundElementCount = 0;
 
             // for merging nodes at the same location
-            double tolerDist = 1e-8 * Math.Sqrt(Math.Pow(colWidth, 2) + Math.Pow(rowHeight, 2));
-            
+            double tolerDist = 1e-8 * Math.Sqrt( Math.Pow( colWidth, 2 ) + Math.Pow( rowHeight, 2 ) );
+
             // *****************************************
             // mesh each feSubStruct
             // *****************************************
-            foreach (feSubstruct substruct in substructs)
+            foreach ( feSubstruct substruct in substructs )
             {
                 // create bounding box around substruct
                 double xmin = substruct.XMin,
@@ -161,8 +164,8 @@ namespace SlopeFEA
                         ymax = substruct.YMax;
 
                 // compute nearest integer number of rows and columns
-                int ncols = Math.Max((int)Math.Round((xmax - xmin) / colWidth), 1),
-                    nrows = Math.Max((int)Math.Round((ymax - ymin) / rowHeight), 1);
+                int ncols = Math.Max( (int) Math.Round( (xmax - xmin) / colWidth ), 1 ),
+                    nrows = Math.Max( (int) Math.Round( (ymax - ymin) / rowHeight ), 1 );
 
                 // compute actual row and column spacing
                 double dx = (xmax - xmin) / ncols,
@@ -174,18 +177,18 @@ namespace SlopeFEA
                 // **********************************************
                 feNode node1, node2, node3, node4;
                 int top, bot, lft, rgt;
-                for (int i = 0; i <= ncols; i++)
+                for ( int i = 0 ; i <= ncols ; i++ )
                 {
                     // create new column
-                    substructNodes.Add(new List<feNode>());
-                    for (int j = 0; j <= nrows; j++)
+                    substructNodes.Add( new List<feNode>() );
+                    for ( int j = 0 ; j <= nrows ; j++ )
                     {
                         // create new node at appropriate location
-                        substructNodes[i].Add(new feNode(++nodeCount, false, xmin + i * dx, ymin + j * dy));
+                        substructNodes[i].Add( new feNode( ++nodeCount, false, xmin + i * dx, ymin + j * dy ) );
 
                         // if not on the boundary, create new quad element
                         // NOTE: nodes are added in CCW order
-                        if (i > 0 && j > 0)
+                        if ( i > 0 && j > 0 )
                         {
                             // node indices
                             lft = i - 1; rgt = i; bot = j - 1; top = j;
@@ -195,9 +198,9 @@ namespace SlopeFEA
                             node2 = substructNodes[rgt][bot];
                             node3 = substructNodes[rgt][top];
                             node4 = substructNodes[lft][top];
-                            substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
+                            substructElements.Add( new fe4NodedQuadElement( substruct, ++quadElementCount,
                                 node1, node2, node3, node4,
-                                substruct.Material, false));
+                                substruct.Material, false ) );
                         }
                     }
                 }   // END OF STRUCTURED MESH GENERATION LOOP
@@ -215,32 +218,32 @@ namespace SlopeFEA
                 double dist;
                 feNode vertexNode;
                 bool foundVertex;
-                for (int i = 0; i < substruct.Points.Count; i++)
+                for ( int i = 0 ; i < substruct.Points.Count ; i++ )
                 {
                     // create locked node at the vertex
-                    vertexNode = new feNode(++nodeCount, true, substruct.Points[i].X, substruct.Points[i].Y);
+                    vertexNode = new feNode( ++nodeCount, true, substruct.Points[i].X, substruct.Points[i].Y );
                     vertexNode.IsLocked = true;
                     vertexNode.IsFixedX = substruct.IsFixedX[i];
                     vertexNode.IsFixedY = substruct.IsFixedY[i];
 
                     // see if a node is already at the vertex
                     foundVertex = false;
-                    foreach (List<feNode> column in substructNodes)
+                    foreach ( List<feNode> column in substructNodes )
                     {
-                        foreach (feNode node in column)
+                        foreach ( feNode node in column )
                         {
-                            dist = feNode.Dist(node, vertexNode);
+                            dist = feNode.Dist( node, vertexNode );
 
-                            if (dist < tolerDist)
+                            if ( dist < tolerDist )
                             {
                                 node.IsBoundary = true;
                                 node.IsLocked = true;
                                 node.IsFixedX = substruct.IsFixedX[i];
                                 node.IsFixedY = substruct.IsFixedY[i];
 
-                                foreach (fePointLoad pl in substruct.PointLoads)
+                                foreach ( fePointLoad pl in substruct.PointLoads )
                                 {
-                                    if (Math.Abs(pl.Point.X - node.X) < tolerDist && Math.Abs(pl.Point.Y - node.Y) < tolerDist)
+                                    if ( Math.Abs( pl.Point.X - node.X ) < tolerDist && Math.Abs( pl.Point.Y - node.Y ) < tolerDist )
                                     {
                                         node.XLoad = pl.XLoad;
                                         node.YLoad = pl.YLoad;
@@ -251,20 +254,20 @@ namespace SlopeFEA
                                 break;
                             }
                         }
-                        if (foundVertex) break;
+                        if ( foundVertex ) break;
                     }
-                    if (!foundVertex)
+                    if ( !foundVertex )
                     {
-                        foreach (fePointLoad pl in substruct.PointLoads)
+                        foreach ( fePointLoad pl in substruct.PointLoads )
                         {
-                            if (Math.Abs(pl.Point.X - vertexNode.X) < tolerDist && Math.Abs(pl.Point.Y - vertexNode.Y) < tolerDist)
+                            if ( Math.Abs( pl.Point.X - vertexNode.X ) < tolerDist && Math.Abs( pl.Point.Y - vertexNode.Y ) < tolerDist )
                             {
                                 vertexNode.XLoad = pl.XLoad;
                                 vertexNode.YLoad = pl.YLoad;
                             }
                         }
 
-                        insertBoundNodes.Add(vertexNode);
+                        insertBoundNodes.Add( vertexNode );
                     }
 
                 }   // END OF VERTEX DETECTION/INSERTION LOOP
@@ -286,38 +289,36 @@ namespace SlopeFEA
                 feLineConstraint lc;
                 feLineLoad ll;
                 fe2NodedBoundElement newBoundElement = null;
-                for (int i = 0; i < substruct.Points.Count; i++)
+                for ( int i = 0 ; i < substruct.Points.Count ; i++ )
                 {
                     p1 = substruct.Points[i];
 
-                    lc = substruct.LineConstraints.Find(delegate(feLineConstraint l) { return l.Points.Contains(p0) && l.Points.Contains(p1); });
-                    ll = substruct.LineLoads.Find(delegate(feLineLoad l) { return l.Points[0] == p0 && l.Points[1] == p1; });
+                    lc = substruct.LineConstraints.Find( delegate( feLineConstraint l ) { return l.Points.Contains( p0 ) && l.Points.Contains( p1 ); } );
+                    ll = substruct.LineLoads.Find( delegate( feLineLoad l ) { return l.Points[0] == p0 && l.Points[1] == p1; } );
 
-                    if (ll != null)
+                    if ( ll != null )
                     {
                         vertexNode = null;
-                        vertexNode = insertBoundNodes.Find(delegate(feNode node)
+                        vertexNode = insertBoundNodes.Find( delegate( feNode node ) {
+                            return Math.Abs( node.X - p0.X ) < tolerDist && Math.Abs( node.Y - p0.Y ) < tolerDist;
+                        } );
+                        if ( vertexNode == null )
                         {
-                            return Math.Abs(node.X - p0.X) < tolerDist && Math.Abs(node.Y - p0.Y) < tolerDist;
-                        });
-                        if (vertexNode == null)
-                        {
-                            foreach (List<feNode> column in substructNodes)
+                            foreach ( List<feNode> column in substructNodes )
                             {
-                                vertexNode = column.Find(delegate(feNode node)
-                                {
-                                    return Math.Abs(node.X - p0.X) < tolerDist && Math.Abs(node.Y - p0.Y) < tolerDist;
-                                });
-                                if (vertexNode != null) break;
+                                vertexNode = column.Find( delegate( feNode node ) {
+                                    return Math.Abs( node.X - p0.X ) < tolerDist && Math.Abs( node.Y - p0.Y ) < tolerDist;
+                                } );
+                                if ( vertexNode != null ) break;
                             }
                         }
 
-                        newBoundElement = new fe2NodedBoundElement(++boundElementCount,
-                            vertexNode, null, ll.NLoad1, 0, ll.TLoad1, 0);
+                        newBoundElement = new fe2NodedBoundElement( ++boundElementCount,
+                            vertexNode, null, ll.NLoad1, 0, ll.TLoad1, 0 );
 
                         dNLoad = ll.NLoad2 - ll.NLoad1;
                         dTLoad = ll.TLoad2 - ll.TLoad1;
-                        distLL = Math.Sqrt(Math.Pow(ll.Points[1].X - ll.Points[0].X, 2) + Math.Pow(ll.Points[1].Y - ll.Points[0].Y, 2));
+                        distLL = Math.Sqrt( Math.Pow( ll.Points[1].X - ll.Points[0].X, 2 ) + Math.Pow( ll.Points[1].Y - ll.Points[0].Y, 2 ) );
                     }
 
                     fixX = (lc != null) && (lc.IsFixedX);
@@ -328,13 +329,13 @@ namespace SlopeFEA
                     dy = p1.Y - p0.Y;
 
                     // look for existing nodes that are on the segment
-                    foreach (List<feNode> column in substructNodes)
+                    foreach ( List<feNode> column in substructNodes )
                     {
-                        foreach (feNode node in column)
+                        foreach ( feNode node in column )
                         {
                             // skip the node if it was already identified
                             // in vertex loop
-                            if (node.IsBoundary) continue;
+                            if ( node.IsBoundary ) continue;
 
                             xn = node.X;
                             yn = node.Y;
@@ -343,69 +344,67 @@ namespace SlopeFEA
                             // of the line segment and the cross product is
                             // within tolerance of zero, the point is on the
                             // line segment
-                            if (xn >= Math.Min(p0.X, p1.X) && xn <= Math.Max(p0.X, p1.X)
-                                && yn >= Math.Min(p0.Y, p1.Y) && yn <= Math.Max(p0.Y, p1.Y)
-                                && Math.Abs((xn - p0.X) * dy - (yn - p0.Y) * dx) < tolerCross)
+                            if ( xn >= Math.Min( p0.X, p1.X ) && xn <= Math.Max( p0.X, p1.X )
+                                && yn >= Math.Min( p0.Y, p1.Y ) && yn <= Math.Max( p0.Y, p1.Y )
+                                && Math.Abs( (xn - p0.X) * dy - (yn - p0.Y) * dx ) < tolerCross )
                             {
                                 node.IsBoundary = true;
                                 node.IsFixedX = fixX;
                                 node.IsFixedY = fixY;
-                                existBoundNodes.Add(node);
+                                existBoundNodes.Add( node );
                             }
                         }
                     }   // END OF EXISTING BOUNDARY NODE DETECTION LOOP
 
-                    dx = Math.Abs(dx); dy = Math.Abs(dy);
+                    dx = Math.Abs( dx ); dy = Math.Abs( dy );
 
                     // compute nearest integer number of nodes on the line segment
-                    numNodes = (int)(Math.Max(Math.Max(Math.Round(dx / colWidth), Math.Round(dy / rowHeight)), 1));
+                    numNodes = (int) (Math.Max( Math.Max( Math.Round( dx / colWidth ), Math.Round( dy / rowHeight ) ), 1 ));
 
                     // grid spacing on boundary line
                     dx = (p1.X - p0.X) / numNodes;
                     dy = (p1.Y - p0.Y) / numNodes;
 
                     // insert locked boundary nodes
-                    for (int j = 1; j < numNodes; j++)
+                    for ( int j = 1 ; j < numNodes ; j++ )
                     {
                         xn = p0.X + j * dx; yn = p0.Y + j * dy;
-                        boundNode = new feNode(++nodeCount, true, xn, yn);
+                        boundNode = new feNode( ++nodeCount, true, xn, yn );
                         boundNode.IsLocked = true;
                         boundNode.IsFixedX = fixX;
                         boundNode.IsFixedY = fixY;
-                        insertBoundNodes.Add(boundNode);
+                        insertBoundNodes.Add( boundNode );
 
-                        if (ll != null)
+                        if ( ll != null )
                         {
                             newBoundElement.Nodes[1] = boundNode;
 
-                            interpLL = Math.Sqrt(Math.Pow(xn - ll.Points[0].X, 2) + Math.Pow(yn - ll.Points[0].Y, 2)) / distLL;
+                            interpLL = Math.Sqrt( Math.Pow( xn - ll.Points[0].X, 2 ) + Math.Pow( yn - ll.Points[0].Y, 2 ) ) / distLL;
 
                             newBoundElement.NLoads[1] = ll.NLoad1 + dNLoad * interpLL;
                             newBoundElement.TLoads[1] = ll.TLoad1 + dTLoad * interpLL;
 
-                            boundElements.Add(newBoundElement);
+                            boundElements.Add( newBoundElement );
 
-                            newBoundElement = new fe2NodedBoundElement(++boundElementCount,
-                                boundNode, null, newBoundElement.NLoads[1], 0, newBoundElement.TLoads[1], 0);
+                            newBoundElement = new fe2NodedBoundElement( ++boundElementCount,
+                                boundNode, null, newBoundElement.NLoads[1], 0, newBoundElement.TLoads[1], 0 );
                         }
                     }
 
-                    if (ll != null)
+                    if ( ll != null )
                     {
                         vertexNode = null;
-                        vertexNode = insertBoundNodes.Find(delegate(feNode node)
+                        vertexNode = insertBoundNodes.Find( delegate( feNode node ) {
+                            return Math.Abs( node.X - p1.X ) < tolerDist && Math.Abs( node.Y - p1.Y ) < tolerDist;
+                        } );
+                        if ( vertexNode == null )
                         {
-                            return Math.Abs(node.X - p1.X) < tolerDist && Math.Abs(node.Y - p1.Y) < tolerDist;
-                        });
-                        if (vertexNode == null)
-                        {
-                            foreach (List<feNode> column in substructNodes)
+                            foreach ( List<feNode> column in substructNodes )
                             {
-                                vertexNode = column.Find(delegate(feNode node)
-                                {
-                                    return Math.Abs(node.X - p1.X) < tolerDist && Math.Abs(node.Y - p1.Y) < tolerDist;
-                                });
-                                if (vertexNode != null) break;
+                                vertexNode = column.Find( delegate( feNode node ) {
+                                    return Math.Abs( node.X - p1.X ) < tolerDist && Math.Abs( node.Y - p1.Y ) < tolerDist;
+                                } );
+                                if ( vertexNode != null ) break;
                             }
                         }
 
@@ -413,7 +412,7 @@ namespace SlopeFEA
                         newBoundElement.NLoads[1] = ll.NLoad2;
                         newBoundElement.TLoads[1] = ll.TLoad2;
 
-                        boundElements.Add(newBoundElement);
+                        boundElements.Add( newBoundElement );
                     }
 
                     // step forward
@@ -429,21 +428,21 @@ namespace SlopeFEA
                 // boundary node and merge them, deleting both
                 // from the list
                 // **********************************************
-                double maxDist = Math.Sqrt(Math.Pow(xmax - xmin, 2) + Math.Pow(ymax - ymin, 2));
+                double maxDist = Math.Sqrt( Math.Pow( xmax - xmin, 2 ) + Math.Pow( ymax - ymin, 2 ) );
                 feNode nearestNode;
                 double nearestDist;
                 int boundElementNodeIndex;
-                while (existBoundNodes.Count > 0)
+                while ( existBoundNodes.Count > 0 )
                 {
                     nearestDist = maxDist;
                     nearestNode = null;
-                    
-                    // find the nearest inserted boundary node
-                    foreach (feNode node in insertBoundNodes)
-                    {
-                        dist = feNode.Dist(existBoundNodes[0], node);
 
-                        if (dist < nearestDist)
+                    // find the nearest inserted boundary node
+                    foreach ( feNode node in insertBoundNodes )
+                    {
+                        dist = feNode.Dist( existBoundNodes[0], node );
+
+                        if ( dist < nearestDist )
                         {
                             nearestNode = node;
                             nearestDist = dist;
@@ -451,14 +450,14 @@ namespace SlopeFEA
                     }
 
                     // merge the nodes and remove from both boundary node lists
-                    foreach (fe2NodedBoundElement boundElement in boundElements)
+                    foreach ( fe2NodedBoundElement boundElement in boundElements )
                     {
-                        boundElementNodeIndex = boundElement.Nodes.FindIndex(delegate(feNode node) { return node == nearestNode; });
-                        if (boundElementNodeIndex != -1) boundElement.Nodes[boundElementNodeIndex] = existBoundNodes[0];
+                        boundElementNodeIndex = boundElement.Nodes.FindIndex( delegate( feNode node ) { return node == nearestNode; } );
+                        if ( boundElementNodeIndex != -1 ) boundElement.Nodes[boundElementNodeIndex] = existBoundNodes[0];
                     }
-                    existBoundNodes[0].Merge(nearestNode, false);
-                    existBoundNodes.RemoveAt(0);
-                    insertBoundNodes.Remove(nearestNode);
+                    existBoundNodes[0].Merge( nearestNode, false );
+                    existBoundNodes.RemoveAt( 0 );
+                    insertBoundNodes.Remove( nearestNode );
 
                 }   // END OF EXISTING BOUNDARY NODE MERGE LOOP
 
@@ -469,7 +468,7 @@ namespace SlopeFEA
                 // contains nodes find the nearest existing
                 // non-boundary node and merge them
                 // **********************************************
-                while (insertBoundNodes.Count > 0)
+                while ( insertBoundNodes.Count > 0 )
                 {
                     boundNode = insertBoundNodes[0];
 
@@ -477,17 +476,17 @@ namespace SlopeFEA
                     nearestNode = null;
 
                     // find the nearest unlocked non-boundary node
-                    foreach (List<feNode> column in substructNodes)
+                    foreach ( List<feNode> column in substructNodes )
                     {
-                        foreach (feNode node in column)
+                        foreach ( feNode node in column )
                         {
                             // skip the node if it is a boundary or locked node
-                            if (node.IsBoundary || node.IsLocked)
+                            if ( node.IsBoundary || node.IsLocked )
                                 continue;
 
-                            dist = feNode.Dist(node, boundNode);
+                            dist = feNode.Dist( node, boundNode );
 
-                            if (dist < nearestDist)
+                            if ( dist < nearestDist )
                             {
                                 nearestNode = node;
                                 nearestDist = dist;
@@ -496,13 +495,13 @@ namespace SlopeFEA
                     }
 
                     // merge the nodes and remove from inserted node list
-                    foreach (fe2NodedBoundElement boundElement in boundElements)
+                    foreach ( fe2NodedBoundElement boundElement in boundElements )
                     {
-                        boundElementNodeIndex = boundElement.Nodes.FindIndex(delegate(feNode node) { return node == boundNode; });
-                        if (boundElementNodeIndex != -1) boundElement.Nodes[boundElementNodeIndex] = nearestNode;
+                        boundElementNodeIndex = boundElement.Nodes.FindIndex( delegate( feNode node ) { return node == boundNode; } );
+                        if ( boundElementNodeIndex != -1 ) boundElement.Nodes[boundElementNodeIndex] = nearestNode;
                     }
-                    nearestNode.Merge(boundNode, false);
-                    insertBoundNodes.RemoveAt(0);
+                    nearestNode.Merge( boundNode, false );
+                    insertBoundNodes.RemoveAt( 0 );
 
                 }   // END OF INSERTED BOUND NODE MERGE LOOP
 
@@ -517,31 +516,31 @@ namespace SlopeFEA
                 // **********************************************
                 int numExtNodes, extNodeIndex;
                 int boundNodeIndex;
-                foreach (fe4NodedQuadElement element in substructElements)
+                foreach ( fe4NodedQuadElement element in substructElements )
                 {
                     // count how many external nodes there are
-                    numExtNodes = element.Nodes.Count(delegate(feNode node) { return !node.IsInside(substruct); });
+                    numExtNodes = element.Nodes.Count( delegate( feNode node ) { return !node.IsInside( substruct ); } );
 
                     // if there is only one, this element should have the external node and one boundary node merged
-                    if (numExtNodes == 1)
+                    if ( numExtNodes == 1 )
                     {
                         // get the external node
-                        extNodeIndex = element.Nodes.FindIndex(delegate(feNode node) { return !node.IsInside(substruct); });
+                        extNodeIndex = element.Nodes.FindIndex( delegate( feNode node ) { return !node.IsInside( substruct ); } );
 
                         // get the first boundary node
-                        boundNodeIndex = element.Nodes.FindIndex(delegate(feNode node) { return node.IsBoundary; });
+                        boundNodeIndex = element.Nodes.FindIndex( delegate( feNode node ) { return node.IsBoundary; } );
 
                         // if the search was successful, merge the nodes
-                        if (extNodeIndex != -1 && boundNodeIndex != -1)
+                        if ( extNodeIndex != -1 && boundNodeIndex != -1 )
                         {
-                            element.Nodes[extNodeIndex].Merge(element.Nodes[boundNodeIndex], false);
-                            foreach (fe2NodedBoundElement boundElement in boundElements)
+                            element.Nodes[extNodeIndex].Merge( element.Nodes[boundNodeIndex], false );
+                            foreach ( fe2NodedBoundElement boundElement in boundElements )
                             {
-                                boundElementNodeIndex = boundElement.Nodes.FindIndex(delegate(feNode node) { return node == element.Nodes[boundNodeIndex]; });
-                                if (boundElementNodeIndex != -1) boundElement.Nodes[boundElementNodeIndex] = element.Nodes[extNodeIndex];
+                                boundElementNodeIndex = boundElement.Nodes.FindIndex( delegate( feNode node ) { return node == element.Nodes[boundNodeIndex]; } );
+                                if ( boundElementNodeIndex != -1 ) boundElement.Nodes[boundElementNodeIndex] = element.Nodes[extNodeIndex];
                             }
                             element.Nodes[boundNodeIndex] = element.Nodes[extNodeIndex];
-                            element.SortNodes(true);
+                            element.SortNodes( true );
                         }
                     }
                 }   // END OF CREATION OF TRI ELEMENTS FROM QUADS WITH ONE NODE OUTSIDE
@@ -556,19 +555,19 @@ namespace SlopeFEA
                 // **********************************************
                 int boundNodeCount;
                 feNode centroidNode;
-                for (int i = substructElements.Count - 1; i >= 0; i--)
+                for ( int i = substructElements.Count - 1 ; i >= 0 ; i-- )
                 {
-                    boundNodeCount = substructElements[i].Nodes.Count(delegate(feNode node) { return node.IsBoundary; });
+                    boundNodeCount = substructElements[i].Nodes.Count( delegate( feNode node ) { return node.IsBoundary; } );
 
                     // check if the element has 4 boundary nodes
-                    if (boundNodeCount == 4)
+                    if ( boundNodeCount == 4 )
                     {
                         // make sure the nodes are distinct (i.e. not already a triangular element) ...
-                        if (substructElements[i].Nodes.Distinct().ToList().Count == 4)
+                        if ( substructElements[i].Nodes.Distinct().ToList().Count == 4 )
                         {
                             // split by the shortest diagonal
-                            if (feNode.Dist(substructElements[i].Nodes[0], substructElements[i].Nodes[2])
-                                    < feNode.Dist(substructElements[i].Nodes[1], substructElements[i].Nodes[3]))
+                            if ( feNode.Dist( substructElements[i].Nodes[0], substructElements[i].Nodes[2] )
+                                    < feNode.Dist( substructElements[i].Nodes[1], substructElements[i].Nodes[3] ) )
                             {
                                 node1 = substructElements[i].Nodes[0];
 
@@ -577,26 +576,26 @@ namespace SlopeFEA
                                 node3 = substructElements[i].Nodes[2];
                                 node4 = node1;
                                 // make sure centroid is inside the substruct and then create the new element
-                                centroidNode = new feNode(0, false, (node1.X + node2.X + node3.X) / 3.0,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0);
-                                if (centroidNode.IsInside(substruct))
+                                centroidNode = new feNode( 0, false, (node1.X + node2.X + node3.X) / 3.0,
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                if ( centroidNode.IsInside( substruct ) )
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
+                                    substructElements.Add( new fe4NodedQuadElement( substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
-                                            substructElements[i].Material, false));
+                                            substructElements[i].Material, false ) );
                                 }
 
                                 // element 2
                                 node2 = node3;
                                 node3 = substructElements[i].Nodes[3];
                                 // make sure centroid is inside the substruct and then create the new element
-                                centroidNode = new feNode(0, false, (node1.X + node2.X + node3.X) / 3.0,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0);
-                                if (centroidNode.IsInside(substruct))
+                                centroidNode = new feNode( 0, false, (node1.X + node2.X + node3.X) / 3.0,
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                if ( centroidNode.IsInside( substruct ) )
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
+                                    substructElements.Add( new fe4NodedQuadElement( substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
-                                            substructElements[i].Material, false));
+                                            substructElements[i].Material, false ) );
                                 }
                             }
                             else
@@ -608,44 +607,44 @@ namespace SlopeFEA
                                 node3 = substructElements[i].Nodes[0];
                                 node4 = node1;
                                 // make sure centroid is inside the substruct and then create the new element
-                                centroidNode = new feNode(0, false, (node1.X + node2.X + node3.X) / 3.0,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0);
-                                if (centroidNode.IsInside(substruct))
+                                centroidNode = new feNode( 0, false, (node1.X + node2.X + node3.X) / 3.0,
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                if ( centroidNode.IsInside( substruct ) )
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
+                                    substructElements.Add( new fe4NodedQuadElement( substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
-                                            substructElements[i].Material, false));
+                                            substructElements[i].Material, false ) );
                                 }
 
                                 // element 2
                                 node3 = node2;
                                 node2 = substructElements[i].Nodes[2];
                                 // make sure centroid is inside the substruct and then create the new element
-                                centroidNode = new feNode(0, false, (node1.X + node2.X + node3.X) / 3.0,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0);
-                                if (centroidNode.IsInside(substruct))
+                                centroidNode = new feNode( 0, false, (node1.X + node2.X + node3.X) / 3.0,
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                if ( centroidNode.IsInside( substruct ) )
                                 {
-                                    substructElements.Add(new fe4NodedQuadElement(substruct, ++quadElementCount,
+                                    substructElements.Add( new fe4NodedQuadElement( substruct, ++quadElementCount,
                                             node1, node2, node3, node4,
-                                            substructElements[i].Material, false));
+                                            substructElements[i].Material, false ) );
                                 }
                             }
 
-                            substructElements.RemoveAt(i);
+                            substructElements.RemoveAt( i );
                         }
 
                         // ... if the element is already triangular
-                        else if (substructElements[i].Nodes.Distinct().ToList().Count == 3)
+                        else if ( substructElements[i].Nodes.Distinct().ToList().Count == 3 )
                         {
                             node1 = substructElements[i].Nodes[0];
                             node2 = substructElements[i].Nodes[1];
                             node3 = substructElements[i].Nodes[2];
 
                             // make sure centroid is inside the substruct and then create the new element
-                            centroidNode = new feNode(0, false, (node1.X + node2.X + node3.X) / 3.0,
-                                (node1.Y + node2.Y + node3.Y) / 3.0);
+                            centroidNode = new feNode( 0, false, (node1.X + node2.X + node3.X) / 3.0,
+                                (node1.Y + node2.Y + node3.Y) / 3.0 );
 
-                            if (!centroidNode.IsInside(substruct)) substructElements.RemoveAt(i);
+                            if ( !centroidNode.IsInside( substruct ) ) substructElements.RemoveAt( i );
                         }
                     }
                 }
@@ -656,27 +655,27 @@ namespace SlopeFEA
                 // inside the substruct
                 // **********************************************
                 feNode deletedNode;
-                for (int i = substructNodes.Count - 1; i >= 0; i--)
+                for ( int i = substructNodes.Count - 1 ; i >= 0 ; i-- )
                 {
-                    for (int j = substructNodes[i].Count - 1; j >= 0; j--)
+                    for ( int j = substructNodes[i].Count - 1 ; j >= 0 ; j-- )
                     {
                         // get a reference to the current node
                         deletedNode = substructNodes[i][j];
 
                         // if the node is external ...
-                        if (!deletedNode.IsInside(substruct))
+                        if ( !deletedNode.IsInside( substruct ) )
                         {
                             // ... eliminate elements containing the node, ...
-                            for (int k = substructElements.Count - 1; k >= 0; k--)
+                            for ( int k = substructElements.Count - 1 ; k >= 0 ; k-- )
                             {
-                                if (substructElements[k].Nodes.Contains(deletedNode))
+                                if ( substructElements[k].Nodes.Contains( deletedNode ) )
                                 {
-                                    substructElements.RemoveAt(k);
+                                    substructElements.RemoveAt( k );
                                 }
                             }
 
                             // ... and finally eliminate the node
-                            substructNodes[i].RemoveAt(j);
+                            substructNodes[i].RemoveAt( j );
                         }
                     }
                 }   // END OF DELETION OF NODES OUTSIDE SUBSTRUCT LOOP
@@ -685,13 +684,13 @@ namespace SlopeFEA
                 // **********************************************
                 // move substructure nodes to global nodes list
                 // **********************************************
-                substructNodes.ForEach(delegate(List<feNode> column) { nodes.AddRange(column); });
+                substructNodes.ForEach( delegate( List<feNode> column ) { nodes.AddRange( column ); } );
                 substructNodes.Clear();
 
                 // **********************************************
                 // move substructure elements to global elements list
                 // **********************************************
-                elements.AddRange(substructElements);
+                elements.AddRange( substructElements );
                 substructElements.Clear();
 
             } // END OF SUBSTRUCTURES LOOP
@@ -702,33 +701,33 @@ namespace SlopeFEA
             // location (on substruct boundaries)
             // **********************************************
             int mergeNodeIndex;
-            for (int i = nodes.Count - 1; i >= 0; i--)
+            for ( int i = nodes.Count - 1 ; i >= 0 ; i-- )
             {
-                for (int j = i - 1; j >= 0; j--)
+                for ( int j = i - 1 ; j >= 0 ; j-- )
                 {
                     // check if the nodes are near enough to merge
-                    if (feNode.Dist(nodes[i], nodes[j]) < tolerDist)
+                    if ( feNode.Dist( nodes[i], nodes[j] ) < tolerDist )
                     {
                         // replace occurrences of the node to be deleted
                         // with the node it is being merged with
-                        foreach (fe4NodedQuadElement element in elements)
+                        foreach ( fe4NodedQuadElement element in elements )
                         {
-                            mergeNodeIndex = element.Nodes.FindIndex(delegate(feNode node) { return node == nodes[i]; });
+                            mergeNodeIndex = element.Nodes.FindIndex( delegate( feNode node ) { return node == nodes[i]; } );
 
-                            while (mergeNodeIndex != -1)
+                            while ( mergeNodeIndex != -1 )
                             {
                                 element.Nodes[mergeNodeIndex] = nodes[j];
-                                mergeNodeIndex = element.Nodes.FindIndex(delegate(feNode node) { return node == nodes[i]; });
+                                mergeNodeIndex = element.Nodes.FindIndex( delegate( feNode node ) { return node == nodes[i]; } );
                             }
                         }
-                        foreach (fe2NodedBoundElement boundElement in boundElements)
+                        foreach ( fe2NodedBoundElement boundElement in boundElements )
                         {
-                            mergeNodeIndex = boundElement.Nodes.FindIndex(delegate(feNode node) { return node == nodes[i]; });
-                            if (mergeNodeIndex != -1) boundElement.Nodes[mergeNodeIndex] = nodes[j];
+                            mergeNodeIndex = boundElement.Nodes.FindIndex( delegate( feNode node ) { return node == nodes[i]; } );
+                            if ( mergeNodeIndex != -1 ) boundElement.Nodes[mergeNodeIndex] = nodes[j];
                         }
 
-                        nodes[j].Merge(nodes[i], false);
-                        nodes.RemoveAt(i);
+                        nodes[j].Merge( nodes[i], false );
+                        nodes.RemoveAt( i );
                         break;
                     }
                 }
@@ -742,47 +741,47 @@ namespace SlopeFEA
             List<int> removeElementIndices = new List<int>();
             int sharedNodeCount;
             // body elements
-            for (int i = 0; i < elements.Count; i++)
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
-                if (removeElementIndices.Contains(i)) continue;
+                if ( removeElementIndices.Contains( i ) ) continue;
 
-                for (int j = i + 1; j < elements.Count; j++)
+                for ( int j = i + 1 ; j < elements.Count ; j++ )
                 {
-                    if (removeElementIndices.Contains(j)) continue;
+                    if ( removeElementIndices.Contains( j ) ) continue;
 
                     // get element node lists
                     ielementNodes = elements[i].Nodes.Distinct().ToList();
                     jelementNodes = elements[j].Nodes.Distinct().ToList();
 
                     sharedNodeCount = 0;
-                    if (ielementNodes.Count > jelementNodes.Count)
+                    if ( ielementNodes.Count > jelementNodes.Count )
                     {
                         // determine how many nodes the elements share
-                        for (int m = 0; m < elements[j].Nodes.Count; m++)
+                        for ( int m = 0 ; m < elements[j].Nodes.Count ; m++ )
                         {
-                            if (elements[i].Nodes.Contains(elements[j].Nodes[m]))
+                            if ( elements[i].Nodes.Contains( elements[j].Nodes[m] ) )
                                 sharedNodeCount++;
                         }
 
                         // if there are more than 3 shared nodes, they overlap
-                        if (sharedNodeCount > 3)
+                        if ( sharedNodeCount > 3 )
                         {
-                            removeElementIndices.Add(j);
+                            removeElementIndices.Add( j );
                         }
                     }
                     else
                     {
                         // determine how many nodes the elements share
-                        for (int m = 0; m < elements[i].Nodes.Count; m++)
+                        for ( int m = 0 ; m < elements[i].Nodes.Count ; m++ )
                         {
-                            if (elements[j].Nodes.Contains(elements[i].Nodes[m]))
+                            if ( elements[j].Nodes.Contains( elements[i].Nodes[m] ) )
                                 sharedNodeCount++;
                         }
 
                         // if there are more than 3 shared nodes, they overlap
-                        if (sharedNodeCount > 3)
+                        if ( sharedNodeCount > 3 )
                         {
-                            removeElementIndices.Add(i);
+                            removeElementIndices.Add( i );
                             break;
                         }
                     }
@@ -793,27 +792,27 @@ namespace SlopeFEA
 
             // remove the selected elements
             removeElementIndices.Sort(); removeElementIndices.Reverse();
-            while (removeElementIndices.Count > 0)
+            while ( removeElementIndices.Count > 0 )
             {
-                elements.RemoveAt(removeElementIndices[0]);
-                removeElementIndices.RemoveAt(0);
+                elements.RemoveAt( removeElementIndices[0] );
+                removeElementIndices.RemoveAt( 0 );
             }
 
             // boundary elements
-            for (int i = 0; i < boundElements.Count; i++)
+            for ( int i = 0 ; i < boundElements.Count ; i++ )
             {
-                if (removeElementIndices.Contains(i)) continue;
+                if ( removeElementIndices.Contains( i ) ) continue;
 
-                for (int j = i + 1; j < boundElements.Count; j++)
+                for ( int j = i + 1 ; j < boundElements.Count ; j++ )
                 {
-                    if (removeElementIndices.Contains(j)) continue;
+                    if ( removeElementIndices.Contains( j ) ) continue;
 
                     sharedNodeCount = 0;
-                    for (int m = 0; m < boundElements[i].Nodes.Count; m++)
+                    for ( int m = 0 ; m < boundElements[i].Nodes.Count ; m++ )
                     {
-                        if (boundElements[j].Nodes.Contains(boundElements[i].Nodes[m])) sharedNodeCount++;
+                        if ( boundElements[j].Nodes.Contains( boundElements[i].Nodes[m] ) ) sharedNodeCount++;
                     }
-                    if (sharedNodeCount > 1) removeElementIndices.Add(j);
+                    if ( sharedNodeCount > 1 ) removeElementIndices.Add( j );
 
                 }   // END OF OVERLAPPING BOUNDARY ELEMENT FINDER j LOOP
 
@@ -821,10 +820,10 @@ namespace SlopeFEA
 
             // remove the selected elements
             removeElementIndices.Sort(); removeElementIndices.Reverse();
-            while (removeElementIndices.Count > 0)
+            while ( removeElementIndices.Count > 0 )
             {
-                boundElements.RemoveAt(removeElementIndices[0]);
-                removeElementIndices.RemoveAt(0);
+                boundElements.RemoveAt( removeElementIndices[0] );
+                removeElementIndices.RemoveAt( 0 );
             }
 
             //// *********************************************
@@ -842,10 +841,10 @@ namespace SlopeFEA
             // **********************************************
             // sort nodes and eliminate gaps in numbering
             // **********************************************
-            
+
             /* INSERTION ORDER SORT */
             //nodes.Sort(feNode.CompareNodesByNumber);
-            
+
             /* ORIGIN DISTANCE SORT */
             //nodes.Sort(feNode.CompareNodesByOriginDist);
 
@@ -854,23 +853,23 @@ namespace SlopeFEA
                     xMinDomain = substructs[0].XMin,
                     yMaxDomain = substructs[0].YMax,
                     yMinDomain = substructs[0].YMin;
-            for (int i = 1; i < substructs.Count; i++)
+            for ( int i = 1 ; i < substructs.Count ; i++ )
             {
-                if (substructs[i].XMax > xMaxDomain) xMaxDomain = substructs[i].XMax;
-                if (substructs[i].XMin < xMinDomain) xMinDomain = substructs[i].XMin;
-                if (substructs[i].YMax > yMaxDomain) yMaxDomain = substructs[i].YMax;
-                if (substructs[i].YMin < yMinDomain) yMinDomain = substructs[i].YMin;
+                if ( substructs[i].XMax > xMaxDomain ) xMaxDomain = substructs[i].XMax;
+                if ( substructs[i].XMin < xMinDomain ) xMinDomain = substructs[i].XMin;
+                if ( substructs[i].YMax > yMaxDomain ) yMaxDomain = substructs[i].YMax;
+                if ( substructs[i].YMin < yMinDomain ) yMinDomain = substructs[i].YMin;
             }
-            if ((xMaxDomain - xMinDomain) > (yMaxDomain - yMinDomain))
+            if ( (xMaxDomain - xMinDomain) > (yMaxDomain - yMinDomain) )
             {
-                nodes.Sort(feNode.CompareNodesHorizontally);
+                nodes.Sort( feNode.CompareNodesHorizontally );
             }
             else
             {
-                nodes.Sort(feNode.CompareNodesVertically);
+                nodes.Sort( feNode.CompareNodesVertically );
             }
-            
-            for (int i = 0; i < nodes.Count; i++)
+
+            for ( int i = 0 ; i < nodes.Count ; i++ )
             {
                 nodes[i].Number = i + 1;
             }
@@ -880,8 +879,8 @@ namespace SlopeFEA
             // sort boundary elements by number and eliminate
             // gaps in numbering
             // **********************************************
-            boundElements.Sort(fe2NodedBoundElement.CompareElementsByNumber);
-            for (int i = 0; i < boundElements.Count; i++)
+            boundElements.Sort( fe2NodedBoundElement.CompareElementsByNumber );
+            for ( int i = 0 ; i < boundElements.Count ; i++ )
             {
                 boundElements[i].Number = i + 1;
             }
@@ -890,8 +889,8 @@ namespace SlopeFEA
             // sort body elements by number and eliminate
             // gaps in numbering
             // **********************************************
-            elements.Sort(fe4NodedQuadElement.CompareElementsByNumber);
-            for (int i = 0; i < elements.Count; i++)
+            elements.Sort( fe4NodedQuadElement.CompareElementsByNumber );
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
                 elements[i].Number = i + 1;
             }
@@ -904,56 +903,57 @@ namespace SlopeFEA
             //      - elements with node connectivity and 
             //          material type (.ele)
             // **********************************************
-            string[] path = canvas.FilePath.Split('.');
+            string[] path = canvas.FilePath.Split( '.' );
             path[path.Length - 1] = "mtl";
-            using (TextWriter tw = new StreamWriter(string.Join(".", path)))
+            using ( TextWriter tw = new StreamWriter( string.Join( ".", path ) ) )
             {
-                tw.WriteLine(canvas.MaterialTypes.Count);
-                foreach (MaterialType material in canvas.MaterialTypes)
+                tw.WriteLine( canvas.MaterialTypes.Count );
+                for ( int i = 0 ; i < canvas.MaterialTypes.Count - 1 ; i++ )
                 {
-                    tw.WriteLine("{0}\t{1}\t{2}\t{3}",
-                                    material.Phi,
-                                    material.Cohesion,
-                                    material.Emod,
-                                    material.Nu);
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}",
+                                    canvas.MaterialTypes[i].Gamma,
+                                    canvas.MaterialTypes[i].Phi,
+                                    canvas.MaterialTypes[i].Cohesion,
+                                    canvas.MaterialTypes[i].Emod,
+                                    canvas.MaterialTypes[i].Nu );
                 }
             }
 
             path[path.Length - 1] = "nod";
-            using (TextWriter tw = new StreamWriter(string.Join(".", path)))
+            using ( TextWriter tw = new StreamWriter( string.Join( ".", path ) ) )
             {
-                tw.WriteLine(nodes.Count);
-                foreach (feNode node in nodes)
+                tw.WriteLine( nodes.Count );
+                foreach ( feNode node in nodes )
                 {
-                    tw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
                                     node.Number,
                                     node.X, node.Y,
                                     node.IsFixedX ? 0 : 1, node.IsFixedY ? 0 : 1,
-                                    node.XLoad, node.YLoad);
+                                    node.XLoad, node.YLoad );
                 }
             }
 
             // only create the element file if this call is for final output
             // (i.e. it is not be used to subsequently create tri elements)
-            if (output)
+            if ( output )
             {
                 path[path.Length - 1] = "ele";
-                using (TextWriter tw = new StreamWriter(string.Join(".", path)))
+                using ( TextWriter tw = new StreamWriter( string.Join( ".", path ) ) )
                 {
-                    tw.WriteLine("{0}\t{1}", /*nnodel*/4, /*ndof*/2);
+                    tw.WriteLine( "{0}\t{1}", /*nnodel*/4, /*ndof*/2 );
 
-                    tw.WriteLine(elements.Count);
+                    tw.WriteLine( elements.Count );
                     int mtlIndex;
-                    foreach (fe4NodedQuadElement element in elements)
+                    foreach ( fe4NodedQuadElement element in elements )
                     {
-                        mtlIndex = canvas.MaterialTypes.FindIndex(delegate(MaterialType m) { return m == element.Material; });
-                        tw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                        mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
+                        tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
                                         element.Number,
                                         element.Nodes[0].Number,
                                         element.Nodes[1].Number,
                                         element.Nodes[2].Number,
                                         element.Nodes[3].Number,
-                                        mtlIndex);
+                                        mtlIndex );
                     }
                 }
 
@@ -969,17 +969,17 @@ namespace SlopeFEA
             }
 
             path[path.Length - 1] = "bel";
-            using (TextWriter tw = new StreamWriter(string.Join(".", path)))
+            using ( TextWriter tw = new StreamWriter( string.Join( ".", path ) ) )
             {
-                tw.WriteLine("{0}\t{1}", /*nnodel*/2, /*ndof*/2);
-                tw.WriteLine(boundElements.Count);
-                foreach (fe2NodedBoundElement element in boundElements)
+                tw.WriteLine( "{0}\t{1}", /*nnodel*/2, /*ndof*/2 );
+                tw.WriteLine( boundElements.Count );
+                foreach ( fe2NodedBoundElement element in boundElements )
                 {
-                    tw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
                                     element.Number,
                                     element.Nodes[0].Number, element.Nodes[1].Number,
                                     element.NLoads[0], element.NLoads[1],
-                                    element.TLoads[0], element.TLoads[1]);
+                                    element.TLoads[0], element.TLoads[1] );
                 }
             }
 
@@ -990,26 +990,27 @@ namespace SlopeFEA
             // is not being used to subsequently create tri
             // elements)
             // **********************************************
-            if (output)
+            if ( output )
             {
                 Polygon newPolygon;
                 double x, y;
-                for (int i = 0; i < elements.Count; i++)
+                for ( int i = 0 ; i < elements.Count ; i++ )
                 {
                     newPolygon = new Polygon();
+                    newPolygon.StrokeThickness = 0.6;
                     newPolygon.Stroke = Brushes.Black;
                     newPolygon.Opacity = /*1.0*/ 0.8;
                     newPolygon.Fill = /*Brushes.White*/ elements[i].Material.Fill;
 
-                    foreach (feNode node in elements[i].Nodes)
+                    foreach ( feNode node in elements[i].Nodes )
                     {
                         x = node.X / (scale * factor) * dpiX + originX;
                         y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                        newPolygon.Points.Add(new Point(x, y));
+                        newPolygon.Points.Add( new Point( x, y ) );
                     }
 
                     elements[i].Boundary = newPolygon;
-                    canvas.Children.Add(newPolygon);
+                    canvas.Children.Add( newPolygon );
                 }
             }
 
@@ -1024,10 +1025,10 @@ namespace SlopeFEA
         /// <param name="colWidth">Desired width of structured mesh columns.</param>
         /// <param name="rowHeight">Desired height of structured mesh rows.</param>
         /// <returns>A list of 3-noded triangular elements.</returns>
-        public static List<fe3NodedTriElement> MeshGenStructured3NodedTri (SlopeCanvas canvas, double colWidth, double rowHeight)
+        public static List<fe3NodedTriElement> MeshGenStructured3NodedTri ( SlopeCanvas canvas, double colWidth, double rowHeight )
         {
             // run the 4-noded quad element generator (this forms the basis for splitting into 3-noded triangular elements)
-            List<fe4NodedQuadElement> quadElements = MeshGenStructured4NodedQuad(canvas, colWidth, rowHeight, false);
+            List<fe4NodedQuadElement> quadElements = MeshGenStructured4NodedQuad( canvas, colWidth, rowHeight, false );
 
             // list for storing the 3-noded triangular elements
             List<fe3NodedTriElement> elements = new List<fe3NodedTriElement>();
@@ -1043,15 +1044,15 @@ namespace SlopeFEA
             // nodes, delete the duplicate, and create
             // a tri element
             // ******************************************
-            for (int i = quadElements.Count - 1; i >= 0; i--)
+            for ( int i = quadElements.Count - 1 ; i >= 0 ; i-- )
             {
-                for (int j = 0; j < quadElements[i].Nodes.Count; j++)
+                for ( int j = 0 ; j < quadElements[i].Nodes.Count ; j++ )
                 {
                     // check if the element contains a repeated node
-                    if (quadElements[i].Nodes.Count(delegate(feNode node) { return node == quadElements[i].Nodes[j]; }) > 1)
+                    if ( quadElements[i].Nodes.Count( delegate( feNode node ) { return node == quadElements[i].Nodes[j]; } ) > 1 )
                     {
                         // remove the repeated node
-                        quadElements[i].Nodes.RemoveAt(j);
+                        quadElements[i].Nodes.RemoveAt( j );
 
                         // get the three vertex nodes
                         node1 = quadElements[i].Nodes[0];
@@ -1059,12 +1060,12 @@ namespace SlopeFEA
                         node3 = quadElements[i].Nodes[2];
 
                         // create a new tri element
-                        elements.Add(new fe3NodedTriElement(quadElements[i].Parent, ++triElementCount,
+                        elements.Add( new fe3NodedTriElement( quadElements[i].Parent, ++triElementCount,
                             node1, node2, node3,
-                            quadElements[i].Material, false));
+                            quadElements[i].Material, false ) );
 
                         // remove the old quad element
-                        quadElements.RemoveAt(i);
+                        quadElements.RemoveAt( i );
 
                         break;
                     }
@@ -1076,26 +1077,26 @@ namespace SlopeFEA
             // split remaining quad elements along their
             // short diagonal
             // ******************************************
-            while (quadElements.Count > 0)
+            while ( quadElements.Count > 0 )
             {
-                if (feNode.Dist(quadElements[0].Nodes[0], quadElements[0].Nodes[2])
-                    < feNode.Dist(quadElements[0].Nodes[1], quadElements[0].Nodes[3]))
+                if ( feNode.Dist( quadElements[0].Nodes[0], quadElements[0].Nodes[2] )
+                    < feNode.Dist( quadElements[0].Nodes[1], quadElements[0].Nodes[3] ) )
                 {
                     node1 = quadElements[0].Nodes[0];
 
                     // element 1
                     node2 = quadElements[0].Nodes[1];
                     node3 = quadElements[0].Nodes[2];
-                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
+                    elements.Add( new fe3NodedTriElement( quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
-                            quadElements[0].Material, false));
+                            quadElements[0].Material, false ) );
 
                     // element 2
                     node2 = node3;
                     node3 = quadElements[0].Nodes[3];
-                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
+                    elements.Add( new fe3NodedTriElement( quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
-                            quadElements[0].Material, false));
+                            quadElements[0].Material, false ) );
                 }
                 else
                 {
@@ -1104,20 +1105,20 @@ namespace SlopeFEA
                     // element 1
                     node2 = quadElements[0].Nodes[3];
                     node3 = quadElements[0].Nodes[0];
-                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
+                    elements.Add( new fe3NodedTriElement( quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
-                            quadElements[0].Material, false));
+                            quadElements[0].Material, false ) );
 
                     // element 2
                     node3 = node2;
                     node2 = quadElements[0].Nodes[2];
-                    elements.Add(new fe3NodedTriElement(quadElements[0].Parent, ++triElementCount,
+                    elements.Add( new fe3NodedTriElement( quadElements[0].Parent, ++triElementCount,
                             node1, node2, node3,
-                            quadElements[0].Material, false));
+                            quadElements[0].Material, false ) );
                 }
 
                 // delete the quad element
-                quadElements.RemoveAt(0);
+                quadElements.RemoveAt( 0 );
             }
 
 
@@ -1126,13 +1127,13 @@ namespace SlopeFEA
             // their corresponding substruct
             // **********************************************
             feNode centroidNode;
-            foreach (feSubstruct substruct in canvas.FEASubstructs)
+            foreach ( feSubstruct substruct in canvas.FEASubstructs )
             {
                 // check all elements
-                for (int i = elements.Count - 1; i >= 0; i--)
+                for ( int i = elements.Count - 1 ; i >= 0 ; i-- )
                 {
                     // if parent is not correct, skip this element
-                    if (elements[i].Parent != substruct) continue;
+                    if ( elements[i].Parent != substruct ) continue;
 
                     // get node references
                     node1 = elements[i].Nodes[0];
@@ -1140,19 +1141,19 @@ namespace SlopeFEA
                     node3 = elements[i].Nodes[2];
 
                     // compute centroid
-                    centroidNode = new feNode(0, false,
+                    centroidNode = new feNode( 0, false,
                         (node1.X + node2.X + node3.X) / 3.0,
-                        (node1.Y + node2.Y + node3.Y) / 3.0);
+                        (node1.Y + node2.Y + node3.Y) / 3.0 );
 
                     // if centroid not inside substruct, delete the element
-                    if (!centroidNode.IsInside(substruct)) elements.RemoveAt(i);
+                    if ( !centroidNode.IsInside( substruct ) ) elements.RemoveAt( i );
                 }
             }
 
             // **********************************************
             // renumber elements in case of elimination
             // **********************************************
-            for (int i = 0; i < elements.Count; i++)
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
                 elements[i].Number = i + 1;
             }
@@ -1169,7 +1170,7 @@ namespace SlopeFEA
 
             // get units dependent scaling factor
             double factor;
-            switch (units)
+            switch ( units )
             {
                 case Units.Metres: factor = 0.0254; break;
                 case Units.Millimetres: factor = 25.4; break;
@@ -1185,23 +1186,23 @@ namespace SlopeFEA
             //      - elements with node connectivity and 
             //          material type (.ele) !!! CREATED HERE
             // **********************************************
-            string[] path = canvas.FilePath.Split('.');
+            string[] path = canvas.FilePath.Split( '.' );
             path[path.Length - 1] = "ele";
-            using (TextWriter tw = new StreamWriter(string.Join(".", path)))
+            using ( TextWriter tw = new StreamWriter( string.Join( ".", path ) ) )
             {
-                tw.WriteLine("{0}\t{1}", /*nnodel*/ 3, /*ndof*/ 2);
+                tw.WriteLine( "{0}\t{1}", /*nnodel*/ 3, /*ndof*/ 2 );
 
-                tw.WriteLine(elements.Count);
+                tw.WriteLine( elements.Count );
                 int mtlIndex;
-                foreach (fe3NodedTriElement element in elements)
+                foreach ( fe3NodedTriElement element in elements )
                 {
-                    mtlIndex = canvas.MaterialTypes.FindIndex(delegate(MaterialType m) { return m == element.Material; });
-                    tw.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
+                    mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}",
                                     element.Number,
                                     element.Nodes[0].Number,
                                     element.Nodes[1].Number,
                                     element.Nodes[2].Number,
-                                    mtlIndex);
+                                    mtlIndex );
                 }
             }
 
@@ -1212,22 +1213,23 @@ namespace SlopeFEA
             // **********************************************
             Polygon newPolygon;
             double x, y;
-            for (int i = 0; i < elements.Count; i++)
+            for ( int i = 0 ; i < elements.Count ; i++ )
             {
                 newPolygon = new Polygon();
+                newPolygon.StrokeThickness = 0.6;
                 newPolygon.Stroke = Brushes.Black;
                 newPolygon.Opacity = /*1.0*/ 0.8;
                 newPolygon.Fill = /*Brushes.White*/ elements[i].Material.Fill;
 
-                foreach (feNode node in elements[i].Nodes)
+                foreach ( feNode node in elements[i].Nodes )
                 {
                     x = node.X / (scale * factor) * dpiX + originX;
                     y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                    newPolygon.Points.Add(new Point(x, y));
+                    newPolygon.Points.Add( new Point( x, y ) );
                 }
 
                 elements[i].Boundary = newPolygon;
-                canvas.Children.Add(newPolygon);
+                canvas.Children.Add( newPolygon );
             }
 
 

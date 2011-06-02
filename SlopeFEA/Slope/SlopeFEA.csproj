@@ -28,8 +28,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <SupportUrl>mailto:karcheba%40mcmaster.ca</SupportUrl>
     <TargetCulture>en-CA</TargetCulture>
-    <ProductName>Slope 2011</ProductName>
-    <PublisherName>Slope 2011</PublisherName>
+    <ProductName>SlopeFEA 2011</ProductName>
+    <PublisherName>SlopeFEA 2011</PublisherName>
     <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>

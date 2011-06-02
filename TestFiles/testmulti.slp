@@ -31,8 +31,8 @@ BOUNDARY GEOMETRY DATA
 Number of Boundary Points = 7
 
 -8, 46.0000000000001
--8, 6.00000000000003
-110, 6.00000000000003
+-8, 6.00000000000004
+110, 6.00000000000004
 110, 22.0000000000001
 72, 22.0000000000001
 52.0000000000001, 38.0000000000001
@@ -46,27 +46,27 @@ MATERIAL TYPE DATA
 Number of Material Types = 3
 
 Material #1
-Name = "sand"
-Colour = #FFEEF099
-Phi = 30
-Coh = 0
-Gamma = 16.5
-Emod = 100000
-Nu = 0.3
+Name = "clay"
+Colour = #FFF2CDAC
+Phi = 5
+Coh = 40
+Gamma = 17
+Emod = 50000
+Nu = 0.45
 
 Material #2
-Name = "clay"
-Colour = #FFD5AE99
-Phi = 5
-Coh = 45
-Gamma = 17
-Emod = 10000
-Nu = 0.45
+Name = "sand"
+Colour = #FFECF4A4
+Phi = 35
+Coh = 0
+Gamma = 16
+Emod = 100000
+Nu = 0.33
 
 Material #3
 Name = "bedrock"
-Colour = #FFBECFC9
-Phi = 55
+Colour = #FFC0D8C2
+Phi = 50
 Coh = 1000
 Gamma = 22
 Emod = 350000
@@ -82,8 +82,8 @@ Number of Material Blocks = 3
 Material Block #1
 Material Type = "bedrock"
 Number of Boundary Points = 4
--8, 6.00000000000003, True, True
-110, 6.00000000000003, True, True
+-8, 6.00000000000004, True, True
+110, 6.00000000000004, True, True
 110, 14, True, False
 -8, 18.0000000000001, True, False
 Number of Line Constraints = 3

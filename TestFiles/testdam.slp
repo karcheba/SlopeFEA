@@ -45,40 +45,40 @@ MATERIAL TYPE DATA
 Number of Material Types = 4
 
 Material #1
-Name = "water"
-Colour = #FFA0F5FC
-Phi = 0
-Coh = 0
-Gamma = 10
-Emod = 0
-Nu = 0.49
-
-Material #2
-Name = "sand"
-Colour = #FFF5EFA3
-Phi = 35
-Coh = 0
-Gamma = 17
-Emod = 100000
-Nu = 0.3
-
-Material #3
 Name = "bedrock"
-Colour = #FFA7C0B7
-Phi = 55
+Colour = #FFC1E6C4
+Phi = 50
 Coh = 1000
 Gamma = 22
 Emod = 350000
 Nu = 0.35
 
-Material #4
+Material #2
 Name = "concrete"
-Colour = #FFB5BBB9
+Colour = #FFDADADA
 Phi = 50
 Coh = 1000
 Gamma = 24
-Emod = 26000000
+Emod = 300000
 Nu = 0.25
+
+Material #3
+Name = "sand"
+Colour = #FFEFF3A5
+Phi = 35
+Coh = 0
+Gamma = 17
+Emod = 100000
+Nu = 0.33
+
+Material #4
+Name = "water"
+Colour = #FF91F9F9
+Phi = 0
+Coh = 0
+Gamma = 10
+Emod = 0
+Nu = 0
 
 
 --------------------------------

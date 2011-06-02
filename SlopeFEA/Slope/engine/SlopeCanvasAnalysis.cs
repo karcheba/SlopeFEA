@@ -41,13 +41,13 @@ namespace SlopeFEA
     partial class SlopeCanvas : Canvas
     {
         private static Random random = new Random();
-        public delegate double EvaluateSafetyFactor(CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh);
+        public delegate double EvaluateSafetyFactor ( CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh );
 
-        private static double GenAlg(SlopeCanvas canvas, BackgroundWorker worker, DoWorkEventArgs e)
+        private static double GenAlg ( SlopeCanvas canvas, BackgroundWorker worker, DoWorkEventArgs e )
         {
             // Set the delegate function for evaluating the factor of safety
             EvaluateSafetyFactor evalSF = null;
-            switch (canvas.AnalysisType)
+            switch ( canvas.AnalysisType )
             {
                 case AnalysisType.Bishop: evalSF += Bishop; break;
                 default: evalSF += RFEM; break;
@@ -56,7 +56,7 @@ namespace SlopeFEA
             // Get material data
             List<MaterialType> materialTypes = new List<MaterialType>();
             MaterialType copyMaterial;
-            for (int i = 0; i < canvas.MaterialTypes.Count; i++)
+            for ( int i = 0 ; i < canvas.MaterialTypes.Count ; i++ )
             {
                 copyMaterial = new MaterialType();
                 copyMaterial.Phi = canvas.MaterialTypes[i].Phi;
@@ -66,15 +66,15 @@ namespace SlopeFEA
                 copyMaterial.Nu = canvas.MaterialTypes[i].Nu;
                 copyMaterial.Name = canvas.MaterialTypes[i].Name;
 
-                if (canvas.AnalysisType == AnalysisType.RFEM) copyMaterial.ComputeRFEMProperties();
+                if ( canvas.AnalysisType == AnalysisType.RFEM ) copyMaterial.ComputeRFEMProperties();
 
-                materialTypes.Add(copyMaterial);
+                materialTypes.Add( copyMaterial );
             }
 
             double angleFactor = Math.PI / 180.0;
             double lengthFactor;
             double cohFactor = 1.0, gammaFactor = 1.0;
-            switch (canvas.Units)
+            switch ( canvas.Units )
             {
                 case Units.Metres:
                     lengthFactor = 0.0254;
@@ -82,22 +82,22 @@ namespace SlopeFEA
 
                 case Units.Millimetres:
                     lengthFactor = 25.4;
-                    cohFactor /= Math.Pow(1000, 2);
-                    gammaFactor /= Math.Pow(1000, 3);
+                    cohFactor /= Math.Pow( 1000, 2 );
+                    gammaFactor /= Math.Pow( 1000, 3 );
                     break;
 
                 case Units.Feet:
                     lengthFactor = 1.0 / 12.0;
-                    cohFactor *= Math.Pow(12, 2);
+                    cohFactor *= Math.Pow( 12, 2 );
                     break;
 
                 default:
                     lengthFactor = 1.0;
-                    gammaFactor /= Math.Pow(12, 3);
+                    gammaFactor /= Math.Pow( 12, 3 );
                     break;
             }
 
-            for (int i = 0; i < materialTypes.Count; i++)
+            for ( int i = 0 ; i < materialTypes.Count ; i++ )
             {
                 materialTypes[i].Phi *= angleFactor;
                 materialTypes[i].Cohesion *= cohFactor;
@@ -105,21 +105,21 @@ namespace SlopeFEA
             }
 
             // Load upper surface and mesh
-            string[] split = canvas.FilePath.Split('.');
+            string[] split = canvas.FilePath.Split( '.' );
 
-            if (split[split.Length - 1] != "slp")
+            if ( split[split.Length - 1] != "slp" )
             {
-                MessageBox.Show("Input file format incorrect. Input data must be in a *.slp file.", "Error");
+                MessageBox.Show( "Input file format incorrect. Input data must be in a *.slp file.", "Error" );
                 return 0;
             }
-            
+
             split[split.Length - 1] = "msh";
 
-            string path = string.Join(".", split);
+            string path = string.Join( ".", split );
 
-            if (!File.Exists(path))
+            if ( !File.Exists( path ) )
             {
-                MessageBox.Show("Could not find mesh data file.", "Error");
+                MessageBox.Show( "Could not find mesh data file.", "Error" );
                 return 0;
             }
 
@@ -129,11 +129,11 @@ namespace SlopeFEA
             List<AnalysisMeshPoint> line;
             try
             {
-                using (TextReader tr = new StreamReader(path))
+                using ( TextReader tr = new StreamReader( path ) )
                 {
                     // Read in actual units
-                    string units = tr.ReadLine().Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries)[1];
-                    switch (units)
+                    string units = tr.ReadLine().Split( new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries )[1];
+                    switch ( units )
                     {
                         case "m":
                             meshUnits = Units.Metres;
@@ -150,31 +150,31 @@ namespace SlopeFEA
                     }
 
                     // Check that canvas and mesh files have same units
-                    if (canvas.Units != meshUnits)
+                    if ( canvas.Units != meshUnits )
                     {
-                        MessageBox.Show("Units mismatch. Mesh file must have same units as input file.", "Error");
+                        MessageBox.Show( "Units mismatch. Mesh file must have same units as input file.", "Error" );
                         return 0;
                     }
 
                     tr.ReadLine();
 
                     // Get number of upper surface points
-                    int count = int.Parse(tr.ReadLine().Split('=')[1]);
+                    int count = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                     tr.ReadLine();
                     tr.ReadLine();
 
                     // Read in units and add to surface point list
-                    for (int i = 0; i < count; i++)
+                    for ( int i = 0 ; i < count ; i++ )
                     {
-                        split = tr.ReadLine().Split(',');
-                        surface.Add(new Point(double.Parse(split[0]), double.Parse(split[1])));
+                        split = tr.ReadLine().Split( ',' );
+                        surface.Add( new Point( double.Parse( split[0] ), double.Parse( split[1] ) ) );
                     }
 
                     tr.ReadLine();
 
                     // Get number of mesh lines
-                    count = int.Parse(tr.ReadLine().Split('=')[1]);
+                    count = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                     tr.ReadLine();
 
@@ -182,7 +182,7 @@ namespace SlopeFEA
                     string type, material;
                     MeshPointType mpType;
                     MaterialType matType = null;
-                    for (int i = 0; i < count; i++)
+                    for ( int i = 0 ; i < count ; i++ )
                     {
                         // Create new list for points in current mesh line
                         line = new List<AnalysisMeshPoint>();
@@ -190,31 +190,31 @@ namespace SlopeFEA
                         tr.ReadLine();
 
                         // Get number of points in current mesh line
-                        pointCount = int.Parse(tr.ReadLine().Split('=')[1]);
+                        pointCount = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
-                        for (int j = 0; j < pointCount; j++)
+                        for ( int j = 0 ; j < pointCount ; j++ )
                         {
                             // Read data for current point
-                            split = tr.ReadLine().Split(',');
+                            split = tr.ReadLine().Split( ',' );
 
                             // Get point type (entrance or exit from material block)
-                            type = split[2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0];
-                            switch (type)
+                            type = split[2].Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries )[0];
+                            switch ( type )
                             {
                                 case "Entrance": mpType = MeshPointType.Entrance; break;
                                 default: mpType = MeshPointType.Exit; break;
                             }
 
                             // Get material type name and find the corresponding material from the list
-                            material = split[3].Split('\"')[1];
-                            matType = materialTypes.Find(delegate(MaterialType mt) { return mt.Name == material; });
+                            material = split[3].Split( '\"' )[1];
+                            matType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == material; } );
 
                             // Add this point to the list of points for the current mesh line
-                            line.Add(new AnalysisMeshPoint(new Point(double.Parse(split[0]), double.Parse(split[1])),
-                                                            matType, mpType));
+                            line.Add( new AnalysisMeshPoint( new Point( double.Parse( split[0] ), double.Parse( split[1] ) ),
+                                                            matType, mpType ) );
                         }
 
-                        mesh.Add(line);
+                        mesh.Add( line );
 
                         tr.ReadLine();
                     }
@@ -222,7 +222,7 @@ namespace SlopeFEA
             }
             catch
             {
-                MessageBox.Show("Error in reading mesh file. Make sure it is formatted correctly.", "Error");
+                MessageBox.Show( "Error in reading mesh file. Make sure it is formatted correctly.", "Error" );
                 return 0;
             }
 
@@ -238,19 +238,19 @@ namespace SlopeFEA
             int numberOfEvaluations = population * generations;
 
             // Compute additional genetic algorithm parameters
-            int fittest = (int)Math.Ceiling(fittestProp * population);
+            int fittest = (int) Math.Ceiling( fittestProp * population );
             int parents = population - fittest;
             fittest += parents % 2;
             parents = population - fittest;
-            int mating = (int)Math.Ceiling(matingProp * population);
+            int mating = (int) Math.Ceiling( matingProp * population );
             int dof = 3;
-            int mutations = (int)Math.Ceiling(mutProb * (population - fittest) * dof);
+            int mutations = (int) Math.Ceiling( mutProb * (population - fittest) * dof );
 
-            List<double> radiusBreaks = FindRadiusBreaks(surface);
+            List<double> radiusBreaks = FindRadiusBreaks( surface );
 
             double yBoundMin = canvas.Boundary.YMin;
             yBoundMin = ((canvas.ActualHeight - yBoundMin) - canvas.OriginOffsetY) / canvas.DpiY * lengthFactor * canvas.Scale;
-            
+
             SoilMovement soilDirection = canvas.Boundary.SoilDirection;
 
             List<CircularSurface> currentSolutions = new List<CircularSurface>();
@@ -259,9 +259,9 @@ namespace SlopeFEA
             List<double> parentSelectors = new List<double>();
 
             // Generate initial random population of failure surfaces
-            while (currentSolutions.Count < population)
+            while ( currentSolutions.Count < population )
             {
-                currentSolutions.Insert(0, new CircularSurface(surface, yBoundMin, radiusBreaks, soilDirection));
+                currentSolutions.Insert( 0, new CircularSurface( surface, yBoundMin, radiusBreaks, soilDirection ) );
                 currentSolutions[0].GenerateSurface();
             }
 
@@ -271,12 +271,12 @@ namespace SlopeFEA
             int progressCount = 1;
             int percentComplete;
             double upperSF, totalWeight;
-            for (int igen = 0; igen < generations; igen++)
+            for ( int igen = 0 ; igen < generations ; igen++ )
             {
-                for (int isoln = 0; isoln < currentSolutions.Count; isoln++)
+                for ( int isoln = 0 ; isoln < currentSolutions.Count ; isoln++ )
                 {
                     // Check if analysis has been cancelled
-                    if (worker.CancellationPending)
+                    if ( worker.CancellationPending )
                     {
                         e.Cancel = true;
                         return 0;
@@ -285,18 +285,18 @@ namespace SlopeFEA
                     foundTwin = false;
 
                     // Check master solution list for existing solution
-                    for (int imaster = 0; imaster < masterSolutions.Count; imaster++)
+                    for ( int imaster = 0 ; imaster < masterSolutions.Count ; imaster++ )
                     {
                         // Determine if (x,y,r) parameters are all within
                         // tolerance of a solution from the master list
-                        xdiff = Math.Abs(currentSolutions[isoln].X - masterSolutions[imaster].X);
-                        if (xdiff > toler) continue;
+                        xdiff = Math.Abs( currentSolutions[isoln].X - masterSolutions[imaster].X );
+                        if ( xdiff > toler ) continue;
 
-                        ydiff = Math.Abs(currentSolutions[isoln].Y - masterSolutions[imaster].Y);
-                        if (ydiff > toler) continue;
+                        ydiff = Math.Abs( currentSolutions[isoln].Y - masterSolutions[imaster].Y );
+                        if ( ydiff > toler ) continue;
 
-                        rdiff = Math.Abs(currentSolutions[isoln].R - masterSolutions[imaster].R);
-                        if (rdiff > toler) continue;
+                        rdiff = Math.Abs( currentSolutions[isoln].R - masterSolutions[imaster].R );
+                        if ( rdiff > toler ) continue;
 
                         currentSolutions[isoln].SF = masterSolutions[imaster].SF;
                         currentSolutions[isoln].XEnter = masterSolutions[imaster].XEnter;
@@ -308,48 +308,48 @@ namespace SlopeFEA
                     }
 
                     // If solution found in master list, do not evaluate
-                    if (foundTwin)
+                    if ( foundTwin )
                     {
                         // Update progress bar
-                        percentComplete = (int)((float)progressCount++ / (float)numberOfEvaluations * (float)100);
-                        worker.ReportProgress(percentComplete);
+                        percentComplete = (int) ((float) progressCount++ / (float) numberOfEvaluations * (float) 100);
+                        worker.ReportProgress( percentComplete );
                         continue;
                     }
 
                     // Evaluate safety factor using the appropriate method
-                    currentSolutions[isoln].SF = evalSF(currentSolutions[isoln], surface, mesh);
+                    currentSolutions[isoln].SF = evalSF( currentSolutions[isoln], surface, mesh );
 
                     // Add new surface to master list
-                    masterSolutions.Add(new CircularSurface(surface, yBoundMin, radiusBreaks, soilDirection,
+                    masterSolutions.Add( new CircularSurface( surface, yBoundMin, radiusBreaks, soilDirection,
                         currentSolutions[isoln].X, currentSolutions[isoln].Y, currentSolutions[isoln].R,
                         currentSolutions[isoln].Limits, currentSolutions[isoln].SF,
                         currentSolutions[isoln].XEnter, currentSolutions[isoln].YEnter,
-                        currentSolutions[isoln].XExit, currentSolutions[isoln].YExit));
+                        currentSolutions[isoln].XExit, currentSolutions[isoln].YExit ) );
 
-                    percentComplete = (int)((float)progressCount++ / (float)numberOfEvaluations * (float)100);
-                    worker.ReportProgress(percentComplete);
+                    percentComplete = (int) ((float) progressCount++ / (float) numberOfEvaluations * (float) 100);
+                    worker.ReportProgress( percentComplete );
                 }
 
                 // Sort the master solution list
-                masterSolutions.Sort(SortSolutions);
+                masterSolutions.Sort( SortSolutions );
 
                 // Only keep top 20 master solutions
-                while (masterSolutions.Count > 20) masterSolutions.RemoveAt(masterSolutions.Count - 1);
+                while ( masterSolutions.Count > 20 ) masterSolutions.RemoveAt( masterSolutions.Count - 1 );
 
                 // Begin mating cycle on all but the last generation
-                if (igen < generations)
+                if ( igen < generations )
                 {
                     // Sort the current solution list
-                    currentSolutions.Sort(SortSolutions);
+                    currentSolutions.Sort( SortSolutions );
 
                     // Clear previous mating pool
                     matingPool.Clear();
 
                     // Take specified proportion into mating pool
-                    while (matingPool.Count < mating)
+                    while ( matingPool.Count < mating )
                     {
-                        matingPool.Add(currentSolutions[0]);
-                        currentSolutions.RemoveAt(0);
+                        matingPool.Add( currentSolutions[0] );
+                        currentSolutions.RemoveAt( 0 );
                     }
 
                     // --------------------------------------
@@ -359,14 +359,14 @@ namespace SlopeFEA
                     // Get value of SF @ mating+1
                     // (for producing weighting scheme)
                     upperSF = currentSolutions[0].SF;
-                    
+
                     // Clear current solution list
                     currentSolutions.Clear();
 
                     // Reverse SF weighting (minimization)
                     // and sum up SF weights
                     totalWeight = 0;
-                    for (int imate = 0; imate < mating; imate++)
+                    for ( int imate = 0 ; imate < mating ; imate++ )
                     {
                         totalWeight += matingPool[imate].SFWeight = matingPool[imate].SF - upperSF;
                     }
@@ -375,7 +375,7 @@ namespace SlopeFEA
                     // and add sum of previous weights to obtain
                     // cumulative weighting scheme
                     matingPool[0].SFWeight /= totalWeight;
-                    for (int imate = 1; imate < mating - 1; imate++)
+                    for ( int imate = 1 ; imate < mating - 1 ; imate++ )
                     {
                         matingPool[imate].SFWeight /= totalWeight;
                         matingPool[imate].SFWeight += matingPool[imate - 1].SFWeight;
@@ -384,27 +384,27 @@ namespace SlopeFEA
 
                     // Generate random numbers for selecting parents
                     parentSelectors.Clear();
-                    while (parentSelectors.Count < parents) parentSelectors.Add(random.NextDouble());
+                    while ( parentSelectors.Count < parents ) parentSelectors.Add( random.NextDouble() );
 
                     // Add "fittest" solutions to front of solution list
-                    for (int ifit = 0; ifit < fittest; ifit++)
+                    for ( int ifit = 0 ; ifit < fittest ; ifit++ )
                     {
-                        currentSolutions.Add(new CircularSurface(surface, yBoundMin, radiusBreaks, soilDirection,
+                        currentSolutions.Add( new CircularSurface( surface, yBoundMin, radiusBreaks, soilDirection,
                             matingPool[ifit].X, matingPool[ifit].Y, matingPool[ifit].R,
-                            matingPool[ifit].Limits));
+                            matingPool[ifit].Limits ) );
                     }
 
                     // Select random parents based on weighting scheme
                     int iparent = 0;
-                    while (currentSolutions.Count < population)
+                    while ( currentSolutions.Count < population )
                     {
-                        for (int imate = 0; imate < mating; imate++)
+                        for ( int imate = 0 ; imate < mating ; imate++ )
                         {
-                            if (parentSelectors[iparent] <= matingPool[imate].SFWeight)
+                            if ( parentSelectors[iparent] <= matingPool[imate].SFWeight )
                             {
-                                currentSolutions.Add(new CircularSurface(surface, yBoundMin, radiusBreaks, soilDirection,
+                                currentSolutions.Add( new CircularSurface( surface, yBoundMin, radiusBreaks, soilDirection,
                                     matingPool[imate].X, matingPool[imate].Y, matingPool[imate].R,
-                                    matingPool[imate].Limits));
+                                    matingPool[imate].Limits ) );
 
                                 break;
                             }
@@ -418,21 +418,21 @@ namespace SlopeFEA
                     double mother, father;
                     // Loop through parents performing crossover
                     // (beginning from one past the fittest)
-                    for (int ichild = fittest; ichild < population; ichild += 2)
+                    for ( int ichild = fittest ; ichild < population ; ichild += 2 )
                     {
                         // Check if crossover is to occur
-                        if (random.NextDouble() <= crossProb)
+                        if ( random.NextDouble() <= crossProb )
                         {
                             // Randomly select X, Y, or R for interpolation
-                            interpt = (int)(random.NextDouble() * dof);
+                            interpt = (int) (random.NextDouble() * dof);
 
                             // Randomly select another point for crossover
-                            crosspt = (int)(random.NextDouble() * (dof - 1));
+                            crosspt = (int) (random.NextDouble() * (dof - 1));
 
                             // Randomly generate crossover coefficient
                             crosscoeff = random.NextDouble();
 
-                            switch(interpt)
+                            switch ( interpt )
                             {
                                 // Interpolation on X
                                 case 0:
@@ -442,7 +442,7 @@ namespace SlopeFEA
                                     currentSolutions[ichild].X = mother - crosscoeff * (mother - father);
                                     currentSolutions[ichild + 1].X = father + crosscoeff * (mother - father);
 
-                                    switch (crosspt)
+                                    switch ( crosspt )
                                     {
                                         // Crossover on Y
                                         case 0:
@@ -472,7 +472,7 @@ namespace SlopeFEA
                                     currentSolutions[ichild].Y = mother - crosscoeff * (mother - father);
                                     currentSolutions[ichild + 1].Y = father + crosscoeff * (mother - father);
 
-                                    switch (crosspt)
+                                    switch ( crosspt )
                                     {
                                         // Crossover on X
                                         case 0:
@@ -502,7 +502,7 @@ namespace SlopeFEA
                                     currentSolutions[ichild].R = mother - crosscoeff * (mother - father);
                                     currentSolutions[ichild + 1].R = father + crosscoeff * (mother - father);
 
-                                    switch (crosspt)
+                                    switch ( crosspt )
                                     {
                                         // Crossover on X
                                         case 0:
@@ -529,13 +529,13 @@ namespace SlopeFEA
 
                     // Loop through population performing mutations
                     int mutchild, mutpt;
-                    for (int imut = 0; imut < mutations; imut++)
+                    for ( int imut = 0 ; imut < mutations ; imut++ )
                     {
                         // Select child and parameter randomly
-                        mutchild = (int)(random.NextDouble() * parents) + fittest;
-                        mutpt = (int)(random.NextDouble() * dof);
+                        mutchild = (int) (random.NextDouble() * parents) + fittest;
+                        mutpt = (int) (random.NextDouble() * dof);
 
-                        switch (mutpt)
+                        switch ( mutpt )
                         {
                             case 0: currentSolutions[mutchild].GenerateX(); break;
                             case 1: currentSolutions[mutchild].GenerateY(); break;
@@ -546,9 +546,9 @@ namespace SlopeFEA
             }
 
             // Maintain top 10 solutions
-            masterSolutions.Sort(SortSolutions);
-            while (masterSolutions.Count > 10) masterSolutions.RemoveAt(masterSolutions.Count - 1);
-            masterSolutions.Sort(SortSolutions);
+            masterSolutions.Sort( SortSolutions );
+            while ( masterSolutions.Count > 10 ) masterSolutions.RemoveAt( masterSolutions.Count - 1 );
+            masterSolutions.Sort( SortSolutions );
 
             // ----------------------------
             // OUTPUT FILE GENERATION
@@ -557,86 +557,86 @@ namespace SlopeFEA
             // Save the minimum case thus far immediately after geometry data.
 
             // Update the file path
-            split = canvas.FilePath.Split('.');
-            switch (canvas.AnalysisType)
+            split = canvas.FilePath.Split( '.' );
+            switch ( canvas.AnalysisType )
             {
                 case AnalysisType.Bishop: split[split.Length - 1] = "bish"; break;
                 default: split[split.Length - 1] = "rfem"; break;
             }
-            path = string.Join(".", split);
+            path = string.Join( ".", split );
 
             // MODIFY THE EXISTING RESULTS FILE
-            if (File.Exists(path))
+            if ( File.Exists( path ) )
             {
                 // Read in all existing output file contents
-                List<string> contents = new List<string>(File.ReadAllLines(path));
+                List<string> contents = new List<string>( File.ReadAllLines( path ) );
 
                 // Find line with number of runs, increment run count, and update this line
-                int iruncount = contents.FindIndex(delegate(string s) { return s.Contains("Number of Runs = "); });
-                int runs = int.Parse(contents[iruncount].Split('=')[1]);
+                int iruncount = contents.FindIndex( delegate( string s ) { return s.Contains( "Number of Runs = " ); } );
+                int runs = int.Parse( contents[iruncount].Split( '=' )[1] );
                 runs++;
-                contents[iruncount] = String.Format("Number of Runs = {0}", runs);
+                contents[iruncount] = String.Format( "Number of Runs = {0}", runs );
 
                 // Find region with critical surface information and obtain its Fs
-                int icrit = contents.FindIndex(delegate(string s) { return s.Contains("MOST CRITICAL SURFACE"); });
-                double prevSF = double.Parse(contents[icrit + 9].Split('=')[1]);
+                int icrit = contents.FindIndex( delegate( string s ) { return s.Contains( "MOST CRITICAL SURFACE" ); } );
+                double prevSF = double.Parse( contents[icrit + 9].Split( '=' )[1] );
 
                 // If min Fs from current run is less than all previous runs, update this section
-                if (masterSolutions[0].SF < prevSF)
+                if ( masterSolutions[0].SF < prevSF )
                 {
-                    contents[icrit + 2] = String.Format("X_centre =\t{0}", Math.Round(masterSolutions[0].X, 2));
-                    contents[icrit + 3] = String.Format("Y_centre =\t{0}", Math.Round(masterSolutions[0].Y, 2));
-                    contents[icrit + 4] = String.Format("R =\t\t{0}", Math.Round(masterSolutions[0].R, 2));
-                    contents[icrit + 5] = String.Format("X_enter =\t{0}", Math.Round(masterSolutions[0].XEnter, 2));
-                    contents[icrit + 6] = String.Format("Y_enter =\t{0}", Math.Round(masterSolutions[0].YEnter, 2));
-                    contents[icrit + 7] = String.Format("X_exit =\t{0}", Math.Round(masterSolutions[0].XExit, 2));
-                    contents[icrit + 8] = String.Format("Y_exit =\t{0}", Math.Round(masterSolutions[0].YExit, 2));
-                    contents[icrit + 9] = String.Format("Fs =\t\t{0}", Math.Round(masterSolutions[0].SF, 3));
-                    contents[icrit + 10] = String.Format("Run No. =\t{0}", runs);
+                    contents[icrit + 2] = String.Format( "X_centre =\t{0}", Math.Round( masterSolutions[0].X, 2 ) );
+                    contents[icrit + 3] = String.Format( "Y_centre =\t{0}", Math.Round( masterSolutions[0].Y, 2 ) );
+                    contents[icrit + 4] = String.Format( "R =\t\t{0}", Math.Round( masterSolutions[0].R, 2 ) );
+                    contents[icrit + 5] = String.Format( "X_enter =\t{0}", Math.Round( masterSolutions[0].XEnter, 2 ) );
+                    contents[icrit + 6] = String.Format( "Y_enter =\t{0}", Math.Round( masterSolutions[0].YEnter, 2 ) );
+                    contents[icrit + 7] = String.Format( "X_exit =\t{0}", Math.Round( masterSolutions[0].XExit, 2 ) );
+                    contents[icrit + 8] = String.Format( "Y_exit =\t{0}", Math.Round( masterSolutions[0].YExit, 2 ) );
+                    contents[icrit + 9] = String.Format( "Fs =\t\t{0}", Math.Round( masterSolutions[0].SF, 3 ) );
+                    contents[icrit + 10] = String.Format( "Run No. =\t{0}", runs );
                 }
 
                 // Write all contents back to file
-                File.WriteAllLines(path, contents);
+                File.WriteAllLines( path, contents );
 
                 // Append current run results to end of file
-                using (TextWriter tw = File.AppendText(path))
+                using ( TextWriter tw = File.AppendText( path ) )
                 {
                     tw.WriteLine();
-                    tw.WriteLine("Run #{0}", runs);
-                    tw.WriteLine("{0}", DateTime.Now);
-                    tw.WriteLine("X_centre\tY_centre\tR\t\tX_enter\t\tY_enter\t\tX_exit\t\tY_exit\t\tFs");
+                    tw.WriteLine( "Run #{0}", runs );
+                    tw.WriteLine( "{0}", DateTime.Now );
+                    tw.WriteLine( "X_centre\tY_centre\tR\t\tX_enter\t\tY_enter\t\tX_exit\t\tY_exit\t\tFs" );
 
-                    for (int i = 0; i < masterSolutions.Count; i++)
+                    for ( int i = 0 ; i < masterSolutions.Count ; i++ )
                     {
-                        tw.WriteLine("{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t",
-                            Math.Round(masterSolutions[i].X, 2), Math.Round(masterSolutions[i].Y, 2), Math.Round(masterSolutions[i].R, 2),
-                            Math.Round(masterSolutions[i].XEnter, 2), Math.Round(masterSolutions[i].YEnter, 2),
-                            Math.Round(masterSolutions[i].XExit, 2), Math.Round(masterSolutions[i].YExit, 2),
-                            Math.Round(masterSolutions[i].SF, 3));
+                        tw.WriteLine( "{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t",
+                            Math.Round( masterSolutions[i].X, 2 ), Math.Round( masterSolutions[i].Y, 2 ), Math.Round( masterSolutions[i].R, 2 ),
+                            Math.Round( masterSolutions[i].XEnter, 2 ), Math.Round( masterSolutions[i].YEnter, 2 ),
+                            Math.Round( masterSolutions[i].XExit, 2 ), Math.Round( masterSolutions[i].YExit, 2 ),
+                            Math.Round( masterSolutions[i].SF, 3 ) );
                     }
                 }
             }
-            
+
             // CREATE A NEW RESULTS FILE
             else
             {
-                using (TextWriter tw = new StreamWriter(path))
+                using ( TextWriter tw = new StreamWriter( path ) )
                 {
-                    tw.WriteLine("*****************************************");
+                    tw.WriteLine( "*****************************************" );
                     tw.WriteLine();
-                    tw.WriteLine("        GENETIC ALGORITHM OUTPUT");
+                    tw.WriteLine( "        GENETIC ALGORITHM OUTPUT" );
                     tw.WriteLine();
-                    switch (canvas.AnalysisType)
+                    switch ( canvas.AnalysisType )
                     {
-                        case AnalysisType.Bishop: tw.WriteLine("    ANALYSIS METHOD: Bishop's Method"); break;
-                        default: tw.WriteLine("         ANALYSIS METHOD: RFEM"); break;
+                        case AnalysisType.Bishop: tw.WriteLine( "    ANALYSIS METHOD: Bishop's Method" ); break;
+                        default: tw.WriteLine( "         ANALYSIS METHOD: RFEM" ); break;
                     }
                     tw.WriteLine();
-                    tw.WriteLine("*****************************************");
+                    tw.WriteLine( "*****************************************" );
                     tw.WriteLine();
 
                     string units;
-                    switch (canvas.Units)
+                    switch ( canvas.Units )
                     {
                         case Units.Metres: units = "m, kPa, kN/m^3"; break;
                         case Units.Millimetres: units = "mm, kPa, kN/m^3"; break;
@@ -644,95 +644,95 @@ namespace SlopeFEA
                         default: units = "in, psi, pcf"; break;
                     }
 
-                    tw.WriteLine("Units = {0}", units);
+                    tw.WriteLine( "Units = {0}", units );
                     tw.WriteLine();
                     tw.WriteLine();
-                    tw.WriteLine("UPPER SURFACE GEOMETRY");
-                    tw.WriteLine("--------------------------");
-                    tw.WriteLine("Number of Points = {0}", surface.Count);
+                    tw.WriteLine( "UPPER SURFACE GEOMETRY" );
+                    tw.WriteLine( "--------------------------" );
+                    tw.WriteLine( "Number of Points = {0}", surface.Count );
                     tw.WriteLine();
-                    tw.WriteLine("(X,Y)");
+                    tw.WriteLine( "(X,Y)" );
 
-                    for (int i = 0; i < surface.Count; i++)
-                        tw.WriteLine("{0}, {1}", Math.Round(surface[i].X, 2), Math.Round(surface[i].Y, 2));
+                    for ( int i = 0 ; i < surface.Count ; i++ )
+                        tw.WriteLine( "{0}, {1}", Math.Round( surface[i].X, 2 ), Math.Round( surface[i].Y, 2 ) );
 
                     tw.WriteLine();
                     tw.WriteLine();
-                    tw.WriteLine("MATERIAL DATA");
-                    tw.WriteLine("--------------------------");
-                    tw.WriteLine("Number of Material Types = {0}", canvas.MaterialTypes.Count);
+                    tw.WriteLine( "MATERIAL DATA" );
+                    tw.WriteLine( "--------------------------" );
+                    tw.WriteLine( "Number of Material Types = {0}", canvas.MaterialTypes.Count );
                     tw.WriteLine();
 
-                    for (int i = 0; i < canvas.MaterialTypes.Count; i++)
+                    for ( int i = 0 ; i < canvas.MaterialTypes.Count ; i++ )
                     {
-                        tw.WriteLine("Material #{0}", i + 1);
-                        tw.WriteLine("Name = \"{0}\"", canvas.MaterialTypes[i].Name);
-                        tw.WriteLine("Phi = {0}", Math.Round(canvas.MaterialTypes[i].Phi, 2));
-                        tw.WriteLine("Cohesion = {0}", Math.Round(canvas.MaterialTypes[i].Cohesion, 2));
-                        tw.WriteLine("Unit Weight = {0}", Math.Round(canvas.MaterialTypes[i].Gamma, 2));
+                        tw.WriteLine( "Material #{0}", i + 1 );
+                        tw.WriteLine( "Name = \"{0}\"", canvas.MaterialTypes[i].Name );
+                        tw.WriteLine( "Phi = {0}", Math.Round( canvas.MaterialTypes[i].Phi, 2 ) );
+                        tw.WriteLine( "Cohesion = {0}", Math.Round( canvas.MaterialTypes[i].Cohesion, 2 ) );
+                        tw.WriteLine( "Unit Weight = {0}", Math.Round( canvas.MaterialTypes[i].Gamma, 2 ) );
                         tw.WriteLine();
                     }
 
                     tw.WriteLine();
-                    tw.WriteLine("MATERIAL BLOCK GEOMETRY");
-                    tw.WriteLine("--------------------------");
-                    tw.WriteLine("Number of Material Blocks = {0}", canvas.MaterialBlocks.Count);
+                    tw.WriteLine( "MATERIAL BLOCK GEOMETRY" );
+                    tw.WriteLine( "--------------------------" );
+                    tw.WriteLine( "Number of Material Blocks = {0}", canvas.MaterialBlocks.Count );
                     tw.WriteLine();
 
                     Point p;
                     double xCoord, yCoord;
 
-                    for (int i = 0; i < canvas.MaterialBlocks.Count; i++)
+                    for ( int i = 0 ; i < canvas.MaterialBlocks.Count ; i++ )
                     {
-                        tw.WriteLine("MB{0}", i + 1);
-                        tw.WriteLine("Material Type = \"{0}\"", canvas.MaterialBlocks[i].Material);
-                        tw.WriteLine("Number of Points = {0}", canvas.MaterialBlocks[i].BoundaryPoints.Count);
-                        tw.WriteLine("(X,Y)");
+                        tw.WriteLine( "MB{0}", i + 1 );
+                        tw.WriteLine( "Material Type = \"{0}\"", canvas.MaterialBlocks[i].Material );
+                        tw.WriteLine( "Number of Points = {0}", canvas.MaterialBlocks[i].BoundaryPoints.Count );
+                        tw.WriteLine( "(X,Y)" );
 
-                        for (int j = 0; j < canvas.MaterialBlocks[i].BoundaryPoints.Count; j++)
+                        for ( int j = 0 ; j < canvas.MaterialBlocks[i].BoundaryPoints.Count ; j++ )
                         {
                             p = canvas.MaterialBlocks[i].BoundaryPoints[j].Point;
 
                             xCoord = (p.X - canvas.OriginOffsetX) / canvas.DpiX * lengthFactor * canvas.Scale;
                             yCoord = (canvas.ActualHeight - p.Y - canvas.OriginOffsetY) / canvas.DpiY * lengthFactor * canvas.Scale;
 
-                            tw.WriteLine("{0}, {1}", Math.Round(xCoord, 2), Math.Round(yCoord, 2));
+                            tw.WriteLine( "{0}, {1}", Math.Round( xCoord, 2 ), Math.Round( yCoord, 2 ) );
                         }
 
                         tw.WriteLine();
                     }
 
                     tw.WriteLine();
-                    tw.WriteLine("MOST CRITICAL SURFACE");
-                    tw.WriteLine("--------------------------");
-                    tw.WriteLine("X_centre =\t{0}", Math.Round(masterSolutions[0].X, 2));
-                    tw.WriteLine("Y_centre =\t{0}", Math.Round(masterSolutions[0].Y, 2));
-                    tw.WriteLine("R =\t\t{0}", Math.Round(masterSolutions[0].R, 2));
-                    tw.WriteLine("X_enter =\t{0}", Math.Round(masterSolutions[0].XEnter, 2));
-                    tw.WriteLine("Y_enter =\t{0}", Math.Round(masterSolutions[0].YEnter, 2));
-                    tw.WriteLine("X_exit =\t{0}", Math.Round(masterSolutions[0].XExit, 2));
-                    tw.WriteLine("Y_exit =\t{0}", Math.Round(masterSolutions[0].YExit, 2));
-                    tw.WriteLine("Fs =\t\t{0}", Math.Round(masterSolutions[0].SF, 3));
-                    tw.WriteLine("Run No. =\t{0}", 1);       // this is the first run
+                    tw.WriteLine( "MOST CRITICAL SURFACE" );
+                    tw.WriteLine( "--------------------------" );
+                    tw.WriteLine( "X_centre =\t{0}", Math.Round( masterSolutions[0].X, 2 ) );
+                    tw.WriteLine( "Y_centre =\t{0}", Math.Round( masterSolutions[0].Y, 2 ) );
+                    tw.WriteLine( "R =\t\t{0}", Math.Round( masterSolutions[0].R, 2 ) );
+                    tw.WriteLine( "X_enter =\t{0}", Math.Round( masterSolutions[0].XEnter, 2 ) );
+                    tw.WriteLine( "Y_enter =\t{0}", Math.Round( masterSolutions[0].YEnter, 2 ) );
+                    tw.WriteLine( "X_exit =\t{0}", Math.Round( masterSolutions[0].XExit, 2 ) );
+                    tw.WriteLine( "Y_exit =\t{0}", Math.Round( masterSolutions[0].YExit, 2 ) );
+                    tw.WriteLine( "Fs =\t\t{0}", Math.Round( masterSolutions[0].SF, 3 ) );
+                    tw.WriteLine( "Run No. =\t{0}", 1 );       // this is the first run
 
                     tw.WriteLine();
                     tw.WriteLine();
-                    tw.WriteLine("ADDITIONAL RUN OUTPUT");
-                    tw.WriteLine("--------------------------");
-                    tw.WriteLine("Number of Runs = {0}", 1); // this is the first run
+                    tw.WriteLine( "ADDITIONAL RUN OUTPUT" );
+                    tw.WriteLine( "--------------------------" );
+                    tw.WriteLine( "Number of Runs = {0}", 1 ); // this is the first run
                     tw.WriteLine();
-                    tw.WriteLine("Run #{0}", 1);             // this is the first run
-                    tw.WriteLine("{0}", DateTime.Now);
+                    tw.WriteLine( "Run #{0}", 1 );             // this is the first run
+                    tw.WriteLine( "{0}", DateTime.Now );
 
-                    tw.WriteLine("X_centre\tY_centre\tR\t\tX_enter\t\tY_enter\t\tX_exit\t\tY_exit\t\tFs");
+                    tw.WriteLine( "X_centre\tY_centre\tR\t\tX_enter\t\tY_enter\t\tX_exit\t\tY_exit\t\tFs" );
 
-                    for (int i = 0; i < masterSolutions.Count; i++)
+                    for ( int i = 0 ; i < masterSolutions.Count ; i++ )
                     {
-                        tw.WriteLine("{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t",
-                            Math.Round(masterSolutions[i].X, 2), Math.Round(masterSolutions[i].Y, 2), Math.Round(masterSolutions[i].R, 2),
-                            Math.Round(masterSolutions[i].XEnter, 2), Math.Round(masterSolutions[i].YEnter, 2),
-                            Math.Round(masterSolutions[i].XExit, 2), Math.Round(masterSolutions[i].YExit, 2),
-                            Math.Round(masterSolutions[i].SF, 3));
+                        tw.WriteLine( "{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\t\t",
+                            Math.Round( masterSolutions[i].X, 2 ), Math.Round( masterSolutions[i].Y, 2 ), Math.Round( masterSolutions[i].R, 2 ),
+                            Math.Round( masterSolutions[i].XEnter, 2 ), Math.Round( masterSolutions[i].YEnter, 2 ),
+                            Math.Round( masterSolutions[i].XExit, 2 ), Math.Round( masterSolutions[i].YExit, 2 ),
+                            Math.Round( masterSolutions[i].SF, 3 ) );
                     }
                 }
             }
@@ -740,12 +740,12 @@ namespace SlopeFEA
             return masterSolutions[0].SF;
         }
 
-        private static List<double> FindRadiusBreaks(List<Point> surface)
+        private static List<double> FindRadiusBreaks ( List<Point> surface )
         {
-            double  xMax, x1, y1, x2, y2,
+            double xMax, x1, y1, x2, y2,
                     currSlope = 0, prevSlope,
                     toler = 1e-5;
-            Point   currPoint, prevPoint;
+            Point currPoint, prevPoint;
 
             List<double> result = new List<double>();
 
@@ -757,13 +757,13 @@ namespace SlopeFEA
             int iPoint = 0;
 
             // Add y coord of first point to break list
-            result.Add(currPoint.Y);
+            result.Add( currPoint.Y );
 
             // Initialize x counting variable
             // (for stepping through surface)
             x2 = currPoint.X;
 
-            while (x2 < xMax)
+            while ( x2 < xMax )
             {
                 prevPoint = currPoint;
                 currPoint = surface[++iPoint];
@@ -776,10 +776,10 @@ namespace SlopeFEA
                 prevSlope = currSlope;
 
                 // Check if line is vertical
-                if (Math.Abs(x2 - x1) < toler)
+                if ( Math.Abs( x2 - x1 ) < toler )
                 {
                     // If soil movement is right-to-left
-                    if (y2 > y1)
+                    if ( y2 > y1 )
                     {
                         // Use max double value
                         currSlope = double.PositiveInfinity;
@@ -794,21 +794,21 @@ namespace SlopeFEA
                 else currSlope = (y2 - y1) / (x2 - x1);
 
                 // If surface is convex at vertex of curr and prev lines
-                if (currSlope < prevSlope) result.Add(y1);
-                else if (x2 == xMax) result.Add(y2);
+                if ( currSlope < prevSlope ) result.Add( y1 );
+                else if ( x2 == xMax ) result.Add( y2 );
             }
 
             result.Sort();
             return result.Distinct().ToList();
         }
 
-        private static int SortSolutions(CircularSurface cs1,CircularSurface cs2)
+        private static int SortSolutions ( CircularSurface cs1, CircularSurface cs2 )
         {
             // If cs1 is null...
-            if (cs1 == null)
+            if ( cs1 == null )
             {
                 // ...and cs2 is also null...
-                if (cs2 == null)
+                if ( cs2 == null )
                 {
                     // ...cs1 == cs2
                     return 0;
@@ -826,7 +826,7 @@ namespace SlopeFEA
             else
             {
                 // ...and cs2 is null...
-                if (cs2 == null)
+                if ( cs2 == null )
                 {
                     // ...cs1 > cs2
                     return 1;
@@ -836,8 +836,8 @@ namespace SlopeFEA
                 else
                 {
                     // ...compare SF of surfaces
-                    if (cs1.SF > cs2.SF) return 1;
-                    else if (cs1.SF < cs2.SF) return -1;
+                    if ( cs1.SF > cs2.SF ) return 1;
+                    else if ( cs1.SF < cs2.SF ) return -1;
                     else return 0;
                 }
             }
@@ -848,9 +848,9 @@ namespace SlopeFEA
         // Bishop's Method
         // ------------------------------------------------------------------
 
-        private static double Bishop(CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh)
+        private static double Bishop ( CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh )
         {
-            double  toler = 1e-5,
+            double toler = 1e-5,
                     x0, y0, x1, y1, m, c,
                     xc, xcSq, yc, ycSq, r, rSq,
                     A, B, C, disc, sqrtDisc,
@@ -878,14 +878,14 @@ namespace SlopeFEA
             yc = slipcircle.Y;
             r = slipcircle.R;
 
-            xcSq = Math.Pow(xc, 2);
-            ycSq = Math.Pow(yc, 2);
-            rSq = Math.Pow(r, 2);
+            xcSq = Math.Pow( xc, 2 );
+            ycSq = Math.Pow( yc, 2 );
+            rSq = Math.Pow( r, 2 );
 
             double direction = slipcircle.SoilDirection == SoilMovement.LtoR ? -1.0 : 1.0;
 
             // Get entry and exit points for failure surface
-            for (int i = 0; i < surface.Count - 1; i++)
+            for ( int i = 0 ; i < surface.Count - 1 ; i++ )
             {
                 // Get coords of current surface line segment
                 x0 = surface[i].X;
@@ -894,61 +894,61 @@ namespace SlopeFEA
                 y1 = surface[i + 1].Y;
 
                 // If line is vertical
-                if (Math.Abs(x0 - x1) < toler)
+                if ( Math.Abs( x0 - x1 ) < toler )
                 {
                     v = x0;
 
                     A = 1.0;
                     B = -2 * yc;
-                    C = Math.Pow(v - xc, 2) + ycSq - rSq;
+                    C = Math.Pow( v - xc, 2 ) + ycSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     w = (-B - sqrtDisc) / (2 * A);
 
-                    if (w >= Math.Min(y0, y1) && w <= Math.Max(y0, y1))
+                    if ( w >= Math.Min( y0, y1 ) && w <= Math.Max( y0, y1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     w = (-B + sqrtDisc) / (2 * A);
 
-                    if (w >= Math.Min(y0, y1) && w <= Math.Max(y0, y1))
+                    if ( w >= Math.Min( y0, y1 ) && w <= Math.Max( y0, y1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
                 // If line is horizontal
-                else if (Math.Abs(y0 - y1) < toler)
+                else if ( Math.Abs( y0 - y1 ) < toler )
                 {
                     w = y0;
 
                     A = 1.0;
                     B = -2 * xc;
-                    C = Math.Pow(w - yc, 2) + xcSq - rSq;
+                    C = Math.Pow( w - yc, 2 ) + xcSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     v = (-B - sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     v = (-B + sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
                 // Otherwise, compute slope and y-intercept
@@ -957,37 +957,37 @@ namespace SlopeFEA
                     m = (y1 - y0) / (x1 - x0);
                     c = y0 - m * x0;
 
-                    A = 1 + Math.Pow(m, 2);
+                    A = 1 + Math.Pow( m, 2 );
                     B = 2 * (m * (c - yc) - xc);
-                    C = Math.Pow(c - yc, 2) + xcSq - rSq;
+                    C = Math.Pow( c - yc, 2 ) + xcSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     v = (-B - sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
                         w = m * v + c;
 
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     v = (-B + sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
                         w = m * v + c;
 
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
             }
 
-            while (xEnterExit.Count >= 2)
+            while ( xEnterExit.Count >= 2 )
             {
                 // Clear entries for previous potential surface
                 alpha.Clear();
@@ -999,19 +999,19 @@ namespace SlopeFEA
                 // Get entry and exit coords of slip surface
                 xEnter = xEnterExit[0];
                 yEnter = yEnterExit[0];
-                xEnterExit.RemoveAt(0);
-                yEnterExit.RemoveAt(0);
+                xEnterExit.RemoveAt( 0 );
+                yEnterExit.RemoveAt( 0 );
 
                 xExit = xEnterExit[0];
                 yExit = yEnterExit[0];
-                xEnterExit.RemoveAt(0);
-                yEnterExit.RemoveAt(0);
+                xEnterExit.RemoveAt( 0 );
+                yEnterExit.RemoveAt( 0 );
 
-                if (Math.Abs(xExit - xEnter) < mesh[1][0].X - mesh[0][0].X) continue;
+                if ( Math.Abs( xExit - xEnter ) < mesh[1][0].X - mesh[0][0].X ) continue;
 
                 // Advance to mesh in region of interest
                 int imesh = 0;
-                while (mesh[imesh][0].X < xEnter) imesh++;
+                while ( mesh[imesh][0].X < xEnter ) imesh++;
 
                 // Initialize x and y coords and moments
                 x0 = xEnter;
@@ -1023,7 +1023,7 @@ namespace SlopeFEA
                 // Step through mesh, getting geometry and applied moments
                 double yUpper, yLower, yHeight;
                 int ibase;
-                while (mesh[imesh][0].X < xExit)
+                while ( mesh[imesh][0].X < xExit )
                 {
                     x1 = mesh[imesh][0].X;
                     yTop1 = mesh[imesh][mesh[imesh].Count - 1].Y;
@@ -1031,28 +1031,28 @@ namespace SlopeFEA
                     // Compute y coord of bottom of right side of slice
                     A = 1.0;
                     B = -2 * yc;
-                    C = Math.Pow(x1 - xc, 2) + ycSq - rSq;
+                    C = Math.Pow( x1 - xc, 2 ) + ycSq - rSq;
 
-                    sqrtDisc = Math.Sqrt(Math.Pow(B, 2) - 4 * A * C);
+                    sqrtDisc = Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C );
 
                     yBot1 = (-B - sqrtDisc) / (2 * A);
 
                     // Compute slice properties
-                    alpha.Add(Math.Atan((yBot1 - yBot0) / (x1 - x0)));
-                    width.Add(x1 - x0);
+                    alpha.Add( Math.Atan( (yBot1 - yBot0) / (x1 - x0) ) );
+                    width.Add( x1 - x0 );
 
                     // Initialize base parameters to zero
-                    phi.Add(0); coh.Add(0);
+                    phi.Add( 0 ); coh.Add( 0 );
 
                     ibase = phi.Count - 1;
 
                     meanWeight1 = 0;
                     bool begin = false;
-                    for (int imeshpt = 0; imeshpt < mesh[imesh].Count; imeshpt += 2)
+                    for ( int imeshpt = 0 ; imeshpt < mesh[imesh].Count ; imeshpt += 2 )
                     {
-                        if (mesh[imesh][imeshpt + 1].Y < yBot1) continue;
+                        if ( mesh[imesh][imeshpt + 1].Y < yBot1 ) continue;
 
-                        if (!begin)
+                        if ( !begin )
                         {
                             /* NOTE:
                              * The angle of friction and cohesion are taken as a simple average between
@@ -1064,7 +1064,7 @@ namespace SlopeFEA
                              * accurate enough; for very wide slices it is not very accurate, but if the slices
                              * are too wide then other errors will dominate regardless.
                              */
-                            if (ibase == 0)
+                            if ( ibase == 0 )
                             {
                                 phi[ibase] = mesh[imesh][imeshpt].Material.Phi;
                                 coh[ibase] = mesh[imesh][imeshpt].Material.Cohesion;
@@ -1092,9 +1092,9 @@ namespace SlopeFEA
                     }
                     meanWeight1 /= (yTop1 - yBot1);
 
-                    weight.Add(0.5 * width[ibase] * (meanWeight0 * (yTop0 - yBot0) + meanWeight1 * (yTop1 - yBot1)));
+                    weight.Add( 0.5 * width[ibase] * (meanWeight0 * (yTop0 - yBot0) + meanWeight1 * (yTop1 - yBot1)) );
 
-                    applied += weight[ibase] * Math.Sin(alpha[ibase]);
+                    applied += weight[ibase] * Math.Sin( alpha[ibase] );
 
                     // Update right side info to new left side
                     x0 = x1;
@@ -1109,20 +1109,20 @@ namespace SlopeFEA
                 yTop1 = yBot1 = yExit;
 
                 // Compute slice properties
-                alpha.Add(Math.Atan((yBot1 - yBot0) / (x1 - x0)));
-                width.Add(x1 - x0);
+                alpha.Add( Math.Atan( (yBot1 - yBot0) / (x1 - x0) ) );
+                width.Add( x1 - x0 );
 
                 // error catch for surfaces with "zero slices"
-                if (phi.Count == 0) continue;
+                if ( phi.Count == 0 ) continue;
 
                 ibase = phi.Count - 1;
 
-                phi.Add(phi[ibase]);
-                coh.Add(coh[ibase]);
+                phi.Add( phi[ibase] );
+                coh.Add( coh[ibase] );
 
-                weight.Add(0.5 * width[ibase + 1] * meanWeight0 * (yTop0 - yBot0));
+                weight.Add( 0.5 * width[ibase + 1] * meanWeight0 * (yTop0 - yBot0) );
 
-                applied += weight[ibase] * Math.Sin(alpha[ibase]);
+                applied += weight[ibase] * Math.Sin( alpha[ibase] );
 
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // TESTING PROPERTY LIST COUNTS
@@ -1140,35 +1140,35 @@ namespace SlopeFEA
                 //    coh.Count,
                 //    weight.Count), "Count Tester");
 
-                if (Math.Abs(applied) > toler)
+                if ( Math.Abs( applied ) > toler )
                 {
                     // Compute resisting moments and safety factor
                     errSF = 1.0;
                     currSF = 1.0;
                     iter = 0;
 
-                    while (errSF > toler && iter++ < 100)
+                    while ( errSF > toler && iter++ < 100 )
                     {
                         prevSF = currSF;
                         resist = 0;
 
-                        for (int islice = 0; islice < alpha.Count; islice++)
+                        for ( int islice = 0 ; islice < alpha.Count ; islice++ )
                         {
-                            bishFactor = Math.Cos(alpha[islice]) + Math.Sin(alpha[islice]) * Math.Tan(phi[islice]) / prevSF;
+                            bishFactor = Math.Cos( alpha[islice] ) + Math.Sin( alpha[islice] ) * Math.Tan( phi[islice] ) / prevSF;
 
-                            resist += direction * (Math.Tan(phi[islice]) * weight[islice] + coh[islice] * width[islice]) / bishFactor;
+                            resist += direction * (Math.Tan( phi[islice] ) * weight[islice] + coh[islice] * width[islice]) / bishFactor;
                         }
 
                         currSF = resist / applied;
-                        errSF = Math.Abs(currSF - prevSF) / prevSF;
+                        errSF = Math.Abs( currSF - prevSF ) / prevSF;
                     }
                 }
                 else currSF = 1000.0;
 
-                if (iter == 100) currSF = 1000.0;
+                if ( iter == 100 ) currSF = 1000.0;
 
                 // If safety factor is lowest computed for this surface
-                if (currSF > 0 && currSF < result)
+                if ( currSF > 0 && currSF < result )
                 {
                     result = currSF;
                     slipcircle.XEnter = xEnter;
@@ -1185,7 +1185,7 @@ namespace SlopeFEA
         // RFEM Analysis
         // ------------------------------------------------------------------
 
-        private static double RFEM(CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh)
+        private static double RFEM ( CircularSurface slipcircle, List<Point> surface, List<List<AnalysisMeshPoint>> mesh )
         {
             int nnodel = 2,             // nodes / element
                 nvar = 2,               // dofs / node
@@ -1199,7 +1199,8 @@ namespace SlopeFEA
 
             /*List<List<int>> ico;                            // for connectivity
             List<int> index = new List<int>(nvel);          // for mapping element to global
-            List<int> nd = new List<int>(nnodel);  */         // for element nodes
+            List<int> nd = new List<int>(nnodel);  */
+            // for element nodes
 
             double result, currSF, toler = 1e-5,
                 xc, yc, r, xcSq, ycSq, rSq,
@@ -1221,34 +1222,34 @@ namespace SlopeFEA
 
             int listcap = 200;
 
-            List<double> xg = new List<double>(listcap),           // mesh coordinates
-                         yg = new List<double>(listcap),
-                         hg = new List<double>(listcap);
+            List<double> xg = new List<double>( listcap ),           // mesh coordinates
+                         yg = new List<double>( listcap ),
+                         hg = new List<double>( listcap );
 
-            List<double> alpha = new List<double>(listcap),        // slice geometry and weight
-                         width = new List<double>(listcap),
-                         blength = new List<double>(listcap),
-                         weight = new List<double>(listcap);
+            List<double> alpha = new List<double>( listcap ),        // slice geometry and weight
+                         width = new List<double>( listcap ),
+                         blength = new List<double>( listcap ),
+                         weight = new List<double>( listcap );
 
-            List<double> K_trb = new List<double>(listcap),        // wt avg base properties
-                         K_nob = new List<double>(listcap),
-                         K_nrb = new List<double>(listcap),
-                         A_coefb = new List<double>(listcap),
-                         Phi_b = new List<double>(listcap),
-                         Coh_b = new List<double>(listcap);
+            List<double> K_trb = new List<double>( listcap ),        // wt avg base properties
+                         K_nob = new List<double>( listcap ),
+                         K_nrb = new List<double>( listcap ),
+                         A_coefb = new List<double>( listcap ),
+                         Phi_b = new List<double>( listcap ),
+                         Coh_b = new List<double>( listcap );
 
-            List<double> K_trs = new List<double>(listcap),        // wt avg interslice properties
-                         K_nos = new List<double>(listcap),
-                         K_nrs = new List<double>(listcap),
-                         A_coefs = new List<double>(listcap),
-                         Phi_s = new List<double>(listcap),
-                         Coh_s = new List<double>(listcap),
-                         Gamma_s = new List<double>(listcap);
+            List<double> K_trs = new List<double>( listcap ),        // wt avg interslice properties
+                         K_nos = new List<double>( listcap ),
+                         K_nrs = new List<double>( listcap ),
+                         A_coefs = new List<double>( listcap ),
+                         Phi_s = new List<double>( listcap ),
+                         Coh_s = new List<double>( listcap ),
+                         Gamma_s = new List<double>( listcap );
 
             double acoef = 1e-5;    // RFEM constant
 
-            List<double> xEnterExit = new List<double>(6);
-            List<double> yEnterExit = new List<double>(6);
+            List<double> xEnterExit = new List<double>( 6 );
+            List<double> yEnterExit = new List<double>( 6 );
 
             // Initialize SF
             result = currSF = 1000.0;
@@ -1258,14 +1259,14 @@ namespace SlopeFEA
             yc = slipcircle.Y;
             r = slipcircle.R;
 
-            xcSq = Math.Pow(xc, 2);
-            ycSq = Math.Pow(yc, 2);
-            rSq = Math.Pow(r, 2);
+            xcSq = Math.Pow( xc, 2 );
+            ycSq = Math.Pow( yc, 2 );
+            rSq = Math.Pow( r, 2 );
 
             direction = slipcircle.SoilDirection == SoilMovement.LtoR ? -1.0 : 1.0;
 
             // Get entry and exit points for failure surface
-            for (int i = 0; i < surface.Count - 1; i++)
+            for ( int i = 0 ; i < surface.Count - 1 ; i++ )
             {
                 // Get coords of current surface line segment
                 x0 = surface[i].X;
@@ -1274,61 +1275,61 @@ namespace SlopeFEA
                 y1 = surface[i + 1].Y;
 
                 // If line is vertical
-                if (Math.Abs(x0 - x1) < toler)
+                if ( Math.Abs( x0 - x1 ) < toler )
                 {
                     v = x0;
 
                     A = 1.0;
                     B = -2 * yc;
-                    C = Math.Pow(v - xc, 2) + ycSq - rSq;
+                    C = Math.Pow( v - xc, 2 ) + ycSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     w = (-B - sqrtDisc) / (2 * A);
 
-                    if (w >= Math.Min(y0, y1) && w <= Math.Max(y0, y1))
+                    if ( w >= Math.Min( y0, y1 ) && w <= Math.Max( y0, y1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     w = (-B + sqrtDisc) / (2 * A);
 
-                    if (w >= Math.Min(y0, y1) && w <= Math.Max(y0, y1))
+                    if ( w >= Math.Min( y0, y1 ) && w <= Math.Max( y0, y1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
                 // If line is horizontal
-                else if (Math.Abs(y0 - y1) < toler)
+                else if ( Math.Abs( y0 - y1 ) < toler )
                 {
                     w = y0;
 
                     A = 1.0;
                     B = -2 * xc;
-                    C = Math.Pow(w - yc, 2) + xcSq - rSq;
+                    C = Math.Pow( w - yc, 2 ) + xcSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     v = (-B - sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     v = (-B + sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
                 // Otherwise, compute slope and y-intercept
@@ -1337,37 +1338,37 @@ namespace SlopeFEA
                     m = (y1 - y0) / (x1 - x0);
                     c = y0 - m * x0;
 
-                    A = 1 + Math.Pow(m, 2);
+                    A = 1 + Math.Pow( m, 2 );
                     B = 2 * (m * (c - yc) - xc);
-                    C = Math.Pow(c - yc, 2) + xcSq - rSq;
+                    C = Math.Pow( c - yc, 2 ) + xcSq - rSq;
 
-                    disc = Math.Pow(B, 2) - 4 * A * C;
-                    if (disc < 0) continue;
-                    sqrtDisc = Math.Sqrt(disc);
+                    disc = Math.Pow( B, 2 ) - 4 * A * C;
+                    if ( disc < 0 ) continue;
+                    sqrtDisc = Math.Sqrt( disc );
 
                     v = (-B - sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
                         w = m * v + c;
 
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
 
                     v = (-B + sqrtDisc) / (2 * A);
 
-                    if (v >= Math.Min(x0, x1) && v <= Math.Max(x0, x1))
+                    if ( v >= Math.Min( x0, x1 ) && v <= Math.Max( x0, x1 ) )
                     {
                         w = m * v + c;
 
-                        xEnterExit.Add(v);
-                        yEnterExit.Add(w);
+                        xEnterExit.Add( v );
+                        yEnterExit.Add( w );
                     }
                 }
             }
 
-            while (xEnterExit.Count >= 2)
+            while ( xEnterExit.Count >= 2 )
             {
                 xg.Clear(); yg.Clear(); hg.Clear();
 
@@ -1382,32 +1383,32 @@ namespace SlopeFEA
                 // Get entry and exit coords of slip surface
                 xEnter = xEnterExit[0];
                 yEnter = yEnterExit[0];
-                xEnterExit.RemoveAt(0);
-                yEnterExit.RemoveAt(0);
+                xEnterExit.RemoveAt( 0 );
+                yEnterExit.RemoveAt( 0 );
 
                 xExit = xEnterExit[0];
                 yExit = yEnterExit[0];
-                xEnterExit.RemoveAt(0);
-                yEnterExit.RemoveAt(0);
+                xEnterExit.RemoveAt( 0 );
+                yEnterExit.RemoveAt( 0 );
 
-                if (Math.Abs(xExit - xEnter) < mesh[1][0].X - mesh[0][0].X) continue;
+                if ( Math.Abs( xExit - xEnter ) < mesh[1][0].X - mesh[0][0].X ) continue;
 
                 // Advance to mesh in region of interest
                 int imesh = 0;
-                while (mesh[imesh][0].X < xEnter) imesh++;
+                while ( mesh[imesh][0].X < xEnter ) imesh++;
 
                 // Initialize x and y coords of LHS
-                x0 = xEnter; xg.Add(x0);
-                y0 = yEnter; yg.Add(y0);
-                h0 = yEnter; hg.Add(h0);
+                x0 = xEnter; xg.Add( x0 );
+                y0 = yEnter; yg.Add( y0 );
+                h0 = yEnter; hg.Add( h0 );
 
                 // Set first interslice parameters to zero (y0 == h0)
-                K_trs.Add(0); K_nos.Add(0); K_nrs.Add(0); A_coefs.Add(0);
-                Phi_s.Add(0); Coh_s.Add(0); Gamma_s.Add(0);
+                K_trs.Add( 0 ); K_nos.Add( 0 ); K_nrs.Add( 0 ); A_coefs.Add( 0 );
+                Phi_s.Add( 0 ); Coh_s.Add( 0 ); Gamma_s.Add( 0 );
 
                 // Step through mesh, getting geometry
                 int ibase, iface;
-                while (mesh[imesh][0].X < xExit)
+                while ( mesh[imesh][0].X < xExit )
                 {
                     x1 = mesh[imesh][0].X;
                     h1 = mesh[imesh][mesh[imesh].Count - 1].Y;
@@ -1415,36 +1416,36 @@ namespace SlopeFEA
                     // Compute y coord of bottom of right side of slice
                     A = 1.0;
                     B = -2 * yc;
-                    C = Math.Pow(x1 - xc, 2) + ycSq - rSq;
+                    C = Math.Pow( x1 - xc, 2 ) + ycSq - rSq;
 
-                    sqrtDisc = Math.Sqrt(Math.Pow(B, 2) - 4 * A * C);
+                    sqrtDisc = Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C );
 
                     y1 = (-B - sqrtDisc) / (2 * A);
 
                     // Add slice coords to mesh coords
-                    xg.Add(x1); yg.Add(y1); hg.Add(h1);
+                    xg.Add( x1 ); yg.Add( y1 ); hg.Add( h1 );
 
                     // Compute slice properties
-                    alpha.Add(Math.Atan((y1 - y0) / (x1 - x0)));
-                    width.Add(x1 - x0);
-                    blength.Add(Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2)));
+                    alpha.Add( Math.Atan( (y1 - y0) / (x1 - x0) ) );
+                    width.Add( x1 - x0 );
+                    blength.Add( Math.Sqrt( Math.Pow( x1 - x0, 2 ) + Math.Pow( y1 - y0, 2 ) ) );
 
                     // Initialize base parameters to zero
-                    K_trb.Add(0); K_nob.Add(0); K_nrb.Add(0); A_coefb.Add(0);
-                    Phi_b.Add(0); Coh_b.Add(0);
+                    K_trb.Add( 0 ); K_nob.Add( 0 ); K_nrb.Add( 0 ); A_coefb.Add( 0 );
+                    Phi_b.Add( 0 ); Coh_b.Add( 0 );
 
                     // Initialize interslice parameters to zero
-                    K_trs.Add(0); K_nos.Add(0); K_nrs.Add(0); A_coefs.Add(0);
-                    Phi_s.Add(0); Coh_s.Add(0); Gamma_s.Add(0);
+                    K_trs.Add( 0 ); K_nos.Add( 0 ); K_nrs.Add( 0 ); A_coefs.Add( 0 );
+                    Phi_s.Add( 0 ); Coh_s.Add( 0 ); Gamma_s.Add( 0 );
 
                     ibase = K_trb.Count - 1; iface = K_trs.Count - 1;
 
                     bool begin = false; double yUpper, yLower, yHeight;
-                    for (int imeshpt = 0; imeshpt < mesh[imesh].Count; imeshpt += 2)
+                    for ( int imeshpt = 0 ; imeshpt < mesh[imesh].Count ; imeshpt += 2 )
                     {
-                        if (mesh[imesh][imeshpt + 1].Y < y1) continue;
+                        if ( mesh[imesh][imeshpt + 1].Y < y1 ) continue;
 
-                        if (!begin)
+                        if ( !begin )
                         {
                             /* NOTE:
                              * The angle of friction and cohesion are taken as a simple average between
@@ -1456,7 +1457,7 @@ namespace SlopeFEA
                              * accurate enough; for very wide slices it is not very accurate, but if the slices
                              * are too wide then other errors will dominate regardless.
                              */
-                            if (ibase == 0)
+                            if ( ibase == 0 )
                             {
                                 K_trb[ibase] = mesh[imesh][imeshpt].Material.Ktrb;
                                 K_nob[ibase] = mesh[imesh][imeshpt].Material.Kno;
@@ -1510,9 +1511,9 @@ namespace SlopeFEA
                     Coh_s[iface] /= yHeight;
                     Gamma_s[iface] /= yHeight;
 
-                    weight.Add(0.5 * width[ibase]
+                    weight.Add( 0.5 * width[ibase]
                         * (Gamma_s[iface] * (hg[iface] - yg[iface])
-                        + Gamma_s[iface - 1] * (hg[iface - 1] - yg[iface - 1])));
+                        + Gamma_s[iface - 1] * (hg[iface - 1] - yg[iface - 1])) );
 
                     // Update right side info to new left side
                     x0 = x1;
@@ -1522,34 +1523,34 @@ namespace SlopeFEA
                 }
 
                 // Add exit coords to mesh coords
-                x1 = xExit; xg.Add(x1);
-                y1 = yExit; yg.Add(y1);
-                h1 = yExit; hg.Add(h1);
+                x1 = xExit; xg.Add( x1 );
+                y1 = yExit; yg.Add( y1 );
+                h1 = yExit; hg.Add( h1 );
 
                 // Compute slice properties
-                alpha.Add(Math.Atan((y1 - y0) / (x1 - x0)));
-                width.Add(x1 - x0);
-                blength.Add(Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2)));
+                alpha.Add( Math.Atan( (y1 - y0) / (x1 - x0) ) );
+                width.Add( x1 - x0 );
+                blength.Add( Math.Sqrt( Math.Pow( x1 - x0, 2 ) + Math.Pow( y1 - y0, 2 ) ) );
 
                 // error catch for surfaces with "zero slices"
-                if (K_trb.Count == 0) continue;
+                if ( K_trb.Count == 0 ) continue;
 
                 ibase = K_trb.Count - 1;
 
                 // Set base parameters to same as previous slice
-                K_trb.Add(K_trb[ibase]);
-                K_nob.Add(K_nob[ibase]);
-                K_nrb.Add(K_nrb[ibase]);
-                A_coefb.Add(A_coefb[ibase]);
-                Phi_b.Add(Phi_b[ibase]);
-                Coh_b.Add(Coh_b[ibase]);
+                K_trb.Add( K_trb[ibase] );
+                K_nob.Add( K_nob[ibase] );
+                K_nrb.Add( K_nrb[ibase] );
+                A_coefb.Add( A_coefb[ibase] );
+                Phi_b.Add( Phi_b[ibase] );
+                Coh_b.Add( Coh_b[ibase] );
 
                 // Set final interslice parameters to zero (y0 == h0)
-                K_trs.Add(0); K_nos.Add(0); K_nrs.Add(0); A_coefs.Add(0);
-                Phi_s.Add(0); Coh_s.Add(0); Gamma_s.Add(0);
+                K_trs.Add( 0 ); K_nos.Add( 0 ); K_nrs.Add( 0 ); A_coefs.Add( 0 );
+                Phi_s.Add( 0 ); Coh_s.Add( 0 ); Gamma_s.Add( 0 );
 
                 // Add weight of final slice
-                weight.Add(0.5 * width[ibase + 1] * Gamma_s[ibase] * (hg[ibase] - yg[ibase]));
+                weight.Add( 0.5 * width[ibase + 1] * Gamma_s[ibase] * (hg[ibase] - yg[ibase]) );
 
                 // Item counts for RFEM
                 n = K_trb.Count;    // # of slices
@@ -1569,19 +1570,19 @@ namespace SlopeFEA
                 */
 
                 // Initialize global stiffness matrix
-                gstif = new BandSymMatrix(nnet, 5);
+                gstif = new BandSymMatrix( nnet, 5 );
 
                 // Initialize global load vectors
-                gload = new DenseMatrix(nnet);
-                iload = new DenseMatrix(nnet);
-                dload = new DenseMatrix(nnet);
-                dload0 = new DenseMatrix(nnet);
+                gload = new DenseMatrix( nnet );
+                iload = new DenseMatrix( nnet );
+                dload = new DenseMatrix( nnet );
+                dload0 = new DenseMatrix( nnet );
 
                 // Initialize global displacement vectors
-                gdisp = new DenseMatrix(nnet);
-                gdisp0 = new DenseMatrix(nnet);
-                ddisp = new DenseMatrix(nnet);
-                idisp = new DenseMatrix(nnet);
+                gdisp = new DenseMatrix( nnet );
+                gdisp0 = new DenseMatrix( nnet );
+                ddisp = new DenseMatrix( nnet );
+                idisp = new DenseMatrix( nnet );
 
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // TESTING PROPERTY LIST COUNTS
@@ -1641,7 +1642,7 @@ namespace SlopeFEA
                 // build up initial stiffness matrix and initial load vector
                 double cos, cos2, sin, sin2, A1, Ab, Kx, Ky, Kn, Kt, F;
                 int gel0, gel1, gel2, gel3;
-                for (int iel = 0; iel < nel; iel++)
+                for ( int iel = 0 ; iel < nel ; iel++ )
                 {
                     gel0 = iel * nvar;
                     gel1 = gel0 + 1;
@@ -1649,10 +1650,10 @@ namespace SlopeFEA
                     gel3 = gel0 + 3;
 
                     // Compute geometry parameters (for efficiency)
-                    cos = Math.Cos(alpha[iel]);
-                    cos2 = Math.Pow(cos, 2);
-                    sin = Math.Sin(alpha[iel]);
-                    sin2 = Math.Pow(sin, 2);
+                    cos = Math.Cos( alpha[iel] );
+                    cos2 = Math.Pow( cos, 2 );
+                    sin = Math.Sin( alpha[iel] );
+                    sin2 = Math.Pow( sin, 2 );
                     A1 = hg[iel + 1] - yg[iel + 1];
                     Ab = blength[iel];
 
@@ -1665,7 +1666,7 @@ namespace SlopeFEA
                     Ky = A1 * (K_trs[iel + 1] + Coh_s[iel + 1] / acoef);
 
                     Kn = Ab * K_nob[iel];
-                    F = Math.Max(Coh_b[iel] - (weight[iel] * cos / Ab) * Math.Tan(Phi_b[iel]), 0);
+                    F = Math.Max( Coh_b[iel] - (weight[iel] * cos / Ab) * Math.Tan( Phi_b[iel] ), 0 );
                     Kt = Ab * (K_trb[iel] + F / acoef);
 
                     // Create element stiffness matrix
@@ -1707,10 +1708,10 @@ namespace SlopeFEA
                 }
 
                 // Compute geometry for last slice
-                cos = Math.Cos(alpha[nel]);
-                cos2 = Math.Pow(cos, 2);
-                sin = Math.Sin(alpha[nel]);
-                sin2 = Math.Pow(sin, 2);
+                cos = Math.Cos( alpha[nel] );
+                cos2 = Math.Pow( cos, 2 );
+                sin = Math.Sin( alpha[nel] );
+                sin2 = Math.Pow( sin, 2 );
                 Ab = blength[nel];
 
                 // Add to global load vector
@@ -1718,7 +1719,7 @@ namespace SlopeFEA
 
                 // Compute stiffness properties for last slice
                 Kn = Ab * K_nob[nel];
-                F = Math.Max(Coh_b[nel] - (weight[nel] * cos / Ab) * Math.Tan(Phi_b[nel]), 0);
+                F = Math.Max( Coh_b[nel] - (weight[nel] * cos / Ab) * Math.Tan( Phi_b[nel] ), 0 );
                 Kt = Ab * (K_trb[nel] + F / acoef);
 
                 // Add to global stiffness matrix
@@ -1730,7 +1731,7 @@ namespace SlopeFEA
                 // obtain Cholesky decomposition of the (initial) global stiffness matrix
                 gstif_chol = gstif.Cholesky;
 
-                if (gstif_chol == null) continue;
+                if ( gstif_chol == null ) continue;
 
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 /* TESTING MATRIX SOLVER */
@@ -1749,44 +1750,44 @@ namespace SlopeFEA
                 // NON-LINEAR SOLVER FOR RFEM (MODIFIED NEWTON-RAPHSON)
                 double eps_s = 1e-5, eps_a, iresid, gresid;
                 int niter = 5000, iter;
-                int nstep = (int)Math.Ceiling(Math.Log(1 / eps_s) / Math.Log(2) + 1);
+                int nstep = (int) Math.Ceiling( Math.Log( 1 / eps_s ) / Math.Log( 2 ) + 1 );
                 double relax = 0.25;
                 double dfact = 1.0, fact0 = 0.0, factor = 0.0;
                 /*bool converge;*/
 
-                for (int istep = 0; istep < nstep; istep++)
+                for ( int istep = 0 ; istep < nstep ; istep++ )
                 {
                     factor = fact0 + dfact;             // Set load scaling factor for current step
-                    gdisp0.CopyInPlace(ref gdisp);      // Put current displacements and loads into
-                    dload0.CopyInPlace(ref dload);      //      solver matrices
+                    gdisp0.CopyInPlace( ref gdisp );      // Put current displacements and loads into
+                    dload0.CopyInPlace( ref dload );      //      solver matrices
 
                     eps_a = 1; iter = 0; /* converge = false;*/
 
-                    while (eps_a > eps_s && iter < niter && factor <= 1)
+                    while ( eps_a > eps_s && iter < niter && factor <= 1 )
                     {
                         iter++;
 
                         // Determine global load vector for this iteration
-                        DenseMatrix.MultiplyInPlace(factor, gload, ref iload);
-                        DenseMatrix.AddInPlace(iload, dload, ref iload);
+                        DenseMatrix.MultiplyInPlace( factor, gload, ref iload );
+                        DenseMatrix.AddInPlace( iload, dload, ref iload );
 
                         // --------------------------------------
                         // SOLVE THE STIFFNESS EQUATION
                         // --------------------------------------
 
                         // solve gstif*idisp = iload
-                        BandSymMatrix.SolveInPlaceCholesky(gstif_chol, iload, ref idisp);
+                        BandSymMatrix.SolveInPlaceCholesky( gstif_chol, iload, ref idisp );
 
                         // compute update global displacements, ddisp = gdisp + idisp
-                        DenseMatrix.AddInPlace(gdisp, idisp, ref ddisp);
+                        DenseMatrix.AddInPlace( gdisp, idisp, ref ddisp );
 
                         // apply relaxation factor, gdisp = (1-relax)*gdisp + relax*ddisp
-                        DenseMatrix.MultiplyInPlace(1 - relax, gdisp, ref gdisp);
-                        DenseMatrix.MultiplyInPlace(relax, ddisp, ref ddisp);
-                        DenseMatrix.AddInPlace(gdisp, ddisp, ref gdisp);
+                        DenseMatrix.MultiplyInPlace( 1 - relax, gdisp, ref gdisp );
+                        DenseMatrix.MultiplyInPlace( relax, ddisp, ref ddisp );
+                        DenseMatrix.AddInPlace( gdisp, ddisp, ref gdisp );
 
                         // compute actual load (non-linear load-displacement curve)
-                        ComputeDLoadRFEM(   ref dload, gdisp,
+                        ComputeDLoadRFEM( ref dload, gdisp,
                                             n, /* kappa = */ 1.0, /*acoef = */ 1e-5,
                                             yg, hg,
                                             alpha, blength,
@@ -1795,26 +1796,26 @@ namespace SlopeFEA
                                             K_trb, K_trs,
                                             A_coefb, A_coefs,
                                             Phi_b, Phi_s,
-                                            Coh_b, Coh_s);
+                                            Coh_b, Coh_s );
 
                         // compute approximation error
                         iresid = 0; gresid = 0;
-                        for (int i = 0; i < nnet; i++)
+                        for ( int i = 0 ; i < nnet ; i++ )
                         {
                             iresid += idisp[i, 0] * idisp[i, 0];
                             gresid += gdisp[i, 0] * gdisp[i, 0];
                         }
-                        eps_a = Math.Sqrt(iresid / gresid);
+                        eps_a = Math.Sqrt( iresid / gresid );
                     }
 
                     /*converge = iter < niter;*/
 
                     // If NewtonRaphson solver converged, step forward
-                    if (iter < niter)
+                    if ( iter < niter )
                     {
                         fact0 = factor;
-                        gdisp.CopyInPlace(ref gdisp0);
-                        dload.CopyInPlace(ref dload0);
+                        gdisp.CopyInPlace( ref gdisp0 );
+                        dload.CopyInPlace( ref dload0 );
                         dfact /= 2;
                         niter /= 2;
                     }
@@ -1824,22 +1825,22 @@ namespace SlopeFEA
                     }
 
                     // ensure lower bound for maximum iterations
-                    niter = Math.Max(niter, 200);
+                    niter = Math.Max( niter, 200 );
 
                     // if converged on first run (i.e. Fs > 1), exit load stepping loop
-                    if (Math.Abs(1 - factor) < toler) break;
+                    if ( Math.Abs( 1 - factor ) < toler ) break;
                 }
 
-                currSF = ComputeSafetyFactorRFEM(   gdisp,
+                currSF = ComputeSafetyFactorRFEM( gdisp,
                                                     n, /* kappa = */ 1.0, /*acoef = */ 1e-5,
                                                     alpha, blength,
                                                     K_nob, K_nrb,
                                                     K_trb, A_coefb,
-                                                    Phi_b, Coh_b);
+                                                    Phi_b, Coh_b );
                 currSF *= soildir * factor;
 
                 // If safety factor is lowest computed for this surface
-                if (currSF > 0 && currSF < result)
+                if ( currSF > 0 && currSF < result )
                 {
                     result = currSF;
                     slipcircle.XEnter = xEnter;
@@ -1855,7 +1856,7 @@ namespace SlopeFEA
             return result;
         }
 
-        private static void ComputeDLoadRFEM(ref DenseMatrix dload, DenseMatrix gdisp,
+        private static void ComputeDLoadRFEM ( ref DenseMatrix dload, DenseMatrix gdisp,
                                                 int n, double kappa, double acoef,
                                                 List<double> yg, List<double> hg,
                                                 List<double> alpha, List<double> blength,
@@ -1864,7 +1865,7 @@ namespace SlopeFEA
                                                 List<double> K_trb, List<double> K_trs,
                                                 List<double> A_coefb, List<double> A_coefs,
                                                 List<double> Phi_b, List<double> Phi_s,
-                                                List<double> Coh_b, List<double> Coh_s)
+                                                List<double> Coh_b, List<double> Coh_s )
         {
             dload.FillZeros();
 
@@ -1878,7 +1879,7 @@ namespace SlopeFEA
                 Ns, Ts, Nb, Tb;
 
             // loop through nodes to compute ACTUAL loads
-            for (int i = 0; i < n; i++)
+            for ( int i = 0 ; i < n ; i++ )
             {
                 ii = 2 * i; iii = ii + 1;  // compute (x,y) dof indices
 
@@ -1886,7 +1887,7 @@ namespace SlopeFEA
                 // COMPUTE LOAD COMPONENTS DUE TO INTERSLICE STIFFNESS
                 // ----------------------------------------------------
 
-                if (i == 0)    // FIRST slice only has interslice stiffness on LEADING side
+                if ( i == 0 )    // FIRST slice only has interslice stiffness on LEADING side
                 {
                     /*
                      * 
@@ -1911,16 +1912,16 @@ namespace SlopeFEA
                     //Ky = A1 * (K_trs[i + 1] + F / (Math.Abs(dv) + acoef));
 
                     sigma_n = Ns / A1;
-                    denom = Math.Abs(dv);
-                    F = sigma_n * Math.Tan(Phi_s[i + 1]) + Coh_s[i + 1];
+                    denom = Math.Abs( dv );
+                    F = sigma_n * Math.Tan( Phi_s[i + 1] ) + Coh_s[i + 1];
                     tau_n = denom > 0.0 ? 0.5 * (K_trs[i + 1] * denom + F) : 0.0;
-                    F = Math.Max(F - tau_n, 0);
+                    F = Math.Max( F - tau_n, 0 );
                     Ky = A1 * (K_trs[i + 1] + F / (denom + acoef));
 
                     Ts = dv * Ky;       // shear force between slices
                     dload[iii, 0] = Ts;
                 }
-                else if (i == n - 1) // LAST slice only has interslice stiffness on TRAILING side
+                else if ( i == n - 1 ) // LAST slice only has interslice stiffness on TRAILING side
                 {
                     /*
                      * 
@@ -1945,10 +1946,10 @@ namespace SlopeFEA
                     //Ky = A0 * (K_trs[i] + F / (Math.Abs(dv) + acoef));
 
                     sigma_n = -Ns / A0;
-                    denom = Math.Abs(dv);
-                    F = sigma_n * Math.Tan(Phi_s[i]) + Coh_s[i];
+                    denom = Math.Abs( dv );
+                    F = sigma_n * Math.Tan( Phi_s[i] ) + Coh_s[i];
                     tau_n = denom > 0.0 ? 0.5 * (K_trs[i] * denom + F) : 0.0;
-                    F = Math.Max(F - tau_n, 0);
+                    F = Math.Max( F - tau_n, 0 );
                     Ky = A0 * (K_trs[i] + F / (denom + acoef));
 
                     Ts = -dv * Ky;      // shear force between slices
@@ -1978,10 +1979,10 @@ namespace SlopeFEA
                     //Ky = A0 * (K_trs[i] + F / (Math.Abs(dv) + acoef));
 
                     sigma_n = -Ns / A0;
-                    denom = Math.Abs(dv);
-                    F = sigma_n * Math.Tan(Phi_s[i]) + Coh_s[i];
+                    denom = Math.Abs( dv );
+                    F = sigma_n * Math.Tan( Phi_s[i] ) + Coh_s[i];
                     tau_n = denom > 0.0 ? 0.5 * (K_trs[i] * denom + F) : 0.0;
-                    F = Math.Max(F - tau_n, 0);
+                    F = Math.Max( F - tau_n, 0 );
                     Ky = A0 * (K_trs[i] + F / (denom + acoef));
 
                     Ts = -dv * Ky;      // shear force between slices
@@ -2011,10 +2012,10 @@ namespace SlopeFEA
                     //Ky = A1 * (K_trs[i + 1] + F / (Math.Abs(dv) + acoef));
 
                     sigma_n = Ns / A1;
-                    denom = Math.Abs(dv);
-                    F = sigma_n * Math.Tan(Phi_s[i + 1]) + Coh_s[i + 1];
+                    denom = Math.Abs( dv );
+                    F = sigma_n * Math.Tan( Phi_s[i + 1] ) + Coh_s[i + 1];
                     tau_n = denom > 0.0 ? 0.5 * (K_trs[i + 1] * denom + F) : 0.0;
-                    F = Math.Max(F - tau_n, 0);
+                    F = Math.Max( F - tau_n, 0 );
                     Ky = A1 * (K_trs[i + 1] + F / (denom + acoef));
 
                     Ts = dv * Ky;       // shear force between slices
@@ -2026,8 +2027,8 @@ namespace SlopeFEA
                 // COMPUTE LOAD COMPONENTS DUE TO BASE STIFFNESS
                 // ----------------------------------------------------
 
-                cos = Math.Cos(alpha[i]);
-                sin = Math.Sin(alpha[i]);       // slice geometry
+                cos = Math.Cos( alpha[i] );
+                sin = Math.Sin( alpha[i] );       // slice geometry
                 Ab = blength[i];
 
                 // convert global displacements to local coordinates
@@ -2044,10 +2045,10 @@ namespace SlopeFEA
                 //Kt = Ab * (K_trb[i] + F / (Math.Abs(ubar) + acoef));
 
                 sigma_n = -Nb / Ab;
-                denom = Math.Abs(ubar);
-                F = sigma_n * Math.Tan(Phi_b[i]) + Coh_b[i];
+                denom = Math.Abs( ubar );
+                F = sigma_n * Math.Tan( Phi_b[i] ) + Coh_b[i];
                 tau_n = denom > 0.0 ? 0.5 * (K_trb[i] * denom + F) : 0.0;
-                F = Math.Max(F - tau_n, 0);
+                F = Math.Max( F - tau_n, 0 );
                 Kt = Ab * (K_trb[i] + F / (denom + acoef));
 
                 Tb = -ubar * Kt;        // shear force at base
@@ -2058,12 +2059,12 @@ namespace SlopeFEA
             }
         }
 
-        private static double ComputeSafetyFactorRFEM(DenseMatrix gdisp,
+        private static double ComputeSafetyFactorRFEM ( DenseMatrix gdisp,
                                                         int n, double kappa, double acoef,
                                                         List<double> alpha, List<double> blength,
                                                         List<double> K_nob, List<double> K_nrb,
                                                         List<double> K_trb, List<double> A_coefb,
-                                                        List<double> Phi_b, List<double> Coh_b)
+                                                        List<double> Phi_b, List<double> Coh_b )
         {
             // moments of mobilized and available shear resistance
             double Ma = 0.0, Mr = 0.0;
@@ -2077,13 +2078,13 @@ namespace SlopeFEA
                 Nb, Tb;
 
             // loop through slices computing available and mobilized shear resistance at base
-            for (int i = 0; i < n; i++)
+            for ( int i = 0 ; i < n ; i++ )
             {
                 ii = 2 * i; iii = ii + 1;   // dof indices
 
                 // slice geometry
-                cos = Math.Cos(alpha[i]);
-                sin = Math.Sin(alpha[i]);
+                cos = Math.Cos( alpha[i] );
+                sin = Math.Sin( alpha[i] );
                 Ab = blength[i];
 
                 // convert global displacements into local coords
@@ -2100,16 +2101,16 @@ namespace SlopeFEA
                 //Kt = Ab * (K_trb[i] + F / (Math.Abs(ubar) + acoef));
 
                 sigma_n = -Nb / Ab;
-                denom = Math.Abs(ubar);
-                F = sigma_n * Math.Tan(Phi_b[i]) + Coh_b[i];
+                denom = Math.Abs( ubar );
+                F = sigma_n * Math.Tan( Phi_b[i] ) + Coh_b[i];
                 tau_n = denom > 0.0 ? 0.5 * (K_trb[i] * denom + F) : 0.0;
-                F = Math.Max(F - tau_n, 0);
+                F = Math.Max( F - tau_n, 0 );
                 Kt = Ab * (K_trb[i] + F / (denom + acoef));
 
                 Tb = -ubar * Kt;        // shear force at base
 
                 // increment moments
-                Mr += Nb * Math.Tan(Phi_b[i]) + Ab * Coh_b[i];
+                Mr += Nb * Math.Tan( Phi_b[i] ) + Ab * Coh_b[i];
                 Ma += Tb;
             }
 
