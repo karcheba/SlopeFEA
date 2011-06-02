@@ -30,8 +30,8 @@ BOUNDARY GEOMETRY DATA
 
 Number of Boundary Points = 4
 
-0, -9.99999999999995
-80.0000000000001, -9.99999999999995
+0, -9.99999999999996
+80.0000000000001, -9.99999999999996
 80, 50
 0, 50
 
@@ -74,81 +74,49 @@ Nu = 0.33
 MATERIAL BLOCK DATA
 --------------------------------
 
-Number of Material Blocks = 6
+Number of Material Blocks = 10
 
 Material Block #1
 Material Type = "sand"
-Number of Boundary Points = 9
-0, 6.41091190159489E-15, True, False
-40, 6.41091190159489E-15, False, False
+Number of Boundary Points = 11
+0, 0, True, False
+40, 0, False, False
 40, 20, False, False
+31, 20, False, False
 29.9999999999999, 20, False, False
 29.9999999999999, 35, False, False
+31, 35, False, False
 40, 35, False, False
 40, 50, False, False
 30, 50, False, False
 0, 50, True, False
 Number of Line Constraints = 1
-8, 0, True, False
+10, 0, True, False
 Number of Line Loads = 1
-6, 7, True, -100, -100, False, 0, 0
+8, 9, True, 100, 100, False, 0, 0
 Number of Point Loads = 0
 
 Material Block #2
 Material Type = "sand"
-Number of Boundary Points = 9
+Number of Boundary Points = 11
 40, 50, False, False
 40, 35, False, False
+49, 35, False, False
 50, 35, False, False
 50, 20, False, False
+49, 20, False, False
 40, 20, False, False
-40, 6.41091190159489E-15, False, False
-80.0000000000001, 6.41091190159489E-15, True, False
+40, 0, False, False
+80.0000000000001, 0, True, False
 80, 50, True, False
 50, 50, False, False
 Number of Line Constraints = 1
-6, 7, True, False
+8, 9, True, False
 Number of Line Loads = 1
-8, 0, True, -100, -100, False, 0, 0
+10, 0, True, 100, 100, False, 0, 0
 Number of Point Loads = 0
 
 Material Block #3
-Material Type = "concrete"
-Number of Boundary Points = 8
-29.9999999999999, 35, False, False
-29.9999999999999, 20, False, False
-40, 20, False, False
-40, 21, False, False
-31, 21, False, False
-31, 34, False, False
-40, 34, False, False
-40, 35, False, False
-Number of Line Constraints = 0
-Number of Line Loads = 3
-5, 6, True, -10, -10, False, 0, 0
-4, 5, True, -10, -10, False, 0, 0
-3, 4, True, -10, -10, False, 0, 0
-Number of Point Loads = 0
-
-Material Block #4
-Material Type = "concrete"
-Number of Boundary Points = 8
-40, 35, False, False
-40, 34, False, False
-49, 34, False, False
-49, 21, False, False
-40, 21, False, False
-40, 20, False, False
-50, 20, False, False
-50, 35, False, False
-Number of Line Constraints = 0
-Number of Line Loads = 3
-3, 4, True, -10, -10, False, 0, 0
-2, 3, True, -10, -10, False, 0, 0
-1, 2, True, -10, -10, False, 0, 0
-Number of Point Loads = 0
-
-Material Block #5
 Material Type = "NULL"
 Number of Boundary Points = 6
 40, 34, False, False
@@ -161,18 +129,88 @@ Number of Line Constraints = 0
 Number of Line Loads = 0
 Number of Point Loads = 0
 
-Material Block #6
+Material Block #4
 Material Type = "bedrock"
 Number of Boundary Points = 5
-0, -9.99999999999995, True, True
-80.0000000000001, -9.99999999999995, True, True
-80.0000000000001, 6.41091190159489E-15, True, False
-40, 6.41091190159489E-15, False, False
-0, 6.41091190159489E-15, True, False
+0, -9.99999999999996, True, True
+80.0000000000001, -9.99999999999996, True, True
+80.0000000000001, 0, True, False
+40, 0, False, False
+0, 0, True, False
 Number of Line Constraints = 3
 4, 0, True, False
 1, 2, True, False
 0, 1, True, True
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #5
+Material Type = "concrete"
+Number of Boundary Points = 4
+40, 34, False, False
+40, 35, False, False
+31, 35, False, False
+31, 34, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #6
+Material Type = "concrete"
+Number of Boundary Points = 4
+40, 35, False, False
+40, 34, False, False
+49, 34, False, False
+49, 35, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #7
+Material Type = "concrete"
+Number of Boundary Points = 6
+30, 20, False, False
+31, 20, False, False
+31, 21, False, False
+31, 34, False, False
+31, 35, False, False
+30, 35, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #8
+Material Type = "concrete"
+Number of Boundary Points = 4
+40, 20, False, False
+40, 21, False, False
+31, 21, False, False
+31, 20, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #9
+Material Type = "concrete"
+Number of Boundary Points = 4
+40, 21, False, False
+40, 20, False, False
+49, 20, False, False
+49, 21, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #10
+Material Type = "concrete"
+Number of Boundary Points = 6
+49, 34, False, False
+49, 21, False, False
+49, 20, False, False
+50, 20, False, False
+50, 35, False, False
+49, 35, False, False
+Number of Line Constraints = 0
 Number of Line Loads = 0
 Number of Point Loads = 0
 

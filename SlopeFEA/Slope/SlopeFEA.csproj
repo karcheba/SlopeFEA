@@ -16,7 +16,7 @@
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>Q:\Research\2010-2011\SlopeFEA\Build\</PublishUrl>
+    <PublishUrl>C:\Users\Brandon\Documents\Research\2010-2011\SlopeFEA\Build\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -30,8 +30,8 @@
     <TargetCulture>en-CA</TargetCulture>
     <ProductName>SlopeFEA 2011</ProductName>
     <PublisherName>SlopeFEA 2011</PublisherName>
-    <ApplicationRevision>7</ApplicationRevision>
-    <ApplicationVersion>1.0.0.7</ApplicationVersion>
+    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationVersion>1.0.0.8</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>

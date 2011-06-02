@@ -51,7 +51,7 @@
         <Label Content="(0, 0)" Height="25" HorizontalAlignment="Center" Margin="0,-275,0,0" Name="coords2" VerticalAlignment="Center" />
         <Label Content="m" Height="25" HorizontalAlignment="Center" Margin="150,-325,0,0" Name="node1Units" VerticalAlignment="Center"/>
         <Label Content="m" Height="25" HorizontalAlignment="Center" Margin="150,-275,0,0" Name="node2Units" VerticalAlignment="Center" />
-        <GroupBox Header="N (+ve outward)" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="nGroup" VerticalAlignment="Center">
+        <GroupBox Header="N (+ve inward)" FontWeight="Bold" Height="120" HorizontalAlignment="Stretch" Margin="10,-100,10,0" Name="nGroup" VerticalAlignment="Center">
             <Grid>
                 <CheckBox Content="Is Loaded" Height="16" HorizontalAlignment="Center" Margin="0,-70,0,0" Name="isLoadedN" VerticalAlignment="Center" Checked="isLoadedN_Checked" Unchecked="isLoadedN_Unchecked" />
                 <Label Content="Node 1 Load" FontWeight="Normal" Height="25" HorizontalAlignment="Center" Margin="-140,-20,0,0" VerticalAlignment="Center" FontSize="11" />

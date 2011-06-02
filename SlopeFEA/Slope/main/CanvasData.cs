@@ -1527,6 +1527,8 @@ namespace SlopeFEA
                 this.tLoad1 = 0.0;
                 this.tLoad2 = 0.0;
             }
+
+            Update();
         }
 
         /// <summary>
@@ -1564,15 +1566,15 @@ namespace SlopeFEA
                 loadLines[i0].Points[1] = plotPoint + 10 * norm;
                 loadLines[i0].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
                 // normal load arrow head 1
-                loadLines[i1].Points[0] = posNLoad ? loadLines[i0].Points[1] : loadLines[i0].Points[0];
-                loadLines[i1].Points[1] = posNLoad ? (Point) (6 * norm) : (Point) (-6 * norm);
+                loadLines[i1].Points[0] = posNLoad ? loadLines[i0].Points[0] : loadLines[i0].Points[1];
+                loadLines[i1].Points[1] = posNLoad ? (Point) (-6 * norm) : (Point) (6 * norm);
                 xprime = loadLines[i1].Points[1].X * Cpos - loadLines[i1].Points[1].Y * Spos + loadLines[i1].Points[0].X;
                 yprime = loadLines[i1].Points[1].X * Spos + loadLines[i1].Points[1].Y * Cpos + loadLines[i1].Points[0].Y;
                 loadLines[i1].Points[1] = new Point( xprime, yprime );
                 loadLines[i1].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
                 // normal load arrow head 2
-                loadLines[i2].Points[0] = posNLoad ? loadLines[i0].Points[1] : loadLines[i0].Points[0];
-                loadLines[i2].Points[1] = posNLoad ? (Point) (6 * norm) : (Point) (-6 * norm);
+                loadLines[i2].Points[0] = posNLoad ? loadLines[i0].Points[0] : loadLines[i0].Points[1];
+                loadLines[i2].Points[1] = posNLoad ? (Point) (-6 * norm) : (Point) (6 * norm);
                 xprime = loadLines[i2].Points[1].X * Cneg - loadLines[i2].Points[1].Y * Sneg + loadLines[i2].Points[0].X;
                 yprime = loadLines[i2].Points[1].X * Sneg + loadLines[i2].Points[1].Y * Cneg + loadLines[i2].Points[0].Y;
                 loadLines[i2].Points[1] = new Point( xprime, yprime );

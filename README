@@ -201,3 +201,9 @@ REVISION HISTORY:
 === (SlopeCanvas.cs) Modified order of plotting so that loads and fixities always get plotted on top
 === (CanvasData.cs) Modified LineLoad.Update() to plot three lines instead of just one
 +++ (Multiple files) Added in-built NULL material; when this material is assigned to a block, the mesh generator skips the block
+
+
+[02 June 2011]
+
+{v1.0.0.8}
+=== (AddLineLoadDialog.xaml, CanvasData.cs) Changed N load to +ve inward [i.e. tending toward CCW rotation]
