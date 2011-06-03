@@ -118,7 +118,7 @@ Number of Line Constraints = 2
 5, 0, True, False
 1, 2, True, False
 Number of Line Loads = 1
-3, 4, True, 10, 20, True, -5, -10
+3, 4, True, -10, -20, True, -5, -10
 Number of Point Loads = 1
 4, True, -10, True, -20
 

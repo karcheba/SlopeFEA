@@ -217,3 +217,4 @@ REVISION HISTORY:
 {v1.0.0.9}
 +++ (Fortran Testing/) Added directory for Fortran 90/95 examples [after [7] and [8]]
 +++ (*.for) Added tutorials completed previously, converted to fixed-format, and compiled with gfortran
+=== (AddLineLoad.xaml, CanvasData.cs) Changed +ve direction for N loading back to outward [CW rotation about node 1]
