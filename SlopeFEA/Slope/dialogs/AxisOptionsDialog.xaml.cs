@@ -48,15 +48,15 @@ namespace SlopeFEA
 
             canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
-            xMax.Text = String.Format( "{0}", Math.Round( canvas.XAxisMax, 2 ) );
-            xMin.Text = String.Format( "{0}", Math.Round( canvas.XAxisMin, 2 ) );
-            xMajor.Text = String.Format( "{0}", Math.Round( canvas.XMajorDivision, 2 ) );
-            xMinor.Text = String.Format( "{0}", canvas.XMinorDivisions );
+            xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
+            xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
+            xMajor.Text = String.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
+            xMinor.Text = String.Format( "{0}" , canvas.XMinorDivisions );
 
-            yMax.Text = String.Format( "{0}", Math.Round( canvas.YAxisMax, 2 ) );
-            yMin.Text = String.Format( "{0}", Math.Round( canvas.YAxisMin, 2 ) );
-            yMajor.Text = String.Format( "{0}", Math.Round( canvas.YMajorDivision, 2 ) );
-            yMinor.Text = String.Format( "{0}", canvas.YMinorDivisions );
+            yMax.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
+            yMin.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
+            yMajor.Text = String.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
+            yMinor.Text = String.Format( "{0}" , canvas.YMinorDivisions );
 
             string units;
             switch ( canvas.Units )
@@ -76,81 +76,81 @@ namespace SlopeFEA
             yMajorUnits.Content = units;
         }
 
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
-            double xmax, xmin, xmajor;
-            double ymax, ymin, ymajor;
-            int xminor, yminor;
+            double xmax , xmin , xmajor;
+            double ymax , ymin , ymajor;
+            int xminor , yminor;
 
-            if ( !double.TryParse( xMax.Text, out xmax ) )
+            if ( !double.TryParse( xMax.Text , out xmax ) )
             {
-                MessageBox.Show( "Max X must be a numeric value.", "Error" );
+                MessageBox.Show( "Max X must be a numeric value." , "Error" );
                 return;
             }
 
-            if ( !double.TryParse( xMin.Text, out xmin ) )
+            if ( !double.TryParse( xMin.Text , out xmin ) )
             {
-                MessageBox.Show( "Min X must be a numeric value.", "Error" );
+                MessageBox.Show( "Min X must be a numeric value." , "Error" );
                 return;
             }
 
-            if ( !double.TryParse( xMajor.Text, out xmajor ) )
+            if ( !double.TryParse( xMajor.Text , out xmajor ) )
             {
-                MessageBox.Show( "Major X division must be a numeric value.", "Error" );
+                MessageBox.Show( "Major X division must be a numeric value." , "Error" );
                 return;
             }
 
             if ( xmajor <= 0 )
             {
-                MessageBox.Show( "Major X division must be greater than zero.", "Error" );
+                MessageBox.Show( "Major X division must be greater than zero." , "Error" );
                 return;
             }
 
-            if ( !int.TryParse( xMinor.Text, out xminor ) )
+            if ( !int.TryParse( xMinor.Text , out xminor ) )
             {
-                MessageBox.Show( "Minor X division count must be an integer.", "Error" );
+                MessageBox.Show( "Minor X division count must be an integer." , "Error" );
                 return;
             }
 
             if ( xminor <= 0 )
             {
-                MessageBox.Show( "Minor X division count must be greater than zero.", "Error" );
+                MessageBox.Show( "Minor X division count must be greater than zero." , "Error" );
                 return;
             }
 
-            if ( !double.TryParse( yMax.Text, out ymax ) )
+            if ( !double.TryParse( yMax.Text , out ymax ) )
             {
-                MessageBox.Show( "Max Y must be a numeric value.", "Error" );
+                MessageBox.Show( "Max Y must be a numeric value." , "Error" );
                 return;
             }
 
-            if ( !double.TryParse( yMin.Text, out ymin ) )
+            if ( !double.TryParse( yMin.Text , out ymin ) )
             {
-                MessageBox.Show( "Min Y must be a numeric value.", "Error" );
+                MessageBox.Show( "Min Y must be a numeric value." , "Error" );
                 return;
             }
 
-            if ( !double.TryParse( yMajor.Text, out ymajor ) )
+            if ( !double.TryParse( yMajor.Text , out ymajor ) )
             {
-                MessageBox.Show( "Major Y division must be a numeric value.", "Error" );
+                MessageBox.Show( "Major Y division must be a numeric value." , "Error" );
                 return;
             }
 
             if ( ymajor <= 0 )
             {
-                MessageBox.Show( "Major Y division must be greater than zero.", "Error" );
+                MessageBox.Show( "Major Y division must be greater than zero." , "Error" );
                 return;
             }
 
-            if ( !int.TryParse( yMinor.Text, out yminor ) )
+            if ( !int.TryParse( yMinor.Text , out yminor ) )
             {
-                MessageBox.Show( "Minor Y division count must be an integer.", "Error" );
+                MessageBox.Show( "Minor Y division count must be an integer." , "Error" );
                 return;
             }
 
             if ( yminor <= 0 )
             {
-                MessageBox.Show( "Minor Y division count must be greater than zero.", "Error" );
+                MessageBox.Show( "Minor Y division count must be greater than zero." , "Error" );
                 return;
             }
 
@@ -175,17 +175,17 @@ namespace SlopeFEA
 
             if ( xmax == 0 && xmin == 0 )
             {
-                MessageBox.Show( "Difference between minimum X and maximum X must be non-zero.", "Error" );
+                MessageBox.Show( "Difference between minimum X and maximum X must be non-zero." , "Error" );
                 return;
             }
 
             if ( ymax == 0 && ymin == 0 )
             {
-                MessageBox.Show( "Difference between minimum Y and maximum Y must be non-zero.", "Error" );
+                MessageBox.Show( "Difference between minimum Y and maximum Y must be non-zero." , "Error" );
                 return;
             }
 
-            double ratio, diff;
+            double ratio , diff;
 
             ratio = xmax / xmajor;
             diff = ratio - Math.Truncate( ratio );

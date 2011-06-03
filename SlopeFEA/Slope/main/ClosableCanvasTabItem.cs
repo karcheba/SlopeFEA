@@ -70,7 +70,7 @@ class ClosableCanvasTabItem : TabItem
         xAxis.Background = Brushes.WhiteSmoke;
         xAxis.VerticalAlignment = VerticalAlignment.Bottom;
         xAxis.HorizontalAlignment = HorizontalAlignment.Stretch;
-        xAxis.Margin = new Thickness( axisWidth, 0, 0, 10 );
+        xAxis.Margin = new Thickness( axisWidth , 0 , 0 , 10 );
         xAxis.Height = axisWidth;
         contentGrid.Children.Add( xAxis );
 
@@ -80,7 +80,7 @@ class ClosableCanvasTabItem : TabItem
         yAxis.Background = Brushes.WhiteSmoke;
         yAxis.VerticalAlignment = VerticalAlignment.Stretch;
         yAxis.HorizontalAlignment = HorizontalAlignment.Left;
-        yAxis.Margin = new Thickness( 0, 0, 0, axisWidth + 10 );
+        yAxis.Margin = new Thickness( 0 , 0 , 0 , axisWidth + 10 );
         yAxis.Width = axisWidth;
         contentGrid.Children.Add( yAxis );
 
@@ -89,7 +89,7 @@ class ClosableCanvasTabItem : TabItem
         drawingCanvas.Background = Brushes.White;
         drawingCanvas.VerticalAlignment = VerticalAlignment.Stretch;
         drawingCanvas.HorizontalAlignment = HorizontalAlignment.Stretch;
-        drawingCanvas.Margin = new Thickness( axisWidth, 0, 0, axisWidth + 10 );
+        drawingCanvas.Margin = new Thickness( axisWidth , 0 , 0 , axisWidth + 10 );
         drawingCanvas.InitializeCanvas();
         contentGrid.Children.Add( drawingCanvas );
 
@@ -97,7 +97,7 @@ class ClosableCanvasTabItem : TabItem
         analysisProgress.Height = 10;
         analysisProgress.VerticalAlignment = VerticalAlignment.Bottom;
         analysisProgress.HorizontalAlignment = HorizontalAlignment.Stretch;
-        analysisProgress.Margin = new Thickness( 0, 0, 0, 0 );
+        analysisProgress.Margin = new Thickness( 0 , 0 , 0 , 0 );
         analysisProgress.Visibility = Visibility.Hidden;
         contentGrid.Children.Add( analysisProgress );
 
@@ -107,7 +107,7 @@ class ClosableCanvasTabItem : TabItem
         hideCanvasRect.Stroke = Brushes.White;
         hideCanvasRect.VerticalAlignment = VerticalAlignment.Stretch;
         hideCanvasRect.HorizontalAlignment = HorizontalAlignment.Stretch;
-        hideCanvasRect.Margin = new Thickness( axisWidth, 0, 0, axisWidth + 10 );
+        hideCanvasRect.Margin = new Thickness( axisWidth , 0 , 0 , axisWidth + 10 );
         hideCanvasRect.Visibility = Visibility.Hidden;
         contentGrid.Children.Add( hideCanvasRect );
     }
@@ -150,7 +150,7 @@ class ClosableCanvasTabItem : TabItem
 
         xStatus.Content = "X";
         yStatus.Content = "Y";
-        scaleStatus.Content = String.Format( "Scale = {0} : 1", Math.Round( canvas.Scale, 2 ) );
+        scaleStatus.Content = String.Format( "Scale = {0} : 1" , Math.Round( canvas.Scale , 2 ) );
 
         Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) this.Parent).Parent).Children[0]).Children[0];
         MenuItem fileMenu = (MenuItem) mainMenu.Items[0];
@@ -387,7 +387,7 @@ class ClosableCanvasTabItem : TabItem
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tabClose_MouseEnter ( object sender, MouseEventArgs e )
+    private void tabClose_MouseEnter ( object sender , MouseEventArgs e )
     {
         ((ClosableHeader) this.Header).tabClose.Foreground = Brushes.Red;
     }
@@ -397,7 +397,7 @@ class ClosableCanvasTabItem : TabItem
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tabClose_MouseLeave ( object sender, MouseEventArgs e )
+    private void tabClose_MouseLeave ( object sender , MouseEventArgs e )
     {
         ((ClosableHeader) this.Header).tabClose.Foreground = Brushes.Black;
     }
@@ -407,7 +407,7 @@ class ClosableCanvasTabItem : TabItem
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tabClose_Click ( object sender, RoutedEventArgs e )
+    private void tabClose_Click ( object sender , RoutedEventArgs e )
     {
         StatusBar status = (StatusBar) ((DockPanel) ((Grid) ((TabControl) this.Parent).Parent).Children[1]).Children[0];
         StatusBarItem xStatus = (StatusBarItem) status.Items[0];
@@ -465,8 +465,8 @@ class ClosableCanvasTabItem : TabItem
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="?"></param>
-    private void tabTitle_SizeChanged ( object sender, SizeChangedEventArgs e )
+    private void tabTitle_SizeChanged ( object sender , SizeChangedEventArgs e )
     {
-        ((ClosableHeader) this.Header).tabClose.Margin = new Thickness( ((ClosableHeader) this.Header).tabTitle.ActualWidth + 5, 3, 4, 0 );
+        ((ClosableHeader) this.Header).tabClose.Margin = new Thickness( ((ClosableHeader) this.Header).tabTitle.ActualWidth + 5 , 3 , 4 , 0 );
     }
 }

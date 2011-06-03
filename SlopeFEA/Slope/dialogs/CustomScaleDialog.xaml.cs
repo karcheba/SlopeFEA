@@ -52,23 +52,23 @@ namespace SlopeFEA
 
             canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
-            scale.Text = String.Format( "{0}", Math.Round( canvas.Scale, 2 ) );
+            scale.Text = String.Format( "{0}" , Math.Round( canvas.Scale , 2 ) );
         }
 
         /// <summary>
         /// Accept input and return to main window.
         /// </summary>
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
             double output;
-            if ( double.TryParse( scale.Text, out output ) && output >= 0 )
+            if ( double.TryParse( scale.Text , out output ) && output >= 0 )
             {
                 // Close dialog
                 this.DialogResult = true;
             }
             else
             {
-                MessageBox.Show( "Must enter a positive numeric value.", "Error" );
+                MessageBox.Show( "Must enter a positive numeric value." , "Error" );
             }
         }
     }

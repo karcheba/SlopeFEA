@@ -45,7 +45,7 @@ namespace SlopeFEA
         private bool isLocalCritical = false;
         private bool isFilled = false;
 
-        public DisplayCircularSurface ( SlopeCanvas canvas, Point enter, Point exit, double radius )
+        public DisplayCircularSurface ( SlopeCanvas canvas , Point enter , Point exit , double radius )
         {
             this.canvas = canvas;
 
@@ -66,7 +66,7 @@ namespace SlopeFEA
             surfaceGeom.Figures.Add( surfaceFigure );
 
             surfaceArc = new ArcSegment();
-            surfaceArc.Size = new Size( radius, radius );
+            surfaceArc.Size = new Size( radius , radius );
             surfaceArc.Point = exit;
             surfaceArc.SweepDirection = SweepDirection.Counterclockwise;
             surfaceArc.IsLargeArc = false;
@@ -161,7 +161,7 @@ namespace SlopeFEA
             surfaceArc.Point = p;
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
             Point p;
 
@@ -175,17 +175,17 @@ namespace SlopeFEA
             p.Y = centre.Y + factor * (p.Y - centre.Y);
             surfaceArc.Point = p;
 
-            surfaceArc.Size = new Size( factor * surfaceArc.Size.Width, factor * surfaceArc.Size.Height );
+            surfaceArc.Size = new Size( factor * surfaceArc.Size.Width , factor * surfaceArc.Size.Height );
         }
     }
 
     public class CircularSurface
     {
-        private double x, y, r,
-                        height, yBoundMin,
-                        yMin, yMax,
-                        rMin, rMax,
-                        xMin, xMax;
+        private double x , y , r ,
+                        height , yBoundMin ,
+                        yMin , yMax ,
+                        rMin , rMax ,
+                        xMin , xMax;
 
         private SoilMovement soilDirection;
 
@@ -194,9 +194,9 @@ namespace SlopeFEA
 
         private Random random;
 
-        public CircularSurface ( double x, double y, double r, double sf,
-                                double xEnter, double yEnter,
-                                double xExit, double yExit )
+        public CircularSurface ( double x , double y , double r , double sf ,
+                                double xEnter , double yEnter ,
+                                double xExit , double yExit )
         {
             random = new Random();
 
@@ -210,8 +210,8 @@ namespace SlopeFEA
             this.YExit = yExit;
         }
 
-        public CircularSurface ( List<Point> surface, double yBoundMin,
-                                List<double> radiusBreaks, SoilMovement soilDirection )
+        public CircularSurface ( List<Point> surface , double yBoundMin ,
+                                List<double> radiusBreaks , SoilMovement soilDirection )
         {
             random = new Random();
 
@@ -227,9 +227,9 @@ namespace SlopeFEA
             this.height = Math.Abs( surface[0].Y - surface[surface.Count - 1].Y );
         }
 
-        public CircularSurface ( List<Point> surface, double yBoundMin,
-                                List<double> radiusBreaks, SoilMovement soilDirection,
-                                double x, double y, double r, List<double> limits )
+        public CircularSurface ( List<Point> surface , double yBoundMin ,
+                                List<double> radiusBreaks , SoilMovement soilDirection ,
+                                double x , double y , double r , List<double> limits )
         {
             random = new Random();
 
@@ -251,11 +251,11 @@ namespace SlopeFEA
             this.rMax = limits[5];
         }
 
-        public CircularSurface ( List<Point> surface, double yBoundMin,
-                                List<double> radiusBreaks, SoilMovement soilDirection,
-                                double x, double y, double r, List<double> limits,
-                                double sf, double xEnter, double yEnter,
-                                double xExit, double yExit )
+        public CircularSurface ( List<Point> surface , double yBoundMin ,
+                                List<double> radiusBreaks , SoilMovement soilDirection ,
+                                double x , double y , double r , List<double> limits ,
+                                double sf , double xEnter , double yEnter ,
+                                double xExit , double yExit )
         {
             random = new Random();
 
@@ -373,7 +373,7 @@ namespace SlopeFEA
 
         public void SetYLimits ()
         {
-            yMin = Math.Max( surface[0].Y, surface[surface.Count - 1].Y );
+            yMin = Math.Max( surface[0].Y , surface[surface.Count - 1].Y );
 
             yMax = yMin + 1.5 * height;
         }
@@ -396,12 +396,12 @@ namespace SlopeFEA
 
         public void SetXLimits ()
         {
-            double yLowest, yRadius = radiusBreaks[0],
-                    x1 = surface[0].X, y1 = surface[0].Y,
-                    x2 = surface[0].X, y2 = surface[0].Y,
-                    v = 0, w = 0, m = 0, c = 0,
-                    mSq = 0, rSq,
-                    A, B, C, toler = 1e-5;
+            double yLowest , yRadius = radiusBreaks[0] ,
+                    x1 = surface[0].X , y1 = surface[0].Y ,
+                    x2 = surface[0].X , y2 = surface[0].Y ,
+                    v = 0 , w = 0 , m = 0 , c = 0 ,
+                    mSq = 0 , rSq ,
+                    A , B , C , toler = 1e-5;
 
             bool vert;
 
@@ -409,7 +409,7 @@ namespace SlopeFEA
             yLowest = y - r;
 
             // Compute square of radius (for efficiency)
-            rSq = Math.Pow( r, 2 );
+            rSq = Math.Pow( r , 2 );
 
             // Shortcut if lowest point is below toe of slope
             if ( yLowest <= radiusBreaks[0] )
@@ -417,15 +417,15 @@ namespace SlopeFEA
                 // Sub min x in boundary surface
                 A = 1.0;
                 B = -2 * surface[0].X;
-                C = Math.Pow( B / 2, 2 ) + Math.Pow( surface[0].Y - this.y, 2 ) - rSq;
+                C = Math.Pow( B / 2 , 2 ) + Math.Pow( surface[0].Y - this.y , 2 ) - rSq;
 
-                xMin = (-B + Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                xMin = (-B + Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                 // Sub max x in boundary surface
                 B = -2 * surface[surface.Count - 1].X;
-                C = Math.Pow( B / 2, 2 ) + Math.Pow( surface[surface.Count - 1].Y - this.y, 2 ) - rSq;
+                C = Math.Pow( B / 2 , 2 ) + Math.Pow( surface[surface.Count - 1].Y - this.y , 2 ) - rSq;
 
-                xMax = (-B - Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                xMax = (-B - Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                 return;
             }
@@ -447,9 +447,9 @@ namespace SlopeFEA
                 // through xMin on upper surface
                 A = 1.0;
                 B = -2 * surface[0].X;
-                C = Math.Pow( B / 2, 2 ) + Math.Pow( surface[0].Y - this.y, 2 ) - rSq;
+                C = Math.Pow( B / 2 , 2 ) + Math.Pow( surface[0].Y - this.y , 2 ) - rSq;
 
-                xMin = (-B + Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                xMin = (-B + Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                 // Find start and end points of tangent line for xMax
                 for ( int i = 0 ; i < surface.Count - 1 ; i++ )
@@ -471,7 +471,7 @@ namespace SlopeFEA
                 if ( !vert )
                 {
                     m = (y2 - y1) / (x2 - x1);
-                    mSq = Math.Pow( m, 2 );
+                    mSq = Math.Pow( m , 2 );
                     c = y1 - m * x1;
                 }
 
@@ -489,10 +489,10 @@ namespace SlopeFEA
                 {
                     A = mSq * (1 + mSq);
                     B = 2 * m * (1 + mSq) * (c - this.y);
-                    C = (1 + mSq) * Math.Pow( c - this.y, 2 ) - rSq;
+                    C = (1 + mSq) * Math.Pow( c - this.y , 2 ) - rSq;
 
                     // ADD the discriminant
-                    v = (-B + Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                    v = (-B + Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                     // Check that (v,w) lies on the line segment
                     if ( v > x1 )
@@ -505,9 +505,9 @@ namespace SlopeFEA
                     {
                         A = 1.0;
                         B = -2 * x1;
-                        C = Math.Pow( x1, 2 ) + Math.Pow( y1 - this.y, 2 ) - rSq;
+                        C = Math.Pow( x1 , 2 ) + Math.Pow( y1 - this.y , 2 ) - rSq;
 
-                        xMax = (-B + Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                        xMax = (-B + Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
                     }
                 }
                 else
@@ -517,9 +517,9 @@ namespace SlopeFEA
 
                     A = 1.0;
                     B = -2 * x1;
-                    C = Math.Pow( x1, 2 ) + Math.Pow( y1 - this.y, 2 ) - rSq;
+                    C = Math.Pow( x1 , 2 ) + Math.Pow( y1 - this.y , 2 ) - rSq;
 
-                    xMax = (-B + Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                    xMax = (-B + Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
                 }
 
                 xMax -= 0.025 / 1.5 * height;
@@ -532,9 +532,9 @@ namespace SlopeFEA
                 // through xMax on upper surface
                 A = 1.0;
                 B = -2 * surface[surface.Count - 1].X;
-                C = Math.Pow( B / 2, 2 ) + Math.Pow( surface[surface.Count - 1].Y - this.y, 2 ) - rSq;
+                C = Math.Pow( B / 2 , 2 ) + Math.Pow( surface[surface.Count - 1].Y - this.y , 2 ) - rSq;
 
-                xMax = (-B - Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                xMax = (-B - Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                 // Find start and end points of tangent line for xMin
                 for ( int i = 0 ; i < surface.Count ; i++ )
@@ -556,7 +556,7 @@ namespace SlopeFEA
                 if ( !vert )
                 {
                     m = (y2 - y1) / (x2 - x1);
-                    mSq = Math.Pow( m, 2 );
+                    mSq = Math.Pow( m , 2 );
                     c = y1 - m * x1;
                 }
 
@@ -574,10 +574,10 @@ namespace SlopeFEA
                 {
                     A = mSq * (1 + mSq);
                     B = 2 * m * (1 + mSq) * (c - this.y);
-                    C = (1 + mSq) * Math.Pow( c - this.y, 2 ) - rSq;
+                    C = (1 + mSq) * Math.Pow( c - this.y , 2 ) - rSq;
 
                     // SUBTRACT the discriminant
-                    v = (-B - Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                    v = (-B - Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
 
                     // Check that (v,w) lies on the line segment
                     if ( v < x2 )
@@ -590,9 +590,9 @@ namespace SlopeFEA
                     {
                         A = 1.0;
                         B = -2 * x2;
-                        C = Math.Pow( x2, 2 ) + Math.Pow( y2 - this.y, 2 ) - rSq;
+                        C = Math.Pow( x2 , 2 ) + Math.Pow( y2 - this.y , 2 ) - rSq;
 
-                        xMin = (-B - Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                        xMin = (-B - Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
                     }
                 }
                 else
@@ -602,9 +602,9 @@ namespace SlopeFEA
 
                     A = 1.0;
                     B = -2 * x2;
-                    C = Math.Pow( x2, 2 ) + Math.Pow( y2 - this.y, 2 ) - rSq;
+                    C = Math.Pow( x2 , 2 ) + Math.Pow( y2 - this.y , 2 ) - rSq;
 
-                    xMin = (-B - Math.Sqrt( Math.Pow( B, 2 ) - 4 * A * C )) / (2 * A);
+                    xMin = (-B - Math.Sqrt( Math.Pow( B , 2 ) - 4 * A * C )) / (2 * A);
                 }
 
                 xMin += 0.025 / 1.5 * height;

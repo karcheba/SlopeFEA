@@ -50,11 +50,11 @@ namespace SlopeFEA
 
             population.Text = canvas.GeneticAlgorithmParameters.Population.ToString();
             generations.Text = canvas.GeneticAlgorithmParameters.Generations.ToString();
-            fittest.Text = String.Format( "{0}", Math.Round( canvas.GeneticAlgorithmParameters.FittestProportion, 3 ) );
-            mating.Text = String.Format( "{0}", Math.Round( canvas.GeneticAlgorithmParameters.MatingPoolProportion, 3 ) );
-            crossover.Text = String.Format( "{0}", Math.Round( canvas.GeneticAlgorithmParameters.CrossoverProbability, 3 ) );
-            mutation.Text = String.Format( "{0}", Math.Round( canvas.GeneticAlgorithmParameters.MutationProbability, 3 ) );
-            slicewidth.Text = String.Format( "{0}", Math.Round( canvas.GeneticAlgorithmParameters.SliceWidth, 2 ) );
+            fittest.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.FittestProportion , 3 ) );
+            mating.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MatingPoolProportion , 3 ) );
+            crossover.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.CrossoverProbability , 3 ) );
+            mutation.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MutationProbability , 3 ) );
+            slicewidth.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.SliceWidth , 2 ) );
 
             string units;
             switch ( canvas.Units )
@@ -67,54 +67,54 @@ namespace SlopeFEA
             sliceUnits.Content = units;
         }
 
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
             int newPop;
-            if ( !int.TryParse( population.Text, out newPop ) || newPop <= 0 )
+            if ( !int.TryParse( population.Text , out newPop ) || newPop <= 0 )
             {
-                MessageBox.Show( "Population must be a positive integer.", "Error" );
+                MessageBox.Show( "Population must be a positive integer." , "Error" );
                 return;
             }
 
             int newGens;
-            if ( !int.TryParse( generations.Text, out newGens ) || newGens <= 0 )
+            if ( !int.TryParse( generations.Text , out newGens ) || newGens <= 0 )
             {
-                MessageBox.Show( "Number of generations must be a positive integer.", "Error" );
+                MessageBox.Show( "Number of generations must be a positive integer." , "Error" );
                 return;
             }
 
             double newFittest;
-            if ( !double.TryParse( fittest.Text, out newFittest ) || newFittest <= 0 || newFittest > 1 )
+            if ( !double.TryParse( fittest.Text , out newFittest ) || newFittest <= 0 || newFittest > 1 )
             {
-                MessageBox.Show( "Fittest proportion must be a number in the range: 0 < x <= 1", "Error" );
+                MessageBox.Show( "Fittest proportion must be a number in the range: 0 < x <= 1" , "Error" );
                 return;
             }
 
             double newMating;
-            if ( !double.TryParse( mating.Text, out newMating ) || newMating <= 0 || newMating > 1 )
+            if ( !double.TryParse( mating.Text , out newMating ) || newMating <= 0 || newMating > 1 )
             {
-                MessageBox.Show( "Mating pool proportion must be a number in the range: 0 < x <= 1", "Error" );
+                MessageBox.Show( "Mating pool proportion must be a number in the range: 0 < x <= 1" , "Error" );
                 return;
             }
 
             double newCrossover;
-            if ( !double.TryParse( crossover.Text, out newCrossover ) || newCrossover <= 0 || newCrossover > 1 )
+            if ( !double.TryParse( crossover.Text , out newCrossover ) || newCrossover <= 0 || newCrossover > 1 )
             {
-                MessageBox.Show( "Crossover probability must be a number in the range: 0 < x <= 1", "Error" );
+                MessageBox.Show( "Crossover probability must be a number in the range: 0 < x <= 1" , "Error" );
                 return;
             }
 
             double newMutation;
-            if ( !double.TryParse( mutation.Text, out newMutation ) || newMutation <= 0 || newMutation > 1 )
+            if ( !double.TryParse( mutation.Text , out newMutation ) || newMutation <= 0 || newMutation > 1 )
             {
-                MessageBox.Show( "Mutation probability must be a number in the range: 0 < x <= 1", "Error" );
+                MessageBox.Show( "Mutation probability must be a number in the range: 0 < x <= 1" , "Error" );
                 return;
             }
 
             double newSlice;
-            if ( !double.TryParse( slicewidth.Text, out newSlice ) || newSlice <= 0 )
+            if ( !double.TryParse( slicewidth.Text , out newSlice ) || newSlice <= 0 )
             {
-                MessageBox.Show( "Slice width must be a positive number", "Error" );
+                MessageBox.Show( "Slice width must be a positive number" , "Error" );
                 return;
             }
 

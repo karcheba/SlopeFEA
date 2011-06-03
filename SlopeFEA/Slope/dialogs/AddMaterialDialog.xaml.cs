@@ -77,7 +77,7 @@ namespace SlopeFEA
             colour.Fill = Brushes.Transparent;
         }
 
-        private void materialList_SelectionChanged ( object sender, SelectionChangedEventArgs e )
+        private void materialList_SelectionChanged ( object sender , SelectionChangedEventArgs e )
         {
             if ( materialList.SelectedItem is MaterialType )
             {
@@ -88,11 +88,11 @@ namespace SlopeFEA
                 MaterialType currMaterial = materialList.SelectedItem as MaterialType;
 
                 colour.Fill = currMaterial.Fill;
-                phi.Text = String.Format( "{0}", Math.Round( currMaterial.Phi, 2 ) );
-                coh.Text = String.Format( "{0}", Math.Round( currMaterial.Cohesion, 2 ) );
-                gamma.Text = String.Format( "{0}", Math.Round( currMaterial.Gamma, 2 ) );
-                emod.Text = String.Format( "{0}", Math.Round( currMaterial.Emod, 2 ) );
-                nu.Text = String.Format( "{0}", Math.Round( currMaterial.Nu, 2 ) );
+                phi.Text = String.Format( "{0}" , Math.Round( currMaterial.Phi , 2 ) );
+                coh.Text = String.Format( "{0}" , Math.Round( currMaterial.Cohesion , 2 ) );
+                gamma.Text = String.Format( "{0}" , Math.Round( currMaterial.Gamma , 2 ) );
+                emod.Text = String.Format( "{0}" , Math.Round( currMaterial.Emod , 2 ) );
+                nu.Text = String.Format( "{0}" , Math.Round( currMaterial.Nu , 2 ) );
             }
             else
             {
@@ -112,7 +112,7 @@ namespace SlopeFEA
             }
         }
 
-        private void chooseColour_Click ( object sender, RoutedEventArgs e )
+        private void chooseColour_Click ( object sender , RoutedEventArgs e )
         {
             System.Windows.Forms.ColorDialog colourDlg = new System.Windows.Forms.ColorDialog();
             colourDlg.AllowFullOpen = true;
@@ -128,60 +128,60 @@ namespace SlopeFEA
             colour.Fill = new SolidColorBrush( newColour );
         }
 
-        private void add_Click ( object sender, RoutedEventArgs e )
+        private void add_Click ( object sender , RoutedEventArgs e )
         {
             MaterialType newMaterial = new MaterialType();
 
             if ( materialList.Text == "Add new material..." || materialList.Text == "" )
             {
-                MessageBox.Show( "Must give the material a name.", "Error" );
+                MessageBox.Show( "Must give the material a name." , "Error" );
                 return;
             }
 
             if ( colour.Fill == Brushes.Transparent )
             {
-                MessageBox.Show( "Must define a colour.", "Error" );
+                MessageBox.Show( "Must define a colour." , "Error" );
                 return;
             }
 
             double newPhi;
-            if ( !double.TryParse( phi.Text, out newPhi ) || newPhi < 0 )
+            if ( !double.TryParse( phi.Text , out newPhi ) || newPhi < 0 )
             {
-                MessageBox.Show( "Phi must be a positive number.", "Error" );
+                MessageBox.Show( "Phi must be a positive number." , "Error" );
                 return;
             }
 
             double newCoh;
-            if ( !double.TryParse( coh.Text, out newCoh ) || newCoh < 0 )
+            if ( !double.TryParse( coh.Text , out newCoh ) || newCoh < 0 )
             {
-                MessageBox.Show( "Cohesion must be a positive number.", "Error" );
+                MessageBox.Show( "Cohesion must be a positive number." , "Error" );
                 return;
             }
 
             double newGamma;
-            if ( !double.TryParse( gamma.Text, out newGamma ) || newGamma < 0 )
+            if ( !double.TryParse( gamma.Text , out newGamma ) || newGamma < 0 )
             {
-                MessageBox.Show( "Gamma must be a positive number.", "Error" );
+                MessageBox.Show( "Gamma must be a positive number." , "Error" );
                 return;
             }
 
             double newEmod;
-            if ( !double.TryParse( emod.Text, out newEmod ) || newEmod < 0 )
+            if ( !double.TryParse( emod.Text , out newEmod ) || newEmod < 0 )
             {
-                MessageBox.Show( "Elastic modulus must be a positive number.", "Error" );
+                MessageBox.Show( "Elastic modulus must be a positive number." , "Error" );
                 return;
             }
 
             double newNu;
-            if ( !double.TryParse( nu.Text, out newNu ) || newNu < 0 || newNu >= 0.5 )
+            if ( !double.TryParse( nu.Text , out newNu ) || newNu < 0 || newNu >= 0.5 )
             {
-                MessageBox.Show( "Poisson's ratio must be a number in the range: 0 <= nu < 0.5", "Error" );
+                MessageBox.Show( "Poisson's ratio must be a number in the range: 0 <= nu < 0.5" , "Error" );
                 return;
             }
 
             if ( materialList.Text == "NULL" )
             {
-                MessageBox.Show( "NULL material name is reserved.", "Error" );
+                MessageBox.Show( "NULL material name is reserved." , "Error" );
                 return;
             }
 
@@ -193,7 +193,7 @@ namespace SlopeFEA
             newMaterial.Emod = newEmod;
             newMaterial.Nu = newNu;
 
-            canvas.MaterialTypes.Insert( canvas.MaterialTypes.Count - 1, newMaterial );
+            canvas.MaterialTypes.Insert( canvas.MaterialTypes.Count - 1 , newMaterial );
 
             materialList.Items.Clear();
 
@@ -210,49 +210,49 @@ namespace SlopeFEA
             canvas.IsSaved = false;
         }
 
-        private void modify_Click ( object sender, RoutedEventArgs e )
+        private void modify_Click ( object sender , RoutedEventArgs e )
         {
 
             MaterialType currMaterial = materialList.SelectedItem as MaterialType;
 
             if ( colour.Fill == Brushes.Transparent )
             {
-                MessageBox.Show( "Must define a colour.", "Error" );
+                MessageBox.Show( "Must define a colour." , "Error" );
                 return;
             }
 
             double newPhi;
-            if ( !double.TryParse( phi.Text, out newPhi ) || newPhi < 0 )
+            if ( !double.TryParse( phi.Text , out newPhi ) || newPhi < 0 )
             {
-                MessageBox.Show( "Phi must be a positive number.", "Error" );
+                MessageBox.Show( "Phi must be a positive number." , "Error" );
                 return;
             }
 
             double newCoh;
-            if ( !double.TryParse( coh.Text, out newCoh ) || newCoh < 0 )
+            if ( !double.TryParse( coh.Text , out newCoh ) || newCoh < 0 )
             {
-                MessageBox.Show( "Cohesion must be a positive number.", "Error" );
+                MessageBox.Show( "Cohesion must be a positive number." , "Error" );
                 return;
             }
 
             double newGamma;
-            if ( !double.TryParse( gamma.Text, out newGamma ) || newGamma < 0 )
+            if ( !double.TryParse( gamma.Text , out newGamma ) || newGamma < 0 )
             {
-                MessageBox.Show( "Gamma must be a positive number.", "Error" );
+                MessageBox.Show( "Gamma must be a positive number." , "Error" );
                 return;
             }
 
             double newEmod;
-            if ( !double.TryParse( emod.Text, out newEmod ) || newEmod < 0 )
+            if ( !double.TryParse( emod.Text , out newEmod ) || newEmod < 0 )
             {
-                MessageBox.Show( "Elastic modulus must be a positive number.", "Error" );
+                MessageBox.Show( "Elastic modulus must be a positive number." , "Error" );
                 return;
             }
 
             double newNu;
-            if ( !double.TryParse( nu.Text, out newNu ) || newNu < 0 || newNu >= 0.5 )
+            if ( !double.TryParse( nu.Text , out newNu ) || newNu < 0 || newNu >= 0.5 )
             {
-                MessageBox.Show( "Poisson's ratio must be a number in the range: 0 <= nu < 0.5", "Error" );
+                MessageBox.Show( "Poisson's ratio must be a number in the range: 0 <= nu < 0.5" , "Error" );
                 return;
             }
 
@@ -269,7 +269,7 @@ namespace SlopeFEA
             canvas.IsSaved = false;
         }
 
-        private void remove_Click ( object sender, RoutedEventArgs e )
+        private void remove_Click ( object sender , RoutedEventArgs e )
         {
             MaterialType currMaterial = materialList.SelectedItem as MaterialType;
 

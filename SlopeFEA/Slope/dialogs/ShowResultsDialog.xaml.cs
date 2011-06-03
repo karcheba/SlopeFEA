@@ -46,7 +46,7 @@ namespace SlopeFEA
         private string resultsPath;
         private string[] resultsPathSplit;
         private List<string> results;
-        private double scale, dpiX, dpiY, originOffsetX, originOffsetY, factor, actualHeight;
+        private double scale , dpiX , dpiY , originOffsetX , originOffsetY , factor , actualHeight;
 
         public ShowResultsDialog ( Window owner )
         {
@@ -81,7 +81,7 @@ namespace SlopeFEA
                 case AnalysisType.Bishop: resultsPathSplit[resultsPathSplit.Length - 1] = "bish"; break;
                 default: resultsPathSplit[resultsPathSplit.Length - 1] = "rfem"; break;
             }
-            resultsPath = string.Join( ".", resultsPathSplit );
+            resultsPath = string.Join( "." , resultsPathSplit );
 
             // error catch to make sure results file exists
             if ( File.Exists( resultsPath ) )
@@ -101,8 +101,8 @@ namespace SlopeFEA
                 // loop through results file, adding an item for each run
                 while ( irun != -1 )
                 {
-                    selectRun.Items.Add( String.Format( "Run #{0}", run++ ) );
-                    irun = results.FindIndex( irun + 1, delegate( string s ) { return s.Contains( "Run #" ); } );
+                    selectRun.Items.Add( String.Format( "Run #{0}" , run++ ) );
+                    irun = results.FindIndex( irun + 1 , delegate( string s ) { return s.Contains( "Run #" ); } );
                 }
 
                 // set selected item to critical run
@@ -114,7 +114,7 @@ namespace SlopeFEA
             }
         }
 
-        private void selectRun_SelectionChanged ( object sender, SelectionChangedEventArgs e )
+        private void selectRun_SelectionChanged ( object sender , SelectionChangedEventArgs e )
         {
             // clear results listbox
             runResults.Text = "";
@@ -138,7 +138,7 @@ namespace SlopeFEA
                     delegate( string s ) { return s.Contains( "MOST CRITICAL SURFACE" ); } );
 
                 // read run number
-                run = int.Parse( results[icritical + 10].Split( new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries )[1] );
+                run = int.Parse( results[icritical + 10].Split( new char[] { '\t' } , StringSplitOptions.RemoveEmptyEntries )[1] );
             }
             else                                        // numbered runs
             {
@@ -148,7 +148,7 @@ namespace SlopeFEA
 
             // find index of run number
             int irun = results.FindIndex(
-                    delegate( string s ) { return s.Contains( String.Format( "Run #{0}", run ) ); } );
+                    delegate( string s ) { return s.Contains( String.Format( "Run #{0}" , run ) ); } );
 
             runResults.Text += results[irun] + "\n";        // add run number to results listbox
             runResults.Text += results[irun + 1] + "\n";    // add time stamp
@@ -156,7 +156,7 @@ namespace SlopeFEA
 
             // Read in local minimum surface data
             runResults.Text += results[irun + 3] + "\n";
-            string[] surfacedata = results[irun + 3].Split( new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries );
+            string[] surfacedata = results[irun + 3].Split( new char[] { '\t' } , StringSplitOptions.RemoveEmptyEntries );
 
             // Read in surface geometry
             double radius = double.Parse( surfacedata[2] );
@@ -173,8 +173,8 @@ namespace SlopeFEA
             yExit = actualHeight - (yExit / (factor * scale) * dpiY + originOffsetY);
 
             // Add to list of current run surfaces
-            runSurfaces.Add( new DisplayCircularSurface( canvas,
-                new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius ) );
+            runSurfaces.Add( new DisplayCircularSurface( canvas ,
+                new Point( xEnter , yEnter ) , new Point( xExit , yExit ) , radius ) );
 
             // Indicate that it is a local critical surface with thicker line
             runSurfaces[0].IsLocalCritical = true;
@@ -184,7 +184,7 @@ namespace SlopeFEA
             {
                 runResults.Text += results[irun + i] + "\n";
 
-                surfacedata = results[irun + i].Split( new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries );
+                surfacedata = results[irun + i].Split( new char[] { '\t' } , StringSplitOptions.RemoveEmptyEntries );
 
                 radius = double.Parse( surfacedata[2] );
                 xEnter = double.Parse( surfacedata[3] );
@@ -198,8 +198,8 @@ namespace SlopeFEA
                 xExit = xExit / (factor * scale) * dpiX + originOffsetX;
                 yExit = actualHeight - (yExit / (factor * scale) * dpiY + originOffsetY);
 
-                runSurfaces.Add( new DisplayCircularSurface( canvas,
-                new Point( xEnter, yEnter ), new Point( xExit, yExit ), radius ) );
+                runSurfaces.Add( new DisplayCircularSurface( canvas ,
+                new Point( xEnter , yEnter ) , new Point( xExit , yExit ) , radius ) );
             }
         }
     }

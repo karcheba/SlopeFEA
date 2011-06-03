@@ -79,22 +79,22 @@ namespace SlopeFEA
 
         public MaterialType SelectedMaterial { get { return selectedMaterial; } }
 
-        private void materialList_SelectionChanged ( object sender, SelectionChangedEventArgs e )
+        private void materialList_SelectionChanged ( object sender , SelectionChangedEventArgs e )
         {
             selectedMaterial = materialList.SelectedItem as MaterialType;
 
             if ( selectedMaterial != null )
             {
                 colour.Fill = selectedMaterial.Fill;
-                phi.Text = String.Format( "{0}", Math.Round( selectedMaterial.Phi, 2 ) );
-                coh.Text = String.Format( "{0}", Math.Round( selectedMaterial.Cohesion, 2 ) );
-                gamma.Text = String.Format( "{0}", Math.Round( selectedMaterial.Gamma, 2 ) );
-                emod.Text = String.Format( "{0}", Math.Round( selectedMaterial.Emod, 2 ) );
-                nu.Text = String.Format( "{0}", Math.Round( selectedMaterial.Nu, 2 ) );
+                phi.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Phi , 2 ) );
+                coh.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Cohesion , 2 ) );
+                gamma.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Gamma , 2 ) );
+                emod.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Emod , 2 ) );
+                nu.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Nu , 2 ) );
             }
         }
 
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
             this.DialogResult = true;
         }

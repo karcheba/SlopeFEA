@@ -62,19 +62,19 @@ namespace SlopeFEA
             rowHeightUnits.Content = units;
         }
 
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
             double newColWidth;
-            if ( !double.TryParse( colWidth.Text, out newColWidth ) || newColWidth <= 0 )
+            if ( !double.TryParse( colWidth.Text , out newColWidth ) || newColWidth <= 0 )
             {
-                MessageBox.Show( "Column width must be a positive number", "Error" );
+                MessageBox.Show( "Column width must be a positive number" , "Error" );
                 return;
             }
 
             double newRowHeight;
-            if ( !double.TryParse( rowHeight.Text, out newRowHeight ) || newRowHeight <= 0 )
+            if ( !double.TryParse( rowHeight.Text , out newRowHeight ) || newRowHeight <= 0 )
             {
-                MessageBox.Show( "Row height must be a positive number", "Error" );
+                MessageBox.Show( "Row height must be a positive number" , "Error" );
                 return;
             }
 

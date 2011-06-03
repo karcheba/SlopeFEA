@@ -40,7 +40,7 @@ namespace SlopeFEA
         private SlopeCanvas canvas;
         private PointLoad load;
 
-        public AddPointLoadDialog ( SlopeCanvas canvas, PointLoad load )
+        public AddPointLoadDialog ( SlopeCanvas canvas , PointLoad load )
         {
             InitializeComponent();
 
@@ -49,7 +49,7 @@ namespace SlopeFEA
 
             // get units dependent scaling factor and strings
             double factor;
-            string coordUnits, loadUnits;
+            string coordUnits , loadUnits;
             switch ( canvas.Units )
             {
                 case Units.Metres: factor = 0.0254; coordUnits = "m"; loadUnits = "kN"; break;
@@ -64,44 +64,44 @@ namespace SlopeFEA
             yLoadUnits.Content = loadUnits;
 
             // set node coordinates
-            double xCoord, yCoord;
+            double xCoord , yCoord;
             xCoord = (load.Node.Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Node.Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords.Content = String.Format( "({0}, {1})", Math.Round( xCoord, 2 ), Math.Round( yCoord, 2 ) );
+            coords.Content = String.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
             isLoadedX.IsChecked = xLoad.IsEnabled = load.IsLoadedX;
-            xLoad.Text = String.Format( "{0}", Math.Round( load.XLoad, 2 ) );
+            xLoad.Text = String.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
             isLoadedY.IsChecked = yLoad.IsEnabled = load.IsLoadedY;
-            yLoad.Text = String.Format( "{0}", Math.Round( load.YLoad, 2 ) );
+            yLoad.Text = String.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
         }
 
-        private void ok_Click ( object sender, RoutedEventArgs e )
+        private void ok_Click ( object sender , RoutedEventArgs e )
         {
-            double xLoadVal = 0, yLoadVal = 0;
+            double xLoadVal = 0 , yLoadVal = 0;
             bool isLoadedXVal = (bool) isLoadedX.IsChecked;
             bool isLoadedYVal = (bool) isLoadedY.IsChecked;
 
             if ( isLoadedXVal )
             {
-                if ( !double.TryParse( xLoad.Text, out xLoadVal ) )
+                if ( !double.TryParse( xLoad.Text , out xLoadVal ) )
                 {
-                    MessageBox.Show( "Horizontal load must have a numeric value.", "Data Error" );
+                    MessageBox.Show( "Horizontal load must have a numeric value." , "Data Error" );
                     return;
                 }
             }
 
             if ( isLoadedYVal )
             {
-                if ( !double.TryParse( yLoad.Text, out yLoadVal ) )
+                if ( !double.TryParse( yLoad.Text , out yLoadVal ) )
                 {
-                    MessageBox.Show( "Vertical load must have a numeric value.", "Data Error" );
+                    MessageBox.Show( "Vertical load must have a numeric value." , "Data Error" );
                     return;
                 }
             }
 
-            load.ApplyLoad( isLoadedXVal, xLoadVal,
-                            isLoadedYVal, yLoadVal );
+            load.ApplyLoad( isLoadedXVal , xLoadVal ,
+                            isLoadedYVal , yLoadVal );
 
             canvas.IsSaved = false;
 
@@ -109,22 +109,22 @@ namespace SlopeFEA
         }
 
 
-        private void isLoadedX_Checked ( object sender, RoutedEventArgs e )
+        private void isLoadedX_Checked ( object sender , RoutedEventArgs e )
         {
             xLoad.IsEnabled = true;
         }
 
-        private void isLoadedX_Unchecked ( object sender, RoutedEventArgs e )
+        private void isLoadedX_Unchecked ( object sender , RoutedEventArgs e )
         {
             xLoad.IsEnabled = false;
         }
 
-        private void isLoadedY_Checked ( object sender, RoutedEventArgs e )
+        private void isLoadedY_Checked ( object sender , RoutedEventArgs e )
         {
             yLoad.IsEnabled = true;
         }
 
-        private void isLoadedY_Unchecked ( object sender, RoutedEventArgs e )
+        private void isLoadedY_Unchecked ( object sender , RoutedEventArgs e )
         {
             yLoad.IsEnabled = false;
         }

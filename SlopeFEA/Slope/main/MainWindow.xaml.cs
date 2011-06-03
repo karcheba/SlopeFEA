@@ -67,58 +67,58 @@ namespace SlopeFEA
             InitializeComponent();
 
             // Bind "New" command
-            CommandBinding cb = new CommandBinding( commandNew, new_Executed );
-            KeyGesture kg = new KeyGesture( Key.N, ModifierKeys.Control );
-            InputBinding ib = new InputBinding( commandNew, kg );
+            CommandBinding cb = new CommandBinding( commandNew , new_Executed );
+            KeyGesture kg = new KeyGesture( Key.N , ModifierKeys.Control );
+            InputBinding ib = new InputBinding( commandNew , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Open" command
-            cb = new CommandBinding( commandOpen, open_Executed );
-            kg = new KeyGesture( Key.O, ModifierKeys.Control );
-            ib = new InputBinding( commandOpen, kg );
+            cb = new CommandBinding( commandOpen , open_Executed );
+            kg = new KeyGesture( Key.O , ModifierKeys.Control );
+            ib = new InputBinding( commandOpen , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Save" command
-            cb = new CommandBinding( commandSave, save_Executed );
-            kg = new KeyGesture( Key.S, ModifierKeys.Control );
-            ib = new InputBinding( commandSave, kg );
+            cb = new CommandBinding( commandSave , save_Executed );
+            kg = new KeyGesture( Key.S , ModifierKeys.Control );
+            ib = new InputBinding( commandSave , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "SaveAll" command
-            cb = new CommandBinding( commandSaveAll, saveAll_Executed );
-            kg = new KeyGesture( Key.S, ModifierKeys.Alt );
-            ib = new InputBinding( commandSaveAll, kg );
+            cb = new CommandBinding( commandSaveAll , saveAll_Executed );
+            kg = new KeyGesture( Key.S , ModifierKeys.Alt );
+            ib = new InputBinding( commandSaveAll , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Exit" command
-            cb = new CommandBinding( commandExit, exit_Executed );
-            kg = new KeyGesture( Key.X, ModifierKeys.Control );
-            ib = new InputBinding( commandExit, kg );
+            cb = new CommandBinding( commandExit , exit_Executed );
+            kg = new KeyGesture( Key.X , ModifierKeys.Control );
+            ib = new InputBinding( commandExit , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Delete" command
-            cb = new CommandBinding( commandDelete, deleteBlock_Executed );
+            cb = new CommandBinding( commandDelete , deleteBlock_Executed );
             kg = new KeyGesture( Key.Delete );
-            ib = new InputBinding( commandDelete, kg );
+            ib = new InputBinding( commandDelete , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Generate Mesh" command
-            cb = new CommandBinding( commandGenerateMesh, generateMesh_Executed );
+            cb = new CommandBinding( commandGenerateMesh , generateMesh_Executed );
             kg = new KeyGesture( Key.F7 );
-            ib = new InputBinding( commandGenerateMesh, kg );
+            ib = new InputBinding( commandGenerateMesh , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
 
             // Bind "Run Analysis" command
-            cb = new CommandBinding( commandRunAnalysis, run_Executed );
+            cb = new CommandBinding( commandRunAnalysis , run_Executed );
             kg = new KeyGesture( Key.F5 );
-            ib = new InputBinding( commandRunAnalysis, kg );
+            ib = new InputBinding( commandRunAnalysis , kg );
             this.CommandBindings.Add( cb );
             this.InputBindings.Add( ib );
         }
@@ -126,9 +126,9 @@ namespace SlopeFEA
         /// <summary>
         /// Update size of content window if toolbar items are dragged to change the toolbar size.
         /// </summary>
-        private void toolbarTray_SizeChanged ( object sender, SizeChangedEventArgs e )
+        private void toolbarTray_SizeChanged ( object sender , SizeChangedEventArgs e )
         {
-            windowManager.Margin = new Thickness( 0, menuDock.ActualHeight + toolbarTray.ActualHeight, 0, windowManager.Margin.Bottom );
+            windowManager.Margin = new Thickness( 0 , menuDock.ActualHeight + toolbarTray.ActualHeight , 0 , windowManager.Margin.Bottom );
         }
 
 
@@ -140,29 +140,29 @@ namespace SlopeFEA
         /// <summary>
         /// Exit the program (Click for menu, Executed for key shortcut)
         /// </summary>
-        private void exit_Click ( object sender, RoutedEventArgs e )
+        private void exit_Click ( object sender , RoutedEventArgs e )
         {
             this.Close();
         }
-        private void exit_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void exit_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            exit_Click( sender, (RoutedEventArgs) e );
+            exit_Click( sender , (RoutedEventArgs) e );
         }
 
 
         /// <summary>
         /// Show some information about the program
         /// </summary>
-        private void about_Click ( object sender, RoutedEventArgs e )
+        private void about_Click ( object sender , RoutedEventArgs e )
         {
-            MessageBox.Show( "Slope 2011 (c) Brandon Karchewski, McMaster University", "About Slope 2011" );
+            MessageBox.Show( "Slope 2011 (c) Brandon Karchewski, McMaster University" , "About Slope 2011" );
         }
 
 
         /// <summary>
         /// Create a new tabbed document (Click for menu, Executed for key shortcut)
         /// </summary>
-        private void new_Click ( object sender, RoutedEventArgs e )
+        private void new_Click ( object sender , RoutedEventArgs e )
         {
             // Create new tab, increment document count, and set new tab as current
             ClosableCanvasTabItem newTab = new ClosableCanvasTabItem();
@@ -194,16 +194,16 @@ namespace SlopeFEA
                 grid.IsChecked = false;
             }
         }
-        private void new_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void new_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            new_Click( sender, (RoutedEventArgs) e );
+            new_Click( sender , (RoutedEventArgs) e );
         }
 
 
         /// <summary>
         /// Load a saved .slp file (Click = menu, Executed = shortcut)
         /// </summary>
-        private void open_Click ( object sender, RoutedEventArgs e )
+        private void open_Click ( object sender , RoutedEventArgs e )
         {
             // Create default SaveFileDialog
             OpenFileDialog openDialog = new OpenFileDialog();
@@ -219,7 +219,7 @@ namespace SlopeFEA
                 string[] path = openDialog.FileName.Split( '.' );
                 if ( !(path[path.Length - 1] == "slp") )
                 {
-                    MessageBox.Show( "Incorrect file format. Input files _ must be of type \"*.slp\"", "Error" );
+                    MessageBox.Show( "Incorrect file format. Input files _ must be of type \"*.slp\"" , "Error" );
                     return;
                 }
 
@@ -267,16 +267,16 @@ namespace SlopeFEA
                 }
             }
         }
-        private void open_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void open_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            open_Click( sender, (RoutedEventArgs) e );
+            open_Click( sender , (RoutedEventArgs) e );
         }
 
 
         /// <summary>
         /// Save current tab if it has unsaved changes (Click = menu, Executed = shortcut)
         /// </summary>
-        private void save_Click ( object sender, RoutedEventArgs e )
+        private void save_Click ( object sender , RoutedEventArgs e )
         {
             // Get currently selected tab
             ClosableCanvasTabItem currTab = windowManager.SelectedItem as ClosableCanvasTabItem;
@@ -291,7 +291,7 @@ namespace SlopeFEA
             // Check if document has never been saved
             if ( currTab.Tag == null ) //(header.Contains("Untitled") && !header.Contains("."))
             {
-                saveAs_Click( sender, e );
+                saveAs_Click( sender , e );
             }
 
             // Check if document has unsaved changes
@@ -301,16 +301,16 @@ namespace SlopeFEA
                 currCanvas.SaveInputFile( currTab.Tag as string );
             }
         }
-        private void save_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void save_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            save_Click( sender, (RoutedEventArgs) e );
+            save_Click( sender , (RoutedEventArgs) e );
         }
 
 
         /// <summary>
         /// Save current tab under a (possibly) new file name
         /// </summary>
-        private void saveAs_Click ( object sender, RoutedEventArgs e )
+        private void saveAs_Click ( object sender , RoutedEventArgs e )
         {
             // Get currently selected tab
             ClosableCanvasTabItem currTab = windowManager.SelectedItem as ClosableCanvasTabItem;
@@ -343,7 +343,7 @@ namespace SlopeFEA
         /// <summary>
         /// Save all open tabs with unsaved changes (Click = menu, Executed = shortcut)
         /// </summary>
-        private void saveAll_Click ( object sender, RoutedEventArgs e )
+        private void saveAll_Click ( object sender , RoutedEventArgs e )
         {
             // Get currently selected tab
             ClosableCanvasTabItem currTab = windowManager.SelectedItem as ClosableCanvasTabItem;
@@ -352,21 +352,21 @@ namespace SlopeFEA
             foreach ( ClosableCanvasTabItem item in windowManager.Items )
             {
                 windowManager.SelectedItem = item;
-                save_Click( item, e );
+                save_Click( item , e );
             }
 
             // Reset selected tab to original
             windowManager.SelectedItem = currTab;
         }
-        private void saveAll_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void saveAll_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            saveAll_Click( sender, (RoutedEventArgs) e );
+            saveAll_Click( sender , (RoutedEventArgs) e );
         }
 
         /// <summary>
         /// Closes currently selected tab.
         /// </summary>
-        private void close_Click ( object sender, RoutedEventArgs e )
+        private void close_Click ( object sender , RoutedEventArgs e )
         {
             ClosableCanvasTabItem currTab = windowManager.SelectedItem as ClosableCanvasTabItem;
             if ( currTab != null )
@@ -424,7 +424,7 @@ namespace SlopeFEA
         /// <summary>
         /// Closes all open tabs and creates a new untitled document.
         /// </summary>
-        private void closeAll_Click ( object sender, RoutedEventArgs e )
+        private void closeAll_Click ( object sender , RoutedEventArgs e )
         {
             while ( windowManager.Items.Count > 0 )
             {
@@ -482,7 +482,7 @@ namespace SlopeFEA
         /// <summary>
         /// Zooms in on canvas content by 10%, centred on current canvas content centre.
         /// </summary>
-        private void zoomIn_Click ( object sender, RoutedEventArgs e )
+        private void zoomIn_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -494,14 +494,14 @@ namespace SlopeFEA
 
             if ( currCanvas != null )
             {
-                currCanvas.Zoom( 1.1, new Point( 0.5 * currCanvas.ActualWidth, 0.5 * currCanvas.ActualHeight ) );
+                currCanvas.Zoom( 1.1 , new Point( 0.5 * currCanvas.ActualWidth , 0.5 * currCanvas.ActualHeight ) );
             }
         }
 
         /// <summary>
         /// Zooms out from canvas content by 10%, centred on current canvas content centre.
         /// </summary>
-        private void zoomOut_Click ( object sender, RoutedEventArgs e )
+        private void zoomOut_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -513,14 +513,14 @@ namespace SlopeFEA
 
             if ( currCanvas != null )
             {
-                currCanvas.Zoom( 1 / 1.1, new Point( 0.5 * currCanvas.ActualWidth, 0.5 * currCanvas.ActualHeight ) );
+                currCanvas.Zoom( 1 / 1.1 , new Point( 0.5 * currCanvas.ActualWidth , 0.5 * currCanvas.ActualHeight ) );
             }
         }
 
         /// <summary>
         /// Begins ZoomArea mode, which allows the user to zoom to a selected rectangle.
         /// </summary>
-        private void zoomArea_Click ( object sender, RoutedEventArgs e )
+        private void zoomArea_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -542,7 +542,7 @@ namespace SlopeFEA
         /// <summary>
         /// Zooms canvas content to fit the greate of all existing content or specified axis extents.
         /// </summary>
-        private void zoomAll_Click ( object sender, RoutedEventArgs e )
+        private void zoomAll_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -562,7 +562,7 @@ namespace SlopeFEA
         /// <summary>
         /// Begins pan mode, which allows the user to drag canvas content into view.
         /// </summary>
-        private void pan_Click ( object sender, RoutedEventArgs e )
+        private void pan_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -585,7 +585,7 @@ namespace SlopeFEA
         /// Begins draw boundaries mode, which allows the user to specify the
         /// boundaries of the slope stability analysis problem graphically
         /// </summary>
-        private void drawBounds_Click ( object sender, RoutedEventArgs e )
+        private void drawBounds_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -602,7 +602,7 @@ namespace SlopeFEA
                 MessageBoxResult newBoundary = MessageBoxResult.Yes;
                 if ( currCanvas.HasBoundary )
                 {
-                    newBoundary = MessageBox.Show( "This will erase existing boundary. Continue?", "Erase Boundaries", MessageBoxButton.YesNo );
+                    newBoundary = MessageBox.Show( "This will erase existing boundary. Continue?" , "Erase Boundaries" , MessageBoxButton.YesNo );
                 }
 
                 // Set drawing mode and set cursor to boxed cross
@@ -621,7 +621,7 @@ namespace SlopeFEA
         /// Begins draw materials mode, which allows the user to specify
         /// blocks of material within the pre-specified analysis boundaries
         /// </summary>
-        private void drawMaterials_Click ( object sender, RoutedEventArgs e )
+        private void drawMaterials_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -643,7 +643,7 @@ namespace SlopeFEA
         /// <summary>
         /// Allows user to specify plotting extents and major/minor grid resolution
         /// </summary>
-        private void axisOptions_Click ( object sender, RoutedEventArgs e )
+        private void axisOptions_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -661,7 +661,7 @@ namespace SlopeFEA
         /// <summary>
         /// Responds to clicks on scale related MenuItems
         /// </summary>
-        private void scale_Click ( object sender, RoutedEventArgs e )
+        private void scale_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -811,7 +811,7 @@ namespace SlopeFEA
                         break;
                 }
                 // Zoom to desired scale and centre content WITHOUT zoom
-                currCanvas.Zoom( currCanvas.Scale / desiredScale, new Point( 0.5 * currCanvas.ActualHeight, 0.5 * currCanvas.ActualWidth ) );
+                currCanvas.Zoom( currCanvas.Scale / desiredScale , new Point( 0.5 * currCanvas.ActualHeight , 0.5 * currCanvas.ActualWidth ) );
                 currCanvas.CentreAndFitExtents( false );
             }
         }
@@ -819,7 +819,7 @@ namespace SlopeFEA
         /// <summary>
         /// Responds to units related MenuItem clicks
         /// </summary>
-        private void units_Click ( object sender, RoutedEventArgs e )
+        private void units_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -857,7 +857,7 @@ namespace SlopeFEA
                     MessageBox.Show( "Do you wish to convert existing values to new units?\n\n" +
                                     "Yes: Converts numerical values to their equivalent in new units.\n" +
                                     "No: Changes unit label and modifies scale appropriately.\n" +
-                                    "Cancel: Maintains existing units and scale.", "Unit Conversion", MessageBoxButton.YesNoCancel );
+                                    "Cancel: Maintains existing units and scale." , "Unit Conversion" , MessageBoxButton.YesNoCancel );
 
                 // If the user changed their mind, reset menu state and do nothing
                 if ( convert == MessageBoxResult.Cancel )
@@ -868,7 +868,7 @@ namespace SlopeFEA
                 // Otherwise pass processing on to SlopeCanvas object
                 else
                 {
-                    currCanvas.UpdateUnits( newUnits, convert );
+                    currCanvas.UpdateUnits( newUnits , convert );
                 }
 
             }
@@ -877,7 +877,7 @@ namespace SlopeFEA
         /// <summary>
         /// Responds to grid display related MenuItem clicks
         /// </summary>
-        private void grid_Click ( object sender, RoutedEventArgs e )
+        private void grid_Click ( object sender , RoutedEventArgs e )
         {
             // Get currently shown grid (if exists)
             MenuItem oldGrid = null;
@@ -944,7 +944,7 @@ namespace SlopeFEA
         /// <summary>
         /// Allows the user to toggle display of analysis mesh lines.
         /// </summary>
-        private void showMesh_Click ( object sender, RoutedEventArgs e )
+        private void showMesh_Click ( object sender , RoutedEventArgs e )
         {
             MenuItem mesh = sender as MenuItem;
 
@@ -962,7 +962,7 @@ namespace SlopeFEA
             }
         }
 
-        private void defineMaterials_Click ( object sender, RoutedEventArgs e )
+        private void defineMaterials_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -979,7 +979,7 @@ namespace SlopeFEA
             }
         }
 
-        private void run_Click ( object sender, RoutedEventArgs e )
+        private void run_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -997,12 +997,12 @@ namespace SlopeFEA
                 }
             }
         }
-        private void run_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void run_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            run_Click( sender, (RoutedEventArgs) e );
+            run_Click( sender , (RoutedEventArgs) e );
         }
 
-        private void generateMesh_Click ( object sender, RoutedEventArgs e )
+        private void generateMesh_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1021,17 +1021,17 @@ namespace SlopeFEA
                     switch ( currCanvas.AnalysisType )
                     {
                         case AnalysisType.Bishop:
-                            currCanvas.Boundary.GenerateMesh( currCanvas.Boundary.XMin, currCanvas.Boundary.XMax );
+                            currCanvas.Boundary.GenerateMesh( currCanvas.Boundary.XMin , currCanvas.Boundary.XMax );
                             break;
 
                         case AnalysisType.RFEM:
-                            currCanvas.Boundary.GenerateMesh( currCanvas.Boundary.XMin, currCanvas.Boundary.XMax );
+                            currCanvas.Boundary.GenerateMesh( currCanvas.Boundary.XMin , currCanvas.Boundary.XMax );
                             break;
 
                         case AnalysisType.FEA4NodedQuad:
                             currCanvas.FEAQuadElements =
-                                SlopeCanvas.MeshGenStructured4NodedQuad( currCanvas,
-                                    currCanvas.FEAParameters.ColWidth, currCanvas.FEAParameters.RowHeight, true );
+                                SlopeCanvas.MeshGenStructured4NodedQuad( currCanvas ,
+                                    currCanvas.FEAParameters.ColWidth , currCanvas.FEAParameters.RowHeight , true );
 
                             currCanvas.IsMeshed = true;
                             currCanvas.ShowMesh = true;
@@ -1041,8 +1041,8 @@ namespace SlopeFEA
 
                         default:
                             currCanvas.FEATriElements =
-                                SlopeCanvas.MeshGenStructured3NodedTri( currCanvas,
-                                    currCanvas.FEAParameters.ColWidth, currCanvas.FEAParameters.RowHeight );
+                                SlopeCanvas.MeshGenStructured3NodedTri( currCanvas ,
+                                    currCanvas.FEAParameters.ColWidth , currCanvas.FEAParameters.RowHeight );
 
                             currCanvas.IsMeshed = true;
                             currCanvas.ShowMesh = true;
@@ -1060,12 +1060,12 @@ namespace SlopeFEA
                 }
             }
         }
-        private void generateMesh_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void generateMesh_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            generateMesh_Click( sender, (RoutedEventArgs) e );
+            generateMesh_Click( sender , (RoutedEventArgs) e );
         }
 
-        private void analysisParameters_Click ( object sender, RoutedEventArgs e )
+        private void analysisParameters_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1086,7 +1086,7 @@ namespace SlopeFEA
             }
         }
 
-        private void addMaterials_Click ( object sender, RoutedEventArgs e )
+        private void addMaterials_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1118,7 +1118,7 @@ namespace SlopeFEA
             }
         }
 
-        private void deleteBlock_Click ( object sender, RoutedEventArgs e )
+        private void deleteBlock_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1133,12 +1133,12 @@ namespace SlopeFEA
                 currCanvas.DeleteSelectedItems();
             }
         }
-        private void deleteBlock_Executed ( object sender, ExecutedRoutedEventArgs e )
+        private void deleteBlock_Executed ( object sender , ExecutedRoutedEventArgs e )
         {
-            deleteBlock_Click( sender, (RoutedEventArgs) e );
+            deleteBlock_Click( sender , (RoutedEventArgs) e );
         }
 
-        private void addPoint_Click ( object sender, RoutedEventArgs e )
+        private void addPoint_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1157,7 +1157,7 @@ namespace SlopeFEA
             }
         }
 
-        private void movePoint_Click ( object sender, RoutedEventArgs e )
+        private void movePoint_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1176,7 +1176,7 @@ namespace SlopeFEA
             }
         }
 
-        private void verify_Click ( object sender, RoutedEventArgs e )
+        private void verify_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1200,7 +1200,7 @@ namespace SlopeFEA
             }
         }
 
-        private void clearMesh_Click ( object sender, RoutedEventArgs e )
+        private void clearMesh_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1217,7 +1217,7 @@ namespace SlopeFEA
             }
         }
 
-        private void stop_Click ( object sender, RoutedEventArgs e )
+        private void stop_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1236,7 +1236,7 @@ namespace SlopeFEA
             }
         }
 
-        private void showCritical_Click ( object sender, RoutedEventArgs e )
+        private void showCritical_Click ( object sender , RoutedEventArgs e )
         {
             MenuItem showCritical = sender as MenuItem;
 
@@ -1254,7 +1254,7 @@ namespace SlopeFEA
             }
         }
 
-        private void viewResults_Click ( object sender, RoutedEventArgs e )
+        private void viewResults_Click ( object sender , RoutedEventArgs e )
         {
             //MessageBox.Show("Select a run to show the top 10 surfaces", "View Run Results");
             Grid currGrid = windowManager.SelectedContent as Grid;
@@ -1273,7 +1273,7 @@ namespace SlopeFEA
             }
         }
 
-        private void outputFile_Click ( object sender, RoutedEventArgs e )
+        private void outputFile_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1297,7 +1297,7 @@ namespace SlopeFEA
                             default: pathsplit[pathsplit.Length - 1] = "rfem"; break;
                         }
 
-                        string path = string.Join( ".", pathsplit );
+                        string path = string.Join( "." , pathsplit );
 
                         if ( File.Exists( path ) ) System.Diagnostics.Process.Start( @path );
                     }
@@ -1305,7 +1305,7 @@ namespace SlopeFEA
             }
         }
 
-        private void analysisMethod_Click ( object sender, RoutedEventArgs e )
+        private void analysisMethod_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1377,7 +1377,7 @@ namespace SlopeFEA
             }
         }
 
-        private void fixX_Click ( object sender, RoutedEventArgs e )
+        private void fixX_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1396,7 +1396,7 @@ namespace SlopeFEA
             }
         }
 
-        private void fixY_Click ( object sender, RoutedEventArgs e )
+        private void fixY_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1415,7 +1415,7 @@ namespace SlopeFEA
             }
         }
 
-        private void pointLoad_Click ( object sender, RoutedEventArgs e )
+        private void pointLoad_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 
@@ -1434,7 +1434,7 @@ namespace SlopeFEA
             }
         }
 
-        private void lineLoad_Click ( object sender, RoutedEventArgs e )
+        private void lineLoad_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
 

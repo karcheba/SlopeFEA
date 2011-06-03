@@ -39,24 +39,24 @@ using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
-    public enum DrawModes { Select, Boundaries, Materials, Pan, ZoomArea, MovePoints, AddPoints, FixX, FixY, PointLoad, LineLoad };
-    public enum Units { Metres, Millimetres, Feet, Inches };
+    public enum DrawModes { Select , Boundaries , Materials , Pan , ZoomArea , MovePoints , AddPoints , FixX , FixY , PointLoad , LineLoad };
+    public enum Units { Metres , Millimetres , Feet , Inches };
     public enum Scales
     {
-        sc1000, sc800, sc600, sc500, sc400, sc300, sc200, sc150,
-        sc100, sc50, sc25, sc10, sc5, sc2, sc1, Custom
+        sc1000 , sc800 , sc600 , sc500 , sc400 , sc300 , sc200 , sc150 ,
+        sc100 , sc50 , sc25 , sc10 , sc5 , sc2 , sc1 , Custom
     };
-    public enum GridType { Major, Minor };
-    public enum MeshPointType { Entrance, Exit };
-    public enum SoilMovement { LtoR, RtoL, None };
-    public enum AnalysisType { Bishop, RFEM, FEA3NodedTri, FEA4NodedQuad };
+    public enum GridType { Major , Minor };
+    public enum MeshPointType { Entrance , Exit };
+    public enum SoilMovement { LtoR , RtoL , None };
+    public enum AnalysisType { Bishop , RFEM , FEA3NodedTri , FEA4NodedQuad };
 
     public class GridPoint
     {
         private GridType type;
         private Ellipse location;
 
-        public GridPoint ( Point pt, GridType type )
+        public GridPoint ( Point pt , GridType type )
         {
             location = new Ellipse();
             location.Height = 1.5;
@@ -64,7 +64,7 @@ namespace SlopeFEA
             location.Fill = Brushes.Black;
             location.Stroke = Brushes.Black;
             location.Visibility = Visibility.Hidden;
-            location.Margin = new Thickness( pt.X - 0.75, pt.Y - 0.75, 0, 0 );
+            location.Margin = new Thickness( pt.X - 0.75 , pt.Y - 0.75 , 0 , 0 );
 
             this.type = type;
         }
@@ -82,21 +82,21 @@ namespace SlopeFEA
 
         public void Translate ( Vector delta )
         {
-            location.Margin = new Thickness( location.Margin.Left + delta.X, location.Margin.Top + delta.Y, 0, 0 );
+            location.Margin = new Thickness( location.Margin.Left + delta.X , location.Margin.Top + delta.Y , 0 , 0 );
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
-            location.Margin = new Thickness( centre.X + factor * (location.Margin.Left - centre.X),
-                                            centre.Y + factor * (location.Margin.Top - centre.Y),
-                                            0, 0 );
+            location.Margin = new Thickness( centre.X + factor * (location.Margin.Left - centre.X) ,
+                                            centre.Y + factor * (location.Margin.Top - centre.Y) ,
+                                            0 , 0 );
         }
     }
 
     public class SlopeBoundary
     {
         private SlopeCanvas canvas;
-        private bool isSelected, showMesh = false;
+        private bool isSelected , showMesh = false;
         private List<DrawingPoint> boundaryPoints;
         private List<MeshLine> meshLines;
         private List<Point> upperSurface;
@@ -120,7 +120,7 @@ namespace SlopeFEA
             canvas.Children.Add( Boundary );
         }
 
-        public SlopeBoundary ( SlopeCanvas canvas, Point[] pts )
+        public SlopeBoundary ( SlopeCanvas canvas , Point[] pts )
         {
             this.canvas = canvas;
 
@@ -141,7 +141,7 @@ namespace SlopeFEA
             for ( int i = 0 ; i < pts.Length - 1 ; i++ )
             {
                 Boundary.Points.Add( pts[i] );
-                boundaryPoints.Add( new DrawingPoint( canvas, this, pts[i] ) );
+                boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
             }
 
             SortPoints();
@@ -200,7 +200,7 @@ namespace SlopeFEA
                 double min = boundaryPoints[0].Point.X;
                 for ( int i = 1 ; i < boundaryPoints.Count ; i++ )
                 {
-                    min = Math.Min( min, boundaryPoints[i].Point.X );
+                    min = Math.Min( min , boundaryPoints[i].Point.X );
                 }
                 return min;
             }
@@ -215,7 +215,7 @@ namespace SlopeFEA
                 double max = boundaryPoints[0].Point.X;
                 for ( int i = 1 ; i < boundaryPoints.Count ; i++ )
                 {
-                    max = Math.Max( max, boundaryPoints[i].Point.X );
+                    max = Math.Max( max , boundaryPoints[i].Point.X );
                 }
                 return max;
             }
@@ -230,7 +230,7 @@ namespace SlopeFEA
                 double min = boundaryPoints[0].Point.Y;
                 for ( int i = 1 ; i < boundaryPoints.Count ; i++ )
                 {
-                    min = Math.Max( min, boundaryPoints[i].Point.Y );
+                    min = Math.Max( min , boundaryPoints[i].Point.Y );
                 }
                 return min;
             }
@@ -242,7 +242,7 @@ namespace SlopeFEA
             {
                 if ( boundaryPoints.Count == 0 ) return 0;
 
-                double x1, y1, x2, y2;
+                double x1 , y1 , x2 , y2;
 
                 x1 = boundaryPoints[boundaryPoints.Count - 1].Point.X;
                 y1 = boundaryPoints[boundaryPoints.Count - 1].Point.Y;
@@ -291,12 +291,12 @@ namespace SlopeFEA
 
             split[split.Length - 1] = "msh";
 
-            string path = string.Join( ".", split );
+            string path = string.Join( "." , split );
 
             using ( TextWriter tw = new StreamWriter( path ) )
             {
                 double factor;
-                double xOffset = canvas.OriginOffsetX, yOffset = canvas.OriginOffsetY;
+                double xOffset = canvas.OriginOffsetX , yOffset = canvas.OriginOffsetY;
                 double canvasHeight = canvas.ActualHeight;
                 string units;
                 switch ( canvas.Units )
@@ -310,43 +310,43 @@ namespace SlopeFEA
                 double scaleX = factor * canvas.Scale / canvas.DpiX;
                 double scaleY = factor * canvas.Scale / canvas.DpiY;
 
-                tw.WriteLine( String.Format( "Units = {0}", units ) );
+                tw.WriteLine( String.Format( "Units = {0}" , units ) );
 
                 tw.WriteLine();
 
-                if ( upperSurface.Count == 0 ) CheckYMax( XMin, XMax, YMin );
+                if ( upperSurface.Count == 0 ) CheckYMax( XMin , XMax , YMin );
 
-                tw.WriteLine( String.Format( "Number of upper surface points = {0}", upperSurface.Count ) );
+                tw.WriteLine( String.Format( "Number of upper surface points = {0}" , upperSurface.Count ) );
 
                 tw.WriteLine();
 
                 tw.WriteLine( "Upper Surface Coordinates" );
 
-                double x = 0, y = 0;
+                double x = 0 , y = 0;
                 foreach ( Point p in upperSurface )
                 {
                     x = (p.X - xOffset) * scaleX;
                     y = (canvasHeight - p.Y - yOffset) * scaleY;
-                    tw.WriteLine( String.Format( "{0}, {1}", x, y ) );
+                    tw.WriteLine( String.Format( "{0}, {1}" , x , y ) );
                 }
 
                 tw.WriteLine();
 
-                tw.WriteLine( String.Format( "Number of mesh lines = {0}", meshLines.Count ) );
+                tw.WriteLine( String.Format( "Number of mesh lines = {0}" , meshLines.Count ) );
 
                 tw.WriteLine();
 
                 if ( meshLines.Count > 0 )
                 {
                     tw.WriteLine( "ML1" );
-                    tw.WriteLine( String.Format( "Number of points = {0}", meshLines[0].MeshPoints.Count ) );
+                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[0].MeshPoints.Count ) );
 
                     x = (XMin - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[0].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"", x, y, mp.Type, mp.Material ) );
+                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
@@ -354,15 +354,15 @@ namespace SlopeFEA
 
                 for ( int i = 1 ; i < meshLines.Count - 1 ; i++ )
                 {
-                    tw.WriteLine( String.Format( "ML{0}", i + 1 ) );
-                    tw.WriteLine( String.Format( "Number of points = {0}", meshLines[i].MeshPoints.Count ) );
+                    tw.WriteLine( String.Format( "ML{0}" , i + 1 ) );
+                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[i].MeshPoints.Count ) );
 
                     x = (meshLines[i].Line.X1 - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[i].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"", x, y, mp.Type, mp.Material ) );
+                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
@@ -370,15 +370,15 @@ namespace SlopeFEA
 
                 if ( meshLines.Count > 1 )
                 {
-                    tw.WriteLine( String.Format( "ML{0}", meshLines.Count ) );
-                    tw.WriteLine( String.Format( "Number of points = {0}", meshLines[meshLines.Count - 1].MeshPoints.Count ) );
+                    tw.WriteLine( String.Format( "ML{0}" , meshLines.Count ) );
+                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[meshLines.Count - 1].MeshPoints.Count ) );
 
                     x = (XMax - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[meshLines.Count - 1].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"", x, y, mp.Type, mp.Material ) );
+                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
@@ -388,7 +388,7 @@ namespace SlopeFEA
             return true;
         }
 
-        public double YMaxOfX ( double x, double yMin )
+        public double YMaxOfX ( double x , double yMin )
         {
             double toler = 1e-5;
             double y = yMin;
@@ -397,7 +397,7 @@ namespace SlopeFEA
             {
                 if ( Math.Abs( x - boundaryPoints[i].Point.X ) < toler )
                 {
-                    y = Math.Min( y, boundaryPoints[i].Point.Y );
+                    y = Math.Min( y , boundaryPoints[i].Point.Y );
                 }
             }
 
@@ -407,7 +407,7 @@ namespace SlopeFEA
         public bool CheckXMaxMin ( double value )
         {
             int count = 0;
-            bool counting = false, done1 = false, wasZero = false, done2 = false;
+            bool counting = false , done1 = false , wasZero = false , done2 = false;
             double toler = 1e-5;
             for ( int i = 0 ; i < boundaryPoints.Count ; i++ )
             {
@@ -448,7 +448,7 @@ namespace SlopeFEA
         public bool CheckYMin ( double value )
         {
             int count = 0;
-            bool counting = false, done1 = false, wasZero = false, done2 = false;
+            bool counting = false , done1 = false , wasZero = false , done2 = false;
             double toler = 1e-5;
             for ( int i = 0 ; i < boundaryPoints.Count ; i++ )
             {
@@ -486,14 +486,14 @@ namespace SlopeFEA
             return count >= 2;
         }
 
-        public int CheckYMax ( double xMin, double xMax, double yMin )
+        public int CheckYMax ( double xMin , double xMax , double yMin )
         {
             upperSurface.Clear();
 
             int countDir = 1;
-            double x = xMin, y = yMin;
+            double x = xMin , y = yMin;
             double toler = 1e-5;
-            int icurr = 0, inext = 0, maxIndex = boundaryPoints.Count - 1;
+            int icurr = 0 , inext = 0 , maxIndex = boundaryPoints.Count - 1;
 
             soilDir = SoilMovement.None;
 
@@ -509,7 +509,7 @@ namespace SlopeFEA
                 }
             }
 
-            upperSurface.Add( new Point( x, y ) );
+            upperSurface.Add( new Point( x , y ) );
 
             while ( (xMax - x) > toler )
             {
@@ -547,7 +547,7 @@ namespace SlopeFEA
 
                 y = boundaryPoints[inext].Point.Y;
 
-                upperSurface.Add( new Point( x, y ) );
+                upperSurface.Add( new Point( x , y ) );
 
                 icurr = inext;
             }
@@ -555,12 +555,12 @@ namespace SlopeFEA
             return soilDir == SoilMovement.LtoR ? 1 : (soilDir == SoilMovement.RtoL ? -1 : 0);
         }
 
-        public void GenerateMesh ( double xMin, double xMax )
+        public void GenerateMesh ( double xMin , double xMax )
         {
             meshLines = new List<MeshLine>();
 
             double toler = 1e-5;
-            meshLines.Add( new MeshLine( canvas, xMin + toler ) );
+            meshLines.Add( new MeshLine( canvas , xMin + toler ) );
 
             double factor;
             switch ( canvas.Units )
@@ -577,12 +577,12 @@ namespace SlopeFEA
 
             while ( x < xMax )
             {
-                meshLines.Add( new MeshLine( canvas, x ) );
+                meshLines.Add( new MeshLine( canvas , x ) );
 
                 x += sliceWidth;
             }
 
-            if ( xMax - x > toler ) meshLines.Add( new MeshLine( canvas, xMax - toler ) );
+            if ( xMax - x > toler ) meshLines.Add( new MeshLine( canvas , xMax - toler ) );
 
             canvas.IsMeshed = true;
             canvas.ShowMesh = true;
@@ -610,7 +610,7 @@ namespace SlopeFEA
             }
         }
 
-        public void AddPoint ( DrawingPoint p1, DrawingPoint p2 )
+        public void AddPoint ( DrawingPoint p1 , DrawingPoint p2 )
         {
             int index1 = 0;
             for ( int i = 0 ; i < BoundaryPoints.Count ; i++ )
@@ -632,28 +632,28 @@ namespace SlopeFEA
                 }
             }
 
-            int maxIndex = Math.Max( index1, index2 );
-            int minIndex = Math.Min( index1, index2 );
+            int maxIndex = Math.Max( index1 , index2 );
+            int minIndex = Math.Min( index1 , index2 );
 
             if ( (maxIndex - minIndex) == 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
-                BoundaryPoints.Insert( maxIndex, new DrawingPoint( canvas, this, newPoint ) );
-                Boundary.Points.Insert( maxIndex, newPoint );
+                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                BoundaryPoints.Insert( maxIndex , new DrawingPoint( canvas , this , newPoint ) );
+                Boundary.Points.Insert( maxIndex , newPoint );
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
             }
             else if ( minIndex == 0 && maxIndex == BoundaryPoints.Count - 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
-                BoundaryPoints.Add( new DrawingPoint( canvas, this, newPoint ) );
+                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                BoundaryPoints.Add( new DrawingPoint( canvas , this , newPoint ) );
                 Boundary.Points.Add( newPoint );
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
             }
             else
             {
-                MessageBox.Show( "Points must be different and adjacent.", "Error" );
+                MessageBox.Show( "Points must be different and adjacent." , "Error" );
             }
         }
 
@@ -672,9 +672,9 @@ namespace SlopeFEA
             }
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
-            meshLines.ForEach( delegate( MeshLine ml ) { ml.Zoom( factor, centre ); } );
+            meshLines.ForEach( delegate( MeshLine ml ) { ml.Zoom( factor , centre ); } );
 
             Point p;
             for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
@@ -683,11 +683,11 @@ namespace SlopeFEA
                 p.X = centre.X + factor * (p.X - centre.X);
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
-                boundaryPoints[i].Zoom( factor, centre );
+                boundaryPoints[i].Zoom( factor , centre );
             }
         }
 
-        private void MouseLeftButtonDown ( object sender, MouseEventArgs e )
+        private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
             // Select boundary object
             if ( canvas.DrawMode == DrawModes.Select )
@@ -698,10 +698,10 @@ namespace SlopeFEA
 
         public int CheckIntersecting ()
         {
-            double x1, y1, x2, y2, x3, y3, x4, y4,
-                    m1, m2, b1, b2,
-                    x, y;
-            bool vert1, vert2;
+            double x1 , y1 , x2 , y2 , x3 , y3 , x4 , y4 ,
+                    m1 , m2 , b1 , b2 ,
+                    x , y;
+            bool vert1 , vert2;
             double toler = 1e-5;
             int count = 0;
 
@@ -765,8 +765,8 @@ namespace SlopeFEA
                         {
                             y = m1 * x + b1;
 
-                            if ( (x - Math.Min( x1, x2 )) < toler && (Math.Max( x1, x2 ) - x) < toler
-                                && (y - Math.Min( y3, y4 )) < toler && (Math.Max( y3, y4 ) - y) < toler )
+                            if ( (x - Math.Min( x1 , x2 )) < toler && (Math.Max( x1 , x2 ) - x) < toler
+                                && (y - Math.Min( y3 , y4 )) < toler && (Math.Max( y3 , y4 ) - y) < toler )
                             {
                                 count++;
                             }
@@ -775,8 +775,8 @@ namespace SlopeFEA
                         {
                             y = m2 * x + b2;
 
-                            if ( (x - Math.Min( x3, x4 )) < toler && (Math.Max( x3, x4 ) - x) < toler
-                                && (y - Math.Min( y1, y2 )) < toler && (Math.Max( y1, y2 ) - y) < toler )
+                            if ( (x - Math.Min( x3 , x4 )) < toler && (Math.Max( x3 , x4 ) - x) < toler
+                                && (y - Math.Min( y1 , y2 )) < toler && (Math.Max( y1 , y2 ) - y) < toler )
                             {
                                 count++;
                             }
@@ -800,8 +800,8 @@ namespace SlopeFEA
                         {
                             x = (b2 - b1) / (m1 - m2);
 
-                            if ( (x - Math.Min( x1, x2 )) > toler && (Math.Max( x1, x2 ) - x) > toler
-                                && (x - Math.Min( x3, x4 )) > toler && (Math.Max( x3, x4 ) - x) > toler )
+                            if ( (x - Math.Min( x1 , x2 )) > toler && (Math.Max( x1 , x2 ) - x) > toler
+                                && (x - Math.Min( x3 , x4 )) > toler && (Math.Max( x3 , x4 ) - x) > toler )
                             {
                                 count++;
                             }
@@ -825,7 +825,7 @@ namespace SlopeFEA
         private bool isFixedY;
         private List<Polyline> fixLines;
 
-        public DrawingPoint ( SlopeCanvas canvas, object parent, Point pt )
+        public DrawingPoint ( SlopeCanvas canvas , object parent , Point pt )
         {
             this.canvas = canvas;
             this.parent = parent;
@@ -845,23 +845,23 @@ namespace SlopeFEA
                 canvas.Children.Add( newLine );
             }
 
-            fixLines[0].Points.Add( new Point( pt.X - 7, pt.Y - 3.5 ) );
-            fixLines[0].Points.Add( new Point( pt.X + 7, pt.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( pt.X - 7 , pt.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( pt.X + 7 , pt.Y - 3.5 ) );
 
-            fixLines[1].Points.Add( new Point( pt.X - 7, pt.Y + 3.5 ) );
-            fixLines[1].Points.Add( new Point( pt.X + 7, pt.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( pt.X - 7 , pt.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( pt.X + 7 , pt.Y + 3.5 ) );
 
-            fixLines[2].Points.Add( new Point( pt.X - 3.5, pt.Y + 7 ) );
-            fixLines[2].Points.Add( new Point( pt.X - 3.5, pt.Y - 7 ) );
+            fixLines[2].Points.Add( new Point( pt.X - 3.5 , pt.Y + 7 ) );
+            fixLines[2].Points.Add( new Point( pt.X - 3.5 , pt.Y - 7 ) );
 
-            fixLines[3].Points.Add( new Point( pt.X + 3.5, pt.Y + 7 ) );
-            fixLines[3].Points.Add( new Point( pt.X + 3.5, pt.Y - 7 ) );
+            fixLines[3].Points.Add( new Point( pt.X + 3.5 , pt.Y + 7 ) );
+            fixLines[3].Points.Add( new Point( pt.X + 3.5 , pt.Y - 7 ) );
 
 
             dot = new Ellipse();
             dot.HorizontalAlignment = HorizontalAlignment.Left;
             dot.VerticalAlignment = VerticalAlignment.Top;
-            dot.Margin = new Thickness( pt.X - 3.5, pt.Y - 3.5, 0, 0 );
+            dot.Margin = new Thickness( pt.X - 3.5 , pt.Y - 3.5 , 0 , 0 );
             dot.Height = 7;
             dot.Width = 7;
             dot.Stroke = Brushes.Black;
@@ -1001,7 +1001,7 @@ namespace SlopeFEA
         public void Translate ( Vector delta )
         {
             point += delta;
-            dot.Margin = new Thickness( point.X - 3.5, point.Y - 3.5, 0, 0 );
+            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
             Point p;
             foreach ( Polyline l in fixLines )
             {
@@ -1015,23 +1015,23 @@ namespace SlopeFEA
             }
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
             point.X = centre.X + factor * (point.X - centre.X);
             point.Y = centre.Y + factor * (point.Y - centre.Y);
-            dot.Margin = new Thickness( point.X - 3.5, point.Y - 3.5, 0, 0 );
+            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
 
-            fixLines[0].Points[0] = new Point( point.X - 7, point.Y - 3.5 );
-            fixLines[0].Points[1] = new Point( point.X + 7, point.Y - 3.5 );
+            fixLines[0].Points[0] = new Point( point.X - 7 , point.Y - 3.5 );
+            fixLines[0].Points[1] = new Point( point.X + 7 , point.Y - 3.5 );
 
-            fixLines[1].Points[0] = new Point( point.X - 7, point.Y + 3.5 );
-            fixLines[1].Points[1] = new Point( point.X + 7, point.Y + 3.5 );
+            fixLines[1].Points[0] = new Point( point.X - 7 , point.Y + 3.5 );
+            fixLines[1].Points[1] = new Point( point.X + 7 , point.Y + 3.5 );
 
-            fixLines[2].Points[0] = new Point( point.X - 3.5, point.Y + 7 );
-            fixLines[2].Points[1] = new Point( point.X - 3.5, point.Y - 7 );
+            fixLines[2].Points[0] = new Point( point.X - 3.5 , point.Y + 7 );
+            fixLines[2].Points[1] = new Point( point.X - 3.5 , point.Y - 7 );
 
-            fixLines[3].Points[0] = new Point( point.X + 3.5, point.Y + 7 );
-            fixLines[3].Points[1] = new Point( point.X + 3.5, point.Y - 7 );
+            fixLines[3].Points[0] = new Point( point.X + 3.5 , point.Y + 7 );
+            fixLines[3].Points[1] = new Point( point.X + 3.5 , point.Y - 7 );
         }
 
         /// <summary>
@@ -1053,7 +1053,7 @@ namespace SlopeFEA
 
             // shift the point, its display circle, and its fixity lines
             point += delta;
-            dot.Margin = new Thickness( point.X - 3.5, point.Y - 3.5, 0, 0 );
+            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
             Point p;
             foreach ( Polyline l in fixLines )
             {
@@ -1086,7 +1086,7 @@ namespace SlopeFEA
         /// </summary>
         /// <param name="sender">Reference to sending object.</param>
         /// <param name="e">Mouse event arguments.</param>
-        private void MouseLeftButtonDown ( object sender, MouseEventArgs e )
+        private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
             if ( canvas.DrawMode == DrawModes.Select
                 || canvas.DrawMode == DrawModes.AddPoints
@@ -1104,18 +1104,18 @@ namespace SlopeFEA
     public class LineConstraint
     {
         private SlopeCanvas canvas;
-        private bool isFixedX, isFixedY;
+        private bool isFixedX , isFixedY;
         private List<Polyline> fixLines;
 
-        public LineConstraint ( SlopeCanvas canvas,
-                                DrawingPoint p1, DrawingPoint p2,
-                                bool fixX, bool fixY )
+        public LineConstraint ( SlopeCanvas canvas ,
+                                DrawingPoint p1 , DrawingPoint p2 ,
+                                bool fixX , bool fixY )
         {
             // set parent drawing canvas
             this.canvas = canvas;
 
             // create list of boundary nodes for the constraint
-            Nodes = new List<DrawingPoint>() { p1, p2 };
+            Nodes = new List<DrawingPoint>() { p1 , p2 };
 
             // set constraints on boundary nodes
             Nodes[0].IsFixedX = fixX || Nodes[0].IsFixedX;
@@ -1124,7 +1124,7 @@ namespace SlopeFEA
             Nodes[1].IsFixedY = fixY || Nodes[1].IsFixedY;
 
             // compute the point at which to plot the constraint
-            MidPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
+            MidPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
 
             // create plotting lines for constraints
             fixLines = new List<Polyline>();
@@ -1141,17 +1141,17 @@ namespace SlopeFEA
                 canvas.Children.Add( newLine );
             }
 
-            fixLines[0].Points.Add( new Point( MidPoint.X - 7, MidPoint.Y - 3.5 ) );
-            fixLines[0].Points.Add( new Point( MidPoint.X + 7, MidPoint.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( MidPoint.X + 7 , MidPoint.Y - 3.5 ) );
 
-            fixLines[1].Points.Add( new Point( MidPoint.X - 7, MidPoint.Y + 3.5 ) );
-            fixLines[1].Points.Add( new Point( MidPoint.X + 7, MidPoint.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( MidPoint.X + 7 , MidPoint.Y + 3.5 ) );
 
-            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5, MidPoint.Y + 7 ) );
-            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5, MidPoint.Y - 7 ) );
+            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5 , MidPoint.Y + 7 ) );
+            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5 , MidPoint.Y - 7 ) );
 
-            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5, MidPoint.Y + 7 ) );
-            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5, MidPoint.Y - 7 ) );
+            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
+            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
 
             // set visibility of constraints
             this.IsFixedX = fixX;
@@ -1205,22 +1205,22 @@ namespace SlopeFEA
 
         public void UpdateLocation ()
         {
-            DrawingPoint p1 = Nodes[0], p2 = Nodes[1];
+            DrawingPoint p1 = Nodes[0] , p2 = Nodes[1];
 
             // compute the point at which to plot the constraint
-            MidPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
+            MidPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
 
-            fixLines[0].Points[0] = new Point( MidPoint.X - 7, MidPoint.Y - 3.5 );
-            fixLines[0].Points[1] = new Point( MidPoint.X + 7, MidPoint.Y - 3.5 );
+            fixLines[0].Points[0] = new Point( MidPoint.X - 7 , MidPoint.Y - 3.5 );
+            fixLines[0].Points[1] = new Point( MidPoint.X + 7 , MidPoint.Y - 3.5 );
 
-            fixLines[1].Points[0] = new Point( MidPoint.X - 7, MidPoint.Y + 3.5 );
-            fixLines[1].Points[1] = new Point( MidPoint.X + 7, MidPoint.Y + 3.5 );
+            fixLines[1].Points[0] = new Point( MidPoint.X - 7 , MidPoint.Y + 3.5 );
+            fixLines[1].Points[1] = new Point( MidPoint.X + 7 , MidPoint.Y + 3.5 );
 
-            fixLines[2].Points[0] = new Point( MidPoint.X - 3.5, MidPoint.Y + 7 );
-            fixLines[2].Points[1] = new Point( MidPoint.X - 3.5, MidPoint.Y - 7 );
+            fixLines[2].Points[0] = new Point( MidPoint.X - 3.5 , MidPoint.Y + 7 );
+            fixLines[2].Points[1] = new Point( MidPoint.X - 3.5 , MidPoint.Y - 7 );
 
-            fixLines[3].Points[0] = new Point( MidPoint.X + 3.5, MidPoint.Y + 7 );
-            fixLines[3].Points[1] = new Point( MidPoint.X + 3.5, MidPoint.Y - 7 );
+            fixLines[3].Points[0] = new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 );
+            fixLines[3].Points[1] = new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 );
         }
 
         public void Delete ()
@@ -1234,12 +1234,12 @@ namespace SlopeFEA
     public class PointLoad
     {
         private SlopeCanvas canvas;
-        private double xLoad, yLoad;
-        private bool isLoadedX, isLoadedY;
+        private double xLoad , yLoad;
+        private bool isLoadedX , isLoadedY;
         private List<Polyline> loadLines;
-        private static double Cpos = Math.Cos( 0.75 * Math.PI ),
-                                Spos = Math.Sin( 0.75 * Math.PI ),
-                                Cneg = Cpos,
+        private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
+                                Spos = Math.Sin( 0.75 * Math.PI ) ,
+                                Cneg = Cpos ,
                                 Sneg = -Spos;
 
         /// <summary>
@@ -1251,9 +1251,9 @@ namespace SlopeFEA
         /// <param name="xLoad">Value of horizontal load</param>
         /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
         /// <param name="yLoad">Value of vertical load</param>
-        public PointLoad ( SlopeCanvas canvas, DrawingPoint node,
-                                bool isLoadedX, double xLoad,
-                                bool isLoadedY, double yLoad )
+        public PointLoad ( SlopeCanvas canvas , DrawingPoint node ,
+                                bool isLoadedX , double xLoad ,
+                                bool isLoadedY , double yLoad )
         {
             // set parent drawing canvas
             this.canvas = canvas;
@@ -1321,8 +1321,8 @@ namespace SlopeFEA
         /// <param name="xLoad">Value of horizontal load</param>
         /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
         /// <param name="yLoad">Value of vertical load</param>
-        public void ApplyLoad ( bool isLoadedX, double xLoad,
-                                bool isLoadedY, double yLoad )
+        public void ApplyLoad ( bool isLoadedX , double xLoad ,
+                                bool isLoadedY , double yLoad )
         {
             this.isLoadedX = isLoadedX;
             if ( IsLoadedX ) this.xLoad = xLoad;
@@ -1339,40 +1339,40 @@ namespace SlopeFEA
         public void Update ()
         {
             // for applying rotations
-            double xprime, yprime;
-            bool posXLoad = XLoad >= 0, posYLoad = YLoad >= 0;
+            double xprime , yprime;
+            bool posXLoad = XLoad >= 0 , posYLoad = YLoad >= 0;
 
             // horizontal load arrow shaft
-            loadLines[0].Points[0] = new Point( Node.Point.X, Node.Point.Y );
-            loadLines[0].Points[1] = loadLines[0].Points[0] + new Vector( 40, 0 );
+            loadLines[0].Points[0] = new Point( Node.Point.X , Node.Point.Y );
+            loadLines[0].Points[1] = loadLines[0].Points[0] + new Vector( 40 , 0 );
             // horizontal load arrow head 1
             loadLines[1].Points[0] = posXLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
-            loadLines[1].Points[1] = posXLoad ? new Point( 12, 0 ) : new Point( -12, 0 );
+            loadLines[1].Points[1] = posXLoad ? new Point( 12 , 0 ) : new Point( -12 , 0 );
             xprime = loadLines[1].Points[1].X * Cpos - loadLines[1].Points[1].Y * Spos + loadLines[1].Points[0].X;
             yprime = loadLines[1].Points[1].X * Spos + loadLines[1].Points[1].Y * Cpos + loadLines[1].Points[0].Y;
-            loadLines[1].Points[1] = new Point( xprime, yprime );
+            loadLines[1].Points[1] = new Point( xprime , yprime );
             // horizontal load arrow head 2
             loadLines[2].Points[0] = posXLoad ? loadLines[0].Points[1] : loadLines[0].Points[0];
-            loadLines[2].Points[1] = posXLoad ? new Point( 12, 0 ) : new Point( -12, 0 );
+            loadLines[2].Points[1] = posXLoad ? new Point( 12 , 0 ) : new Point( -12 , 0 );
             xprime = loadLines[2].Points[1].X * Cneg - loadLines[2].Points[1].Y * Sneg + loadLines[2].Points[0].X;
             yprime = loadLines[2].Points[1].X * Sneg + loadLines[2].Points[1].Y * Cneg + loadLines[2].Points[0].Y;
-            loadLines[2].Points[1] = new Point( xprime, yprime );
+            loadLines[2].Points[1] = new Point( xprime , yprime );
 
             // vertical load arrow shaft
-            loadLines[3].Points[0] = new Point( Node.Point.X, Node.Point.Y );
-            loadLines[3].Points[1] = loadLines[3].Points[0] + new Vector( 0, -40 );
+            loadLines[3].Points[0] = new Point( Node.Point.X , Node.Point.Y );
+            loadLines[3].Points[1] = loadLines[3].Points[0] + new Vector( 0 , -40 );
             // vertical load arrow head 1
             loadLines[4].Points[0] = posYLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
-            loadLines[4].Points[1] = posYLoad ? new Point( 0, -12 ) : new Point( 0, 12 );
+            loadLines[4].Points[1] = posYLoad ? new Point( 0 , -12 ) : new Point( 0 , 12 );
             xprime = loadLines[4].Points[1].X * Cpos - loadLines[4].Points[1].Y * Spos + loadLines[4].Points[0].X;
             yprime = loadLines[4].Points[1].X * Spos + loadLines[4].Points[1].Y * Cpos + loadLines[4].Points[0].Y;
-            loadLines[4].Points[1] = new Point( xprime, yprime );
+            loadLines[4].Points[1] = new Point( xprime , yprime );
             // vertical load arrow head 2
             loadLines[5].Points[0] = posYLoad ? loadLines[3].Points[1] : loadLines[3].Points[0];
-            loadLines[5].Points[1] = posYLoad ? new Point( 0, -12 ) : new Point( 0, 12 );
+            loadLines[5].Points[1] = posYLoad ? new Point( 0 , -12 ) : new Point( 0 , 12 );
             xprime = loadLines[5].Points[1].X * Cneg - loadLines[5].Points[1].Y * Sneg + loadLines[5].Points[0].X;
             yprime = loadLines[5].Points[1].X * Sneg + loadLines[5].Points[1].Y * Cneg + loadLines[5].Points[0].Y;
-            loadLines[5].Points[1] = new Point( xprime, yprime );
+            loadLines[5].Points[1] = new Point( xprime , yprime );
 
             int i = 0;
             for ( ; i < 3 ; i++ ) loadLines[i].Visibility = IsLoadedX ? Visibility.Visible : Visibility.Hidden;
@@ -1393,12 +1393,12 @@ namespace SlopeFEA
     public class LineLoad
     {
         private SlopeCanvas canvas;
-        private double nLoad1, nLoad2, tLoad1, tLoad2;
-        private bool isLoadedN, isLoadedT;
+        private double nLoad1 , nLoad2 , tLoad1 , tLoad2;
+        private bool isLoadedN , isLoadedT;
         private List<Polyline> loadLines;
-        private static double Cpos = Math.Cos( 0.75 * Math.PI ),
-                                Spos = Math.Sin( 0.75 * Math.PI ),
-                                Cneg = Cpos,
+        private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
+                                Spos = Math.Sin( 0.75 * Math.PI ) ,
+                                Cneg = Cpos ,
                                 Sneg = -Spos;
 
         /// <summary>
@@ -1413,20 +1413,20 @@ namespace SlopeFEA
         /// <param name="isLoadedT">Is load applied in the tangential direction?</param>
         /// <param name="tLoad1">Value of tangential load at node 1.</param>
         /// <param name="tLoad2">Value of tangential load at node 2.</param>
-        public LineLoad ( SlopeCanvas canvas,
-                                DrawingPoint p1, DrawingPoint p2,
-                                bool isLoadedN,
-                                double nLoad1, double nLoad2,
-                                bool isLoadedT,
-                                double tLoad1, double tLoad2 )
+        public LineLoad ( SlopeCanvas canvas ,
+                                DrawingPoint p1 , DrawingPoint p2 ,
+                                bool isLoadedN ,
+                                double nLoad1 , double nLoad2 ,
+                                bool isLoadedT ,
+                                double tLoad1 , double tLoad2 )
         {
             // set parent drawing canvas
             this.canvas = canvas;
 
             // create list of boundary nodes for the load
-            Nodes = new List<DrawingPoint>() { p1, p2 };
+            Nodes = new List<DrawingPoint>() { p1 , p2 };
 
-            PlotPoints = new List<Point>() { new Point(), new Point(), new Point() };
+            PlotPoints = new List<Point>() { new Point() , new Point() , new Point() };
 
             // set load state
             this.isLoadedN = isLoadedN;
@@ -1499,10 +1499,10 @@ namespace SlopeFEA
         /// <param name="isLoadedT">Is a tangential load applied?</param>
         /// <param name="tLoad1">Value of tangential load at node 1.</param>
         /// <param name="tLoad2">Value of tangential load at node 2.</param>
-        public void ApplyLoad ( bool isLoadedN,
-                                double nLoad1, double nLoad2,
-                                bool isLoadedT,
-                                double tLoad1, double tLoad2 )
+        public void ApplyLoad ( bool isLoadedN ,
+                                double nLoad1 , double nLoad2 ,
+                                bool isLoadedT ,
+                                double tLoad1 , double tLoad2 )
         {
             this.isLoadedN = isLoadedN;
             if ( IsLoadedN )
@@ -1540,15 +1540,15 @@ namespace SlopeFEA
             for ( int i = 0 ; i < 3 ; i++ ) PlotPoints[i] = Nodes[0].Point + (i + 1) * 0.25 * (Nodes[1].Point - Nodes[0].Point);
 
             // unit tangential and normal vectors
-            Vector tang = Nodes[1].Point - Nodes[0].Point,
-                norm = new Vector( -tang.Y, tang.X );
+            Vector tang = Nodes[1].Point - Nodes[0].Point ,
+                norm = new Vector( -tang.Y , tang.X );
             tang /= tang.Length;
             norm /= norm.Length;
 
-            int i0, i1, i2, i3, i4, i5;
+            int i0 , i1 , i2 , i3 , i4 , i5;
             Point plotPoint;
-            double xprime, yprime;
-            bool posNLoad, posTLoad;
+            double xprime , yprime;
+            bool posNLoad , posTLoad;
             for ( int i = 0 ; i < 3 ; i++ )
             {
                 // load line indices
@@ -1570,14 +1570,14 @@ namespace SlopeFEA
                 loadLines[i1].Points[1] = posNLoad ? (Point) (-6 * norm) : (Point) (6 * norm);
                 xprime = loadLines[i1].Points[1].X * Cpos - loadLines[i1].Points[1].Y * Spos + loadLines[i1].Points[0].X;
                 yprime = loadLines[i1].Points[1].X * Spos + loadLines[i1].Points[1].Y * Cpos + loadLines[i1].Points[0].Y;
-                loadLines[i1].Points[1] = new Point( xprime, yprime );
+                loadLines[i1].Points[1] = new Point( xprime , yprime );
                 loadLines[i1].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
                 // normal load arrow head 2
                 loadLines[i2].Points[0] = posNLoad ? loadLines[i0].Points[0] : loadLines[i0].Points[1];
                 loadLines[i2].Points[1] = posNLoad ? (Point) (-6 * norm) : (Point) (6 * norm);
                 xprime = loadLines[i2].Points[1].X * Cneg - loadLines[i2].Points[1].Y * Sneg + loadLines[i2].Points[0].X;
                 yprime = loadLines[i2].Points[1].X * Sneg + loadLines[i2].Points[1].Y * Cneg + loadLines[i2].Points[0].Y;
-                loadLines[i2].Points[1] = new Point( xprime, yprime );
+                loadLines[i2].Points[1] = new Point( xprime , yprime );
                 loadLines[i2].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
 
                 // tangential load arrow shaft
@@ -1589,14 +1589,14 @@ namespace SlopeFEA
                 loadLines[i4].Points[1] = posTLoad ? (Point) (6 * tang) : (Point) (-6 * tang);
                 xprime = loadLines[i4].Points[1].X * Cpos - loadLines[i4].Points[1].Y * Spos + loadLines[i4].Points[0].X;
                 yprime = loadLines[i4].Points[1].X * Spos + loadLines[i4].Points[1].Y * Cpos + loadLines[i4].Points[0].Y;
-                loadLines[i4].Points[1] = new Point( xprime, yprime );
+                loadLines[i4].Points[1] = new Point( xprime , yprime );
                 loadLines[i4].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
                 // tangential load arrow head 2
                 loadLines[i5].Points[0] = posTLoad ? loadLines[i3].Points[1] : loadLines[i3].Points[0];
                 loadLines[i5].Points[1] = posTLoad ? (Point) (6 * tang) : (Point) (-6 * tang);
                 xprime = loadLines[i5].Points[1].X * Cneg - loadLines[i5].Points[1].Y * Sneg + loadLines[i5].Points[0].X;
                 yprime = loadLines[i5].Points[1].X * Sneg + loadLines[i5].Points[1].Y * Cneg + loadLines[i5].Points[0].Y;
-                loadLines[i5].Points[1] = new Point( xprime, yprime );
+                loadLines[i5].Points[1] = new Point( xprime , yprime );
                 loadLines[i5].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
             }
         }
@@ -1633,7 +1633,7 @@ namespace SlopeFEA
         private List<LineLoad> lineLoads;
         private List<PointLoad> pointLoads;
 
-        public MaterialBlock ( SlopeCanvas canvas, Point[] pts )
+        public MaterialBlock ( SlopeCanvas canvas , Point[] pts )
         {
             this.canvas = canvas;
 
@@ -1651,7 +1651,7 @@ namespace SlopeFEA
             for ( int i = 0 ; i < pts.Length - 1 ; i++ )
             {
                 Boundary.Points.Add( pts[i] );
-                boundaryPoints.Add( new DrawingPoint( canvas, this, pts[i] ) );
+                boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
             }
 
             Material = new MaterialType();
@@ -1705,7 +1705,7 @@ namespace SlopeFEA
             {
                 if ( boundaryPoints.Count == 0 ) return 0;
 
-                double x1, y1, x2, y2;
+                double x1 , y1 , x2 , y2;
 
                 x1 = boundaryPoints[boundaryPoints.Count - 1].Point.X;
                 y1 = boundaryPoints[boundaryPoints.Count - 1].Point.Y;
@@ -1762,7 +1762,7 @@ namespace SlopeFEA
             canvas.MaterialBlocks.Remove( this );
         }
 
-        public void AddPoint ( DrawingPoint p1, DrawingPoint p2 )
+        public void AddPoint ( DrawingPoint p1 , DrawingPoint p2 )
         {
             // find point indices in list
             int index1 = BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == p1; } );
@@ -1771,7 +1771,7 @@ namespace SlopeFEA
             // if points were not successfully found
             if ( index1 == -1 || index2 == -1 )
             {
-                MessageBox.Show( "Points not found on block.", "Fix X error" );
+                MessageBox.Show( "Points not found on block." , "Fix X error" );
                 return;
             }
 
@@ -1790,10 +1790,10 @@ namespace SlopeFEA
 
             if ( (index2 - index1) == 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
-                DrawingPoint newNode = new DrawingPoint( canvas, this, newPoint );
-                BoundaryPoints.Insert( index2, newNode );
-                Boundary.Points.Insert( index2, newPoint );
+                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                DrawingPoint newNode = new DrawingPoint( canvas , this , newPoint );
+                BoundaryPoints.Insert( index2 , newNode );
+                Boundary.Points.Insert( index2 , newPoint );
 
                 // if a line constraint exists between these two points, remove it and create two in its place
                 LineConstraint existingLC = this.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
@@ -1804,10 +1804,10 @@ namespace SlopeFEA
                     newNode.IsFixedY = existingLC.IsFixedY;
 
                     // create the two new line constraints
-                    LineConstraint newLC1 = new LineConstraint( canvas,
-                        p1, newNode, existingLC.IsFixedX, existingLC.IsFixedY );
-                    LineConstraint newLC2 = new LineConstraint( canvas,
-                        newNode, p2, existingLC.IsFixedX, existingLC.IsFixedY );
+                    LineConstraint newLC1 = new LineConstraint( canvas ,
+                        p1 , newNode , existingLC.IsFixedX , existingLC.IsFixedY );
+                    LineConstraint newLC2 = new LineConstraint( canvas ,
+                        newNode , p2 , existingLC.IsFixedX , existingLC.IsFixedY );
 
                     // clear the existing plotting lines, remove the existing constraint, and add the new constraints
                     existingLC.Delete();
@@ -1821,18 +1821,18 @@ namespace SlopeFEA
                 if ( existingLL != null )
                 {
                     // create two new line loads
-                    LineLoad newLL1 = new LineLoad( canvas,
-                        p1, newNode,
-                        existingLL.IsLoadedN,
-                        existingLL.NLoad1, 0.5 * (existingLL.NLoad1 + existingLL.NLoad2),
-                        existingLL.IsLoadedT,
-                        existingLL.TLoad1, 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
-                    LineLoad newLL2 = new LineLoad( canvas,
-                        newNode, p2,
-                        existingLL.IsLoadedN,
-                        newLL1.NLoad2, existingLL.NLoad2,
-                        existingLL.IsLoadedT,
-                        newLL1.TLoad2, existingLL.TLoad2 );
+                    LineLoad newLL1 = new LineLoad( canvas ,
+                        p1 , newNode ,
+                        existingLL.IsLoadedN ,
+                        existingLL.NLoad1 , 0.5 * (existingLL.NLoad1 + existingLL.NLoad2) ,
+                        existingLL.IsLoadedT ,
+                        existingLL.TLoad1 , 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
+                    LineLoad newLL2 = new LineLoad( canvas ,
+                        newNode , p2 ,
+                        existingLL.IsLoadedN ,
+                        newLL1.NLoad2 , existingLL.NLoad2 ,
+                        existingLL.IsLoadedT ,
+                        newLL1.TLoad2 , existingLL.TLoad2 );
 
                     // clear the existing plotting lines, remove the existing line load, and add the new line loads
                     existingLL.Delete();
@@ -1846,8 +1846,8 @@ namespace SlopeFEA
             }
             else if ( index2 == 0 && index1 == BoundaryPoints.Count - 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X), 0.5 * (p1.Point.Y + p2.Point.Y) );
-                DrawingPoint newNode = new DrawingPoint( canvas, this, newPoint );
+                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                DrawingPoint newNode = new DrawingPoint( canvas , this , newPoint );
                 BoundaryPoints.Add( newNode );
                 Boundary.Points.Add( newPoint );
 
@@ -1860,10 +1860,10 @@ namespace SlopeFEA
                     newNode.IsFixedY = existingLC.IsFixedY;
 
                     // create the two new line constraints
-                    LineConstraint newLC1 = new LineConstraint( canvas,
-                        p1, newNode, existingLC.IsFixedX, existingLC.IsFixedY );
-                    LineConstraint newLC2 = new LineConstraint( canvas,
-                        newNode, p2, existingLC.IsFixedX, existingLC.IsFixedY );
+                    LineConstraint newLC1 = new LineConstraint( canvas ,
+                        p1 , newNode , existingLC.IsFixedX , existingLC.IsFixedY );
+                    LineConstraint newLC2 = new LineConstraint( canvas ,
+                        newNode , p2 , existingLC.IsFixedX , existingLC.IsFixedY );
 
                     // clear the existing plotting lines, remove the existing constraint, and add the new constraints
                     existingLC.Delete();
@@ -1877,18 +1877,18 @@ namespace SlopeFEA
                 if ( existingLL != null )
                 {
                     // create two new line loads
-                    LineLoad newLL1 = new LineLoad( canvas,
-                        p1, newNode,
-                        existingLL.IsLoadedN,
-                        existingLL.NLoad1, 0.5 * (existingLL.NLoad1 + existingLL.NLoad2),
-                        existingLL.IsLoadedT,
-                        existingLL.TLoad1, 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
-                    LineLoad newLL2 = new LineLoad( canvas,
-                        newNode, p2,
-                        existingLL.IsLoadedN,
-                        newLL1.NLoad2, existingLL.NLoad2,
-                        existingLL.IsLoadedT,
-                        newLL1.TLoad2, existingLL.TLoad2 );
+                    LineLoad newLL1 = new LineLoad( canvas ,
+                        p1 , newNode ,
+                        existingLL.IsLoadedN ,
+                        existingLL.NLoad1 , 0.5 * (existingLL.NLoad1 + existingLL.NLoad2) ,
+                        existingLL.IsLoadedT ,
+                        existingLL.TLoad1 , 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
+                    LineLoad newLL2 = new LineLoad( canvas ,
+                        newNode , p2 ,
+                        existingLL.IsLoadedN ,
+                        newLL1.NLoad2 , existingLL.NLoad2 ,
+                        existingLL.IsLoadedT ,
+                        newLL1.TLoad2 , existingLL.TLoad2 );
 
                     // clear the existing plotting lines, remove the existing line load, and add the new line loads
                     existingLL.Delete();
@@ -1902,11 +1902,11 @@ namespace SlopeFEA
             }
             else
             {
-                MessageBox.Show( "Points must be different and adjacent.", "Error" );
+                MessageBox.Show( "Points must be different and adjacent." , "Error" );
             }
         }
 
-        public void FixX ( DrawingPoint p1, DrawingPoint p2 )
+        public void FixX ( DrawingPoint p1 , DrawingPoint p2 )
         {
             // find point indices in list
             int index1 = BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == p1; } );
@@ -1915,7 +1915,7 @@ namespace SlopeFEA
             // if points were not successfully found
             if ( index1 == -1 || index2 == -1 )
             {
-                MessageBox.Show( "Points not found on block.", "Fix X error" );
+                MessageBox.Show( "Points not found on block." , "Fix X error" );
                 return;
             }
 
@@ -1956,7 +1956,7 @@ namespace SlopeFEA
                 }
                 else
                 {
-                    LineConstraints.Add( new LineConstraint( canvas, p1, p2, true, false ) );
+                    LineConstraints.Add( new LineConstraint( canvas , p1 , p2 , true , false ) );
                 }
 
                 canvas.IsSaved = false;
@@ -1966,7 +1966,7 @@ namespace SlopeFEA
             // ... otherwise, indicate that a constraint cannot be applied in this manner
             else
             {
-                MessageBox.Show( "Points must be either the same or directly adjacent.", "Error" );
+                MessageBox.Show( "Points must be either the same or directly adjacent." , "Error" );
             }
 
             // remove any line constraints that are both unfixed
@@ -1977,7 +1977,7 @@ namespace SlopeFEA
             }
         }
 
-        public void FixY ( DrawingPoint p1, DrawingPoint p2 )
+        public void FixY ( DrawingPoint p1 , DrawingPoint p2 )
         {
             // find point indices in list
             int index1 = BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == p1; } );
@@ -1986,7 +1986,7 @@ namespace SlopeFEA
             // if points were not successfully found
             if ( index1 == -1 || index2 == -1 )
             {
-                MessageBox.Show( "Points not found on block.", "Fix Y error" );
+                MessageBox.Show( "Points not found on block." , "Fix Y error" );
                 return;
             }
 
@@ -2026,7 +2026,7 @@ namespace SlopeFEA
                 }
                 else
                 {
-                    LineConstraints.Add( new LineConstraint( canvas, p1, p2, false, true ) );
+                    LineConstraints.Add( new LineConstraint( canvas , p1 , p2 , false , true ) );
                 }
 
                 canvas.IsSaved = false;
@@ -2036,7 +2036,7 @@ namespace SlopeFEA
             // ... otherwise, indicate that a constraint cannot be applied in this manner
             else
             {
-                MessageBox.Show( "Points must be either the same or directly adjacent.", "Error" );
+                MessageBox.Show( "Points must be either the same or directly adjacent." , "Error" );
             }
 
 
@@ -2056,12 +2056,12 @@ namespace SlopeFEA
             // if undefined, create a new point load object
             if ( load == null )
             {
-                load = new PointLoad( canvas, p, false, 0, false, 0 );
+                load = new PointLoad( canvas , p , false , 0 , false , 0 );
                 pointLoads.Add( load );
             }
 
             // start dialog for user input
-            AddPointLoadDialog dlg = new AddPointLoadDialog( canvas, load );
+            AddPointLoadDialog dlg = new AddPointLoadDialog( canvas , load );
             dlg.ShowDialog();
 
             // if there is no load in horizontal or vertical direction, delete the load ...
@@ -2084,7 +2084,7 @@ namespace SlopeFEA
             }
         }
 
-        public void ApplyLineLoad ( DrawingPoint p1, DrawingPoint p2 )
+        public void ApplyLineLoad ( DrawingPoint p1 , DrawingPoint p2 )
         {
             // find point indices in list
             int index1 = BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == p1; } );
@@ -2093,7 +2093,7 @@ namespace SlopeFEA
             // if points were not successfully found
             if ( index1 == -1 || index2 == -1 )
             {
-                MessageBox.Show( "Points not found on block.", "Line Load Error" );
+                MessageBox.Show( "Points not found on block." , "Line Load Error" );
                 return;
             }
 
@@ -2118,12 +2118,12 @@ namespace SlopeFEA
                 // if undefined, create a new line load object
                 if ( load == null )
                 {
-                    load = new LineLoad( canvas, p1, p2, false, 0, 0, false, 0, 0 );
+                    load = new LineLoad( canvas , p1 , p2 , false , 0 , 0 , false , 0 , 0 );
                     lineLoads.Add( load );
                 }
 
                 // start dialog for user input
-                AddLineLoadDialog dlg = new AddLineLoadDialog( canvas, load );
+                AddLineLoadDialog dlg = new AddLineLoadDialog( canvas , load );
                 dlg.ShowDialog();
 
                 // if there is no load in normal or tangential direction, delete the load ...
@@ -2147,7 +2147,7 @@ namespace SlopeFEA
             }
             else
             {
-                MessageBox.Show( "Points must be different and adjacent.", "Line Load Error" );
+                MessageBox.Show( "Points must be different and adjacent." , "Line Load Error" );
             }
         }
 
@@ -2168,7 +2168,7 @@ namespace SlopeFEA
             PointLoads.ForEach( delegate( PointLoad pl ) { pl.Update(); } );
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
             Point p;
             for ( int i = 0 ; i < Boundary.Points.Count ; i++ )
@@ -2177,7 +2177,7 @@ namespace SlopeFEA
                 p.X = centre.X + factor * (p.X - centre.X);
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
-                boundaryPoints[i].Zoom( factor, centre );
+                boundaryPoints[i].Zoom( factor , centre );
             }
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
@@ -2185,17 +2185,17 @@ namespace SlopeFEA
             PointLoads.ForEach( delegate( PointLoad pl ) { pl.Update(); } );
         }
 
-        private void MouseLeftButtonDown ( object sender, MouseEventArgs e )
+        private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
             if ( canvas.DrawMode == DrawModes.Select ) this.IsSelected = true;
         }
 
         public int CheckIntersecting ()
         {
-            double x1, y1, x2, y2, x3, y3, x4, y4,
-                    m1, m2, b1, b2,
-                    x, y;
-            bool vert1, vert2;
+            double x1 , y1 , x2 , y2 , x3 , y3 , x4 , y4 ,
+                    m1 , m2 , b1 , b2 ,
+                    x , y;
+            bool vert1 , vert2;
             double toler = 1e-5;
             int count = 0;
 
@@ -2259,8 +2259,8 @@ namespace SlopeFEA
                         {
                             y = m1 * x + b1;
 
-                            if ( (x - Math.Min( x1, x2 )) < toler && (Math.Max( x1, x2 ) - x) < toler
-                                && (y - Math.Min( y3, y4 )) < toler && (Math.Max( y3, y4 ) - y) < toler )
+                            if ( (x - Math.Min( x1 , x2 )) < toler && (Math.Max( x1 , x2 ) - x) < toler
+                                && (y - Math.Min( y3 , y4 )) < toler && (Math.Max( y3 , y4 ) - y) < toler )
                             {
                                 count++;
                             }
@@ -2269,8 +2269,8 @@ namespace SlopeFEA
                         {
                             y = m2 * x + b2;
 
-                            if ( (x - Math.Min( x3, x4 )) < toler && (Math.Max( x3, x4 ) - x) < toler
-                                && (y - Math.Min( y1, y2 )) < toler && (Math.Max( y1, y2 ) - y) < toler )
+                            if ( (x - Math.Min( x3 , x4 )) < toler && (Math.Max( x3 , x4 ) - x) < toler
+                                && (y - Math.Min( y1 , y2 )) < toler && (Math.Max( y1 , y2 ) - y) < toler )
                             {
                                 count++;
                             }
@@ -2294,8 +2294,8 @@ namespace SlopeFEA
                         {
                             x = (b2 - b1) / (m1 - m2);
 
-                            if ( (x - Math.Min( x1, x2 )) > toler && (Math.Max( x1, x2 ) - x) > toler
-                                && (x - Math.Min( x3, x4 )) > toler && (Math.Max( x3, x4 ) - x) > toler )
+                            if ( (x - Math.Min( x1 , x2 )) > toler && (Math.Max( x1 , x2 ) - x) > toler
+                                && (x - Math.Min( x3 , x4 )) > toler && (Math.Max( x3 , x4 ) - x) > toler )
                             {
                                 count++;
                             }
@@ -2310,7 +2310,7 @@ namespace SlopeFEA
 
     public class MaterialType
     {
-        double kno_, knr_, Acoef_, ktrb_, ktrs_;
+        double kno_ , knr_ , Acoef_ , ktrb_ , ktrs_;
 
         public MaterialType ()
         {
@@ -2331,7 +2331,7 @@ namespace SlopeFEA
         // after Stolle & Guo (2008)
         public void ComputeRFEMProperties ()
         {
-            double kappa = 1.0, del = 0.0015;
+            double kappa = 1.0 , del = 0.0015;
 
             kno_ = (Emod * (1 - Nu) / ((1 + Nu) * (1 - 2 * Nu + 0.00001))) / del;
             knr_ = kno_ / 100;
@@ -2388,7 +2388,7 @@ namespace SlopeFEA
         private List<MeshPoint> meshPoints;
         private Line line;
 
-        public MeshLine ( SlopeCanvas canvas, double x )
+        public MeshLine ( SlopeCanvas canvas , double x )
         {
             this.canvas = canvas;
 
@@ -2398,7 +2398,7 @@ namespace SlopeFEA
 
             // for intersection finding algorithm
             double toler = 1e-5;
-            double x1, y1, x2, y2, m = 0, y = 0;
+            double x1 , y1 , x2 , y2 , m = 0 , y = 0;
             //bool added;
 
             // loop through MaterialBlocks finding boundary intersection points
@@ -2418,7 +2418,7 @@ namespace SlopeFEA
                     y2 = p.Y;
 
                     // MeshLine will not intersect segment
-                    if ( x < Math.Min( x1, x2 ) || x > Math.Max( x1, x2 ) || Math.Abs( x2 - x1 ) < toler )
+                    if ( x < Math.Min( x1 , x2 ) || x > Math.Max( x1 , x2 ) || Math.Abs( x2 - x1 ) < toler )
                     {
                         x1 = x2; y1 = y2;   // skip to next point
                         continue;
@@ -2437,7 +2437,7 @@ namespace SlopeFEA
                     }
 
                     // add the intersection point if found
-                    blockPoints.Add( new MeshPoint( new Point( x, y ), mb.Material ) );
+                    blockPoints.Add( new MeshPoint( new Point( x , y ) , mb.Material ) );
 
                     x1 = x2;    // update trailing point
                     y1 = y2;
@@ -2455,8 +2455,8 @@ namespace SlopeFEA
                 {
                     if ( meshPoints[i].Y < blockPoints[0].Y )
                     {
-                        meshPoints.InsertRange( i, blockPoints.GetRange( 0, 2 ) );
-                        blockPoints.RemoveRange( 0, 2 );
+                        meshPoints.InsertRange( i , blockPoints.GetRange( 0 , 2 ) );
+                        blockPoints.RemoveRange( 0 , 2 );
                         if ( blockPoints.Count <= 1 ) break;
                     }
                 }
@@ -2464,8 +2464,8 @@ namespace SlopeFEA
                 // insert remaining block points at end of MeshLine
                 while ( blockPoints.Count > 1 )
                 {
-                    meshPoints.AddRange( blockPoints.GetRange( 0, 2 ) );
-                    blockPoints.RemoveRange( 0, 2 );
+                    meshPoints.AddRange( blockPoints.GetRange( 0 , 2 ) );
+                    blockPoints.RemoveRange( 0 , 2 );
                 }
             }
 
@@ -2516,9 +2516,9 @@ namespace SlopeFEA
             line.Y2 += delta.Y;
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
-            meshPoints.ForEach( delegate( MeshPoint mp ) { mp.Zoom( factor, centre ); } );
+            meshPoints.ForEach( delegate( MeshPoint mp ) { mp.Zoom( factor , centre ); } );
 
             line.X1 = centre.X + factor * (line.X1 - centre.X);
             line.X2 = centre.X + factor * (line.X2 - centre.X);
@@ -2532,7 +2532,7 @@ namespace SlopeFEA
         private Ellipse location;
         private MaterialType material;
 
-        public MeshPoint ( Point pt, MaterialType material )
+        public MeshPoint ( Point pt , MaterialType material )
         {
             location = new Ellipse();
             location.Height = 3;
@@ -2540,7 +2540,7 @@ namespace SlopeFEA
             location.Fill = Brushes.Black;
             location.Stroke = Brushes.Black;
             location.Visibility = Visibility.Visible;
-            location.Margin = new Thickness( pt.X - 1.5, pt.Y - 1.5, 0, 0 );
+            location.Margin = new Thickness( pt.X - 1.5 , pt.Y - 1.5 , 0 , 0 );
 
             this.material = material;
         }
@@ -2561,17 +2561,17 @@ namespace SlopeFEA
 
         public void Translate ( Vector delta )
         {
-            location.Margin = new Thickness( location.Margin.Left + delta.X, location.Margin.Top + delta.Y, 0, 0 );
+            location.Margin = new Thickness( location.Margin.Left + delta.X , location.Margin.Top + delta.Y , 0 , 0 );
         }
 
-        public void Zoom ( double factor, Point centre )
+        public void Zoom ( double factor , Point centre )
         {
-            location.Margin = new Thickness( centre.X + factor * ((location.Margin.Left + 1.5) - centre.X) - 1.5,
-                                            centre.Y + factor * ((location.Margin.Top + 1.5) - centre.Y) - 1.5,
-                                            0, 0 );
+            location.Margin = new Thickness( centre.X + factor * ((location.Margin.Left + 1.5) - centre.X) - 1.5 ,
+                                            centre.Y + factor * ((location.Margin.Top + 1.5) - centre.Y) - 1.5 ,
+                                            0 , 0 );
         }
 
-        public static int CompareByY ( MeshPoint mp1, MeshPoint mp2 )
+        public static int CompareByY ( MeshPoint mp1 , MeshPoint mp2 )
         {
             // If mp1 is null...
             if ( mp1 == null )
@@ -2619,7 +2619,7 @@ namespace SlopeFEA
         private MaterialType material;
         private MeshPointType type;
 
-        public AnalysisMeshPoint ( Point pt, MaterialType material, MeshPointType type )
+        public AnalysisMeshPoint ( Point pt , MaterialType material , MeshPointType type )
         {
             location.X = pt.X;
             location.Y = pt.Y;
