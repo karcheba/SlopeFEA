@@ -207,4 +207,4 @@ REVISION HISTORY:
 
 {v1.0.0.8}
 === (AddLineLoadDialog.xaml, CanvasData.cs) Changed N load to +ve inward [i.e. tending toward CCW rotation]
-+++ (BLAS/) Added [contains Basic Linear Algebra Subprograms for linking with FEA code later]
+=== (SlopeCanvas.cs) Changed draw order so that vertex nodes are drawn on top
