@@ -81,6 +81,8 @@ REFERENCES:
 [4]		McCombie, P. and Wilkinson, P. 2002. "The use of the simple genetic algorithm in finding the critical factor of safety in slope stability analysis," Computers and Geotechnics, 29: 699-714.
 [5]		Sengupta, A. and Upadhyay, A. 2005.  "An evolutionary algorithm for locating the critical failure surface in a soil slope," The Electronic Journal of Geotechnical Engineering, 10 (F).
 [6]		Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
+[7]		Marshall, A., Morgan, J., and Schonfelder, J. 1997. "Fortran 90 Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/F90Course3DayHomePage.html
+[8]		Marshall, A. 1997. "HPF Fortran Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/HPFCourse5DayHomePage.html
 
 
 REVISION HISTORY:
@@ -208,3 +210,10 @@ REVISION HISTORY:
 {v1.0.0.8}
 === (AddLineLoadDialog.xaml, CanvasData.cs) Changed N load to +ve inward [i.e. tending toward CCW rotation]
 === (SlopeCanvas.cs) Changed draw order so that vertex nodes are drawn on top
+
+
+[03 June 2011]
+
+{v1.0.0.9}
++++ (Fortran Testing/) Added directory for Fortran 90/95 examples [after [7] and [8]]
++++ (*.for) Added tutorials completed previously, converted to fixed-format, and compiled with gfortran
