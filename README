@@ -219,3 +219,15 @@ REVISION HISTORY:
 +++ (*.for) Added tutorials completed previously, converted to fixed-format, and compiled with gfortran
 === (AddLineLoad.xaml, CanvasData.cs) Changed +ve direction for N loading back to outward [CW rotation about node 1]
 +++ (Fortran Testing/) Continued working through [7], performing exercises along the way
+
+
+[04-05 June 2011]
+
+{v1.0.0.9}
++++ (Fortran Testing/) Continued working through [7], performing exercises along the way
+
+
+[06 June 2011]
+
+{v1.0.0.9}
++++ (LAPACK/) Built and tested reference BLAS and LAPACK
