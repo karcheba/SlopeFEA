@@ -82,7 +82,7 @@ REFERENCES:
 [5]		Sengupta, A. and Upadhyay, A. 2005.  "An evolutionary algorithm for locating the critical failure surface in a soil slope," The Electronic Journal of Geotechnical Engineering, 10 (F).
 [6]		Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
 [7]		Marshall, A., Morgan, J., and Schonfelder, J. 1997. "Fortran 90 Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/F90Course3DayHomePage.html
-[8]		Marshall, A. 1997. "HPF Fortran Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/HPFCourse5DayHomePage.html
+[8]		Hermanns, M. 2002. "Parallel Programming in Fortran 95 using OpenMP," Universidad Politecnica de Madrid, Spain. Available: http://www.openmp.org/presentations/miguel/F95_OpenMPv1_v2.pdf
 
 
 REVISION HISTORY:
@@ -238,3 +238,11 @@ REVISION HISTORY:
 
 {v1.0.0.9}
 +++ (Fortran Testing/) Continued working through [7], performing exercises along the way
+
+
+[08 June 2011]
+
+{v1.0.0.9}
+--- (README) Reference [8] to University of Liverpool HPF Course
++++ (README) Reference [8] to OpenMP in Fortran 95
++++ (Fortran Testing/) Began working through [8]
