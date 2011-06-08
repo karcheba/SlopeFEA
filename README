@@ -83,6 +83,8 @@ REFERENCES:
 [6]		Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
 [7]		Marshall, A., Morgan, J., and Schonfelder, J. 1997. "Fortran 90 Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/F90Course3DayHomePage.html
 [8]		Hermanns, M. 2002. "Parallel Programming in Fortran 95 using OpenMP," Universidad Politecnica de Madrid, Spain. Available: http://www.openmp.org/presentations/miguel/F95_OpenMPv1_v2.pdf
+[9]		Basic Linear Algebra Subprograms (BLAS). Available: http://www.netlib.org/blas/ (see Publications/References page on project site for list of contributors)
+[10]	Linear Algebra Package (LAPACK). Available: http://www.netlib.org/lapack/ (see Contributors page on project site for long list of contributors)
 
 
 REVISION HISTORY:
@@ -246,3 +248,4 @@ REVISION HISTORY:
 --- (README) Reference [8] to University of Liverpool HPF Course
 +++ (README) Reference [8] to OpenMP in Fortran 95
 +++ (Fortran Testing/) Began working through [8]
++++ (Fortran Testing/) Completed the majority of [8] and reviewed applicable functions/subroutines in [9,10] for later use in analysis code
