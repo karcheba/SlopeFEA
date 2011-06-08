@@ -79,8 +79,8 @@ Number of Material Blocks = 10
 Material Block #1
 Material Type = "sand"
 Number of Boundary Points = 11
-0, -7.37254868683412E-14, True, False
-40, -7.37254868683412E-14, False, False
+0, -8.33418547207335E-14, True, False
+40, -8.33418547207335E-14, False, False
 40, 20, False, False
 31, 20, False, False
 29.9999999999999, 20, False, False
@@ -106,8 +106,8 @@ Number of Boundary Points = 11
 50, 20, False, False
 49, 20, False, False
 40, 20, False, False
-40, -7.37254868683412E-14, False, False
-80.0000000000001, -7.37254868683412E-14, True, False
+40, -8.33418547207335E-14, False, False
+80.0000000000001, -8.33418547207335E-14, True, False
 80, 50, True, False
 50, 50, False, False
 Number of Line Constraints = 1
@@ -134,9 +134,9 @@ Material Type = "bedrock"
 Number of Boundary Points = 5
 0, -10, True, True
 80.0000000000001, -10, True, True
-80.0000000000001, -7.37254868683412E-14, True, False
-40, -7.37254868683412E-14, False, False
-0, -7.37254868683412E-14, True, False
+80.0000000000001, -8.33418547207335E-14, True, False
+40, -8.33418547207335E-14, False, False
+0, -8.33418547207335E-14, True, False
 Number of Line Constraints = 3
 4, 0, True, False
 1, 2, True, False
