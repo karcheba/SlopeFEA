@@ -34,6 +34,9 @@ namespace SlopeFEA
     public class FortranWrappers
     {
         [DllImport( "DLLtest.dll" , CallingConvention = CallingConvention.Cdecl )]
-        public static extern void dlltest_ ( /*ref int input*/string fname , int strLen );
+        public static extern void dlltest_ ( string fname , int strLen );
+
+        [DllImport( "SlopeFEA.dll" , CallingConvention = CallingConvention.Cdecl )]
+        public static extern void slopefea_ ( string fname , int strLen );
     }
 }
