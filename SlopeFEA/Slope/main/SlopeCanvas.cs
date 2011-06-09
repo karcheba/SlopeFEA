@@ -585,6 +585,9 @@ namespace SlopeFEA
                     break;
 
                 default:
+                    string[] path = FilePath.Split( '.' );
+                    string fname = path[0];
+                    FortranWrappers.dlltest_( fname , fname.Length + 1 );
                     MessageBox.Show( "Run FEA code." , "FEA Analysis" );
                     break;
             }

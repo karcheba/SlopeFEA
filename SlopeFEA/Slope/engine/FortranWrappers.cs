@@ -27,12 +27,13 @@
  * and the revision history.
  ************************************************************************/
 
+using System.Runtime.InteropServices;
+
 namespace SlopeFEA
 {
-    public class NativeMethods
+    public class FortranWrappers
     {
-        [System.Runtime.InteropServices.DllImportAttribute( "user32.dll" , EntryPoint = "SetCursorPos" )]
-        [return: System.Runtime.InteropServices.MarshalAsAttribute( System.Runtime.InteropServices.UnmanagedType.Bool )]
-        public static extern bool SetCursorPos ( int X , int Y );
+        [DllImport( "DLLtest.dll" , CallingConvention = CallingConvention.Cdecl )]
+        public static extern void dlltest_ ( /*ref int input*/string fname , int strLen );
     }
 }

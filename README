@@ -249,3 +249,11 @@ REVISION HISTORY:
 +++ (README) Reference [8] to OpenMP in Fortran 95
 +++ (Fortran Testing/) Began working through [8]
 +++ (Fortran Testing/) Completed the majority of [8] and reviewed applicable functions/subroutines in [9,10] for later use in analysis code
+
+
+[09 June 2011]
+
+{v1.0.0.10}
+=== (FemMC3.for) [not included in project] Dissected code for the purpose of understanding the procedure and developing analysis code
++++ (FortranWrappers.cs, DLLtest.dll, DLLtest.for, DLLtest.o) Created to determine how to to call a Fortran procedure from C#, passing in the appropriate file name; it works!
+		[Note: This took longer than expected due to a number of tricky aspects related to name mangling by the Fortran compiler, the differences in how C# and Fortran store strings, and the lack of case sensitivity in Fortran]

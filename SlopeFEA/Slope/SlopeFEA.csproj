@@ -38,7 +38,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -107,6 +107,7 @@
     <Compile Include="dialogs\AddPointLoadDialog.xaml.cs">
       <DependentUpon>AddPointLoadDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="engine\FortranWrappers.cs" />
     <Compile Include="main\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
