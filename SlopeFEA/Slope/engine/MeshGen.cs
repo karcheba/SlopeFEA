@@ -926,7 +926,10 @@ namespace SlopeFEA
             path[path.Length - 1] = "nod";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( nodes.Count );
+                tw.WriteLine( "{0}\t{1}\t{2}" ,
+                                /*NNOD=*/ nodes.Count ,
+                                /*NDIM=*/ 2 ,
+                                /*NVAR=*/ 2 );
                 foreach ( feNode node in nodes )
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
@@ -944,9 +947,10 @@ namespace SlopeFEA
                 path[path.Length - 1] = "ele";
                 using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
                 {
-                    tw.WriteLine( "{0}\t{1}" , /*nnodel*/4 , /*ndof*/2 );
+                    tw.WriteLine( "{0}\t{1}" ,
+                                    /*NEL=*/ elements.Count ,
+                                    /*NNODEL=*/ 4 );
 
-                    tw.WriteLine( elements.Count );
                     int mtlIndex;
                     foreach ( fe4NodedQuadElement element in elements )
                     {
@@ -975,8 +979,10 @@ namespace SlopeFEA
             path[path.Length - 1] = "bel";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( "{0}\t{1}" , /*nnodel*/2 , /*ndof*/2 );
-                tw.WriteLine( boundElements.Count );
+                tw.WriteLine( "{0}\t{1}" ,
+                                /*NELB=*/ boundElements.Count ,
+                                /*NNODELB=*/ 2 );
+
                 foreach ( fe2NodedBoundElement element in boundElements )
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
@@ -1194,9 +1200,10 @@ namespace SlopeFEA
             path[path.Length - 1] = "ele";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( "{0}\t{1}" , /*nnodel*/ 3 , /*ndof*/ 2 );
+                tw.WriteLine( "{0}\t{1}" ,
+                                /*NEL=*/ elements.Count ,
+                                /*NNODEL=*/ 3 );
 
-                tw.WriteLine( elements.Count );
                 int mtlIndex;
                 foreach ( fe3NodedTriElement element in elements )
                 {

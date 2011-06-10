@@ -258,7 +258,9 @@ REVISION HISTORY:
 +++ (FortranWrappers.cs, DLLtest.dll, DLLtest.for, DLLtest.o) Created to determine how to to call a Fortran procedure from C#, passing in the appropriate file name; it works!
 		[Note: This took longer than expected due to a number of tricky aspects related to name mangling by the Fortran compiler, the differences in how C# and Fortran store strings, and the lack of case sensitivity in Fortran]
 +++ (SlopeFEA.for) Created and added some lines for opening input files
-+++ (feModules.for) Created, added gcontrol module which also contains bandwidth() subroutine
++++ (feModules.for) Created, added gcontrol module
 +++ (gcontrol.for) Module file for gcontrol [will contain procedures for input, mapping, etc.]
++++ (gcontrol.for)  Added BANDWH() subroutine
 --- (feModules.for) Removed gcontrol module
 +++ (feModules.for) Added mproperty and tractions modules
++++ (gcontrol.for) Added MAPST() subroutine

@@ -195,7 +195,7 @@ Row Height = 3
 ANALYSIS STATUS
 --------------------------------
 
-Analysis Type = FEA4NodedQuad
+Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = False

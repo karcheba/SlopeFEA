@@ -586,8 +586,7 @@ namespace SlopeFEA
 
                 default:
                     string[] path = FilePath.Split( '.' );
-                    string fname = path[0];
-                    FortranWrappers.slopefea_( fname , fname.Length + 1 );
+                    FortranWrappers.slopefea_( path[0] , path[0].Length + 1 );
                     MessageBox.Show( "Run FEA code." , "FEA Analysis" );
                     break;
             }
@@ -2111,7 +2110,7 @@ namespace SlopeFEA
             string[] split;
             using ( TextReader tr = new StreamReader( nodeFile ) )
             {
-                int numNodes = int.Parse( tr.ReadLine() );
+                int numNodes = int.Parse( tr.ReadLine().Split( '\t' )[0] );
                 feNode newNode;
                 for ( int i = 0 ; i < numNodes ; i++ )
                 {
@@ -2127,8 +2126,7 @@ namespace SlopeFEA
             List<fe3NodedTriElement> elements = new List<fe3NodedTriElement>();
             using ( TextReader tr = new StreamReader( elementFile ) )
             {
-                tr.ReadLine();
-                int numElements = int.Parse( tr.ReadLine() );
+                int numElements = int.Parse( tr.ReadLine().Split( '\t' )[0] );
                 for ( int i = 0 ; i < numElements ; i++ )
                 {
                     split = tr.ReadLine().Split( '\t' );
@@ -2214,7 +2212,7 @@ namespace SlopeFEA
             string[] split;
             using ( TextReader tr = new StreamReader( nodeFile ) )
             {
-                int numNodes = int.Parse( tr.ReadLine() );
+                int numNodes = int.Parse( tr.ReadLine().Split( '\t' )[0] );
                 feNode newNode;
                 for ( int i = 0 ; i < numNodes ; i++ )
                 {
@@ -2230,8 +2228,7 @@ namespace SlopeFEA
             List<fe4NodedQuadElement> elements = new List<fe4NodedQuadElement>();
             using ( TextReader tr = new StreamReader( elementFile ) )
             {
-                tr.ReadLine();
-                int numElements = int.Parse( tr.ReadLine() );
+                int numElements = int.Parse( tr.ReadLine().Split( '\t' )[0] );
                 for ( int i = 0 ; i < numElements ; i++ )
                 {
                     split = tr.ReadLine().Split( '\t' );
