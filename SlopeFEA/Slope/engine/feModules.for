@@ -8,15 +8,56 @@
       IMPLICIT NONE
 !
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
-      REAL(dk), ALLOCATABLE :: GAMMA(:)     ! elastic modulus
+      INTEGER(ik), SAVE :: NMAT             ! # of materials
+      REAL(dk), ALLOCATABLE :: GRR(:)       ! unit weight
       REAL(dk), ALLOCATABLE :: PHI(:)       ! internal angle of fric
       REAL(dk), ALLOCATABLE :: COH(:)       ! cohesion
       REAL(dk), ALLOCATABLE :: PSI(:)       ! dilatancy angle
       REAL(dk), ALLOCATABLE :: EMOD(:)      ! elastic modulus
       REAL(dk), ALLOCATABLE :: NU(:)        ! poisson's ratio
-      INTEGER(ik), SAVE :: NMAT     ! # of materials
 !
       END MODULE mproperty
+!
+!
+! ......................................................................
+! .... NODE PROPERTIES .................................................
+! ......................................................................
+!     storage of node information
+! ......................................................................
+      MODULE nodes
+!
+      IMPLICIT NONE
+!
+      INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
+      INTEGER(ik), SAVE :: NNOD     ! # of nodes (from .nod file)
+      INTEGER(ik), SAVE :: NDIM     ! # of dimensions (e.g. 2d, 3d)
+      INTEGER(ik), SAVE :: NVAR     ! # of dofs per node (from .nod file)
+      INTEGER(ik), ALLOCATABLE :: IX(:)     ! connectivity/fixity
+      REAL(dk), ALLOCATABLE :: COORDS(:,:)  ! grid coords
+      REAL(dk), ALLOCATABLE :: PLOADS(:)    ! point loads
+!
+      END MODULE nodes
+!
+!
+! ......................................................................
+! .... ELEMENT PROPERTIES ..............................................
+! ......................................................................
+!     storage of body element information
+! ......................................................................
+      MODULE elements
+!
+      IMPLICIT NONE
+!
+      INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
+      INTEGER(ik), SAVE :: NEL      ! # of elements (from .ele file)
+      INTEGER(ik), SAVE :: NNODEL   ! # of nodes per element (from .ele file)
+      INTEGER(ik), SAVE :: NVEL     ! # of dofs per element (NVAR*NNODEL)
+      INTEGER(ik), SAVE :: NNN      ! # of nodes per element +1 for mtl type
+      INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connectivity/fixity
+      REAL(dk), ALLOCATABLE :: AREA(:)              ! element area
+      REAL(dk), ALLOCATABLE :: XMC(:), YMC(:)       ! element centroid
+!
+      END MODULE elements
 !
 !
 ! ......................................................................
@@ -27,9 +68,9 @@
       MODULE tractions
 !
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
+      INTEGER(ik), SAVE :: NELT                     ! # of traction elements
+      INTEGER(ik), SAVE :: NNODELT                  ! # nodes per traction element
       REAL(dk), ALLOCATABLE :: TNF(:,:),TSF(:,:)    ! traction element loads
-      INTEGER(ik), ALLOCATABLE :: ICOB(:,:)         ! traction element connect
-      INTEGER(ik), SAVE :: NELB     ! # of traction elements
-      INTEGER(ik), SAVE :: NNODELB  ! # nodes per traction element
+      INTEGER(ik), ALLOCATABLE :: ICOT(:,:)         ! traction element connect
 !
       END MODULE tractions

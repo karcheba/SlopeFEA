@@ -2134,7 +2134,7 @@ namespace SlopeFEA
                         nodes[int.Parse( split[1] ) - 1] ,
                         nodes[int.Parse( split[2] ) - 1] ,
                         nodes[int.Parse( split[3] ) - 1] ,
-                        MaterialTypes[int.Parse( split[4] )] , false ) );
+                        MaterialTypes[int.Parse( split[4] ) - 1] , false ) );
                 }
             }
 
@@ -2237,7 +2237,7 @@ namespace SlopeFEA
                         nodes[int.Parse( split[2] ) - 1] ,
                         nodes[int.Parse( split[3] ) - 1] ,
                         nodes[int.Parse( split[4] ) - 1] ,
-                        MaterialTypes[int.Parse( split[5] )] , false ) );
+                        MaterialTypes[int.Parse( split[5] ) - 1] , false ) );
                 }
             }
 

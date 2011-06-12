@@ -81,7 +81,7 @@ Number of Boundary Points = 5
 -14, 3.99999999999996, True, True
 -3.99999999999999, 3.99999999999996, False, True
 -3.99999999999999, 38, False, False
--3.99999999999999, 48, False, False
+-4, 48, False, False
 -14, 48, True, False
 Number of Line Constraints = 2
 4, 0, True, False

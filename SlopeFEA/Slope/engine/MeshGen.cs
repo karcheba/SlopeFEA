@@ -961,7 +961,7 @@ namespace SlopeFEA
                                         element.Nodes[1].Number ,
                                         element.Nodes[2].Number ,
                                         element.Nodes[3].Number ,
-                                        mtlIndex );
+                                        mtlIndex + 1 );
                     }
                 }
 
@@ -1213,7 +1213,7 @@ namespace SlopeFEA
                                     element.Nodes[0].Number ,
                                     element.Nodes[1].Number ,
                                     element.Nodes[2].Number ,
-                                    mtlIndex );
+                                    mtlIndex + 1 );
                 }
             }
 

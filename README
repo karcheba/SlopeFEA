@@ -258,9 +258,24 @@ REVISION HISTORY:
 +++ (FortranWrappers.cs, DLLtest.dll, DLLtest.for, DLLtest.o) Created to determine how to to call a Fortran procedure from C#, passing in the appropriate file name; it works!
 		[Note: This took longer than expected due to a number of tricky aspects related to name mangling by the Fortran compiler, the differences in how C# and Fortran store strings, and the lack of case sensitivity in Fortran]
 +++ (SlopeFEA.for) Created and added some lines for opening input files
-+++ (feModules.for) Created, added gcontrol module
-+++ (gcontrol.for) Module file for gcontrol [will contain procedures for input, mapping, etc.]
-+++ (gcontrol.for)  Added BANDWH() subroutine
---- (feModules.for) Removed gcontrol module
-+++ (feModules.for) Added mproperty and tractions modules
-+++ (gcontrol.for) Added MAPST() subroutine
++++ (feModules.for) Created, added GCONTROL module
++++ (gcontrol.for) Module file for GCONTROL [will contain procedures for input, mapping, etc.]
++++ (gcontrol.for)  Added BANDWH() subroutine for calculating number of co-diagonal bands [for packed banded storage of stiffness matrix]
+
+
+[10 June 2011]
+
+{v1.0.0.10}
+--- (feModules.for) Removed GCONTROL module
++++ (feModules.for) Added MPROPERTY and TRACTIONS modules
++++ (gcontrol.for) Added MAPST() subroutine [for mapping to packed banded storage]
++++ (gcontrol.for) Added INPUT() subroutine
+--- (SlopeFEA.for) Removed lines for opening input units in main program [moved to INPUT() subroutine in GCONTROL]
+
+
+[12 June 2011]
+
+{v1.0.0.10}
++++ (gcontrol.for) Continued creating INPUT() subroutine
+=== (MeshGen.cs, SlopeCanvas.cs) Changed material type numbering in mesh generator output and mesh loading to one-based indexing (for Fortran compatibility)
++++ (feModules.for) Added NODES and ELEMENTS modules
