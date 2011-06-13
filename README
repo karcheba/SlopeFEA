@@ -279,3 +279,9 @@ REVISION HISTORY:
 +++ (gcontrol.for) Continued creating INPUT() subroutine
 === (MeshGen.cs, SlopeCanvas.cs) Changed material type numbering in mesh generator output and mesh loading to one-based indexing (for Fortran compatibility)
 +++ (feModules.for) Added NODES and ELEMENTS modules
+
+
+[13 June 2011]
+
+{v1.0.0.10}
++++ (gcontrol.for) Added to INPUT() subroutine

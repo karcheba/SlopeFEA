@@ -44,22 +44,70 @@
       OPEN(ele,     FILE=fpath(1:LEN(fpath)-1)//".ele")
       OPEN(bel,     FILE=fpath(1:LEN(fpath)-1)//".bel")
 !
+!     write output file header
+      CALL DATE_AND_TIME(VALUES=currtime)
+      WRITE(output,100)     NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+!
 !     *********************************
-!     ********* MATERIAL DATA *********
+!     ********* CONTROL DATA **********
 !     *********************************
-      READ(mtl,*) NMAT          ! get number of materials
+      READ(mtl,*) NMAT          ! # of materials
       ALLOCATE( GRR(NMAT),
      +          PHI(NMAT),
-     +          COH(NMAT),      ! allocate material data storage
+     +          COH(NMAT),
      +          PSI(NMAT),
      +          EMOD(NMAT),
-     +          NU(NMAT)    )
+     +          NU(NMAT)    )   ! alloc and init material data storage
       GRR(:)    = 0.0
       PHI(:)    = 0.0
-      COH(:)    = 0.0       ! initialize
+      COH(:)    = 0.0
       PSI(:)    = 0.0
       EMOD(:)   = 0.0
       NU(:)     = 0.0
+!
+      READ(nod,*) NNOD, NDIM, NVAR      ! # nodes, # dimensions, # dofs/node
+      ALLOCATE( COORDS(NDIM,NNOD),
+     +          PLOADS(NDIM,NNOD),
+     +          IX(NNOD*NVAR)   )
+      COORDS(:,:)   = 0.0           ! alloc and init grid data storage
+      PLOADS(:,:)   = 0.0
+      IX(:)         = 0
+!
+      READ(ele,*) NEL, NNODEL   ! # body elements, # nodes per element
+      NVEL = NVAR*NNODEL    ! compute #dofs/element
+      NNN = NNODEL+1        ! compute #nodes+mtl type/element
+      ALLOCATE( LJ(NVEL),
+     +          ICO(NNN,NEL),
+     +          AREA(NEL),
+     +          XMC(NEL), YMC(NEL),
+     +          lcoords(NDIM,NNODEL)    )
+      LJ(:)         = 0                     ! alloc and init element data storage
+      ICO(:,:)      = 0
+      AREA(:)       = 0.0
+      XMC(:)        = 0.0
+      YMC(:)        = 0.0
+      lcoords(:,:)  = 0.0
+!
+      READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
+      ALLOCATE( ICOT(NNODELT,NELT),
+     +          TNF(NNODELT,NELT),
+     +          TSF(NNODELT,NELT)   )
+      ICOT(:,:) = 0                     ! alloc and init traction data storage
+      TNF(:,:)  = 0.0
+      TST(:,:)  = 0.0
+!
+!     write control data to output file
+      WRITE(output,110) ANTYPE, NMAT, NNOD, NDIM, NVAR,
+     +                  NEL, NNODEL, NVEL, NELT, NNODELT,
+     +                  NSTEP, NITER, NPRINT, IREAD,
+     +                  LFACT, GFACT
+!
+!     *********************************
+!     ********* MATERIAL DATA *********
+!     *********************************
       DO i = 1,NMAT
         READ(mtl,*) GRR(i), PHI(i), COH(i), EMOD(i), NU(i)    ! get data from file
       END DO
@@ -68,13 +116,6 @@
 !     *********************************
 !     *********** NODE DATA ***********
 !     *********************************
-      READ(nod,*) NNOD, NDIM, NVAR      ! # nodes, # dimensions, # dofs/node
-      ALLOCATE( COORDS(NDIM,NNOD),
-     +          PLOADS(NDIM,NNOD),      ! allocate storage for grid data
-     +          IX(NNOD*NVAR)   )
-      COORDS(:,:)   = 0.0
-      PLOADS(:,:)   = 0.0   ! initialize
-      IX(:)         = 0
       DO i = 1,NNOD
         i2 = NVAR*i     ! indices for fixity/node numbering vector
         i1 = i2-1
@@ -96,20 +137,6 @@
 !     *********************************
 !     ********* ELEMENT DATA **********
 !     *********************************
-      READ(ele,*) NEL, NNODEL   ! # body elements, # nodes per element
-      NVEL = NVAR*NNODEL    ! compute #dofs/element
-      NNN = NNODEL+1        ! compute #nodes+mtl type/element
-      ALLOCATE( LJ(NVEL),
-     +          ICO(NNN,NEL),
-     +          AREA(NEL),                  ! allocate storage for element data
-     +          XMC(NEL), YMC(NEL),
-     +          lcoords(NDIM,NNODEL)    )
-      LJ(:)         = 0
-      ICO(:,:)      = 0
-      AREA(:)       = 0.0
-      XMC(:)        = 0.0   ! initialize
-      YMC(:)        = 0.0
-      lcoords(:,:)  = 0.0
       DO i = 1,NEL
         READ(ele,*) j, ICO(:,i)     ! read connect/mtl data for each element
         DO j = 1,NNODEL
@@ -126,17 +153,11 @@
         YMC(i) = SUM(lcoords(2,:))/NNODEL
       END DO
       CLOSE(ele)
+      CALL BANDWH()     ! compute number of codiagonal bands
 !
 !     *********************************
 !     ********* TRACTION DATA *********
 !     *********************************
-      READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
-      ALLOCATE( ICOT(NNODELT,NELT),
-     +          TNF(NNODELT,NELT),      ! allocate storage for traction data
-     +          TSF(NNODELT,NELT)   )
-      ICOT(:,:) = 0
-      TNF(:,:)  = 0.0   ! initialize
-      TST(:,:)  = 0.0
       DO i = 1,NELT
         READ(bel,*) j,
      +              ICOT(:,i),  ! read traction element data
@@ -146,21 +167,31 @@
       CLOSE(bel)
 !
 !     *********************************
-!     ********** OUTPUT FILE **********
+!     ****** OUTPUT FILE FORMATS ******
 !     *********************************
-!     write header
-      CALL DATE_AND_TIME(VALUES=currtime)
-      WRITE(output,100)     NNODEL,
-     +                      fpath(1:LEN(fpath)-1),
-     +                      currtime(2), currtime(3), currtime(1),
-     +                      currtime(5:8)
+!     header
   100 FORMAT(/, '====================================================',
      +       /, 6X, I1, '-NODED FINITE ELEMENT STRESS ANALYSIS',
      +       /, '====================================================',
      +       //, 'FILE: ', A,
      +       /, 'DATE: ', I2, '/', I2, '/', I4,
-     +       /, 'TIME: ', I2, ':', I2, ':', I2, '.', I3 )
-  110 FORMAT(//)
+     +       /, 'TIME: ', I2, ':', I2, ':', I2, '.', I3, // )
+  110 FORMAT(/, 1X, 'Type of analysis ....................... = ', A,
+     +       /, 1X, '# of material types .............. NMAT = ', I7,
+     +       /, 1X, '# of nodes ....................... NNOD = ', I7,
+     +       /, 1X, '# of coordinate dimensions ....... NDIM = ', I7,
+     +       /, 1X, '# of dofs/node ................... NVAR = ', I7,
+     +       /, 1X, '# of body elements ................ NEL = ', I7,
+     +       /, 1X, '# of nodes/element ............. NNODEL = ', I7,
+     +       /, 1X, '# of dofs/element ................ NVEL = ', I7,
+     +       /, 1X, '# of traction elements ........... NELT = ', I7,
+     +       /, 1X, '# of nodes/traction element ... NNODELT = ', I7,
+     +       /, 1X, '# of load steps ................. NSTEP = ', I7,
+     +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
+     +       /, 1X, '# of print lines ............... NPRINT = ', I7,
+     +       /, 1X, 'output node number .............. IREAD = ', I7,
+     +       /, 1X, 'load factor ..................... LFACT = ', E12.5,
+     +       /, 1X, 'gravity factor .................. GFACT = ', E12.5,
 !
       END SUBROUTINE INPUT
 !
