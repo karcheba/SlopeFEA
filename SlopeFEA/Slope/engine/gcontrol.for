@@ -1,3 +1,33 @@
+!***********************************************************************
+! PROJECT:     SlopeFEA (c) 2011 Brandon Karchewski
+!              Licensed under the Academic Free License version 3.0
+!                  http://www.opensource.org/licenses/afl-3.0.php
+! 
+! CONTACT:     Brandon Karchewski
+!              Department of Civil Engineering
+!              McMaster University, JHE-301
+!              1280 Main St W
+!              Hamilton, Ontario, Canada
+!              L8S 4L7
+!              p: 905-525-9140 x24287
+!              f: 905-529-9688
+!              e: karcheba@mcmaster.ca
+!              
+! 
+! SOURCE INFORMATION:
+! 
+! The repository for this software project is hosted on git at:
+!      
+!      git://github.com/karcheba/SlopeFEA
+!      
+! As such, the code for the project is free and open source.
+! The relevant license is AFLv3 (see link above). See the
+! README file in the root directory of the repository for a
+! detailed project description, acknowledgements, references,
+! and the revision history.
+!***********************************************************************
+!
+!
       MODULE gcontrol
       USE mproperty; USE nodes; USE elements; USE tractions
 !
@@ -11,8 +41,9 @@
       INTEGER(ik), SAVE :: NNET     ! # of system dofs (computed in BANDWH)
       INTEGER(ik), SAVE :: LBAND    ! # of co-diagonal bands in stiff mat (computed in BANDWH)
 !
-      REAL(dk), ALLOCATABLE :: TLOAD(:),GLOAD(:)    ! load vecs
-      REAL(dk), ALLOCATABLE :: DISP(:),TDISP(:)     ! disp (and/or vel,acc,press,temp,etc.) vecs
+      REAL(dk), ALLOCATABLE :: TLOAD(:), GLOAD(:)   ! load vecs
+      REAL(dk), ALLOCATABLE :: STR(:), GLOAD0(:)    ! for non-linear stepping
+      REAL(dk), ALLOCATABLE :: DISP(:), TDISP(:)    ! disp (and/or vel,acc,press,temp,etc.) vecs
       REAL(dk), ALLOCATABLE :: GSTIF(:,:)           ! global stiffness mat
       REAL(dk), ALLOCATABLE :: ESTIF(:,:)           ! element stiffness mat
 !	
@@ -155,6 +186,22 @@
       CALL BANDWH()     ! compute number of codiagonal bands
       WRITE(output,130) 
       WRITE(output,131) NNET, LBAND ! write stiffness matrix stats to output
+      ALLOCATE( TLOAD(NNET),
+     +          GLOAD(NNET),
+     +          STR(NNET),
+     +          GLOAD0(NNET),
+     +          DISP(NNET),
+     +          TDISP(NNET),
+     +          GSTIF(LBAND+1,NNET),
+     +          ESTIF(NVEL,NVEL)  )
+      TLOAD(:)    = 0.0               ! alloc and init solution space
+      GLOAD(:)    = 0.0
+      STR(:)      = 0.0
+      GLOAD0(:)   = 0.0
+      DISP(:)     = 0.0
+      TDISP(:)    = 0.0
+      GSTIF(:,:)  = 0.0
+      ESTIF(:,:)  = 0.0
 !
 !     *********************************
 !     ********* MATERIAL DATA *********
@@ -268,6 +315,9 @@
       REWIND(bel);    CLOSE(bel)
 !
       REWIND(output); CLOSE(output)               ! output file
+!
+!     solution space
+      DEALLOCATE( TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, GSTIF, ESTIF )
 !
       RETURN
 !

@@ -288,3 +288,4 @@ REVISION HISTORY:
 +++	(gcontrol.for) Completed INPUT() subroutine
 +++ (gcontrol.for) Added CLEANUP() subroutine to deallocate and rewind in preparation for subsequent runs
 +++ (Test Files/*.out) Tested INPUT(), BANDWH(), CLEANUP()
++++ (gcontrol.for) Added allocation of TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, GSTIF, ESTIF to INPUT() and deallocation to CLEANUP()
