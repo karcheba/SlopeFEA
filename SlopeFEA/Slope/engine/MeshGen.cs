@@ -911,7 +911,7 @@ namespace SlopeFEA
             path[path.Length - 1] = "mtl";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( canvas.MaterialTypes.Count );
+                tw.WriteLine( canvas.MaterialTypes.Count - 1 );
                 for ( int i = 0 ; i < canvas.MaterialTypes.Count - 1 ; i++ )
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}" ,
@@ -934,9 +934,9 @@ namespace SlopeFEA
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     node.Number ,
-                                    node.X , node.Y ,
+                                    Math.Round( node.X , 6 ) , Math.Round( node.Y , 6 ) ,
                                     node.IsFixedX ? 0 : 1 , node.IsFixedY ? 0 : 1 ,
-                                    node.XLoad , node.YLoad );
+                                    Math.Round( node.XLoad , 6 ) , Math.Round( node.YLoad , 6 ) );
                 }
             }
 
@@ -988,8 +988,8 @@ namespace SlopeFEA
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     element.Number ,
                                     element.Nodes[0].Number , element.Nodes[1].Number ,
-                                    element.NLoads[0] , element.NLoads[1] ,
-                                    element.TLoads[0] , element.TLoads[1] );
+                                    Math.Round( element.NLoads[0] , 6 ) , Math.Round( element.NLoads[1] , 6 ) ,
+                                    Math.Round( element.TLoads[0] , 6 ) , Math.Round( element.TLoads[1] , 6 ) );
                 }
             }
 

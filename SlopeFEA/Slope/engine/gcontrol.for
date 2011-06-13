@@ -5,7 +5,6 @@
 !
       IMPLICIT NONE
 !
-      INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)      ! int/doub kind params
       INTEGER, PARAMETER :: output=2,mtl=3,nod=4,ele=5,bel=6    ! input file unit numbers
       CHARACTER(LEN=64) :: ANTYPE   ! string denoting analysis type
 !
@@ -34,8 +33,8 @@
       CHARACTER*(*), INTENT(IN) :: fpath        ! input file path
       INTEGER(ik) :: i,i1,i2,j      ! loop variables
       INTEGER(ik) :: ntot           ! total possible dofs
-      INTEGER(ik) :: currtime       ! for printing analysis date/time
-      REAL(dk), ALLOCATABLE :: lcoords(:)   ! for computing element area
+      INTEGER(ik) :: currtime(8)    ! for printing analysis date/time
+      REAL(dk), ALLOCATABLE :: lcoords(:,:)   ! for computing element area
 !
 !     open input file units
       OPEN(output,  FILE=fpath(1:LEN(fpath)-1)//".out")
@@ -44,23 +43,16 @@
       OPEN(ele,     FILE=fpath(1:LEN(fpath)-1)//".ele")
       OPEN(bel,     FILE=fpath(1:LEN(fpath)-1)//".bel")
 !
-!     write output file header
-      CALL DATE_AND_TIME(VALUES=currtime)
-      WRITE(output,100)     NNODEL,
-     +                      fpath(1:LEN(fpath)-1),
-     +                      currtime(2), currtime(3), currtime(1),
-     +                      currtime(5:8)
-!
 !     *********************************
 !     ********* CONTROL DATA **********
 !     *********************************
-      READ(mtl,*) NMAT          ! # of materials
-      ALLOCATE( GRR(NMAT),
-     +          PHI(NMAT),
-     +          COH(NMAT),
-     +          PSI(NMAT),
-     +          EMOD(NMAT),
-     +          NU(NMAT)    )   ! alloc and init material data storage
+      READ(mtl,*) NMTL          ! # of materials
+      ALLOCATE( GRR(NMTL),
+     +          PHI(NMTL),
+     +          COH(NMTL),
+     +          PSI(NMTL),
+     +          EMOD(NMTL),
+     +          NU(NMTL)    )   ! alloc and init material data storage
       GRR(:)    = 0.0
       PHI(:)    = 0.0
       COH(:)    = 0.0
@@ -82,13 +74,12 @@
       ALLOCATE( LJ(NVEL),
      +          ICO(NNN,NEL),
      +          AREA(NEL),
-     +          XMC(NEL), YMC(NEL),
+     +          CENT(NDIM,NEL),
      +          lcoords(NDIM,NNODEL)    )
       LJ(:)         = 0                     ! alloc and init element data storage
       ICO(:,:)      = 0
       AREA(:)       = 0.0
-      XMC(:)        = 0.0
-      YMC(:)        = 0.0
+      CENT(:,:)     = 0.0
       lcoords(:,:)  = 0.0
 !
       READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
@@ -97,31 +88,31 @@
      +          TSF(NNODELT,NELT)   )
       ICOT(:,:) = 0                     ! alloc and init traction data storage
       TNF(:,:)  = 0.0
-      TST(:,:)  = 0.0
+      TSF(:,:)  = 0.0
+!
+!     write output file header
+      CALL DATE_AND_TIME(VALUES=currtime)
+      WRITE(output,100)     NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
 !
 !     write control data to output file
-      WRITE(output,110) ANTYPE, NMAT, NNOD, NDIM, NVAR,
-     +                  NEL, NNODEL, NVEL, NELT, NNODELT,
-     +                  NSTEP, NITER, NPRINT, IREAD,
-     +                  LFACT, GFACT
-!
-!     *********************************
-!     ********* MATERIAL DATA *********
-!     *********************************
-      DO i = 1,NMAT
-        READ(mtl,*) GRR(i), PHI(i), COH(i), EMOD(i), NU(i)    ! get data from file
-      END DO
-      CLOSE(mtl)
+      WRITE(output,101) ANTYPE, NMTL, NNOD, NDIM, NVAR,
+     +                  NEL, NNODEL, NVEL, NELT, NNODELT!,
+!     +                  NSTEP, NITER, NPRINT, IREAD,
+!     +                  LFACT, GFACT
 !
 !     *********************************
 !     *********** NODE DATA ***********
 !     *********************************
+      WRITE(output,110);  WRITE(output,111) ! node data headers
       DO i = 1,NNOD
         i2 = NVAR*i     ! indices for fixity/node numbering vector
         i1 = i2-1
         READ(nod,*) j,
      +              COORDS(:,i),    ! node locations
-     +              IX(i1:i2)       ! fixity data
+     +              IX(i1:i2),      ! fixity data
      +              PLOADS(:,i)     ! point load data
       END DO
       ntot = NVAR*NNOD;     ! compute total possible dofs
@@ -132,15 +123,20 @@
             IX(i) = NNET    ! label the node
         END IF
       END DO
-      CLOSE(nod)
+      DO i = 1,NNOD
+        i2 = NVAR*i     ! indices for fixity/node numbering vector
+        i1 = i2-1
+        WRITE(output,112) i, COORDS(:,i), IX(i1:i2), PLOADS(:,i)
+      END DO
 !
 !     *********************************
 !     ********* ELEMENT DATA **********
 !     *********************************
+      WRITE(output,120);  WRITE(output,121) ! element data headers
       DO i = 1,NEL
         READ(ele,*) j, ICO(:,i)     ! read connect/mtl data for each element
         DO j = 1,NNODEL
-            lcoords(j,:) = COORDS(:,ICO(j,i))   ! get vertex coords
+            lcoords(:,j) = COORDS(:,ICO(j,i))   ! get vertex coords
         END DO
         AREA(i) = lcoords(1,NNODEL)*lcoords(2,1) 
      +                  - lcoords(1,1)*lcoords(2,NNODEL)    ! compute element area
@@ -149,22 +145,37 @@
      +                          - lcoords(1,  j)*lcoords(2,j-1)
         END DO
         AREA(i) = 0.5*AREA(i)
-        XMC(i) = SUM(lcoords(1,:))/NNODEL   ! compute element centroid
-        YMC(i) = SUM(lcoords(2,:))/NNODEL
+        DO j = 1,NDIM
+          CENT(j,i) = SUM(lcoords(j,:))/NNODEL    ! compute element centroid
+        END DO
+        WRITE(output,122) i, ICO(:,i), AREA(i), CENT(:,i)
       END DO
-      CLOSE(ele)
+      DEALLOCATE(lcoords)
+!
       CALL BANDWH()     ! compute number of codiagonal bands
+      WRITE(output,130) 
+      WRITE(output,131) NNET, LBAND ! write stiffness matrix stats to output
+!
+!     *********************************
+!     ********* MATERIAL DATA *********
+!     *********************************
+      WRITE(output,140)   ! material data header
+      DO i = 1,NMTL
+        READ(mtl,*) GRR(i), PHI(i), COH(i), EMOD(i), NU(i)    ! get data from file
+        WRITE(output,141) i, GRR(i), PHI(i), COH(i), EMOD(i), NU(i)
+      END DO
 !
 !     *********************************
 !     ********* TRACTION DATA *********
 !     *********************************
+      WRITE(output,150);  WRITE(output,151) ! traction element headers
       DO i = 1,NELT
         READ(bel,*) j,
      +              ICOT(:,i),  ! read traction element data
      +              TNF(:,i),
      +              TSF(:,i)
+        WRITE(output,152) i, ICOT(:,i), TNF(:,i), TSF(:,i)
       END DO
-      CLOSE(bel)
 !
 !     *********************************
 !     ****** OUTPUT FILE FORMATS ******
@@ -176,8 +187,10 @@
      +       //, 'FILE: ', A,
      +       /, 'DATE: ', I2, '/', I2, '/', I4,
      +       /, 'TIME: ', I2, ':', I2, ':', I2, '.', I3, // )
-  110 FORMAT(/, 1X, 'Type of analysis ....................... = ', A,
-     +       /, 1X, '# of material types .............. NMAT = ', I7,
+!
+!     control information
+  101 FORMAT(/, 1X, 'type of analysis ...................... = ', A,
+     +       /, 1X, '# of material types .............. NMTL = ', I7,
      +       /, 1X, '# of nodes ....................... NNOD = ', I7,
      +       /, 1X, '# of coordinate dimensions ....... NDIM = ', I7,
      +       /, 1X, '# of dofs/node ................... NVAR = ', I7,
@@ -186,14 +199,79 @@
      +       /, 1X, '# of dofs/element ................ NVEL = ', I7,
      +       /, 1X, '# of traction elements ........... NELT = ', I7,
      +       /, 1X, '# of nodes/traction element ... NNODELT = ', I7,
-     +       /, 1X, '# of load steps ................. NSTEP = ', I7,
-     +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
-     +       /, 1X, '# of print lines ............... NPRINT = ', I7,
-     +       /, 1X, 'output node number .............. IREAD = ', I7,
-     +       /, 1X, 'load factor ..................... LFACT = ', E12.5,
-     +       /, 1X, 'gravity factor .................. GFACT = ', E12.5,
+!     +       /, 1X, '# of load steps ................. NSTEP = ', I7,
+!     +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
+!     +       /, 1X, '# of print lines ............... NPRINT = ', I7,
+!     +       /, 1X, 'output node number .............. IREAD = ', I7,
+!     +       /, 1X, 'load factor ..................... LFACT = ', E12.5,
+!     +       /, 1X, 'gravity factor .................. GFACT = ', E12.5,
+     +       / )
+!
+!     node data
+  110 FORMAT(//,
+     +  '===================== NODE INFORMATION =====================')
+  111 FORMAT(//, 3X, 'NODE', 8X, 'COORDS (X,Y,..)', 8X, 'FIX (U,V,..)',
+     +        8X, 'PLOADS (U,V,..)', //)
+  112 FORMAT(1X, I5, 5X, F10.3, 2X, F10.3, 5X, 2I5,
+     +        5X, F10.3, 2X, F10.3, /)
+!
+!     element data
+  120 FORMAT(//,
+     +  '================= BODY ELEMENT INFORMATION =================')
+  121 FORMAT(//, 3X, 'ELEMENT', 9X, 'NODES', 9X, 'MTL', 8X, 'AREA',
+     +        8X, 'CENTROID (X,Y,..)', //)
+  122 FORMAT(1X, I5, 5X, 3I5, 5X, I3, 5X, E12.4, 5X, 2F10.3, /)
+!
+!     stiffness matrix statistics (packed band storage)
+  130 FORMAT(//,
+     +  '=============== STIFFNESS MATRIX INFORMATION ===============')
+  131 FORMAT(//, 1X, '# of degrees of freedom ... NNET = ', I7,
+     +        /, 1X, '# of codiagonal bands .... LBAND = ', I7, /)
+!
+  140 FORMAT(//,
+     +  '==================== MATERIAL PROPERTIES ===================')
+  141 FORMAT(//, 'MATERIAL SET', I5,
+     +        /, '*************************',
+     +        /, 'unit weight ............... GRR = ', E12.5,
+     +        /, 'internal friction angle ... PHI = ', E12.5,
+     +        /, 'cohesion .................. COH = ', E12.5,
+     +        /, 'elastic modulus .......... EMOD = ', E12.5,
+     +        /, 'poisson''s ratio ............ NU = ', E12.5  )
+!
+  150 FORMAT(///,
+     +  '=============== TRACTION ELEMENT INFORMATION ===============')
+  151 FORMAT(//, 3X, 'ELEMENT', 6X, 'NODES', 15X, 'TNF', 20X, 'TSF', //)
+  152 FORMAT(1X, I5, 5X, 2I5, 5X, 2E12.4, 5X, 2E12.4, /)
+!
+      RETURN
 !
       END SUBROUTINE INPUT
+!
+!
+! ......................................................................
+! .... CLEANUP .........................................................
+! ......................................................................
+!     deallocate memory, rewind data units, close data files
+! ......................................................................
+      SUBROUTINE CLEANUP ()
+!
+      DEALLOCATE( GRR, PHI, COH, PSI, EMOD, NU )  ! material data
+      REWIND(mtl);    CLOSE(mtl)
+!
+      DEALLOCATE( COORDS, PLOADS, IX )            ! node data
+      REWIND(nod);    CLOSE(nod)
+!
+      DEALLOCATE( LJ, ICO, AREA, CENT )           ! body element data
+      REWIND(ele);    CLOSE(ele)
+!
+      DEALLOCATE( ICOT, TNF, TSF )                ! traction element data
+      REWIND(bel);    CLOSE(bel)
+!
+      REWIND(output); CLOSE(output)               ! output file
+!
+      RETURN
+!
+      END SUBROUTINE CLEANUP
 !
 !
 ! ......................................................................
@@ -218,14 +296,14 @@
 !$OMP DO
       DO i = 1,NEL    ! check the bandwidth for each element
 !
-!         obtain element connectivity
+!       obtain element connectivity
         DO j = 1,NVAR   ! dofs per node
-            DO k = 1,NNODEL ! nodes per element
+          DO k = 1,NNODEL ! nodes per element
 !
-                k1 = (k-1)*NVAR ! initial index
-	            LJ(j+k1) = IX(NVAR*ICO(k,i)-NVAR+j) ! get global node number
+            k1 = (k-1)*NVAR ! initial index
+            LJ(j+k1) = IX(NVAR*ICO(k,i)-NVAR+j) ! get global node number
 !
-            END DO
+          END DO
         END DO
 !
 !       initialize index statistics
@@ -246,7 +324,7 @@
         lbcurr = lmax-lmin
         IF (lbcurr .GT. LBAND) THEN
 !$OMP ATOMIC
-            LBAND = lbcurr
+          LBAND = lbcurr
         END IF
 !
       END DO
@@ -278,26 +356,26 @@
 !$OMP DO
       DO i = 1,NVEL   ! rows of element mat
 !
-          ljr = LJ(i)
-          IF (ljr .EQ. 0) CYCLE   ! skip if node is fixed
+        ljr = LJ(i)
+        IF (ljr .EQ. 0) CYCLE   ! skip if node is fixed
 !
-          DO j = i,NVEL   ! cols of element mat
+        DO j = i,NVEL   ! cols of element mat
 !
-            ljc = LJ(j)
-            IF (ljc .EQ. 0) CYCLE   ! skip if node is fixed
+          ljc = LJ(j)
+          IF (ljc .EQ. 0) CYCLE   ! skip if node is fixed
 !
 !           ensure row<=col for upper band storage
-            IF (ljr .LE. ljc) THEN
-                k = LBAND + 1 + ljr - ljc
+          IF (ljr .LE. ljc) THEN
+            k = LBAND + 1 + ljr - ljc
 !$OMP ATOMIC    ! only one thread may increment this at a time
-                AB(k,ljc) = AB(k,ljc) + S(i,j)
-            ELSE
-                k = LBAND + 1 + ljc - ljr
+            AB(k,ljc) = AB(k,ljc) + S(i,j)
+          ELSE
+            k = LBAND + 1 + ljc - ljr
 !$OMP ATOMIC    ! only one thread may increment this at a time
-                AB(k,ljr) = AB(k,ljr) + S(i,j)
-            END IF
+            AB(k,ljr) = AB(k,ljr) + S(i,j)
+          END IF
 !
-          END DO  ! cols
+        END DO  ! cols
 !
       END DO  ! rows
 !$OMP END DO

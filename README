@@ -285,3 +285,6 @@ REVISION HISTORY:
 
 {v1.0.0.10}
 +++ (gcontrol.for) Added to INPUT() subroutine
++++	(gcontrol.for) Completed INPUT() subroutine
++++ (gcontrol.for) Added CLEANUP() subroutine to deallocate and rewind in preparation for subsequent runs
++++ (Test Files/*.out) Tested INPUT(), BANDWH(), CLEANUP()
