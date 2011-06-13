@@ -183,6 +183,11 @@ namespace SlopeFEA
         /// </summary>
         public bool IsFixedZ { get; set; }
 
+        /// <summary>
+        /// Print point property.
+        /// </summary>
+        public bool IsPrintPoint { get; set; }
+
 
         /// <summary>
         /// Merge nodes combining coordinates as specified by mergeCoords,
@@ -218,6 +223,7 @@ namespace SlopeFEA
             this.IsFixedX = this.IsFixedX || m.IsFixedX;
             this.IsFixedY = this.IsFixedY || m.IsFixedY;
             this.IsFixedZ = this.IsFixedZ || m.IsFixedZ;
+            this.IsPrintPoint = this.IsPrintPoint || m.IsPrintPoint;
         }
 
 
@@ -778,6 +784,7 @@ namespace SlopeFEA
             this.Points = new List<Point>();
             this.IsFixedX = new List<bool>();
             this.IsFixedY = new List<bool>();
+            this.IsPrintPoint = new List<bool>();
             this.LineConstraints = new List<feLineConstraint>();
             this.LineLoads = new List<feLineLoad>();
             this.PointLoads = new List<fePointLoad>();
@@ -817,6 +824,11 @@ namespace SlopeFEA
         /// Boundary point y-fixity property.
         /// </summary>
         public List<bool> IsFixedY { get; set; }
+
+        /// <summary>
+        /// Boundary printing point property.
+        /// </summary>
+        public List<bool> IsPrintPoint { get; set; }
 
         /// <summary>
         /// Minimum x-coordinate property.

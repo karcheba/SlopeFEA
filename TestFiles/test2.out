@@ -5,7 +5,7 @@
 
 FILE: Q:\Research\2010-2011\SlopeFEA\TestFiles\test2
 DATE:  6/13/2011
-TIME: 13:51:30.439
+TIME: 16: 5:18.540
 
 
 
@@ -19,6 +19,12 @@ TIME: 13:51:30.439
  # of dofs/element ................ NVEL =       6
  # of traction elements ........... NELT =      11
  # of nodes/traction element ... NNODELT =       2
+ # of load steps ................. NSTEP =      96
+ # of iterations/load step ....... NITER =       5
+ # of print lines ............... NPRINT =     200
+ output node number ............. IPRINT =      10
+ load factor ..................... LFACT =  0.10000E+01
+ gravity factor .................. GFACT =  0.10000E+01
 
 
 

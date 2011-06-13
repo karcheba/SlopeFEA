@@ -1452,5 +1452,24 @@ namespace SlopeFEA
                 currCanvas.Cursor = ((TextBlock) this.Resources["lineLoadCursor"]).Cursor;
             }
         }
+
+        private void printPoint_Click ( object sender , RoutedEventArgs e )
+        {
+            Grid currGrid = windowManager.SelectedContent as Grid;
+
+            SlopeCanvas currCanvas = null;
+            if ( currGrid != null )
+            {
+                currCanvas = currGrid.Children[2] as SlopeCanvas;
+            }
+
+            if ( currCanvas != null )
+            {
+                currCanvas.ClearSelections();
+                currCanvas.CancelDrawing();
+                currCanvas.DrawMode = DrawModes.PrintPoint;
+                currCanvas.Cursor = ((TextBlock) this.Resources["printPointCursor"]).Cursor;
+            }
+        }
     }
 }

@@ -73,6 +73,7 @@
       INTEGER(ik), SAVE :: NNOD     ! # of nodes (from .nod file)
       INTEGER(ik), SAVE :: NDIM     ! # of dimensions (e.g. 2d, 3d)
       INTEGER(ik), SAVE :: NVAR     ! # of dofs per node (from .nod file)
+      INTEGER(ik), SAVE :: IPRINT   ! node # for printing
       INTEGER(ik), ALLOCATABLE :: IX(:)     ! connectivity/fixity
       REAL(dk), ALLOCATABLE :: COORDS(:,:)  ! grid coords
       REAL(dk), ALLOCATABLE :: PLOADS(:,:)    ! point loads

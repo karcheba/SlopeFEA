@@ -47,6 +47,7 @@
             <TextBlock x:Key="zoomAreaCursor" Cursor="/Slope;component/icons/zoom.cur"/>
             <TextBlock x:Key="addPointsCursor" Cursor="/Slope;component/icons/AddPoint.cur"/>
             <TextBlock x:Key="movePointsCursor" Cursor="/Slope;component/icons/MovePoint.cur"/>
+            <TextBlock x:Key="printPointCursor" Cursor="/Slope;component/icons/PrintPoint.cur"/>
             <TextBlock x:Key="rollerXCursor" Cursor="/Slope;component/icons/RollerX.cur"/>
             <TextBlock x:Key="rollerYCursor" Cursor="/Slope;component/icons/RollerY.cur"/>
 			<TextBlock x:Key="pointLoadCursor" Cursor="/Slope;component/icons/PointLoad.cur"/>
@@ -177,6 +178,11 @@
                     <MenuItem Header="Ad_d Points" Click="addPoint_Click">
                         <MenuItem.Icon>
                             <Image Source="/Slope;component/icons/AddPoint.ico"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Select _Print Point" Click="printPoint_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/Slope;component/icons/PrintPoint.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
@@ -450,6 +456,17 @@
                                 <TextBlock/>
                                 <TextBlock Text="Click adjacent key points on the same block to add"/>
                                 <TextBlock Text="a new key point midway between them."/>
+                            </StackPanel>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button Name="toolPrintPoint" Click="printPoint_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/PrintPoint.ico"  />
+                        <Button.ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="Select Print Point" FontWeight="DemiBold"/>
+                                <TextBlock/>
+                                <TextBlock Text="Click a vertex of a material block to set"/>
+                                <TextBlock Text="it as the printing point for the FEA solver."/>
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>

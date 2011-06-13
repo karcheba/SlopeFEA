@@ -90,10 +90,10 @@ Number of Material Blocks = 6
 Material Block #1
 Material Type = "water"
 Number of Boundary Points = 4
--4.00000000000002, 38, True, False
-39.9999999999999, 38.0000000000001, False, False
-39.9999999999999, 56, False, False
--4.00000000000002, 56.0000000000001, True, False
+-4.00000000000002, 38, True, False, False
+39.9999999999999, 38.0000000000001, False, False, False
+39.9999999999999, 56, False, False, False
+-4.00000000000002, 56.0000000000001, True, False, False
 Number of Line Constraints = 1
 3, 0, True, False
 Number of Line Loads = 0
@@ -102,10 +102,10 @@ Number of Point Loads = 0
 Material Block #2
 Material Type = "water"
 Number of Boundary Points = 4
-41.9999999999999, 46, False, False
-41.9999999999999, 38.0000000000001, False, False
-110, 38, True, False
-110, 46, True, False
+41.9999999999999, 46, False, False, False
+41.9999999999999, 38.0000000000001, False, False, False
+110, 38, True, False, False
+110, 46, True, False, False
 Number of Line Constraints = 1
 2, 3, True, False
 Number of Line Loads = 0
@@ -114,13 +114,13 @@ Number of Point Loads = 0
 Material Block #3
 Material Type = "concrete"
 Number of Boundary Points = 7
-39.9999999999999, 38.0000000000001, False, False
-39.9999999999999, 32.0000000000001, False, False
-41.9999999999999, 32.0000000000001, False, False
-41.9999999999999, 38.0000000000001, False, False
-41.9999999999999, 46, False, False
-42, 56, False, False
-39.9999999999999, 56, False, False
+39.9999999999999, 38.0000000000001, False, False, False
+39.9999999999999, 32.0000000000001, False, False, False
+41.9999999999999, 32.0000000000001, False, False, False
+41.9999999999999, 38.0000000000001, False, False, False
+41.9999999999999, 46, False, False, False
+42, 56, False, False, True
+39.9999999999999, 56, False, False, False
 Number of Line Constraints = 0
 Number of Line Loads = 1
 4, 5, True, 10, 20, False, 0, 0
@@ -130,12 +130,12 @@ Number of Point Loads = 1
 Material Block #4
 Material Type = "sand"
 Number of Boundary Points = 6
--4.00000000000002, 26.0000000000001, True, False
-41.9999999999999, 26.0000000000002, False, False
-41.9999999999999, 32.0000000000001, False, False
-39.9999999999999, 32.0000000000001, False, False
-39.9999999999999, 38.0000000000001, False, False
--4.00000000000002, 38, True, False
+-4.00000000000002, 26.0000000000001, True, False, False
+41.9999999999999, 26.0000000000002, False, False, False
+41.9999999999999, 32.0000000000001, False, False, False
+39.9999999999999, 32.0000000000001, False, False, False
+39.9999999999999, 38.0000000000001, False, False, False
+-4.00000000000002, 38, True, False, False
 Number of Line Constraints = 1
 5, 0, True, False
 Number of Line Loads = 0
@@ -144,11 +144,11 @@ Number of Point Loads = 0
 Material Block #5
 Material Type = "sand"
 Number of Boundary Points = 5
-110, 26.0000000000001, True, False
-110, 38, True, False
-41.9999999999999, 38.0000000000001, False, False
-42, 32, False, False
-42, 26.0000000000001, False, False
+110, 26.0000000000001, True, False, False
+110, 38, True, False, False
+41.9999999999999, 38.0000000000001, False, False, False
+42, 32, False, False, False
+42, 26.0000000000001, False, False, False
 Number of Line Constraints = 1
 0, 1, True, False
 Number of Line Loads = 0
@@ -157,11 +157,11 @@ Number of Point Loads = 0
 Material Block #6
 Material Type = "bedrock"
 Number of Boundary Points = 5
--4.00000000000002, 14.0000000000001, True, True
-110, 14.0000000000001, True, True
-110, 26.0000000000001, True, False
-42, 26.0000000000001, False, False
--4.00000000000002, 26.0000000000001, True, False
+-4.00000000000002, 14.0000000000001, True, True, False
+110, 14.0000000000001, True, True, False
+110, 26.0000000000001, True, False, False
+42, 26.0000000000001, False, False, False
+-4.00000000000002, 26.0000000000001, True, False, False
 Number of Line Constraints = 3
 4, 0, True, False
 1, 2, True, False
@@ -189,6 +189,11 @@ FEA PARAMETERS
 
 Column Width = 3
 Row Height = 3
+Number of Load Steps = 5
+Number of Iterations = 200
+Number of Print Lines = 10
+Load Factor = 1
+Gravity Factor = 1
 
 
 --------------------------------

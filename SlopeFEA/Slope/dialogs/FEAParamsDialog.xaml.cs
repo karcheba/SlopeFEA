@@ -49,6 +49,11 @@ namespace SlopeFEA
 
             colWidth.Text = canvas.FEAParameters.ColWidth.ToString();
             rowHeight.Text = canvas.FEAParameters.RowHeight.ToString();
+            nStep.Text = canvas.FEAParameters.NStep.ToString();
+            nIter.Text = canvas.FEAParameters.NIter.ToString();
+            nPrint.Text = canvas.FEAParameters.NPrint.ToString();
+            LFact.Text = canvas.FEAParameters.LFact.ToString();
+            GFact.Text = canvas.FEAParameters.GFact.ToString();
 
             string units;
             switch ( canvas.Units )
@@ -78,8 +83,48 @@ namespace SlopeFEA
                 return;
             }
 
+            int newNStep;
+            if ( !int.TryParse( nStep.Text , out newNStep ) || newNStep < 1 )
+            {
+                MessageBox.Show( "Number of load steps must be an integer >= 1" , "Error" );
+                return;
+            }
+
+            int newNIter;
+            if ( !int.TryParse( nIter.Text , out newNIter ) || newNIter < 1 )
+            {
+                MessageBox.Show( "Number of iterations must be an integer >= 1" , "Error" );
+                return;
+            }
+
+            int newNPrint;
+            if ( !int.TryParse( nPrint.Text , out newNPrint ) || newNPrint < 1 )
+            {
+                MessageBox.Show( "Number of print lines must be an integer >= 1" , "Error" );
+                return;
+            }
+
+            double newLFact;
+            if ( !double.TryParse( LFact.Text , out newLFact ) || newLFact < 0 )
+            {
+                MessageBox.Show( "Load factor must be a number >= 0." , "Error" );
+                return;
+            }
+
+            double newGFact;
+            if ( !double.TryParse( GFact.Text , out newGFact ) || newGFact < 0 )
+            {
+                MessageBox.Show( "Gravity factor must be a number >= 0." , "Error" );
+                return;
+            }
+
             canvas.FEAParameters.ColWidth = newColWidth;
             canvas.FEAParameters.RowHeight = newRowHeight;
+            canvas.FEAParameters.NStep = newNStep;
+            canvas.FEAParameters.NIter = newNIter;
+            canvas.FEAParameters.NPrint = newNPrint;
+            canvas.FEAParameters.LFact = newLFact;
+            canvas.FEAParameters.GFact = newGFact;
 
             canvas.IsSaved = false;
             canvas.IsVerified = false;

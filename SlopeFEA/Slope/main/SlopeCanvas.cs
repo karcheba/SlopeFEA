@@ -546,9 +546,13 @@ namespace SlopeFEA
             genAlgParams.MutationProbability = 0.25;
             genAlgParams.SliceWidth = 10;
 
-            feaParams.ElementSize = 1;
-            feaParams.ColWidth = 1;
-            feaParams.RowHeight = 1;
+            feaParams.ColWidth = 1.0;
+            feaParams.RowHeight = 1.0;
+            feaParams.NStep = 5;
+            feaParams.NIter = 200;
+            feaParams.NPrint = 10;
+            feaParams.LFact = 1.0;
+            feaParams.GFact = 1.0;
 
             AnalysisType = AnalysisType.Bishop;
         }
@@ -729,9 +733,10 @@ namespace SlopeFEA
                         xCoord = (p.X - OriginOffsetX) / dpiX * factor * Scale;
                         yCoord = (ActualHeight - p.Y - OriginOffsetY) / dpiY * factor * Scale;
 
-                        tw.WriteLine( "{0}, {1}, {2}, {3}" , xCoord , yCoord ,
+                        tw.WriteLine( "{0}, {1}, {2}, {3}, {4}" , xCoord , yCoord ,
                             materialBlocks[i].BoundaryPoints[j].IsFixedX ,
-                            materialBlocks[i].BoundaryPoints[j].IsFixedY );
+                            materialBlocks[i].BoundaryPoints[j].IsFixedY ,
+                            materialBlocks[i].BoundaryPoints[j].IsPrintPoint );
                     }
 
                     tw.WriteLine( "Number of Line Constraints = {0}" , materialBlocks[i].LineConstraints.Count );
@@ -792,6 +797,11 @@ namespace SlopeFEA
 
                 tw.WriteLine( "Column Width = {0}" , feaParams.ColWidth );
                 tw.WriteLine( "Row Height = {0}" , feaParams.RowHeight );
+                tw.WriteLine( "Number of Load Steps = {0}" , feaParams.NStep );
+                tw.WriteLine( "Number of Iterations = {0}" , feaParams.NIter );
+                tw.WriteLine( "Number of Print Lines = {0}" , feaParams.NPrint );
+                tw.WriteLine( "Load Factor = {0}" , feaParams.LFact );
+                tw.WriteLine( "Gravity Factor = {0}" , feaParams.GFact );
 
                 tw.WriteLine();
                 tw.WriteLine();
@@ -948,6 +958,7 @@ namespace SlopeFEA
                     Point[] materialBoundPoints;
                     bool[] isFixedX;
                     bool[] isFixedY;
+                    bool[] isPrintPoint;
                     string materialName;
                     int numMaterialBoundPoints , numLineConstraints , numLineLoads , numPointLoads;
                     double xCoord , yCoord;
@@ -964,6 +975,7 @@ namespace SlopeFEA
                         materialBoundPoints = new Point[numMaterialBoundPoints + 1];
                         isFixedX = new bool[numMaterialBoundPoints + 1];
                         isFixedY = new bool[numMaterialBoundPoints + 1];
+                        isPrintPoint = new bool[numMaterialBoundPoints + 1];
 
                         for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {
@@ -974,6 +986,7 @@ namespace SlopeFEA
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                             isFixedX[j] = coords[2] == Boolean.TrueString;
                             isFixedY[j] = coords[3] == Boolean.TrueString;
+                            isPrintPoint[j] = coords[4] == Boolean.TrueString;
                         }
 
                         newMaterialBlock = new MaterialBlock( this , materialBoundPoints );
@@ -981,6 +994,7 @@ namespace SlopeFEA
                         {
                             newMaterialBlock.BoundaryPoints[j].IsFixedX = isFixedX[j];
                             newMaterialBlock.BoundaryPoints[j].IsFixedY = isFixedY[j];
+                            newMaterialBlock.BoundaryPoints[j].IsPrintPoint = isPrintPoint[j];
                         }
 
                         numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
@@ -1048,6 +1062,11 @@ namespace SlopeFEA
 
                 feaParams.ColWidth = double.Parse( tr.ReadLine().Split( '=' )[1] );
                 feaParams.RowHeight = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.NStep = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.NIter = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.NPrint = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.LFact = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                feaParams.GFact = double.Parse( tr.ReadLine().Split( '=' )[1] );
 
                 tr.ReadLine();      //
                 tr.ReadLine();      //
@@ -2028,7 +2047,6 @@ namespace SlopeFEA
                     } );
 
                 genAlgParams.SliceWidth /= distConv;
-                feaParams.ElementSize /= distConv;
                 feaParams.ColWidth /= distConv;
                 feaParams.RowHeight /= distConv;
 
@@ -2689,6 +2707,33 @@ namespace SlopeFEA
                     }
                     break;
 
+                case (DrawModes.PrintPoint):
+                    {
+                        ClearSelections();
+
+                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
+                        {
+                            DrawingPoint pp = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
+
+                            if ( pp != null )
+                            {
+                                materialBlocks.ForEach(
+                                    delegate( MaterialBlock mb )
+                                    {
+                                        mb.BoundaryPoints.ForEach( delegate( DrawingPoint bp ) { bp.IsPrintPoint = false; } );
+                                    } );
+
+                                pp.IsPrintPoint = true;
+
+                                if ( this.IsSaved ) this.IsSaved = false;
+                                if ( this.IsVerified ) this.IsVerified = false;
+
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
 
                 case (DrawModes.Select):
                     {
@@ -3018,6 +3063,9 @@ namespace SlopeFEA
                         break;
                     case DrawModes.LineLoad:
                         this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["lineLoadCursor"])).Cursor;
+                        break;
+                    case DrawModes.PrintPoint:
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["printPointCursor"])).Cursor;
                         break;
                     default:
                         this.Cursor = Cursors.Arrow;

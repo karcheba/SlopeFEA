@@ -289,3 +289,10 @@ REVISION HISTORY:
 +++ (gcontrol.for) Added CLEANUP() subroutine to deallocate and rewind in preparation for subsequent runs
 +++ (Test Files/*.out) Tested INPUT(), BANDWH(), CLEANUP()
 +++ (gcontrol.for) Added allocation of TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, GSTIF, ESTIF to INPUT() and deallocation to CLEANUP()
++++ (PrintPoint.ico, PrintPoint.cur) Created
++++ (MainWindow.xaml, MainWindow.xaml.cs, SlopeCanvas.cs, CanvasData.cs) Added selection of print point mode
++++ (FEA.cs) Added isPrintPoint[] to feSubstruct and IsPrintPoint to feNode
++++ (MeshGen.cs) Added detection of print point
++++ (feModules.for) Added IPRINT variable for print point
++++ (gcontrol.for) Added reading and writing of IPRINT variable
++++ (FEAParamsDialog.xaml, FEAParamsDialog.xaml.cs, SlopeCanvas.cs, CanvasData.cs, gcontrol.for) Added NSTEP, NITER, NPRINT, LFACT, GFACT

@@ -38,7 +38,14 @@
       INTEGER, PARAMETER :: output=2,mtl=3,nod=4,ele=5,bel=6    ! input file unit numbers
       CHARACTER(LEN=64) :: ANTYPE   ! string denoting analysis type
 !
-      INTEGER(ik), SAVE :: NNET     ! # of system dofs (computed in BANDWH)
+      INTEGER(ik), SAVE :: NSTEP    ! # of load steps
+      INTEGER(ik), SAVE :: NITER    ! # of load steps
+      INTEGER(ik), SAVE :: NPRINT   ! # of load steps
+!
+      REAL(dk), SAVE :: LFACT       ! load factor
+      REAL(dk), SAVE :: GFACT       ! gravity factor
+!
+      INTEGER(ik), SAVE :: NNET     ! # of system dofs (computed in INPUT)
       INTEGER(ik), SAVE :: LBAND    ! # of co-diagonal bands in stiff mat (computed in BANDWH)
 !
       REAL(dk), ALLOCATABLE :: TLOAD(:), GLOAD(:)   ! load vecs
@@ -91,7 +98,9 @@
       EMOD(:)   = 0.0
       NU(:)     = 0.0
 !
-      READ(nod,*) NNOD, NDIM, NVAR      ! # nodes, # dimensions, # dofs/node
+!     # nodes, # dimensions, # dofs/node, print node
+      READ(nod,*) NNOD, NDIM, NVAR, IPRINT, NSTEP, NITER, NPRINT,
+     +            LFACT, GFACT
       ALLOCATE( COORDS(NDIM,NNOD),
      +          PLOADS(NDIM,NNOD),
      +          IX(NNOD*NVAR)   )
@@ -130,9 +139,9 @@
 !
 !     write control data to output file
       WRITE(output,101) ANTYPE, NMTL, NNOD, NDIM, NVAR,
-     +                  NEL, NNODEL, NVEL, NELT, NNODELT!,
-!     +                  NSTEP, NITER, NPRINT, IREAD,
-!     +                  LFACT, GFACT
+     +                  NEL, NNODEL, NVEL, NELT, NNODELT,
+     +                  IPRINT, NSTEP, NITER, NPRINT,
+     +                  LFACT, GFACT
 !
 !     *********************************
 !     *********** NODE DATA ***********
@@ -246,12 +255,12 @@
      +       /, 1X, '# of dofs/element ................ NVEL = ', I7,
      +       /, 1X, '# of traction elements ........... NELT = ', I7,
      +       /, 1X, '# of nodes/traction element ... NNODELT = ', I7,
-!     +       /, 1X, '# of load steps ................. NSTEP = ', I7,
-!     +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
-!     +       /, 1X, '# of print lines ............... NPRINT = ', I7,
-!     +       /, 1X, 'output node number .............. IREAD = ', I7,
-!     +       /, 1X, 'load factor ..................... LFACT = ', E12.5,
-!     +       /, 1X, 'gravity factor .................. GFACT = ', E12.5,
+     +       /, 1X, '# of load steps ................. NSTEP = ', I7,
+     +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
+     +       /, 1X, '# of print lines ............... NPRINT = ', I7,
+     +       /, 1X, 'output node number ............. IPRINT = ', I7,
+     +       /, 1X, 'load factor ..................... LFACT = ', E12.5,
+     +       /, 1X, 'gravity factor .................. GFACT = ', E12.5,
      +       / )
 !
 !     node data

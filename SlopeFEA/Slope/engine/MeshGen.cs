@@ -99,6 +99,7 @@ namespace SlopeFEA
 
                     newSubstruct.IsFixedX.Add( p.IsFixedX );
                     newSubstruct.IsFixedY.Add( p.IsFixedY );
+                    newSubstruct.IsPrintPoint.Add( p.IsPrintPoint );
                 }
 
                 // create line constraints
@@ -225,6 +226,7 @@ namespace SlopeFEA
                     vertexNode.IsLocked = true;
                     vertexNode.IsFixedX = substruct.IsFixedX[i];
                     vertexNode.IsFixedY = substruct.IsFixedY[i];
+                    vertexNode.IsPrintPoint = substruct.IsPrintPoint[i];
 
                     // see if a node is already at the vertex
                     foundVertex = false;
@@ -240,6 +242,7 @@ namespace SlopeFEA
                                 node.IsLocked = true;
                                 node.IsFixedX = substruct.IsFixedX[i];
                                 node.IsFixedY = substruct.IsFixedY[i];
+                                node.IsPrintPoint = substruct.IsPrintPoint[i];
 
                                 foreach ( fePointLoad pl in substruct.PointLoads )
                                 {
@@ -873,9 +876,11 @@ namespace SlopeFEA
                 nodes.Sort( feNode.CompareNodesVertically );
             }
 
+            int printNode = 0;
             for ( int i = 0 ; i < nodes.Count ; i++ )
             {
                 nodes[i].Number = i + 1;
+                if ( nodes[i].IsPrintPoint ) printNode = nodes[i].Number;
             }
 
 
@@ -926,17 +931,23 @@ namespace SlopeFEA
             path[path.Length - 1] = "nod";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( "{0}\t{1}\t{2}" ,
-                                /*NNOD=*/ nodes.Count ,
-                                /*NDIM=*/ 2 ,
-                                /*NVAR=*/ 2 );
+                tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}" ,
+                    /*NNOD=*/ nodes.Count ,
+                    /*NDIM=*/ 2 ,
+                    /*NVAR=*/ 2 ,
+                    /*IREAD=*/ printNode ,
+                    /*NSTEP=*/ canvas.FEAParameters.NStep ,
+                    /*NITER=*/ canvas.FEAParameters.NIter ,
+                    /*NPRINT=*/ canvas.FEAParameters.NPrint ,
+                    /*LFACT=*/ canvas.FEAParameters.LFact ,
+                    /*GFACT=*/ canvas.FEAParameters.GFact );
                 foreach ( feNode node in nodes )
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     node.Number ,
-                                    Math.Round( node.X , 6 ) , Math.Round( node.Y , 6 ) ,
+                                    node.X , node.Y ,
                                     node.IsFixedX ? 0 : 1 , node.IsFixedY ? 0 : 1 ,
-                                    Math.Round( node.XLoad , 6 ) , Math.Round( node.YLoad , 6 ) );
+                                    node.XLoad , node.YLoad );
                 }
             }
 
@@ -988,8 +999,8 @@ namespace SlopeFEA
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     element.Number ,
                                     element.Nodes[0].Number , element.Nodes[1].Number ,
-                                    Math.Round( element.NLoads[0] , 6 ) , Math.Round( element.NLoads[1] , 6 ) ,
-                                    Math.Round( element.TLoads[0] , 6 ) , Math.Round( element.TLoads[1] , 6 ) );
+                                    element.NLoads[0] , element.NLoads[1] ,
+                                    element.TLoads[0] , element.TLoads[1] );
                 }
             }
 

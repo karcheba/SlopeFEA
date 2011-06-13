@@ -5,7 +5,7 @@
 
 FILE: Q:\Research\2010-2011\SlopeFEA\TestFiles\testmulti
 DATE:  6/13/2011
-TIME: 13:51:20.699
+TIME: 16: 5:24.780
 
 
 
@@ -19,6 +19,12 @@ TIME: 13:51:20.699
  # of dofs/element ................ NVEL =       6
  # of traction elements ........... NELT =       5
  # of nodes/traction element ... NNODELT =       2
+ # of load steps ................. NSTEP =     153
+ # of iterations/load step ....... NITER =       5
+ # of print lines ............... NPRINT =     200
+ output node number ............. IPRINT =      10
+ load factor ..................... LFACT =  0.10000E+01
+ gravity factor .................. GFACT =  0.10000E+01
 
 
 
@@ -494,7 +500,7 @@ TIME: 13:51:20.699
    ELEMENT         NODES         MTL        AREA        CENTROID (X,Y,..)
 
 
-     1       164  173  172       2      -0.1137E-12         64.000    28.400
+     1       164  173  172       2       0.1137E-12         64.000    28.400
 
      2       173  180  181       2       0.3280E+01         69.567    23.400
 

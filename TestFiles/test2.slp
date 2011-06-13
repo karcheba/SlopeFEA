@@ -63,12 +63,12 @@ Number of Material Blocks = 1
 Material Block #1
 Material Type = "clay"
 Number of Boundary Points = 6
--16, 22, True, False
--16, 1.99999999999998, True, True
-118, 1.99999999999998, True, True
-118, 48, True, False
-62, 48, False, False
-26, 22, False, False
+-16, 22, True, False, False
+-16, 1.99999999999998, True, True, False
+118, 1.99999999999998, True, True, False
+118, 48, True, False, False
+62, 48, False, False, True
+26, 22, False, False, False
 Number of Line Constraints = 3
 0, 1, True, False
 2, 3, True, False
@@ -98,6 +98,11 @@ FEA PARAMETERS
 
 Column Width = 5
 Row Height = 5
+Number of Load Steps = 5
+Number of Iterations = 200
+Number of Print Lines = 10
+Load Factor = 1
+Gravity Factor = 1
 
 
 --------------------------------

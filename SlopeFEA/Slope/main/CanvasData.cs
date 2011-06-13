@@ -39,7 +39,7 @@ using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
-    public enum DrawModes { Select , Boundaries , Materials , Pan , ZoomArea , MovePoints , AddPoints , FixX , FixY , PointLoad , LineLoad };
+    public enum DrawModes { Select , Boundaries , Materials , Pan , ZoomArea , MovePoints , AddPoints , PrintPoint , FixX , FixY , PointLoad , LineLoad };
     public enum Units { Metres , Millimetres , Feet , Inches };
     public enum Scales
     {
@@ -821,6 +821,7 @@ namespace SlopeFEA
         private Point point;
         private Ellipse dot;
         private bool isSelected;
+        private bool isPrintPoint;
         private bool isFixedX;
         private bool isFixedY;
         private List<Polyline> fixLines;
@@ -845,25 +846,25 @@ namespace SlopeFEA
                 canvas.Children.Add( newLine );
             }
 
-            fixLines[0].Points.Add( new Point( pt.X - 7 , pt.Y - 3.5 ) );
-            fixLines[0].Points.Add( new Point( pt.X + 7 , pt.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( point.X - 7 , point.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( point.X + 7 , point.Y - 3.5 ) );
 
-            fixLines[1].Points.Add( new Point( pt.X - 7 , pt.Y + 3.5 ) );
-            fixLines[1].Points.Add( new Point( pt.X + 7 , pt.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( point.X - 7 , point.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( point.X + 7 , point.Y + 3.5 ) );
 
-            fixLines[2].Points.Add( new Point( pt.X - 3.5 , pt.Y + 7 ) );
-            fixLines[2].Points.Add( new Point( pt.X - 3.5 , pt.Y - 7 ) );
+            fixLines[2].Points.Add( new Point( point.X - 3.5 , point.Y + 7 ) );
+            fixLines[2].Points.Add( new Point( point.X - 3.5 , point.Y - 7 ) );
 
-            fixLines[3].Points.Add( new Point( pt.X + 3.5 , pt.Y + 7 ) );
-            fixLines[3].Points.Add( new Point( pt.X + 3.5 , pt.Y - 7 ) );
+            fixLines[3].Points.Add( new Point( point.X + 3.5 , point.Y + 7 ) );
+            fixLines[3].Points.Add( new Point( point.X + 3.5 , point.Y - 7 ) );
 
 
             dot = new Ellipse();
             dot.HorizontalAlignment = HorizontalAlignment.Left;
             dot.VerticalAlignment = VerticalAlignment.Top;
-            dot.Margin = new Thickness( pt.X - 3.5 , pt.Y - 3.5 , 0 , 0 );
             dot.Height = 7;
             dot.Width = 7;
+            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
             dot.Stroke = Brushes.Black;
             dot.Fill = Brushes.Black;
             dot.Opacity = 0.7;
@@ -892,6 +893,31 @@ namespace SlopeFEA
                     dot.Fill = Brushes.Black;
                     dot.Stroke = Brushes.Black;
                 }
+            }
+        }
+
+        public bool IsPrintPoint
+        {
+            get
+            {
+                return this.isPrintPoint;
+            }
+            set
+            {
+                this.isPrintPoint = value;
+
+                if ( value )
+                {
+                    dot.Height = 12;
+                    dot.Width = 12;
+                }
+                else
+                {
+                    dot.Height = 7;
+                    dot.Width = 7;
+                }
+
+                dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
             }
         }
 
@@ -1001,7 +1027,7 @@ namespace SlopeFEA
         public void Translate ( Vector delta )
         {
             point += delta;
-            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
+            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
             Point p;
             foreach ( Polyline l in fixLines )
             {
@@ -1019,7 +1045,7 @@ namespace SlopeFEA
         {
             point.X = centre.X + factor * (point.X - centre.X);
             point.Y = centre.Y + factor * (point.Y - centre.Y);
-            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
+            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
 
             fixLines[0].Points[0] = new Point( point.X - 7 , point.Y - 3.5 );
             fixLines[0].Points[1] = new Point( point.X + 7 , point.Y - 3.5 );
@@ -1053,7 +1079,7 @@ namespace SlopeFEA
 
             // shift the point, its display circle, and its fixity lines
             point += delta;
-            dot.Margin = new Thickness( point.X - 3.5 , point.Y - 3.5 , 0 , 0 );
+            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
             Point p;
             foreach ( Polyline l in fixLines )
             {
@@ -1094,7 +1120,8 @@ namespace SlopeFEA
                 || canvas.DrawMode == DrawModes.FixX
                 || canvas.DrawMode == DrawModes.FixY
                 || canvas.DrawMode == DrawModes.PointLoad
-                || canvas.DrawMode == DrawModes.LineLoad )
+                || canvas.DrawMode == DrawModes.LineLoad
+                || canvas.DrawMode == DrawModes.PrintPoint )
             {
                 this.IsSelected = true;
             }
@@ -2377,9 +2404,13 @@ namespace SlopeFEA
         {
         }
 
-        public double ElementSize { get; set; }
         public double ColWidth { get; set; }
         public double RowHeight { get; set; }
+        public int NStep { get; set; }
+        public int NIter { get; set; }
+        public int NPrint { get; set; }
+        public double LFact { get; set; }
+        public double GFact { get; set; }
     }
 
     public class MeshLine
