@@ -36,6 +36,8 @@
       MODULE numeric
       IMPLICIT NONE
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
+      REAL(dk), PARAMETER :: PI = 3.1415926535898
+      REAL(dk), PARAMETER :: degTOrad = PI / 180.0D0
       END MODULE numeric
 !
 !
@@ -74,7 +76,7 @@
       INTEGER(ik), SAVE :: NDIM     ! # of dimensions (e.g. 2d, 3d)
       INTEGER(ik), SAVE :: NVAR     ! # of dofs per node (from .nod file)
       INTEGER(ik), SAVE :: IPRINT   ! node # for printing
-      INTEGER(ik), ALLOCATABLE :: IX(:)     ! connectivity/fixity
+      INTEGER(ik), ALLOCATABLE :: IX(:)     ! fix info
       REAL(dk), ALLOCATABLE :: COORDS(:,:)  ! grid coords
       REAL(dk), ALLOCATABLE :: PLOADS(:,:)    ! point loads
 !
@@ -95,7 +97,7 @@
       INTEGER(ik), SAVE :: NNODEL   ! # of nodes per element (from .ele file)
       INTEGER(ik), SAVE :: NVEL     ! # of dofs per element (NVAR*NNODEL)
       INTEGER(ik), SAVE :: NNN      ! # of nodes per element +1 for mtl type
-      INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connectivity/fixity
+      INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)    ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)  ! element centroid
 !

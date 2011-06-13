@@ -296,3 +296,5 @@ REVISION HISTORY:
 +++ (feModules.for) Added IPRINT variable for print point
 +++ (gcontrol.for) Added reading and writing of IPRINT variable
 +++ (FEAParamsDialog.xaml, FEAParamsDialog.xaml.cs, SlopeCanvas.cs, CanvasData.cs, gcontrol.for) Added NSTEP, NITER, NPRINT, LFACT, GFACT
++++ (feModules.for) Added PI and degTOrad constants to NUMERIC
++++ (gfortran.for) Added pre-calculation of trig functions of material props to INPUT()

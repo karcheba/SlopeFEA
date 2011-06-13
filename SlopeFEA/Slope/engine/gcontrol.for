@@ -39,8 +39,8 @@
       CHARACTER(LEN=64) :: ANTYPE   ! string denoting analysis type
 !
       INTEGER(ik), SAVE :: NSTEP    ! # of load steps
-      INTEGER(ik), SAVE :: NITER    ! # of load steps
-      INTEGER(ik), SAVE :: NPRINT   ! # of load steps
+      INTEGER(ik), SAVE :: NITER    ! # of iterations
+      INTEGER(ik), SAVE :: NPRINT   ! # of print lines
 !
       REAL(dk), SAVE :: LFACT       ! load factor
       REAL(dk), SAVE :: GFACT       ! gravity factor
@@ -107,6 +107,11 @@
       COORDS(:,:)   = 0.0           ! alloc and init grid data storage
       PLOADS(:,:)   = 0.0
       IX(:)         = 0
+      IF (GFACT .LT. 0.0) GFACT = 0.0
+      IF (LFACT .LT. 0.0) LFACT = 0.0     ! ensure solution parameters are meaningful
+      IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0
+      IF (NSTEP .LT. 2) NSTEP = 2
+      IF (NITER .LT. 2) NITER = 2
 !
       READ(ele,*) NEL, NNODEL   ! # body elements, # nodes per element
       NVEL = NVAR*NNODEL    ! compute #dofs/element
@@ -219,6 +224,12 @@
       DO i = 1,NMTL
         READ(mtl,*) GRR(i), PHI(i), COH(i), EMOD(i), NU(i)    ! get data from file
         WRITE(output,141) i, GRR(i), PHI(i), COH(i), EMOD(i), NU(i)
+        
+        IF (COH(i) .LT. 1.0D-8) COH(i) = 1.0D-8   ! ensure small cohesion for numerical stability
+        COH(i) = COH(i)*COS(degTOrad*PHI(i))
+        PHI(i) = SIN(degTOrad*PHI(i))             ! pre-calculate trig functions of material props
+        PSI(i) = SIN(degTOrad*PSI(i))
+        
       END DO
 !
 !     *********************************
