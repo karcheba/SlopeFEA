@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from feModules.for on Tue Jun 14 08:52:50 2011
-MD5:9bdf50937352e85d63b378e7be0b5bab -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from feModules.for on Tue Jun 14 16:56:41 2011
+MD5:42cfd16ffa03612067d05d561645bb9c -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -61,8 +61,21 @@ UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 17 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0
 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
+18 'sxx' 'elements' 'sxx' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
+1 DEFERRED () ()) 0 () () () 0 0)
+19 'sxy' 'elements' 'sxy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
+1 DEFERRED () ()) 0 () () () 0 0)
+20 'syy' 'elements' 'syy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
+1 DEFERRED () ()) 0 () () () 0 0)
+21 'szz' 'elements' 'szz' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
+1 DEFERRED () ()) 0 () () () 0 0)
 )
 
 ('__convert_r4_r8' 0 2 'area' 0 3 'cent' 0 4 'degtorad' 0 5 'dk' 0 6
 'elements' 0 7 'ico' 0 8 'ik' 0 9 'kind' 0 10 'lj' 0 11 'nel' 0 12 'nnn'
-0 13 'nnodel' 0 14 'numeric' 0 15 'nvel' 0 16 'pi' 0 17)
+0 13 'nnodel' 0 14 'numeric' 0 15 'nvel' 0 16 'pi' 0 17 'sxx' 0 18 'sxy'
+0 19 'syy' 0 20 'szz' 0 21)

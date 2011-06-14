@@ -298,3 +298,15 @@ REVISION HISTORY:
 +++ (FEAParamsDialog.xaml, FEAParamsDialog.xaml.cs, SlopeCanvas.cs, CanvasData.cs, gcontrol.for) Added NSTEP, NITER, NPRINT, LFACT, GFACT
 +++ (feModules.for) Added PI and degTOrad constants to NUMERIC
 +++ (gfortran.for) Added pre-calculation of trig functions of material props to INPUT()
+
+
+[14 June 2011]
+
+{v1.0.0.10}
+--- (Build/) Removed since the ClickOnce installer cannot accomodate packaging of the Fortran compiled FEA DLL files
++++ (SlopeFEA 2011/) Added SlopeFEA 2011.vdproj setup wizard project [creates a folder in the Program Files (x86 for 64-bit systems) containing the program EXE and the FEA DLLs, places shortcuts on the desktop and in the start menu, and places some sample input files in a folder on the desktop]
++++ (feUtility.for) Created, as the name suggests it contains utility functions for the FEA solver
++++ (feUtility.for) Added LOAD(), TRACT() fka BONDRY(), ESHAPET(), STFMAT() fka MATRX(), STIFF(), DMATRX(), BMATRX()
++++ (feModules.for) Added NVELT
++++ (gcontrol.for) Added LOCAL(), LOCALT(), MAPLD(), fGSTIF, fWORK, fiWORK, HBW
++++ (SlopeFEA3Node.for) Added calls to LOAD() and STFMAT()

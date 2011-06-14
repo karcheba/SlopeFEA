@@ -40,6 +40,12 @@
       ANTYPE = 'PLANE STRAIN ELASTIC'
       CALL INPUT(fpath)     ! initialize data in gcontrol
 !
+!     set up load vectors (gravity and traction
+      CALL LOAD(GLOAD, TLOAD)
+!
+!     form and decompose global stiffness matrix
+      CALL STFMAT(GSTIF)
+!
       CALL CLEANUP()
 !
       RETURN

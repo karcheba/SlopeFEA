@@ -29,7 +29,11 @@
 !
 !
       MODULE gcontrol
-      USE mproperty; USE nodes; USE elements; USE tractions
+      USE numeric     ! number types and constants
+      USE mproperty   ! material property data
+      USE nodes       ! node data
+      USE elements    ! element data
+      USE tractions   ! applied load data
 !
 !$    USE OMP_LIB         ! parallel lib (gfortran: compile with -fopenmp switch)
 !
@@ -50,9 +54,12 @@
 !
       REAL(dk), ALLOCATABLE :: TLOAD(:), GLOAD(:)   ! load vecs
       REAL(dk), ALLOCATABLE :: STR(:), GLOAD0(:)    ! for non-linear stepping
-      REAL(dk), ALLOCATABLE :: DISP(:), TDISP(:)    ! disp (and/or vel,acc,press,temp,etc.) vecs
-      REAL(dk), ALLOCATABLE :: GSTIF(:,:)           ! global stiffness mat
-      REAL(dk), ALLOCATABLE :: ESTIF(:,:)           ! element stiffness mat
+      REAL(dk), ALLOCATABLE :: DISP(:), TDISP(:)        ! disp (and/or vel,acc,press,temp,etc.) vecs
+      REAL(dk), ALLOCATABLE :: GSTIF(:,:), fGSTIF(:,:)  ! global stiffness mat
+      REAL(dk), ALLOCATABLE :: fWORK(:)     ! workspace for solver
+      INTEGER(ik), ALLOCATABLE :: fiWORK(:) ! integer workspace for solver
+      REAL(dk), ALLOCATABLE :: ESTIF(:,:)               ! element stiffness mat
+      INTEGER(ik), SAVE :: HBW    ! half bandwidth of stiff mat (LBAND+1)
 !	
 !
 !
@@ -91,12 +98,12 @@
      +          PSI(NMTL),
      +          EMOD(NMTL),
      +          NU(NMTL)    )   ! alloc and init material data storage
-      GRR(:)    = 0.0
-      PHI(:)    = 0.0
-      COH(:)    = 0.0
-      PSI(:)    = 0.0
-      EMOD(:)   = 0.0
-      NU(:)     = 0.0
+      GRR(:)    = 0.0D0
+      PHI(:)    = 0.0D0
+      COH(:)    = 0.0D0
+      PSI(:)    = 0.0D0
+      EMOD(:)   = 0.0D0
+      NU(:)     = 0.0D0
 !
 !     # nodes, # dimensions, # dofs/node, print node
       READ(nod,*) NNOD, NDIM, NVAR, IPRINT, NSTEP, NITER, NPRINT,
@@ -104,12 +111,12 @@
       ALLOCATE( COORDS(NDIM,NNOD),
      +          PLOADS(NDIM,NNOD),
      +          IX(NNOD*NVAR)   )
-      COORDS(:,:)   = 0.0           ! alloc and init grid data storage
-      PLOADS(:,:)   = 0.0
+      COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
+      PLOADS(:,:)   = 0.0D0
       IX(:)         = 0
-      IF (GFACT .LT. 0.0) GFACT = 0.0
-      IF (LFACT .LT. 0.0) LFACT = 0.0     ! ensure solution parameters are meaningful
-      IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0
+      IF (GFACT .LT. 0.0) GFACT = 0.0D0
+      IF (LFACT .LT. 0.0) LFACT = 0.0D0     ! ensure solution parameters are meaningful
+      IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0D0
       IF (NSTEP .LT. 2) NSTEP = 2
       IF (NITER .LT. 2) NITER = 2
 !
@@ -120,20 +127,26 @@
      +          ICO(NNN,NEL),
      +          AREA(NEL),
      +          CENT(NDIM,NEL),
+     +          SXX(NEL), SYY(NEL), SXY(NEL), SZZ(NEL),
      +          lcoords(NDIM,NNODEL)    )
       LJ(:)         = 0                     ! alloc and init element data storage
       ICO(:,:)      = 0
-      AREA(:)       = 0.0
-      CENT(:,:)     = 0.0
-      lcoords(:,:)  = 0.0
+      AREA(:)       = 0.0D0
+      CENT(:,:)     = 0.0D0
+      SXX(:)        = 0.0D0
+      SYY(:)        = 0.0D0
+      SXY(:)        = 0.0D0
+      SZZ(:)        = 0.0D0
+      lcoords(:,:)  = 0.0D0
 !
       READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
+      NVELT = NVAR*NNODELT    ! compute # dofs per traction element
       ALLOCATE( ICOT(NNODELT,NELT),
      +          TNF(NNODELT,NELT),
      +          TSF(NNODELT,NELT)   )
       ICOT(:,:) = 0                     ! alloc and init traction data storage
-      TNF(:,:)  = 0.0
-      TSF(:,:)  = 0.0
+      TNF(:,:)  = 0.0D0
+      TSF(:,:)  = 0.0D0
 !
 !     write output file header
       CALL DATE_AND_TIME(VALUES=currtime)
@@ -144,7 +157,7 @@
 !
 !     write control data to output file
       WRITE(output,101) ANTYPE, NMTL, NNOD, NDIM, NVAR,
-     +                  NEL, NNODEL, NVEL, NELT, NNODELT,
+     +                  NEL, NNODEL, NVEL, NELT, NNODELT, NVELT,
      +                  IPRINT, NSTEP, NITER, NPRINT,
      +                  LFACT, GFACT
 !
@@ -189,7 +202,7 @@
             AREA(i) = AREA(i)   + lcoords(1,j-1)*lcoords(2,  j)
      +                          - lcoords(1,  j)*lcoords(2,j-1)
         END DO
-        AREA(i) = 0.5*AREA(i)
+        AREA(i) = 0.5D0*AREA(i)
         DO j = 1,NDIM
           CENT(j,i) = SUM(lcoords(j,:))/NNODEL    ! compute element centroid
         END DO
@@ -206,16 +219,20 @@
      +          GLOAD0(NNET),
      +          DISP(NNET),
      +          TDISP(NNET),
-     +          GSTIF(LBAND+1,NNET),
+     +          GSTIF(LBAND+1,NNET), fGSTIF(LBAND+1,NNET),
+     +          fWORK(3*NNET), fiWORK(NNET),
      +          ESTIF(NVEL,NVEL)  )
-      TLOAD(:)    = 0.0               ! alloc and init solution space
-      GLOAD(:)    = 0.0
-      STR(:)      = 0.0
-      GLOAD0(:)   = 0.0
-      DISP(:)     = 0.0
-      TDISP(:)    = 0.0
-      GSTIF(:,:)  = 0.0
-      ESTIF(:,:)  = 0.0
+      TLOAD(:)    = 0.0D0               ! alloc and init solution space
+      GLOAD(:)    = 0.0D0
+      STR(:)      = 0.0D0
+      GLOAD0(:)   = 0.0D0
+      DISP(:)     = 0.0D0
+      TDISP(:)    = 0.0D0
+      GSTIF(:,:)  = 0.0D0
+      fGSTIF(:,:) = 0.0D0
+      fWORK(:)    = 0.0D0
+      fiWORK(:)   = 0
+      ESTIF(:,:)  = 0.0D0
 !
 !     *********************************
 !     ********* MATERIAL DATA *********
@@ -266,6 +283,7 @@
      +       /, 1X, '# of dofs/element ................ NVEL = ', I7,
      +       /, 1X, '# of traction elements ........... NELT = ', I7,
      +       /, 1X, '# of nodes/traction element ... NNODELT = ', I7,
+     +       /, 1X, '# of dofs/traction element ...... NVELT = ', I7,
      +       /, 1X, '# of load steps ................. NSTEP = ', I7,
      +       /, 1X, '# of iterations/load step ....... NITER = ', I7,
      +       /, 1X, '# of print lines ............... NPRINT = ', I7,
@@ -328,7 +346,8 @@
       DEALLOCATE( COORDS, PLOADS, IX )            ! node data
       REWIND(nod);    CLOSE(nod)
 !
-      DEALLOCATE( LJ, ICO, AREA, CENT )           ! body element data
+      DEALLOCATE( LJ, ICO, AREA, CENT,
+     +            SXX, SYY, SXY, SZZ )            ! body element data
       REWIND(ele);    CLOSE(ele)
 !
       DEALLOCATE( ICOT, TNF, TSF )                ! traction element data
@@ -337,7 +356,8 @@
       REWIND(output); CLOSE(output)               ! output file
 !
 !     solution space
-      DEALLOCATE( TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, GSTIF, ESTIF )
+      DEALLOCATE( TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, 
+     +            GSTIF, fGSTIF, fWORK, fiWORK, ESTIF )
 !
       RETURN
 !
@@ -392,18 +412,83 @@
         END DO
 !
         lbcurr = lmax-lmin
-        IF (lbcurr .GT. LBAND) THEN
-!$OMP ATOMIC
-          LBAND = lbcurr
-        END IF
+!$OMP ATOMIC    ! only one thread may update at a time
+        IF (lbcurr .GT. LBAND) LBAND = lbcurr
 !
       END DO
 !$OMP END DO
 !$OMP END PARALLEL
 !
+      HBW = LBAND+1
+!
       RETURN
 !
       END SUBROUTINE BANDWH
+!
+!
+! ......................................................................
+! .... LOCAL ...........................................................
+! ......................................................................
+!     gets local coords and material type of given element, iel
+! ......................................................................
+      SUBROUTINE LOCAL (iel, lcoords, mtype)
+!
+      IMPLICIT NONE
+!
+      INTEGER(ik), INTENT(IN) :: iel          ! element number
+      INTEGER(ik), INTENT(OUT) :: mtype       ! material type
+      REAL(dk), INTENT(OUT) :: lcoords(:,:)   ! local coords
+      INTEGER(ik) :: i, i1, i2, j    ! loop variables
+!
+      lcoords(1:NDIM,1:NNODEL) = COORDS(1:NDIM,ICO(1:NNODEL,IEL)) ! get local coords
+      mtype = ICO(NNN,IEL)    ! get material type
+!
+!$OMP PARALLEL PRIVATE(i,i1,i2)
+!$OMP DO
+!     get local connectivity
+      DO j = 1,NNODEL   ! element nodes
+        i1 = NVAR*(j-1)   ! local offset
+        i2 = NVAR*(ICO(j,iel)-1)  ! global offset
+        DO i = 1,NVAR   ! dofs
+          LJ(i+i1) = IX(i+i2)   ! map global to local
+        END DO  ! dofs
+      END DO  ! element nodes
+!$OMP END DO
+!$OMP END PARALLEL
+!
+      RETURN
+!
+      END SUBROUTINE LOCAL
+!
+!
+! ......................................................................
+! .... LOCALT ..........................................................
+! ......................................................................
+!     gets local coords of given traction element, iel
+! ......................................................................
+      SUBROUTINE LOCALT (iel, lcoordsT)
+!
+      IMPLICIT NONE
+!
+      INTEGER(ik), INTENT(IN) :: iel          ! element number
+      REAL(dk), INTENT(OUT) :: lcoordsT(:,:)   ! local coords
+      INTEGER(ik) :: i, i1, i2, j    ! loop variables
+!
+!     get local coords
+      lcoordsT(1:NDIM,1:NNODELT) = COORDS(1:NDIM,ICOT(1:NNODELT,iel))
+!
+!     get local connectivity
+      DO j = 1,NNODELT    ! traction element nodes
+        i1 = NVAR*(j-1)   ! local offset
+        i2 = NVAR*(ICO(j,iel)-1)  ! global offset
+        DO i = 1,NVAR   ! dofs
+          LJ(i+i1) = IX(i+i2)   ! map global to local
+        END DO  ! dofs
+      END DO  ! traction element nodes
+!
+      RETURN
+!
+      END SUBROUTINE LOCALT
 !
 !
 ! ......................................................................
@@ -437,11 +522,11 @@
 !           ensure row<=col for upper band storage
           IF (ljr .LE. ljc) THEN
             k = LBAND + 1 + ljr - ljc
-!$OMP ATOMIC    ! only one thread may increment this at a time
+!$OMP ATOMIC    ! only one thread may increment at a time
             AB(k,ljc) = AB(k,ljc) + S(i,j)
           ELSE
             k = LBAND + 1 + ljc - ljr
-!$OMP ATOMIC    ! only one thread may increment this at a time
+!$OMP ATOMIC    ! only one thread may increment at a time
             AB(k,ljr) = AB(k,ljr) + S(i,j)
           END IF
 !
@@ -454,6 +539,36 @@
       RETURN
 !
       END SUBROUTINE MAPST
+!
+!
+! ......................................................................
+! .... MAPLD ...........................................................
+! ......................................................................
+!     maps the indices of the element load vec to the global load vec
+! ......................................................................
+      SUBROUTINE MAPLD (GLO, loc, nv)
+!
+      IMPLICIT NONE
+!
+      REAL(dk), INTENT(IN) :: loc(:)    ! element vec
+      INTEGER(ik), INTENT(IN) :: nv     ! # dofs
+      REAL(dk), INTENT(INOUT) :: GLO(:)     ! global vec
+      INTEGER(ik) :: i, ljr    ! loop variable
+!
+!$OMP PARALLEL PRIVATE(ljr)
+!$OMP DO
+      DO i = 1,nv   ! element dofs
+        ljr = LJ(i)     ! row of global load vec
+        IF (ljr .EQ. 0) CYCLE   ! skip if dof is fixed
+!$OMP ATOMIC    ! only one thread may increment at a time
+        GLO(ljr) = GLO(ljr) + loc(i)    ! increment global
+      END DO  ! element dofs
+!$OMP END DO
+!$OMP END PARALLEL
+!
+      RETURN
+!
+      END SUBROUTINE MAPLD
 !
 !
       END MODULE gcontrol

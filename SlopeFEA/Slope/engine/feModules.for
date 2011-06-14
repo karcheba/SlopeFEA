@@ -34,10 +34,13 @@
 !     data types
 ! ......................................................................
       MODULE numeric
+!
       IMPLICIT NONE
+!
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
       REAL(dk), PARAMETER :: PI = 3.1415926535898
       REAL(dk), PARAMETER :: degTOrad = PI / 180.0D0
+!
       END MODULE numeric
 !
 !
@@ -100,6 +103,7 @@
       INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)    ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)  ! element centroid
+      REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:) ! internal stresses
 !
       END MODULE elements
 !
@@ -114,6 +118,7 @@
 !
       INTEGER(ik), SAVE :: NELT                     ! # of traction elements
       INTEGER(ik), SAVE :: NNODELT                  ! # nodes per traction element
+      INTEGER(ik), SAVE :: NVELT                    ! # of dofs per traction element (NVAR*NNODELT)
       REAL(dk), ALLOCATABLE :: TNF(:,:),TSF(:,:)    ! traction element loads
       INTEGER(ik), ALLOCATABLE :: ICOT(:,:)         ! traction element connect
 !
