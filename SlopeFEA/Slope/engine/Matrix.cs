@@ -29,6 +29,7 @@
 
 using System;
 using System.IO;
+using System.Windows;
 
 namespace Matrix
 {
@@ -229,6 +230,7 @@ namespace Matrix
                 }
                 catch ( InvalidOperationException e )
                 {
+                    MessageBox.Show( e.Message , "Error" );
                     return null;
                 }
             }
@@ -789,6 +791,7 @@ namespace Matrix
                 }
                 catch ( InvalidOperationException e )
                 {
+                    MessageBox.Show( e.Message , "Error" );
                     return null;
                 }
             }
