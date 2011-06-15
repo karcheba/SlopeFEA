@@ -39,7 +39,7 @@
 !
       IMPLICIT NONE
 !
-      INTEGER, PARAMETER :: output=2,mtl=3,nod=4,ele=5,bel=6    ! input file unit numbers
+      INTEGER, PARAMETER :: output=2,mtl=3,nod=4,ele=5,bel=6,his=7  ! file unit numbers
       CHARACTER(LEN=64) :: ANTYPE   ! string denoting analysis type
 !
       INTEGER(ik), SAVE :: NSTEP    ! # of load steps
@@ -87,6 +87,7 @@
       OPEN(nod,     FILE=fpath(1:LEN(fpath)-1)//".nod")
       OPEN(ele,     FILE=fpath(1:LEN(fpath)-1)//".ele")
       OPEN(bel,     FILE=fpath(1:LEN(fpath)-1)//".bel")
+      OPEN(his,     FILE=fpath(1:LEN(fpath)-1)//".his")
 !
 !     *********************************
 !     ********* CONTROL DATA **********
@@ -354,6 +355,8 @@
       REWIND(bel);    CLOSE(bel)
 !
       REWIND(output); CLOSE(output)               ! output file
+!
+      REWIND(his);    CLOSE(his)                  ! load step history file
 !
 !     solution space
       DEALLOCATE( TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, 

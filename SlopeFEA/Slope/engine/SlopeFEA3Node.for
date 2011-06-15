@@ -29,7 +29,8 @@
 !
 !
       SUBROUTINE slopefea3node (fpath)
-      USE gcontrol
+      USE gcontrol    ! controls inputs, grid, and elements
+      USE feutility   ! utility functions for FEA solver
 !
 !$    USE OMP_LIB       ! parallel lib (gfortran: compile with -fopenmp switch)
 !

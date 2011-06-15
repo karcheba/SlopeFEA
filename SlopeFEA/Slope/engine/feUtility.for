@@ -162,27 +162,53 @@
 !
 !     perform initial matrix inversion
       GLOAD0(:) = 1.0D-2 * GLOAD(:)
-      CALL DPBSVX(  FACT  = 'N',
-      +             UPLO  = 'U',
-      +             N     = NNET,
-      +             KD    = LBAND,
-      +             NRHS  = 1,
-      +             AB    = GSTIF,
-      +             LDAB  = HBW,
-      +             AFB   = fGSTIF,
-      +             LDAFB = HBW,
-      +             EQUED = 'N',
-      +             S     = DISP,
-      +             B     = GLOAD0,
-      +             LDB   = NNET,
-      +             X     = DISP,
-      +             LDX   = NNET,
-      +             RCOND = rcn,
-      +             FERR  = forerr,
-      +             BERR  = bakerr,
-      +             WORK  = fWORK,
-      +             IWORK = fiWORK,
-      +             INFO  = ierr )
+      CALL DPBSVX(  'N',    ! FACT  = 
+     +              'U',    ! UPLO  = 
+     +              NNET,   ! N     = 
+     +              LBAND,  ! KD    = 
+     +              1,      ! NRHS  = 
+     +              GSTIF,  ! AB    = 
+     +              HBW,    ! LDAB  = 
+     +              fGSTIF, ! AFB   = 
+     +              HBW,    ! LDAFB = 
+     +              'N',    ! EQUED = 
+     +              DISP,   ! S     = 
+     +              GLOAD0, ! B     = 
+     +              NNET,   ! LDB   = 
+     +              DISP,   ! X     = 
+     +              NNET,   ! LDX   = 
+     +              rcn,    ! RCOND = 
+     +              forerr, ! FERR  = 
+     +              bakerr, ! BERR  = 
+     +              fWORK,  ! WORK  = 
+     +              fiWORK, ! IWORK = 
+     +              ierr )  ! INFO  = 
+!
+!     print packed stiff mat (testing)
+      WRITE(his,*) 'GSTIF'
+      DO iel = 1,HBW
+        WRITE(his,*) GSTIF(iel,:)
+      END DO
+!
+      WRITE(his,*)
+!
+!     print factored packed stiff mat (testing)
+      WRITE(his,*) 'fGSTIF'
+      DO iel = 1,HBW
+        WRITE(his,*) fGSTIF(iel,:)
+      END DO
+!
+      WRITE(his,*)
+!
+!     print gravity load vector (testing)
+      WRITE(his,*) 'GLOAD'
+      WRITE(his,*) GLOAD(:)
+!
+      WRITE(his,*)
+!
+!     print traction load vector (testing)
+      WRITE(his,*) 'TLOAD'
+      WRITE(his,*) TLOAD(:)
 !
       RETURN
 !
