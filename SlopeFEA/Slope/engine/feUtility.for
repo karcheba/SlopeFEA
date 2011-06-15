@@ -49,14 +49,14 @@
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(OUT) :: GLOAD(:), TLOAD(:)
+      REAL(dk), INTENT(OUT) :: GLOAD(:,:), TLOAD(:,:)
       REAL(dk) :: lcoords(NDIM,NNODEL), lcoordsT(NDIM,NNODELT)  ! local coords
       REAL(dk) :: eload(NVEL), eloadT(NVELT)  ! element load vec
       INTEGER(ik) :: mtype          ! element material type
       INTEGER(ik) :: iel            ! loop variable
 !
 !     gravity loads
-      GLOAD(:) = 0.0D0
+      GLOAD(:,1) = 0.0D0
       DO iel = 1,NEL  ! body elements
         CALL LOCAL(iel, lcoords, mtype)   ! get coords and material of element
         eload(:) = 0.0D0                  ! initialize element load vec
@@ -65,7 +65,7 @@
       END DO  ! body elements
 !
 !     tractions (if present)
-      TLOAD(:) = 0.0D0
+      TLOAD(:,1) = 0.0D0
       DO iel = 1,NELT   ! traction elements
         CALL LOCALT(iel, lcoordsT)      ! get coords of traction element
         CALL TRACT(eloadT, lcoordsT, TNF(:,iel), TSF(:,iel)) ! get traction load vec
@@ -149,7 +149,7 @@
       REAL(dk), INTENT(OUT) :: GSTIF(:,:)   ! global stiff mat
       REAL(dk) :: lcoords(NDIM,NNODEL)      ! local coords
       INTEGER(ik) :: iel, mtype             ! element number and material type
-      REAL(dk) :: rcn, forerr, bakerr       ! est cond num, est forward err, est backward err
+      REAL(dk) :: rcn, forerr(1), bakerr(1) ! est cond num, est forward err, est backward err
       INTEGER(ik) :: ierr                   ! error code for DPBSVX()
 !
 !     form global stiffness matrix (packed banded storage)
@@ -161,7 +161,11 @@
       END DO
 !
 !     perform initial matrix inversion
-!      GLOAD0(:) = 1.0D-2 * GLOAD(:)
+      fGSTIF(:,:) = GSTIF(:,:)
+      CALL DPBTRF('U', NNET, LBAND, fGSTIF, HBW, ierr)
+      DISP(:,1) = GLOAD(:,1)
+      CALL DPBTRS('U', NNET, LBAND, 1, fGSTIF, HBW, DISP, NNET, ierr)
+!      GLOAD0(:,1) = 1.0D-2 * GLOAD(:,1)
 !      CALL DPBSVX(  'N',    ! FACT  = 
 !     +              'U',    ! UPLO  = 
 !     +              NNET,   ! N     = 
@@ -193,22 +197,28 @@
       WRITE(his,*)
 !
 !     print factored packed stiff mat (testing)
-!      WRITE(his,*) 'fGSTIF'
-!      DO iel = 1,HBW
-!        WRITE(his,*) fGSTIF(iel,:)
-!      END DO
+      WRITE(his,*) 'fGSTIF'
+      DO iel = 1,HBW
+        WRITE(his,*) fGSTIF(iel,:)
+      END DO
 !
       WRITE(his,*)
 !
 !     print gravity load vector (testing)
       WRITE(his,*) 'GLOAD'
-      WRITE(his,*) GLOAD(:)
+      WRITE(his,*) GLOAD(:,1)
+!
+      WRITE(his,*)
+!
+!     print gravity load displacements (testing)
+      WRITE(his,*) 'DISP'
+      WRITE(his,*) DISP(:,1)
 !
       WRITE(his,*)
 !
 !     print traction load vector (testing)
       WRITE(his,*) 'TLOAD'
-      WRITE(his,*) TLOAD(:)
+      WRITE(his,*) TLOAD(:,1)
 !
       RETURN
 !

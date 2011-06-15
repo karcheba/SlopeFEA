@@ -96,8 +96,8 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 5
-Row Height = 5
+Column Width = 20
+Row Height = 20
 Number of Load Steps = 5
 Number of Iterations = 200
 Number of Print Lines = 10

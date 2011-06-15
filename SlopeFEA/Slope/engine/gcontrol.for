@@ -52,9 +52,9 @@
       INTEGER(ik), SAVE :: NNET     ! # of system dofs (computed in INPUT)
       INTEGER(ik), SAVE :: LBAND    ! # of co-diagonal bands in stiff mat (computed in BANDWH)
 !
-      REAL(dk), ALLOCATABLE :: TLOAD(:), GLOAD(:)   ! load vecs
-      REAL(dk), ALLOCATABLE :: STR(:), GLOAD0(:)    ! for non-linear stepping
-      REAL(dk), ALLOCATABLE :: DISP(:), TDISP(:)        ! disp (and/or vel,acc,press,temp,etc.) vecs
+      REAL(dk), ALLOCATABLE :: TLOAD(:,:), GLOAD(:,:)   ! load vecs
+      REAL(dk), ALLOCATABLE :: STR(:), GLOAD0(:,:)    ! for non-linear stepping
+      REAL(dk), ALLOCATABLE :: DISP(:,:), TDISP(:,:)        ! disp (and/or vel,acc,press,temp,etc.) vecs
       REAL(dk), ALLOCATABLE :: GSTIF(:,:), fGSTIF(:,:)  ! global stiffness mat
       REAL(dk), ALLOCATABLE :: fWORK(:)     ! workspace for solver
       INTEGER(ik), ALLOCATABLE :: fiWORK(:) ! integer workspace for solver
@@ -80,6 +80,7 @@
       INTEGER(ik) :: ntot           ! total possible dofs
       INTEGER(ik) :: currtime(8)    ! for printing analysis date/time
       REAL(dk), ALLOCATABLE :: lcoords(:,:)   ! for computing element area
+      INTEGER(ik) :: ierr   ! for check allocation status
 !
 !     open input file units
       OPEN(output,  FILE=fpath(1:LEN(fpath)-1)//".out")
@@ -93,12 +94,18 @@
 !     ********* CONTROL DATA **********
 !     *********************************
       READ(mtl,*) NMTL          ! # of materials
-      ALLOCATE( GRR(NMTL),
-     +          PHI(NMTL),
-     +          COH(NMTL),
-     +          PSI(NMTL),
-     +          EMOD(NMTL),
-     +          NU(NMTL)    )   ! alloc and init material data storage
+      ALLOCATE( GRR(NMTL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GRR."
+      ALLOCATE( PHI(NMTL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PHI."
+      ALLOCATE( COH(NMTL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating COH."
+      ALLOCATE( PSI(NMTL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PSI."
+      ALLOCATE( EMOD(NMTL), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EMOD."
+      ALLOCATE( NU(NMTL),   STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NU."
       GRR(:)    = 0.0D0
       PHI(:)    = 0.0D0
       COH(:)    = 0.0D0
@@ -109,9 +116,12 @@
       READ(nod,*) NNOD, NDIM, NVAR, IPRINT,   ! # nodes, # dimensions, # dofs/node, print node
      +            NSTEP, NITER, NPRINT,       ! # load steps, # iterations, # print lines
      +            LFACT, GFACT                ! load factor, gravity factor
-      ALLOCATE( COORDS(NDIM,NNOD),
-     +          PLOADS(NDIM,NNOD),
-     +          IX(NNOD*NVAR)   )
+      ALLOCATE( COORDS(NDIM,NNOD),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating COORDS."
+      ALLOCATE( PLOADS(NDIM,NNOD),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PLOADS."
+      ALLOCATE( IX(NNOD*NVAR),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating IX."
       COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
       PLOADS(:,:)   = 0.0D0
       IX(:)         = 0
@@ -124,12 +134,24 @@
       READ(ele,*) NEL, NNODEL   ! # body elements, # nodes per element
       NVEL = NVAR*NNODEL    ! compute #dofs/element
       NNN = NNODEL+1        ! compute #nodes+mtl type/element
-      ALLOCATE( LJ(NVEL),
-     +          ICO(NNN,NEL),
-     +          AREA(NEL),
-     +          CENT(NDIM,NEL),
-     +          SXX(NEL), SYY(NEL), SXY(NEL), SZZ(NEL),
-     +          lcoords(NDIM,NNODEL)    )
+      ALLOCATE( LJ(NVEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating LJ."
+      ALLOCATE( ICO(NNN,NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ICO."
+      ALLOCATE( AREA(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating AREA."
+      ALLOCATE( CENT(NDIM,NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating CENT."
+      ALLOCATE( SXX(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SXX."
+      ALLOCATE( SYY(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SYY."
+      ALLOCATE( SXY(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SXY."
+      ALLOCATE( SZZ(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SZZ."
+      ALLOCATE( lcoords(NDIM,NNODEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating lcoords."
       LJ(:)         = 0                     ! alloc and init element data storage
       ICO(:,:)      = 0
       AREA(:)       = 0.0D0
@@ -142,9 +164,12 @@
 !
       READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
       NVELT = NVAR*NNODELT    ! compute # dofs per traction element
-      ALLOCATE( ICOT(NNODELT,NELT),
-     +          TNF(NNODELT,NELT),
-     +          TSF(NNODELT,NELT)   )
+      ALLOCATE( ICOT(NNODELT,NELT),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ICOT."
+      ALLOCATE( TNF(NNODELT,NELT),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TNF."
+      ALLOCATE( TSF(NNODELT,NELT),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TSF."
       ICOT(:,:) = 0                     ! alloc and init traction data storage
       TNF(:,:)  = 0.0D0
       TSF(:,:)  = 0.0D0
@@ -209,26 +234,40 @@
         END DO
         WRITE(output,122) i, ICO(:,i), AREA(i), CENT(:,i)
       END DO
-      DEALLOCATE(lcoords)
+      DEALLOCATE(lcoords, STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in deallocating lcoords."
 !
       CALL BANDWH()     ! compute number of codiagonal bands
       WRITE(output,130) 
       WRITE(output,131) NNET, LBAND ! write stiffness matrix stats to output
-      ALLOCATE( TLOAD(NNET),
-     +          GLOAD(NNET),
-     +          STR(NNET),
-     +          GLOAD0(NNET),
-     +          DISP(NNET),
-     +          TDISP(NNET),
-     +          GSTIF(HBW,NNET), fGSTIF(HBW,NNET),
-     +          fWORK(3*NNET), fiWORK(NNET),
-     +          ESTIF(NVEL,NVEL)  )
-      TLOAD(:)    = 0.0D0               ! alloc and init solution space
-      GLOAD(:)    = 0.0D0
+      ALLOCATE( TLOAD(NNET,1),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TLOAD."
+      ALLOCATE( GLOAD(NNET,1),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD."
+      ALLOCATE( STR(NNET),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating STR."
+      ALLOCATE( GLOAD0(NNET,1),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD0."
+      ALLOCATE( DISP(NNET,1),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating DISP."
+      ALLOCATE( TDISP(NNET,1),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TDISP."
+      ALLOCATE( GSTIF(HBW,NNET),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GSTIF."
+      ALLOCATE( fGSTIF(HBW,NNET),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating fGSTIF."
+      ALLOCATE( fWORK(3*NNET),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating fWORK."
+      ALLOCATE( fiWORK(NNET),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating fiWORK."
+      ALLOCATE( ESTIF(NVEL,NVEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ESTIF."
+      TLOAD(:,1)  = 0.0D0
+      GLOAD(:,1)  = 0.0D0
       STR(:)      = 0.0D0
-      GLOAD0(:)   = 0.0D0
-      DISP(:)     = 0.0D0
-      TDISP(:)    = 0.0D0
+      GLOAD0(:,1) = 0.0D0               ! alloc and init solution space
+      DISP(:,1)   = 0.0D0
+      TDISP(:,1)  = 0.0D0
       GSTIF(:,:)  = 0.0D0
       fGSTIF(:,:) = 0.0D0
       fWORK(:)    = 0.0D0
@@ -555,7 +594,7 @@
 !
       REAL(dk), INTENT(IN) :: loc(:)    ! element vec
       INTEGER(ik), INTENT(IN) :: nv     ! # dofs
-      REAL(dk), INTENT(INOUT) :: GLO(:)     ! global vec
+      REAL(dk), INTENT(INOUT) :: GLO(:,:)     ! global vec
       INTEGER(ik) :: i, ljr    ! loop variable
 !
 !$OMP PARALLEL PRIVATE(ljr)
@@ -564,7 +603,7 @@
         ljr = LJ(i)     ! row of global load vec
         IF (ljr .EQ. 0) CYCLE   ! skip if dof is fixed
 !$OMP ATOMIC    ! only one thread may increment at a time
-        GLO(ljr) = GLO(ljr) + loc(i)    ! increment global
+        GLO(ljr,1) = GLO(ljr,1) + loc(i)    ! increment global
       END DO  ! element dofs
 !$OMP END DO
 !$OMP END PARALLEL

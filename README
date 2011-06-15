@@ -310,3 +310,10 @@ REVISION HISTORY:
 +++ (feModules.for) Added NVELT
 +++ (gcontrol.for) Added LOCAL(), LOCALT(), MAPLD(), fGSTIF, fWORK, fiWORK, HBW
 +++ (SlopeFEA3Node.for) Added calls to LOAD() and STFMAT()
+
+
+[15 June 2011]
+
+{v1.0.0.10}
+=== (feUtility.for) Changed call to DPBSVX() to calls to DPBTRF() and DPBTRS() [DPBSVX() calls these two routines among many other things, DPBTRF() computes the Cholesky factorization and DPBTRS() solves a linear system based on the factorization]
++++ (solver_test.xls) Added spreadsheet containing preliminary verification of results for a simple slope [displacement only linear elastic model; results look reasonable, i.e. everything is moving in the expected direction; more thorough testing will be completed once the analysis code is finished]

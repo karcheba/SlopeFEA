@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from gcontrol.for on Wed Jun 15 08:46:13 2011
-MD5:b9abdf332fab1cc4e95ad260d2769524 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from gcontrol.for on Wed Jun 15 10:15:24 2011
+MD5:69ed44e7bf90d016e3e4aee22358a56d -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -46,7 +46,7 @@ UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 REAL ()) 0 '0.477d1aaaaaaaac@-1') () 0 () () () 0 0)
 12 'disp' 'gcontrol' 'disp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-1 DEFERRED () ()) 0 () () () 0 0)
+2 DEFERRED () () () ()) 0 () () () 0 0)
 13 'dk' 'numeric' 'dk' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (INTEGER
 4 0 0 INTEGER ()) 0 '8') () 0 () () () 0 0)
@@ -78,10 +78,10 @@ UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
 UNKNOWN EXPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 23 'gload' 'gcontrol' 'gload' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-1 DEFERRED () ()) 0 () () () 0 0)
+2 DEFERRED () () () ()) 0 () () () 0 0)
 24 'gload0' 'gcontrol' 'gload0' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-1 DEFERRED () ()) 0 () () () 0 0)
+2 DEFERRED () () () ()) 0 () () () 0 0)
 25 'grr' 'mproperty' 'grr' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
@@ -228,10 +228,10 @@ UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
 90 'tdisp' 'gcontrol' 'tdisp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-1 DEFERRED () ()) 0 () () () 0 0)
+2 DEFERRED () () () ()) 0 () () () 0 0)
 91 'tload' 'gcontrol' 'tload' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-1 DEFERRED () ()) 0 () () () 0 0)
+2 DEFERRED () () () ()) 0 () () () 0 0)
 92 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 2 DEFERRED () () () ()) 0 () () () 0 0)
@@ -266,8 +266,9 @@ DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2 ASSUMED_SHAPE (CONSTANT
 (INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (INTEGER 4 0 0 INTEGER ())
 0 '1') ()) 0 () () () 0 0)
 52 'glo' '' 'glo' 51 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
-(INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2 ASSUMED_SHAPE (CONSTANT
+(INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (INTEGER 4 0 0 INTEGER ())
+0 '1') ()) 0 () () () 0 0)
 53 'loc' '' 'loc' 51 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
 (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
