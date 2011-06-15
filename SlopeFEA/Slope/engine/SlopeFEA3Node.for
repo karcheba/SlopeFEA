@@ -49,6 +49,15 @@
 !     form and decompose global stiffness matrix
       CALL STFMAT(GSTIF)
 !
+!     solve gravity loading
+      IF (GFACT .GT. 0.0D0) THEN
+        WRITE(output,10)
+        WRITE(his,10)
+   10   FORMAT(///, '=============== GRAVITY LOADING ===============,//)
+        GLOAD(:) = GFACT*GLOAD(:)
+        CALL FEASLV(GLOAD, GLOAD0)
+      END IF
+!
       CALL CLEANUP()
 !
       RETURN

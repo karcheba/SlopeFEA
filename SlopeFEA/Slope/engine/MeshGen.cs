@@ -1171,6 +1171,16 @@ namespace SlopeFEA
                 }
             }
 
+
+            // **********************************************
+            // eliminate elements with zero area
+            // **********************************************
+            for ( int i = elements.Count - 1 ; i >= 0 ; i-- )
+            {
+                if ( elements[i].Area < 1e-5 ) elements.RemoveAt( i );
+            }
+
+
             // **********************************************
             // renumber elements in case of elimination
             // **********************************************

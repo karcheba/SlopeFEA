@@ -12,8 +12,8 @@ PLOTTING DATA
 
 Units = m, kPa, kN/m^3
 
-XAxisMax = 100
-XAxisMin = 0
+XAxisMax = 120
+XAxisMin = -20
 YAxisMax = 50
 YAxisMin = 0
 
@@ -30,9 +30,9 @@ BOUNDARY GEOMETRY DATA
 
 Number of Boundary Points = 7
 
--8, 46.0000000000001
--8, 6.00000000000004
-110, 6.00000000000004
+-7.99999999999994, 46.0000000000001
+-7.99999999999994, 6.00000000000003
+110, 6.00000000000003
 110, 22.0000000000001
 72, 22.0000000000001
 52.0000000000001, 38.0000000000001
@@ -82,10 +82,10 @@ Number of Material Blocks = 3
 Material Block #1
 Material Type = "bedrock"
 Number of Boundary Points = 4
--8, 6.00000000000004, True, True, False
-110, 6.00000000000004, True, True, False
+-7.99999999999994, 6.00000000000003, True, True, False
+110, 6.00000000000003, True, True, False
 110, 14, True, False, False
--8, 18.0000000000001, True, False, False
+-7.99999999999994, 18.0000000000001, True, False, False
 Number of Line Constraints = 3
 3, 0, True, False
 1, 2, True, False
@@ -96,10 +96,10 @@ Number of Point Loads = 0
 Material Block #2
 Material Type = "clay"
 Number of Boundary Points = 4
--8, 38.0000000000001, True, False, False
+-7.99999999999994, 38.0000000000001, True, False, False
 52.0000000000001, 38.0000000000001, False, False, False
 24, 46.0000000000001, False, False, False
--8, 46.0000000000001, True, False, False
+-7.99999999999994, 46.0000000000001, True, False, False
 Number of Line Constraints = 1
 3, 0, True, False
 Number of Line Loads = 0
@@ -108,12 +108,12 @@ Number of Point Loads = 0
 Material Block #3
 Material Type = "sand"
 Number of Boundary Points = 6
--8, 18, True, False, False
+-7.99999999999994, 18, True, False, False
 110, 14, True, False, False
 110, 22.0000000000001, True, False, False
 72, 22.0000000000001, False, False, False
-52, 38, False, False, True
--8, 38, True, False, False
+51.9999999999999, 38, False, False, True
+-7.99999999999994, 38, True, False, False
 Number of Line Constraints = 2
 5, 0, True, False
 1, 2, True, False

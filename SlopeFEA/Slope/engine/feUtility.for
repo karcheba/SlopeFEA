@@ -49,14 +49,14 @@
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(OUT) :: GLOAD(:,:), TLOAD(:,:)
+      REAL(dk), INTENT(OUT) :: GLOAD(:), TLOAD(:)
       REAL(dk) :: lcoords(NDIM,NNODEL), lcoordsT(NDIM,NNODELT)  ! local coords
       REAL(dk) :: eload(NVEL), eloadT(NVELT)  ! element load vec
       INTEGER(ik) :: mtype          ! element material type
       INTEGER(ik) :: iel            ! loop variable
 !
 !     gravity loads
-      GLOAD(:,1) = 0.0D0
+      GLOAD(:) = 0.0D0
       DO iel = 1,NEL  ! body elements
         CALL LOCAL(iel, lcoords, mtype)   ! get coords and material of element
         eload(:) = 0.0D0                  ! initialize element load vec
@@ -65,7 +65,7 @@
       END DO  ! body elements
 !
 !     tractions (if present)
-      TLOAD(:,1) = 0.0D0
+      TLOAD(:) = 0.0D0
       DO iel = 1,NELT   ! traction elements
         CALL LOCALT(iel, lcoordsT)      ! get coords of traction element
         CALL TRACT(eloadT, lcoordsT, TNF(:,iel), TSF(:,iel)) ! get traction load vec
@@ -149,8 +149,7 @@
       REAL(dk), INTENT(OUT) :: GSTIF(:,:)   ! global stiff mat
       REAL(dk) :: lcoords(NDIM,NNODEL)      ! local coords
       INTEGER(ik) :: iel, mtype             ! element number and material type
-      REAL(dk) :: rcn, forerr(1), bakerr(1) ! est cond num, est forward err, est backward err
-      INTEGER(ik) :: ierr                   ! error code for DPBSVX()
+      INTEGER(ik) :: ierr                   ! error code
 !
 !     form global stiffness matrix (packed banded storage)
       GSTIF(:,:) = 0.0D0
@@ -160,65 +159,61 @@
         CALL MAPST(GSTIF, ESTIF)
       END DO
 !
+!     print packed stiff mat (testing)
+!      WRITE(his,*) 'GSTIF'
+!      DO iel = 1,HBW
+!        WRITE(his,*) GSTIF(iel,:)
+!      END DO
+!
+!      WRITE(his,*)
+!
 !     perform initial matrix inversion
       fGSTIF(:,:) = GSTIF(:,:)
       CALL DPBTRF('U', NNET, LBAND, fGSTIF, HBW, ierr)
-      DISP(:,1) = GLOAD(:,1)
+      IF (ierr .NE. 0) THEN
+        IF (ierr .LT. 0) THEN
+          WRITE(his,*) "Error in factorization. Invalid argument ",
+     +                    -ierr
+        ELSE
+          WRITE(his,*) "Error in factorization. Minor ", ierr,
+     +                  " is not positive definite."
+        END IF
+      END IF
+!
+!     *******TEST SOLVE***********
+!     linear elastic under gravity load
+      DISP(:) = GLOAD(:)
       CALL DPBTRS('U', NNET, LBAND, 1, fGSTIF, HBW, DISP, NNET, ierr)
-!      GLOAD0(:,1) = 1.0D-2 * GLOAD(:,1)
-!      CALL DPBSVX(  'N',    ! FACT  = 
-!     +              'U',    ! UPLO  = 
-!     +              NNET,   ! N     = 
-!     +              LBAND,  ! KD    = 
-!     +              1,      ! NRHS  = 
-!     +              GSTIF,  ! AB    = 
-!     +              HBW,    ! LDAB  = 
-!     +              fGSTIF, ! AFB   = 
-!     +              HBW,    ! LDAFB = 
-!     +              'N',    ! EQUED = 
-!     +              DISP,   ! S     = 
-!     +              GLOAD0, ! B     = 
-!     +              NNET,   ! LDB   = 
-!     +              DISP,   ! X     = 
-!     +              NNET,   ! LDX   = 
-!     +              rcn,    ! RCOND = 
-!     +              forerr, ! FERR  = 
-!     +              bakerr, ! BERR  = 
-!     +              fWORK,  ! WORK  = 
-!     +              fiWORK, ! IWORK = 
-!     +              ierr )  ! INFO  = 
-!
-!     print packed stiff mat (testing)
-      WRITE(his,*) 'GSTIF'
-      DO iel = 1,HBW
-        WRITE(his,*) GSTIF(iel,:)
-      END DO
-!
-      WRITE(his,*)
+      IF (ierr .LT. 0) THEN
+        WRITE(his,*) "Problem with solution. Invalid argument ",
+     +                    -ierr
+        CALL CLEANUP()
+        STOP
+      END IF
 !
 !     print factored packed stiff mat (testing)
-      WRITE(his,*) 'fGSTIF'
-      DO iel = 1,HBW
-        WRITE(his,*) fGSTIF(iel,:)
-      END DO
+!      WRITE(his,*) 'fGSTIF'
+!      DO iel = 1,HBW
+!        WRITE(his,*) fGSTIF(iel,:)
+!      END DO
 !
-      WRITE(his,*)
+!      WRITE(his,*)
 !
 !     print gravity load vector (testing)
-      WRITE(his,*) 'GLOAD'
-      WRITE(his,*) GLOAD(:,1)
+!      WRITE(his,*) 'GLOAD'
+!      WRITE(his,*) GLOAD(:)
 !
-      WRITE(his,*)
+!      WRITE(his,*)
 !
 !     print gravity load displacements (testing)
-      WRITE(his,*) 'DISP'
-      WRITE(his,*) DISP(:,1)
+!      WRITE(his,*) 'DISP'
+!      WRITE(his,*) DISP(:)
 !
-      WRITE(his,*)
+!      WRITE(his,*)
 !
 !     print traction load vector (testing)
-      WRITE(his,*) 'TLOAD'
-      WRITE(his,*) TLOAD(:,1)
+!      WRITE(his,*) 'TLOAD'
+!      WRITE(his,*) TLOAD(:)
 !
       RETURN
 !
@@ -306,6 +301,124 @@
       RETURN
 !
       END SUBROUTINE BMATRX
+!
+!
+! ......................................................................
+! .... FEASLV ..........................................................
+! ......................................................................
+!     solve the system given the appropriate load vector
+! ......................................................................
+      SUBROUTINE FEASLV (load, load0)
+!
+      IMPLICIT NONE
+!
+      REAL(dk), INTENT(IN) :: load(:), load0(:)   ! incremental and base load vecs
+      REAL(dk) :: dfact, factor     ! factors for load stepping
+      REAL(dk) :: error             ! for non-linear solver convergence
+      REAL(dk) :: dprint            ! for tracking print point
+      INTEGER(ik) :: istep, iter, i ! loop vars for load stepping and non-linear solver
+      INTEGER(ik) :: nplast, nfbar  ! count of plastic points and "???SAFE POINTS???"
+      INTEGER(ik) :: ierr           ! error code for DPBTRS()
+!
+!     initialize total displacement
+      TDISP(:) = 0.0D0
+!
+!     initialize non-linear stepping variables
+      dfact = 1.0D0 / DBLE(NSTEP)
+      factor = 0.0D0
+      istep = 0
+!
+!     load stepping loop
+      DO WHILE (istep .LT. NSTEP)
+!
+!       increment load step vars
+        istep = istep+1
+        factor = factor+dfact
+!
+!       initialize non-linear solver vars
+        iter = 0
+        error = 2.0D0*TOLER
+!
+!       non-linear solver loop
+        DO WHILE (iter.LT.NITER .AND. error.GT.TOLER)
+!
+          iter = iter+1   ! increment iteration counter
+!
+!         insert residual load into DISP
+          CALL RLOAD(DISP,load,STR,load0,factor)
+!
+!         solve this iteration (DISP has load on entry, incremental displacements on exit)
+          CALL DPBTRS('U',NNET,LBAND,1,fGSTIF,HBW,DISP,NNET,ierr)
+!
+!         update volumetric strain
+          CALL VOLSTR(DISP)
+!
+!         update displacements, stresses, error, and number of plastic points
+          CALL UPDATE(DISP,TDISP,STR,error,nplast)
+!
+!         print an output line
+          IF (MOD(NPRINT,ISTEP) .EQ. 0) THEN
+!
+!           count "???SAFE POINTS???"
+            nfbar = 0
+            DO i = 1,NEL
+              IF (FBAR(i) .GT. 1.1) nfbar = nfbar+1
+            END DO
+!
+!           get displacement of print point
+            dprint = 0.0D0
+            IF (IX(NVAR*iread) .GT. 0) dprint = TDISP(IX(NVAR*iread))
+!
+!           write data to load history file
+            WRITE(his,10) istep,iter,nplast,nfbar,error,factor,dprint
+!
+          END IF
+!
+!         check for convergence (stop computation if failed)
+          IF (iter.GE.NITER .AND. error.GT.TOLER) THEN
+            WRITE(his,*) '*** FAILED TO CONVERGE ***'
+            CALL CLEANUP()
+            STOP
+          END IF
+!
+        END DO  ! non-linear solver
+!
+      END DO  ! load stepping
+!
+!     format statements
+  10  FORMAT(4I6, 2X, 3E12.4)   ! for load step history print line
+!
+      RETURN
+!
+      END SUBROUTINE FEASLV
+!
+!
+! ......................................................................
+! .... RLOAD ...........................................................
+! ......................................................................
+!     get residual load vector
+! ......................................................................
+      SUBROUTINE RLOAD(disp,load,str,load0,factor)
+!
+      IMPLICIT NONE
+!
+      REAL(dk), INTENT(OUT) :: disp(:)
+      REAL(dk), INTENT(IN) :: load(:), str(:), load0(:), factor
+!
+      disp(:) = factor*load(:) + load0(:) - str(:)
+!
+      RETURN
+!
+      END SUBROUTINE RLOAD
+!
+!
+! ......................................................................
+! .... VOLSTR ..........................................................
+! ......................................................................
+!     compute volumetric strains
+! ......................................................................
+      SUBROUTINE VOLSTR (disp)
+      END SUBROUTINE VOLSTR
 !
 !
       END MODULE feutility

@@ -40,6 +40,7 @@
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
       REAL(dk), PARAMETER :: PI = 3.1415926535898
       REAL(dk), PARAMETER :: degTOrad = PI / 180.0D0
+      REAL(dk), PARAMETER :: TOLER = 1.0E-8
 !
       END MODULE numeric
 !
@@ -103,7 +104,7 @@
       INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)    ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)  ! element centroid
-      REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:) ! internal stresses
+      REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:), FBAR(:) ! internal stresses
 !
       END MODULE elements
 !
