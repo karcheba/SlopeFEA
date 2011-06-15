@@ -106,9 +106,9 @@
       EMOD(:)   = 0.0D0
       NU(:)     = 0.0D0
 !
-!     # nodes, # dimensions, # dofs/node, print node
-      READ(nod,*) NNOD, NDIM, NVAR, IPRINT, NSTEP, NITER, NPRINT,
-     +            LFACT, GFACT
+      READ(nod,*) NNOD, NDIM, NVAR, IPRINT,   ! # nodes, # dimensions, # dofs/node, print node
+     +            NSTEP, NITER, NPRINT,       ! # load steps, # iterations, # print lines
+     +            LFACT, GFACT                ! load factor, gravity factor
       ALLOCATE( COORDS(NDIM,NNOD),
      +          PLOADS(NDIM,NNOD),
      +          IX(NNOD*NVAR)   )
@@ -220,7 +220,7 @@
      +          GLOAD0(NNET),
      +          DISP(NNET),
      +          TDISP(NNET),
-     +          GSTIF(LBAND+1,NNET), fGSTIF(LBAND+1,NNET),
+     +          GSTIF(HBW,NNET), fGSTIF(HBW,NNET),
      +          fWORK(3*NNET), fiWORK(NNET),
      +          ESTIF(NVEL,NVEL)  )
       TLOAD(:)    = 0.0D0               ! alloc and init solution space

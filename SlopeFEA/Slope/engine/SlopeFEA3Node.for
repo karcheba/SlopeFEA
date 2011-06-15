@@ -28,7 +28,8 @@
 !***********************************************************************
 !
 !
-      SUBROUTINE slopefea3node (fpath)
+!      SUBROUTINE slopefea3node (fpath)
+      PROGRAM slopefea3node
       USE gcontrol    ! controls inputs, grid, and elements
       USE feutility   ! utility functions for FEA solver
 !
@@ -36,9 +37,10 @@
 !
       IMPLICIT NONE
 !
-      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
+!      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
+      CHARACTER*(*), PARAMETER :: fpath = "test "
 !
-      ANTYPE = 'PLANE STRAIN ELASTIC'
+      ANTYPE = "PLANE STRAIN ELASTIC"
       CALL INPUT(fpath)     ! initialize data in gcontrol
 !
 !     set up load vectors (gravity and traction
@@ -51,4 +53,5 @@
 !
       RETURN
 !
-      END SUBROUTINE slopefea3node
+!      END SUBROUTINE slopefea3node
+      END PROGRAM slopefea3node

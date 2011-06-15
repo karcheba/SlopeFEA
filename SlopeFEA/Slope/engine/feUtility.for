@@ -161,28 +161,28 @@
       END DO
 !
 !     perform initial matrix inversion
-      GLOAD0(:) = 1.0D-2 * GLOAD(:)
-      CALL DPBSVX(  'N',    ! FACT  = 
-     +              'U',    ! UPLO  = 
-     +              NNET,   ! N     = 
-     +              LBAND,  ! KD    = 
-     +              1,      ! NRHS  = 
-     +              GSTIF,  ! AB    = 
-     +              HBW,    ! LDAB  = 
-     +              fGSTIF, ! AFB   = 
-     +              HBW,    ! LDAFB = 
-     +              'N',    ! EQUED = 
-     +              DISP,   ! S     = 
-     +              GLOAD0, ! B     = 
-     +              NNET,   ! LDB   = 
-     +              DISP,   ! X     = 
-     +              NNET,   ! LDX   = 
-     +              rcn,    ! RCOND = 
-     +              forerr, ! FERR  = 
-     +              bakerr, ! BERR  = 
-     +              fWORK,  ! WORK  = 
-     +              fiWORK, ! IWORK = 
-     +              ierr )  ! INFO  = 
+!      GLOAD0(:) = 1.0D-2 * GLOAD(:)
+!      CALL DPBSVX(  'N',    ! FACT  = 
+!     +              'U',    ! UPLO  = 
+!     +              NNET,   ! N     = 
+!     +              LBAND,  ! KD    = 
+!     +              1,      ! NRHS  = 
+!     +              GSTIF,  ! AB    = 
+!     +              HBW,    ! LDAB  = 
+!     +              fGSTIF, ! AFB   = 
+!     +              HBW,    ! LDAFB = 
+!     +              'N',    ! EQUED = 
+!     +              DISP,   ! S     = 
+!     +              GLOAD0, ! B     = 
+!     +              NNET,   ! LDB   = 
+!     +              DISP,   ! X     = 
+!     +              NNET,   ! LDX   = 
+!     +              rcn,    ! RCOND = 
+!     +              forerr, ! FERR  = 
+!     +              bakerr, ! BERR  = 
+!     +              fWORK,  ! WORK  = 
+!     +              fiWORK, ! IWORK = 
+!     +              ierr )  ! INFO  = 
 !
 !     print packed stiff mat (testing)
       WRITE(his,*) 'GSTIF'
@@ -193,10 +193,10 @@
       WRITE(his,*)
 !
 !     print factored packed stiff mat (testing)
-      WRITE(his,*) 'fGSTIF'
-      DO iel = 1,HBW
-        WRITE(his,*) fGSTIF(iel,:)
-      END DO
+!      WRITE(his,*) 'fGSTIF'
+!      DO iel = 1,HBW
+!        WRITE(his,*) fGSTIF(iel,:)
+!      END DO
 !
       WRITE(his,*)
 !
@@ -280,7 +280,7 @@
       REAL(dk) :: invArea     ! for calc efficiency
 !
       B(:,:) = 0.0D0    ! intialize kinematic matrix
-      invArea = 1.0D0 / area  ! compute 1/area
+      invArea = 2.0D0 / area  ! compute 2/area
 !
       B(1,1) = (lcoords(2,2)-lcoords(2,3)) * invArea
       B(1,3) = (lcoords(2,3)-lcoords(2,1)) * invArea
