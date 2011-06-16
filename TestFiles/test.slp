@@ -50,6 +50,7 @@ Name = "sand"
 Colour = #FFEDF196
 Phi = 30
 Coh = 0
+Psi = 0
 Gamma = 16
 Emod = 100000
 Nu = 0.33

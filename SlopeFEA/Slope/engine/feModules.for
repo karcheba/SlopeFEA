@@ -41,6 +41,7 @@
       REAL(dk), PARAMETER :: PI = 3.1415926535898
       REAL(dk), PARAMETER :: degTOrad = PI / 180.0D0
       REAL(dk), PARAMETER :: TOLER = 1.0E-8
+      REAL(dk), PARAMETER :: ONE_THIRD = 1.0D0 / 3.0D0
 !
       END MODULE numeric
 !
@@ -83,6 +84,7 @@
       INTEGER(ik), ALLOCATABLE :: IX(:)     ! fix info
       REAL(dk), ALLOCATABLE :: COORDS(:,:)  ! grid coords
       REAL(dk), ALLOCATABLE :: PLOADS(:,:)    ! point loads
+      REAL(dk), ALLOCATABLE :: EVOL(:), EVOL0(:), EVOLi(:), DIA(:)  ! for volumetric strain
 !
       END MODULE nodes
 !
@@ -104,6 +106,7 @@
       INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)    ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)  ! element centroid
+      REAL(dk), ALLOCATABLE :: EVOLB(:)   ! element volumetric strain
       REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:), FBAR(:) ! internal stresses
 !
       END MODULE elements

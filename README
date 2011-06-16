@@ -320,3 +320,16 @@ REVISION HISTORY:
 +++ (*.out, *.his) Tested decomposition and trial solution of 5 test files of varying complexity
 +++ (MeshGen.cs) Added removal of elements with zero area in MeshGenStructured3NodedTri() as this was causing issues in the solver
 +++ (gcontrol.for) Added code to clear existing output from output files in INPUT()
++++ (SlopeFEA3Node.for) Added solver code for gravity loading
++++ (feUtility.for) Added FEASLV() and RLOAD()
+
+
+[16 June 2011]
+
+{v1.0.0.10}
++++ (feUtility.for) Continued building solver code in FEASLV()
++++ (feUtility.for) Added VOLSTR() and UPDATE()
++++ (gcontrol.for) Added GLOLOC()
++++ (feModules.for) Added EVOL, EVOL0, EVOLi, DIA to nodes and EVOLB, FBAR to elements
++++ (AddMaterialDialog.*, AssignMaterialDialog.*, SlopeCanvas.cs, MeshGen.cs) Added PSI
++++ (feUtility.for) Added MOHRC()

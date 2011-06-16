@@ -2343,6 +2343,7 @@ namespace SlopeFEA
         {
             Phi = 0;
             Cohesion = 0;
+            Psi = 0;
             Gamma = 0;
             Emod = 0;
             Nu = 0;
@@ -2350,6 +2351,7 @@ namespace SlopeFEA
 
         public double Phi { get; set; }
         public double Cohesion { get; set; }
+        public double Psi { get; set; }
         public double Gamma { get; set; }
         public double Emod { get; set; }
         public double Nu { get; set; }

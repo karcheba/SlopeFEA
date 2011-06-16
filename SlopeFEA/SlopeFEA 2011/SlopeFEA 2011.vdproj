@@ -85,6 +85,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -101,6 +109,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -155,7 +184,7 @@
             "SourcePath" = "8:..\\..\\TestFiles\\test2.slp"
             "TargetName" = "8:test2.slp"
             "Tag" = "8:"
-            "Folder" = "8:_92C4288DB5454081AAF5EFCB062F5C8E"
+            "Folder" = "8:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -175,7 +204,7 @@
             "SourcePath" = "8:..\\..\\TestFiles\\testdam.slp"
             "TargetName" = "8:testdam.slp"
             "Tag" = "8:"
-            "Folder" = "8:_92C4288DB5454081AAF5EFCB062F5C8E"
+            "Folder" = "8:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -215,7 +244,7 @@
             "SourcePath" = "8:..\\..\\TestFiles\\test.slp"
             "TargetName" = "8:test.slp"
             "Tag" = "8:"
-            "Folder" = "8:_92C4288DB5454081AAF5EFCB062F5C8E"
+            "Folder" = "8:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -235,7 +264,7 @@
             "SourcePath" = "8:..\\..\\TestFiles\\testtunnel.slp"
             "TargetName" = "8:testtunnel.slp"
             "Tag" = "8:"
-            "Folder" = "8:_92C4288DB5454081AAF5EFCB062F5C8E"
+            "Folder" = "8:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -255,7 +284,7 @@
             "SourcePath" = "8:..\\..\\TestFiles\\testmulti.slp"
             "TargetName" = "8:testmulti.slp"
             "Tag" = "8:"
-            "Folder" = "8:_92C4288DB5454081AAF5EFCB062F5C8E"
+            "Folder" = "8:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -285,17 +314,6 @@
             "Property" = "8:DesktopFolder"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_92C4288DB5454081AAF5EFCB062F5C8E"
-                    {
-                    "Name" = "8:SlopeFEA 2011 Samples"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_8951804CF03F4B938B67E25A91E9C49D"
-                        "Folders"
-                        {
-                        }
-                    }
                 }
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_75F512AB514A4A76A6FE1C17690AF064"
@@ -308,6 +326,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_40A0E3EF1A5B4FE58CECF0D1E23BC7F8"
+                    {
+                    "Name" = "8:SlopeFEA 2011 Samples"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_8951804CF03F4B938B67E25A91E9C49D"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_F1FDA1EB95ED48CCBBE90470FC4506CD"
@@ -348,25 +377,25 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SlopeFEA 2011"
-        "ProductCode" = "8:{23669031-32A2-4077-8EA4-3D4AE3FD1C74}"
-        "PackageCode" = "8:{3D35A389-A1C5-4DBC-B8D7-E875103F50DB}"
+        "ProductCode" = "8:{2269C8EF-AB6B-40AF-911C-2E9421FCF706}"
+        "PackageCode" = "8:{DB536576-2BFD-4498-8F26-3EABB3FC5F87}"
         "UpgradeCode" = "8:{61C949B6-7E9F-4509-BBB0-58ECF09E3004}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Microsoft"
+        "InstallAllUsers" = "11:TRUE"
+        "ProductVersion" = "8:1.0.10"
+        "Manufacturer" = "8:McMaster University"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:"
+        "ARPHELPLINK" = "8:mailto:karcheba@mcmaster.ca"
         "Title" = "8:SlopeFEA 2011"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Microsoft"
+        "ARPCONTACT" = "8:Brandon Karchewski"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPCOMMENTS" = "8:Analysis of geotechnical engineering problems."
+        "ARPURLINFOABOUT" = "8:http://www.eng.mcmaster.ca/civil/"
+        "ARPPRODUCTICON" = "8:_87A14BEDA0914E69806B20FB4231CFA5"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"

@@ -1294,7 +1294,8 @@ namespace SlopeFEA
                         switch ( currCanvas.AnalysisType )
                         {
                             case AnalysisType.Bishop: pathsplit[pathsplit.Length - 1] = "bish"; break;
-                            default: pathsplit[pathsplit.Length - 1] = "rfem"; break;
+                            case AnalysisType.RFEM: pathsplit[pathsplit.Length - 1] = "rfem"; break;
+                            default: pathsplit[pathsplit.Length - 1] = "out"; break;
                         }
 
                         string path = string.Join( "." , pathsplit );

@@ -49,6 +49,7 @@ Name = "clay"
 Colour = #FFD8AC5A
 Phi = 5
 Coh = 50
+Psi = 10
 Gamma = 18
 Emod = 10000
 Nu = 0.45

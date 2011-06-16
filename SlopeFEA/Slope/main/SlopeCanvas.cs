@@ -592,6 +592,7 @@ namespace SlopeFEA
                     string[] path = FilePath.Split( '.' );
                     FortranWrappers.slopefea3node_( path[0] , path[0].Length + 1 );
                     MessageBox.Show( "Run FEA code." , "FEA Analysis" );
+                    this.IsAnalyzed = true;
                     break;
             }
         }
@@ -704,6 +705,7 @@ namespace SlopeFEA
                     tw.WriteLine( "Colour = {0}" , materialTypes[i].Fill );
                     tw.WriteLine( "Phi = {0}" , materialTypes[i].Phi );
                     tw.WriteLine( "Coh = {0}" , materialTypes[i].Cohesion );
+                    tw.WriteLine( "Psi = {0}" , materialTypes[i].Psi );
                     tw.WriteLine( "Gamma = {0}" , materialTypes[i].Gamma );
                     tw.WriteLine( "Emod = {0}" , materialTypes[i].Emod );
                     tw.WriteLine( "Nu = {0}" , materialTypes[i].Nu );
@@ -932,6 +934,7 @@ namespace SlopeFEA
                         tr.ReadLine().Split( new char[] { '=' , ' ' } , StringSplitOptions.RemoveEmptyEntries )[1] ) );
                     newMaterial.Phi = double.Parse( tr.ReadLine().Split( '=' )[1] );
                     newMaterial.Cohesion = double.Parse( tr.ReadLine().Split( '=' )[1] );
+                    newMaterial.Psi = double.Parse( tr.ReadLine().Split( '=' )[1] );
                     newMaterial.Gamma = double.Parse( tr.ReadLine().Split( '=' )[1] );
                     newMaterial.Emod = double.Parse( tr.ReadLine().Split( '=' )[1] );
                     newMaterial.Nu = double.Parse( tr.ReadLine().Split( '=' )[1] );

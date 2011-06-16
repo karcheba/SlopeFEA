@@ -90,6 +90,7 @@ namespace SlopeFEA
                 colour.Fill = currMaterial.Fill;
                 phi.Text = String.Format( "{0}" , Math.Round( currMaterial.Phi , 2 ) );
                 coh.Text = String.Format( "{0}" , Math.Round( currMaterial.Cohesion , 2 ) );
+                psi.Text = String.Format( "{0}" , Math.Round( currMaterial.Psi , 2 ) );
                 gamma.Text = String.Format( "{0}" , Math.Round( currMaterial.Gamma , 2 ) );
                 emod.Text = String.Format( "{0}" , Math.Round( currMaterial.Emod , 2 ) );
                 nu.Text = String.Format( "{0}" , Math.Round( currMaterial.Nu , 2 ) );
@@ -105,6 +106,7 @@ namespace SlopeFEA
                     colour.Fill = Brushes.Transparent;
                     phi.Text = "";
                     coh.Text = "";
+                    psi.Text = "";
                     gamma.Text = "";
                     emod.Text = "";
                     nu.Text = "";
@@ -138,6 +140,12 @@ namespace SlopeFEA
                 return;
             }
 
+            if ( materialList.Text == "NULL" )
+            {
+                MessageBox.Show( "NULL material name is reserved." , "Error" );
+                return;
+            }
+
             if ( colour.Fill == Brushes.Transparent )
             {
                 MessageBox.Show( "Must define a colour." , "Error" );
@@ -147,41 +155,42 @@ namespace SlopeFEA
             double newPhi;
             if ( !double.TryParse( phi.Text , out newPhi ) || newPhi < 0 )
             {
-                MessageBox.Show( "Phi must be a positive number." , "Error" );
+                MessageBox.Show( "Angle of friction must be a positive value." , "Error" );
                 return;
             }
 
             double newCoh;
             if ( !double.TryParse( coh.Text , out newCoh ) || newCoh < 0 )
             {
-                MessageBox.Show( "Cohesion must be a positive number." , "Error" );
+                MessageBox.Show( "Cohesion must be a positive value." , "Error" );
+                return;
+            }
+
+            double newPsi;
+            if ( !double.TryParse( psi.Text , out newPsi ) || newPsi < 0 )
+            {
+                MessageBox.Show( "Dilatancy angle must be a positive value." , "Error" );
                 return;
             }
 
             double newGamma;
             if ( !double.TryParse( gamma.Text , out newGamma ) || newGamma < 0 )
             {
-                MessageBox.Show( "Gamma must be a positive number." , "Error" );
+                MessageBox.Show( "Unit weight must be a positive value." , "Error" );
                 return;
             }
 
             double newEmod;
             if ( !double.TryParse( emod.Text , out newEmod ) || newEmod < 0 )
             {
-                MessageBox.Show( "Elastic modulus must be a positive number." , "Error" );
+                MessageBox.Show( "Elastic modulus must be a positive value." , "Error" );
                 return;
             }
 
             double newNu;
             if ( !double.TryParse( nu.Text , out newNu ) || newNu < 0 || newNu >= 0.5 )
             {
-                MessageBox.Show( "Poisson's ratio must be a number in the range: 0 <= nu < 0.5" , "Error" );
-                return;
-            }
-
-            if ( materialList.Text == "NULL" )
-            {
-                MessageBox.Show( "NULL material name is reserved." , "Error" );
+                MessageBox.Show( "Poisson's ratio must be a value in the range: 0 <= nu < 0.5" , "Error" );
                 return;
             }
 
@@ -189,6 +198,7 @@ namespace SlopeFEA
             newMaterial.Fill = colour.Fill;
             newMaterial.Phi = newPhi;
             newMaterial.Cohesion = newCoh;
+            newMaterial.Psi = newPsi;
             newMaterial.Gamma = newGamma;
             newMaterial.Emod = newEmod;
             newMaterial.Nu = newNu;
@@ -224,28 +234,35 @@ namespace SlopeFEA
             double newPhi;
             if ( !double.TryParse( phi.Text , out newPhi ) || newPhi < 0 )
             {
-                MessageBox.Show( "Phi must be a positive number." , "Error" );
+                MessageBox.Show( "Angle of friction must be a positive value." , "Error" );
                 return;
             }
 
             double newCoh;
             if ( !double.TryParse( coh.Text , out newCoh ) || newCoh < 0 )
             {
-                MessageBox.Show( "Cohesion must be a positive number." , "Error" );
+                MessageBox.Show( "Cohesion must be a positive value." , "Error" );
+                return;
+            }
+
+            double newPsi;
+            if ( !double.TryParse( psi.Text , out newPsi ) || newPsi < 0 )
+            {
+                MessageBox.Show( "Dilatancy angle must be a positive value." , "Error" );
                 return;
             }
 
             double newGamma;
             if ( !double.TryParse( gamma.Text , out newGamma ) || newGamma < 0 )
             {
-                MessageBox.Show( "Gamma must be a positive number." , "Error" );
+                MessageBox.Show( "Unit weight must be a positive value." , "Error" );
                 return;
             }
 
             double newEmod;
             if ( !double.TryParse( emod.Text , out newEmod ) || newEmod < 0 )
             {
-                MessageBox.Show( "Elastic modulus must be a positive number." , "Error" );
+                MessageBox.Show( "Elastic modulus must be a positive value." , "Error" );
                 return;
             }
 
@@ -259,6 +276,7 @@ namespace SlopeFEA
             currMaterial.Fill = colour.Fill;
             currMaterial.Phi = newPhi;
             currMaterial.Cohesion = newCoh;
+            currMaterial.Psi = newPsi;
             currMaterial.Gamma = newGamma;
             currMaterial.Emod = newEmod;
             currMaterial.Nu = newNu;

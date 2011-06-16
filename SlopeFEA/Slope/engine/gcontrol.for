@@ -123,9 +123,18 @@
       IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PLOADS."
       ALLOCATE( IX(NNOD*NVAR),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating IX."
+      ALLOCATE( EVOL(NNOD),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOL."
+      ALLOCATE( EVOL0(NNOD),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOL0."
+      ALLOCATE( EVOLi(NNOD),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOLi."
       COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
       PLOADS(:,:)   = 0.0D0
       IX(:)         = 0
+      EVOL(:)       = 0.0D0
+      EVOL0(:)      = 0.0D0
+      EVOLi(:)      = 0.0D0
       IF (GFACT .LT. 0.0) GFACT = 0.0D0
       IF (LFACT .LT. 0.0) LFACT = 0.0D0     ! ensure solution parameters are meaningful
       IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0D0
@@ -143,6 +152,8 @@
       IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating AREA."
       ALLOCATE( CENT(NDIM,NEL),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating CENT."
+      ALLOCATE( EVOLB(NEL),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOLB."
       ALLOCATE( SXX(NEL),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SXX."
       ALLOCATE( SYY(NEL),  STAT=ierr)
@@ -159,6 +170,7 @@
       ICO(:,:)      = 0
       AREA(:)       = 0.0D0
       CENT(:,:)     = 0.0D0
+      EVOLB(:)      = 0.0D0
       SXX(:)        = 0.0D0
       SYY(:)        = 0.0D0
       SXY(:)        = 0.0D0
@@ -281,8 +293,9 @@
 !     *********************************
       WRITE(output,140)   ! material data header
       DO i = 1,NMTL
-        READ(mtl,*) GRR(i), PHI(i), COH(i), EMOD(i), NU(i)    ! get data from file
-        WRITE(output,141) i, GRR(i), PHI(i), COH(i), EMOD(i), NU(i)
+        READ(mtl,*) GRR(i), PHI(i), COH(i), PSI(i), EMOD(i), NU(i)    ! get data from file
+        WRITE(output,141) i, GRR(i), PHI(i), COH(i),
+     +                    PSI(i) EMOD(i), NU(i)
         
         IF (COH(i) .LT. 1.0D-8) COH(i) = 1.0D-8   ! ensure small cohesion for numerical stability
         COH(i) = COH(i)*COS(degTOrad*PHI(i))
@@ -362,6 +375,7 @@
      +        /, 'unit weight ............... GRR = ', E12.5,
      +        /, 'internal friction angle ... PHI = ', E12.5,
      +        /, 'cohesion .................. COH = ', E12.5,
+     +        /, 'dilatancy angle ........... PSI = ', E12.5,
      +        /, 'elastic modulus .......... EMOD = ', E12.5,
      +        /, 'poisson''s ratio ............ NU = ', E12.5  )
 !
@@ -613,6 +627,36 @@
       RETURN
 !
       END SUBROUTINE MAPLD
+!
+!
+! ......................................................................
+! .... GLOLOC ..........................................................
+! ......................................................................
+!     exchange global and local stresses
+! ......................................................................
+      SUBROUTINE GLOLOC (SXX, SYY, SXY, SZZ, SIG, iel, gl_lo)
+!
+      IMPLICIT NONE
+!
+      LOGICAL, INTENT(IN) :: in_out   ! .TRUE.=glo->loc, .FALSE.=loc->glo
+      INTEGER(ik), INTENT(IN) :: iel  ! element number
+      REAL(dk), INTENT(INOUT) :: SXX(:), SYY(:), SXY(:), SZZ(:), SIG(:)  ! stress vectors
+!
+      IF (gl_lo) THEN
+        SIG(1) = SXX(iel)
+        SIG(2) = SYY(iel)
+        SIG(3) = SXY(iel)
+        SIG(4) = SZZ(iel)
+      ELSE
+        SXX(iel) = SIG(1)
+        SYY(iel) = SIG(2)
+        SXY(iel) = SIG(3)
+        SZZ(iel) = SIG(4)
+      END IF
+!
+      RETURN
+!
+      END SUBROUTINE GLOLOC
 !
 !
       END MODULE gcontrol

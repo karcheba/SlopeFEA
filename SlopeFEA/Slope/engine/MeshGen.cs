@@ -919,10 +919,11 @@ namespace SlopeFEA
                 tw.WriteLine( canvas.MaterialTypes.Count - 1 );
                 for ( int i = 0 ; i < canvas.MaterialTypes.Count - 1 ; i++ )
                 {
-                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}" ,
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}" ,
                                     canvas.MaterialTypes[i].Gamma ,
                                     canvas.MaterialTypes[i].Phi ,
                                     canvas.MaterialTypes[i].Cohesion ,
+                                    canvas.MaterialTypes[i].Psi ,
                                     canvas.MaterialTypes[i].Emod ,
                                     canvas.MaterialTypes[i].Nu );
                 }
