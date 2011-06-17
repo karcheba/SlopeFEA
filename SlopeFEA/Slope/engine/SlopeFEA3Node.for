@@ -28,8 +28,8 @@
 !***********************************************************************
 !
 !
-      SUBROUTINE slopefea3node (fpath)
-!      PROGRAM slopefea3node
+!      SUBROUTINE slopefea3node (fpath)
+      PROGRAM slopefea3node
       USE gcontrol    ! controls inputs, grid, and elements
       USE feutility   ! utility functions for FEA solver
 !
@@ -37,8 +37,8 @@
 !
       IMPLICIT NONE
 !
-      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
-!      CHARACTER*(*), PARAMETER :: fpath = "test "
+!      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
+      CHARACTER*(*), PARAMETER :: fpath = "test "
 !
       ANTYPE = "PLANE STRAIN ELASTIC"
       CALL INPUT(fpath)     ! initialize data in gcontrol
@@ -51,16 +51,29 @@
 !
 !     solve gravity loading
       IF (GFACT .GT. 0.0D0) THEN
-        WRITE(output,10)
+        WRITE(nod,10)
+        WRITE(ele,10)
+        WRITE(outp,10)
         WRITE(his,10)
-   10   FORMAT(///, '=============== GRAVITY LOADING ===============,//)
+   10   FORMAT(///,"=============== GRAVITY LOADING ===============",//)
         GLOAD(:) = GFACT*GLOAD(:)
         CALL FEASLV(GLOAD, GLOAD0)
+      END IF
+!
+!     solve traction loading
+      IF (LFACT .GT. 0.0D0) THEN
+        WRITE(nod,20)
+        WRITE(ele,20)
+        WRITE(outp,20)
+        WRITE(his,20)
+   20   FORMAT(///,"============== TRACTION LOADING ===============",//)
+        TLOAD(:) = LFACT*TLOAD(:)
+        CALL FEASLV(TLOAD, GLOAD)
       END IF
 !
       CALL CLEANUP()
 !
       RETURN
 !
-      END SUBROUTINE slopefea3node
-!      END PROGRAM slopefea3node
+!      END SUBROUTINE slopefea3node
+      END PROGRAM slopefea3node

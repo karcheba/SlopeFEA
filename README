@@ -333,3 +333,12 @@ REVISION HISTORY:
 +++ (feModules.for) Added EVOL, EVOL0, EVOLi, DIA to nodes and EVOLB, FBAR to elements
 +++ (AddMaterialDialog.*, AssignMaterialDialog.*, SlopeCanvas.cs, MeshGen.cs) Added PSI
 +++ (feUtility.for) Added MOHRC()
+
+
+[17 June 2011]
+
+{v1.0.0.10}
++++ (feUtility.for) Finished MOHRC()
++++ (gcontrol.for) Added OUTPUT()
++++ (SlopeFEA3Node.for) Added lines to call FEASLV() on traction loads, added calls to OUTPUT() and SMOOTH(), SMOOTH() calls commented out as this is yet to be written
++++ (SlopeFEA3Node.dll, SlopeFEA3Node.exe) Compiled for testing, compilation successful, at runtime throws a memory access violation, this occurred once before when testing at INPUT()/BANDWH() stage and turned out to be a minor error, will fix over weekend or on Monday since convocation is this afternoon :)

@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from feModules.for on Tue Jun 14 16:56:41 2011
-MD5:95112e7c3a39fa0be2661c7eb68ca188 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from feModules.for on Fri Jun 17 10:14:29 2011
+MD5:75802c0fee1ec7a20ace145461a9a189 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -43,20 +43,26 @@ UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
 11 'nvelt' 'tractions' 'nvelt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-12 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+12 'one_third' 'numeric' 'one_third' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
+CONSTANT (REAL 8 0 0 REAL ()) 0 '0.55555555555554@0') () 0 () () () 0 0)
+13 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0
 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
-13 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+14 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 2 DEFERRED () () () ()) 0 () () () 0 0)
-14 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
+15 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
+0 0 REAL ()) 0 '0.2af31dc0000000@-6') () 0 () () () 0 0)
+16 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
 () () () 0 0)
-15 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+17 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 2 DEFERRED () () () ()) 0 () () () 0 0)
 )
 
 ('__convert_r4_r8' 0 2 'degtorad' 0 3 'dk' 0 4 'icot' 0 5 'ik' 0 6 'kind'
-0 7 'nelt' 0 8 'nnodelt' 0 9 'numeric' 0 10 'nvelt' 0 11 'pi' 0 12 'tnf'
-0 13 'tractions' 0 14 'tsf' 0 15)
+0 7 'nelt' 0 8 'nnodelt' 0 9 'numeric' 0 10 'nvelt' 0 11 'one_third' 0
+12 'pi' 0 13 'tnf' 0 14 'toler' 0 15 'tractions' 0 16 'tsf' 0 17)

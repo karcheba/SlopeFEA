@@ -320,7 +320,7 @@
       INTEGER(ik) :: nplast, nten, nfbar  ! count of plastic, tensile, "???SAFE???" points
       INTEGER(ik) :: ierr           ! error code for DPBTRS()
 !
-!     write output header
+!     write outp header
       WRITE(his,10)
 !
 !     initialize total displacement
@@ -356,10 +356,10 @@
 !         update volumetric strain
           CALL VOLSTR(DISP)
 !
-!         update displacements, stresses, error, and number of plastic points
+!         update displacements, stresses, error, and number of plastic/tensile points
           CALL UPDATE(DISP,TDISP,STR,error,nplast,nten)
 !
-!         print an output line
+!         print an outp line
           IF (MOD(NPRINT,ISTEP) .EQ. 0) THEN
 !
 !           count "???SAFE POINTS???"
@@ -370,7 +370,7 @@
 !
 !           get displacement of print point
             dprint = 0.0D0
-            IF (IX(NVAR*iread) .GT. 0) dprint = TDISP(IX(NVAR*iread))
+            IF (IX(NVAR*IPRINT) .GT. 0) dprint = TDISP(IX(NVAR*IPRINT))
 !
 !           write data to load history file
             WRITE(his,11) istep,iter,nplast,nten,
@@ -381,6 +381,8 @@
 !         check for convergence (stop computation if failed)
           IF (iter.GE.NITER .AND. error.GT.TOLER) THEN
             WRITE(his,*) '*** FAILED TO CONVERGE ***'
+            CALL OUTPUT(factor)
+!            CALL SMOOTH()
             CALL CLEANUP()
             STOP
           END IF
@@ -388,6 +390,10 @@
         END DO  ! non-linear solver
 !
       END DO  ! load stepping
+!
+!     print outp
+      CALL OUTPUT(factor)
+!      CALL SMOOTH()
 !
 !     format statements
   10  FORMAT(/,3X,'STEP',3X,'ITER',1X,'NPLAST',3X,'NTEN',2X,'NFBAR',
@@ -503,13 +509,13 @@
       REAL(dk), INTENT(INOUT) :: TDISP(:)     ! total displacements
       REAL(dk), INTENT(OUT) :: STR(:), error  ! internal force and relative err
       INTEGER(ik), INTENT(OUT) :: nplast, nten  ! number of plastic, tensile points
-      REAL(dk) :: lcoords(NDIM,NNODEL)        ! local coords
+      REAL(dk) :: lcoords(NDIM,NNODEL), larea        ! local coords
       REAL(dk) :: ldisp(NVEL), lstr(NVEL)     ! local displacement and stress increments
       REAL(dk) :: B(3,NVEL), D(3,3), ST(4)    ! kinematic and constitutive matrices
       REAL(dk) :: sig(4), dsig(3), eps(3), evc  ! el stress/strain, vol strain corr
       INTEGER(ik) :: i, iel, mtype
 !
-!     initialize outputs
+!     initialize outps
       STR(:) = 0.0D0
       nplast = 0
       nten = 0
@@ -533,9 +539,10 @@
         END WHERE
 !
 !       get element kinematic, constitutive, local sxx/syy/szz/sxy
-        CALL BMATRX(B, lcoords, AREA(iel))
+        larea = AREA(iel)
+        CALL BMATRX(B, lcoords, larea)
         CALL DMATRX(D, EMOD(mtype), NU(mtype))
-        CALL GLOLOC(SXX,SYY,SXY,SZZ,sig,iel,1)
+        CALL GLOLOC(SXX,SYY,SXY,SZZ, sig, iel, .TRUE.)
 !
 !       compute strain increments
         DO i = 1,3
@@ -557,6 +564,11 @@
         CALL MOHRC(PHI(mtype), PSI(mtype), COH(mtype), EMOD(mtype),
      +                NU(mtype), sig, nplast, nten, FBAR(iel))
 !
+!       compute increase in internal forces and increment global internal forces
+        lstr(:) = (sig(1)*B(1,:) + sig(2)*B(2,:) + sig(3)*B(3,:))*larea
+        CALL GLOLOC(SXX,SYY,SXY,SZZ, sig, iel, .FALSE.)
+        CALL MAPLD(STR, lstr, NVEL)
+!
       END DO
 !
       RETURN
@@ -574,17 +586,19 @@
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(IN) :: sphi, spsi, cohs, emod, nu, sig(:)   ! material props and stress state
+      REAL(dk), INTENT(IN) :: sphi, spsi, cohs, emod, nu    ! material props
+      REAL(dk), INTENT(INOUT) :: sig(:)                     !  stress state
       INTEGER(ik), INTENT(OUT) :: nplast, nten    ! count of plastic/tensile points
       REAL(dk), INTENT(OUT) :: fbarel
       REAL(dk) :: gmod, sxe, sstar, tstar
       REAL(dk) :: sinalf, cosalf
-      REAL(dk) :: sig1,sig2,sig3, sig1T,sig2T,sig3T
+      REAL(dk) :: sig1,sig2,sig3, sig1T,sig2T,sig3T, sFail
       INTEGER(ik) :: isigZZ, iArea
       REAL(dk) :: f21,f32,f31
       REAL(dk) :: nu1, nu2, nuQ, psiRat, psiMin, psiMet, psiNu
-      REAL(dk) :: hA, hB
+      REAL(dk) :: hA, hB, hC
       REAL(dk) :: dsp1,dsp2,dsp3, a11,a12, deter, rlam31,rlam32,rlam21
+      REAL(dk) :: dsstar,dtstar, dspXX,dspYY,dspXY,dspZZ, tauMax
 !
 !     compute shear modulus
       gmod = 0.5D0 * emod / (1.0D0 + nu)
@@ -664,8 +678,87 @@
 !
 !       compute plastic strain
         SELECT CASE (iArea)
-          CASE (1)
+!
+          CASE (1)            ! extension
+!
+            a11 = gmod * (1.0D0 + sphi*spsi/nu1)
+            a12 = 0.5D0 * gmod * (1.0D0 + sphi + spsi + nuQ*sphi*spsi)
+            deter = a11*a11 - a12*a12
+            rlam31 = (f31*a11 - f32*a12) / deter
+            rlam32 = (f32*a11 - f31*a12) / deter
+            rlam21 = 0.0D0
+            dsp1 = rlam31*psiMin + rlam32*psiNu
+            dsp2 = rlam31*psiNu + rlam32*psiMin
+            dsp3 = rlam31*psiMet + rlam32*psiMet
+!
+          CASE (2)            ! shear
+!
+            a11 = gmod * (1.0D0 + sphi*spsi/nu1)
+            rlam31 = f31 / a11
+            rlam32 = 0.0D0
+            rlam21 = 0.0D0
+            dsp1 = rlam31*psiMin
+            dsp2 = rlam31*psiNu
+            dsp3 = rlam31*psiMet
+!
+          CASE (3)            ! compression
+!
+            a11 = gmod * (1.0D0 + sphi*spsi/nu1)
+            a12 = 0.5D0 * gmod * (1.0D0 - sphi - spsi + nuQ*sphi*spsi)
+            deter = a11*a11 - a12*a12
+            rlam31 = (f31*a11 - f21*a12) / deter
+            rlam32 = 0.0D0
+            rlam21 = (f21*a11 - f31*a12) / deter
+            dsp1 = rlam31*psiMin + rlam21*psiMin
+            dsp2 = rlam31*psiNu + rlam21*psiMet
+            dsp3 = rlam31*psiMet + rlam21*psiNu
+!
         END SELECT
+!
+!       increment tensile point count
+        IF (sig3 .GT. 0.0D0) nten = nten+1
+!
+!       test apex points
+        IF (sphi .GT. 1.0D-6) THEN
+          sFail = cohs/sphi
+          hC = sig1+sig2+sig3 - (dsp1+dsp2+dsp3) - 3.0D0*sFail
+          IF (hC .GT. 0.0D0) THEN
+            dsp1 = sig1-sFail
+            dsp2 = sig2-sFail
+            dsp3 = sig3-sFail
+          END IF
+        END IF
+!
+!     compute Cartesian stress components
+      SELECT CASE (isigZZ)
+        CASE (1)
+          dtstar = 0.5D0 * (dsp3-dsp2)
+          dsstar = 0.5D0 * (dsp3+dsp2)
+          dspZZ = dsp1
+        CASE (2)
+          dtstar = 0.5D0 * (dsp3-dsp1)
+          dsstar = 0.5D0 * (dsp3+dsp1)
+          dspZZ = dsp2
+        CASE (3)
+          dtstar = 0.5D0 * (dsp2-dsp1)
+          dsstar = 0.5D0 * (dsp2+dsp1)
+          dspZZ = dsp3
+      END SELECT
+!
+      dspXX = (dsstar + dtstar*cosalf)
+      dspYY = (dsstar - dtstar*cosalf)
+      dspXY = dtstar*sinalf
+      sig(1) = sig(1) - dspXX
+      sig(2) = sig(2) - dspYY
+      sig(3) = sig(3) - dspXY
+      sig(4) = sig(4) - dspZZ
+!
+!     compute tauMax to check accuracy
+      tauMax = 0.5D0 * (sig3 - dsp3 - sig1 + dsp1)
+      IF (tauMax .LT. -1.0D-6) THEN
+        WRITE(his,*) "Error: tauMax is negative !!!"
+        STOP
+      END IF
 !
       END IF  ! plastic point
 !

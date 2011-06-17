@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from feModules.for on Tue Jun 14 08:52:50 2011
-MD5:d7bbeb5524b3e33f7579852c9f44980f -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from feModules.for on Fri Jun 17 10:14:29 2011
+MD5:878687e96365c69f48a2aa0e3b2ffb0c -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -49,17 +49,23 @@ UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
 13 'numeric' 'numeric' 'numeric' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-14 'phi' 'mproperty' 'phi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+14 'one_third' 'numeric' 'one_third' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
+CONSTANT (REAL 8 0 0 REAL ()) 0 '0.55555555555554@0') () 0 () () () 0 0)
+15 'phi' 'mproperty' 'phi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-15 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+16 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0
 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
-16 'psi' 'mproperty' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+17 'psi' 'mproperty' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
+18 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
+0 0 REAL ()) 0 '0.2af31dc0000000@-6') () 0 () () () 0 0)
 )
 
 ('__convert_r4_r8' 0 2 'coh' 0 3 'degtorad' 0 4 'dk' 0 5 'emod' 0 6 'grr'
 0 7 'ik' 0 8 'kind' 0 9 'mproperty' 0 10 'nmtl' 0 11 'nu' 0 12 'numeric'
-0 13 'phi' 0 14 'pi' 0 15 'psi' 0 16)
+0 13 'one_third' 0 14 'phi' 0 15 'pi' 0 16 'psi' 0 17 'toler' 0 18)
