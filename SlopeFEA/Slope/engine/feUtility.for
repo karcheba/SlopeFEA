@@ -142,14 +142,18 @@
 ! ......................................................................
 !     builds the global stiffness matrix
 ! ......................................................................
-      SUBROUTINE STFMAT (GSTIF)
+      SUBROUTINE STFMAT (GSTIF, rerr)
 !
       IMPLICIT NONE
 !
       REAL(dk), INTENT(OUT) :: GSTIF(:,:)   ! global stiff mat
+      INTEGER(ik), INTENT(OUT) :: rerr      ! error return code, == 0 successful return, /= 0 failed
       REAL(dk) :: lcoords(NDIM,NNODEL)      ! local coords
       INTEGER(ik) :: iel, mtype             ! element number and material type
       INTEGER(ik) :: ierr                   ! error code
+!
+!     initialize return code
+      rerr = 0
 !
 !     form global stiffness matrix (packed banded storage)
       GSTIF(:,:) = 0.0D0
@@ -187,8 +191,9 @@
       IF (ierr .LT. 0) THEN
         WRITE(his,*) "Problem with solution. Invalid argument ",
      +                    -ierr
+        rerr = ierr
         CALL CLEANUP()
-        STOP
+        RETURN
       END IF
 !
 !     print factored packed stiff mat (testing)
@@ -308,17 +313,21 @@
 ! ......................................................................
 !     solve the system given the appropriate load vector
 ! ......................................................................
-      SUBROUTINE FEASLV (load, load0)
+      SUBROUTINE FEASLV (load, load0, rerr)
 !
       IMPLICIT NONE
 !
       REAL(dk), INTENT(IN) :: load(:), load0(:)   ! incremental and base load vecs
+      INTEGER(ik), INTENT(OUT) :: rerr      ! error return code, == 0 successful return, /= 0 failed
       REAL(dk) :: dfact, factor     ! factors for load stepping
       REAL(dk) :: error             ! for non-linear solver convergence
       REAL(dk) :: dprint            ! for tracking print point
       INTEGER(ik) :: istep, iter, i ! loop vars for load stepping and non-linear solver
       INTEGER(ik) :: nplast, nten, nfbar  ! count of plastic, tensile, "???SAFE???" points
       INTEGER(ik) :: ierr           ! error code for DPBTRS()
+!
+!     initialize return code
+      rerr = 0
 !
 !     write outp header
       WRITE(his,10)
@@ -357,7 +366,8 @@
           CALL VOLSTR(DISP)
 !
 !         update displacements, stresses, error, and number of plastic/tensile points
-          CALL UPDATE(DISP,TDISP,STR,error,nplast,nten)
+          CALL UPDATE(DISP,TDISP,STR,error,nplast,nten,rerr)
+          IF (rerr .NE. 0)  RETURN
 !
 !         print an outp line
           IF (MOD(NPRINT,ISTEP) .EQ. 0) THEN
@@ -381,10 +391,11 @@
 !         check for convergence (stop computation if failed)
           IF (iter.GE.NITER .AND. error.GT.TOLER) THEN
             WRITE(his,*) '*** FAILED TO CONVERGE ***'
+            rerr = -1
             CALL OUTPUT(factor)
 !            CALL SMOOTH()
             CALL CLEANUP()
-            STOP
+            RETURN
           END IF
 !
         END DO  ! non-linear solver
@@ -501,13 +512,14 @@
 !     increment displacements, update internal forces, compute error,
 !     and count number of plastic points
 ! ......................................................................
-      SUBROUTINE UPDATE (DISP, TDISP, STR, error, nplast, nten)
+      SUBROUTINE UPDATE (DISP, TDISP, STR, error, nplast, nten, rerr)
 !
       IMPLICIT NONE
 !
       REAL(dk), INTENT(IN) :: DISP(:)         ! incremental displacements
       REAL(dk), INTENT(INOUT) :: TDISP(:)     ! total displacements
       REAL(dk), INTENT(OUT) :: STR(:), error  ! internal force and relative err
+      INTEGER(ik), INTENT(OUT) :: rerr        ! error code
       INTEGER(ik), INTENT(OUT) :: nplast, nten  ! number of plastic, tensile points
       REAL(dk) :: lcoords(NDIM,NNODEL), larea        ! local coords
       REAL(dk) :: ldisp(NVEL), lstr(NVEL)     ! local displacement and stress increments
@@ -562,7 +574,8 @@
 !
 !       check for plastic yielding and tensile points
         CALL MOHRC(PHI(mtype), PSI(mtype), COH(mtype), EMOD(mtype),
-     +                NU(mtype), sig, nplast, nten, FBAR(iel))
+     +                NU(mtype), sig, nplast, nten, FBAR(iel), rerr)
+        IF (rerr .NE. 0)  RETURN
 !
 !       compute increase in internal forces and increment global internal forces
         lstr(:) = (sig(1)*B(1,:) + sig(2)*B(2,:) + sig(3)*B(3,:))*larea
@@ -582,13 +595,15 @@
 !     evaluate plastic state according to Mohr-Coulomb failure criterion
 ! ......................................................................
       SUBROUTINE MOHRC (sphi, spsi, cohs, emod, nu, sig,
-     +                      nplast, nten, fbarel)
+     +                      nplast, nten, fbarel,
+     +                      rerr)
 !
       IMPLICIT NONE
 !
       REAL(dk), INTENT(IN) :: sphi, spsi, cohs, emod, nu    ! material props
       REAL(dk), INTENT(INOUT) :: sig(:)                     !  stress state
       INTEGER(ik), INTENT(OUT) :: nplast, nten    ! count of plastic/tensile points
+      INTEGER(ik), INTENT(OUT) :: rerr            ! error return code, == 0 successful return, /= 0 failed
       REAL(dk), INTENT(OUT) :: fbarel
       REAL(dk) :: gmod, sxe, sstar, tstar
       REAL(dk) :: sinalf, cosalf
@@ -599,6 +614,9 @@
       REAL(dk) :: hA, hB, hC
       REAL(dk) :: dsp1,dsp2,dsp3, a11,a12, deter, rlam31,rlam32,rlam21
       REAL(dk) :: dsstar,dtstar, dspXX,dspYY,dspXY,dspZZ, tauMax
+!
+!     initialize return code
+      rerr = 0
 !
 !     compute shear modulus
       gmod = 0.5D0 * emod / (1.0D0 + nu)
@@ -757,7 +775,8 @@
       tauMax = 0.5D0 * (sig3 - dsp3 - sig1 + dsp1)
       IF (tauMax .LT. -1.0D-6) THEN
         WRITE(his,*) "Error: tauMax is negative !!!"
-        STOP
+        rerr = -1
+        RETURN
       END IF
 !
       END IF  ! plastic point

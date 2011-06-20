@@ -28,8 +28,8 @@
 !***********************************************************************
 !
 !
-!      SUBROUTINE slopefea3node (fpath)
-      PROGRAM slopefea3node
+      SUBROUTINE slopefea3node (fpath)
+!      PROGRAM slopefea3node
       USE gcontrol    ! controls inputs, grid, and elements
       USE feutility   ! utility functions for FEA solver
 !
@@ -37,17 +37,20 @@
 !
       IMPLICIT NONE
 !
-!      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
-      CHARACTER*(*), PARAMETER :: fpath = "test "
+      CHARACTER*(*), INTENT(IN) :: fpath    ! path to data files
+!      CHARACTER*(*), PARAMETER :: fpath = "test "
+      INTEGER(ik) :: rerr     ! error code
 !
-      ANTYPE = "PLANE STRAIN ELASTIC"
+      ANTYPE = "PLANE STRAIN ELASTO-PLASTIC"//
+     +          " (MOHR-COULOMB FAILURE CRITERION)"
       CALL INPUT(fpath)     ! initialize data in gcontrol
 !
 !     set up load vectors (gravity and traction
       CALL LOAD(GLOAD, TLOAD)
 !
 !     form and decompose global stiffness matrix
-      CALL STFMAT(GSTIF)
+      CALL STFMAT(GSTIF, rerr)
+      IF (rerr .NE. 0)  RETURN
 !
 !     solve gravity loading
       IF (GFACT .GT. 0.0D0) THEN
@@ -57,7 +60,8 @@
         WRITE(his,10)
    10   FORMAT(///,"=============== GRAVITY LOADING ===============",//)
         GLOAD(:) = GFACT*GLOAD(:)
-        CALL FEASLV(GLOAD, GLOAD0)
+        CALL FEASLV(GLOAD, GLOAD0, rerr)
+        IF (rerr .NE. 0)  RETURN
       END IF
 !
 !     solve traction loading
@@ -68,12 +72,13 @@
         WRITE(his,20)
    20   FORMAT(///,"============== TRACTION LOADING ===============",//)
         TLOAD(:) = LFACT*TLOAD(:)
-        CALL FEASLV(TLOAD, GLOAD)
+        CALL FEASLV(TLOAD, GLOAD, rerr)
+        IF (rerr .NE. 0)  RETURN
       END IF
 !
       CALL CLEANUP()
 !
       RETURN
 !
-!      END SUBROUTINE slopefea3node
-      END PROGRAM slopefea3node
+      END SUBROUTINE slopefea3node
+!      END PROGRAM slopefea3node

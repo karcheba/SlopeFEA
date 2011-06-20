@@ -342,3 +342,11 @@ REVISION HISTORY:
 +++ (gcontrol.for) Added OUTPUT()
 +++ (SlopeFEA3Node.for) Added lines to call FEASLV() on traction loads, added calls to OUTPUT() and SMOOTH(), SMOOTH() calls commented out as this is yet to be written
 +++ (SlopeFEA3Node.dll, SlopeFEA3Node.exe) Compiled for testing, compilation successful, at runtime throws a memory access violation, this occurred once before when testing at INPUT()/BANDWH() stage and turned out to be a minor error, will fix over weekend or on Monday since convocation is this afternoon :)
+
+
+[19 June 2011]
+
+{v1.0.0.10}
+=== (gcontrol.for) Moved check for sensible value to after reading of NVELT in INPUT() [otherwise, GFACT always gets set to 1.0 since NVELT=0, always .LT. 1 before this point]
++++ (gcontrol.for) Added allocation and initialization of DIA [this solves the memory access violation issue, since VOLSTR() was trying to use DIA before it was allocated]
++++ (SlopeFEA3Node.for, feUtility.for) Added an error return code, rerr, to STFMAT(), FEASLV(), UPDATE(), MOHRC(), and SlopeFEA3Node() to avoid using STOP [since this also kills the calling program]

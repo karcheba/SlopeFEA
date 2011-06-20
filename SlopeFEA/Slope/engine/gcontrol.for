@@ -129,17 +129,15 @@
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating EVOL0."
       ALLOCATE( EVOLi(NNOD),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating EVOLi."
+      ALLOCATE( DIA(NNOD), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating DIA."
       COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
       PLOADS(:,:)   = 0.0D0
       IX(:)         = 0
       EVOL(:)       = 0.0D0
       EVOL0(:)      = 0.0D0
       EVOLi(:)      = 0.0D0
-      IF (GFACT .LT. 0.0) GFACT = 0.0D0
-      IF (LFACT .LT. 0.0) LFACT = 0.0D0     ! ensure solution parameters are meaningful
-      IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0D0
-      IF (NSTEP .LT. 2) NSTEP = 2
-      IF (NITER .LT. 2) NITER = 2
+      DIA(:)        = 0.0D0
 !
       READ(ele,*) NEL, NNODEL   ! # body elements, # nodes per element
       NVEL = NVAR*NNODEL    ! compute #dofs/element
@@ -189,6 +187,12 @@
       ICOT(:,:) = 0                     ! alloc and init traction data storage
       TNF(:,:)  = 0.0D0
       TSF(:,:)  = 0.0D0
+!
+      IF (GFACT .LT. 0.0D0) GFACT = 0.0D0
+      IF (LFACT .LT. 0.0D0) LFACT = 0.0D0     ! ensure solution parameters are meaningful
+      IF (LFACT .LT. 1.0D-8 .OR. NELT .LT. 1) GFACT = 1.0D0
+      IF (NSTEP .LT. 2) NSTEP = 2
+      IF (NITER .LT. 2) NITER = 2
 !
 !     write outp file headers
       CALL DATE_AND_TIME(VALUES=currtime)
@@ -702,9 +706,9 @@
   111 FORMAT(I5, 4E15.6)
 !
   120 FORMAT( /, "MATERIAL POINT STRESSES", /, "**********************",
-     +        //, 2X, "IEL", 6X, "LOCATION", 16X,
-     +        "S11", 10X, "S22", 10X, "S12", 10X, "S33", //)
-  121 FORMAT(I5, 2E10.3, 4E13.4)
+     +        //, 2X, "IEL", 11X, "LOCATION", 23X,
+     +        "S11", 12X, "S22", 12X, "S12", 12X, "S33", //)
+  121 FORMAT(I5, 6E15.6)
 !
       RETURN
 !

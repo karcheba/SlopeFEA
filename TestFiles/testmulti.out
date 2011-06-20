@@ -1,15 +1,21 @@
+ Error in allocating EVOL.
+ Error in allocating EVOL0.
+ Error in allocating EVOLi.
+ Error in allocating DIA.
+ Error in allocating EVOLB.
+ Error in allocating FBAR.
 
 ====================================================
       3-NODED FINITE ELEMENT STRESS ANALYSIS
 ====================================================
 
-FILE: Q:\Research\2010-2011\SlopeFEA\TestFiles\testmulti
-DATE:  6/15/2011
-TIME: 14: 0:35.466
+FILE: C:\Users\Brandon\Documents\Research\2010-2011\SlopeFEA\TestFiles\testmulti
+DATE:  6/19/2011
+TIME: 21:59:39.469
 
 
 
- type of analysis ...................... = PLANE STRAIN ELASTIC                                            
+ type of analysis ...................... = PLANE STRAIN ELASTO-PLASTIC (MOHR-COULOMB FAILURE CRITERION)    
  # of material types .............. NMTL =       3
  # of nodes ....................... NNOD =     229
  # of coordinate dimensions ....... NDIM =       2
@@ -23,7 +29,7 @@ TIME: 14: 0:35.466
  # of load steps ................. NSTEP =     153
  # of iterations/load step ....... NITER =       5
  # of print lines ............... NPRINT =     200
- output node number ............. IPRINT =      10
+ outp node number ............. IPRINT =      10
  load factor ..................... LFACT =  0.10000E+01
  gravity factor .................. GFACT =  0.10000E+01
 
@@ -527,13 +533,13 @@ TIME: 14: 0:35.466
 
     13        16   17    2       3       0.8850E+01         -4.067     8.000
 
-    14         2   17   18       3       0.8850E+01         -4.067    10.000
+    14        17    3    2       3       0.8850E+01         -6.033    10.000
 
-    15         2   18    3       3       0.8850E+01         -6.033    11.000
+    15        17   18    3       3       0.8850E+01         -4.067    11.000
 
-    16         3   18   19       3       0.8850E+01         -4.067    13.000
+    16        18    4    3       3       0.8850E+01         -6.033    13.000
 
-    17         3   19    4       3       0.8850E+01         -6.033    14.000
+    17        18   19    4       3       0.8850E+01         -4.067    14.000
 
     18         4   19   20       3       0.8260E+01         -4.067    15.933
 
@@ -1309,6 +1315,7 @@ MATERIAL SET    1
 unit weight ............... GRR =  0.17000E+02
 internal friction angle ... PHI =  0.50000E+01
 cohesion .................. COH =  0.40000E+02
+dilatancy angle ........... PSI =  0.00000E+00
 elastic modulus .......... EMOD =  0.50000E+05
 poisson's ratio ............ NU =  0.45000E+00
 
@@ -1318,6 +1325,7 @@ MATERIAL SET    2
 unit weight ............... GRR =  0.16000E+02
 internal friction angle ... PHI =  0.35000E+02
 cohesion .................. COH =  0.00000E+00
+dilatancy angle ........... PSI =  0.00000E+00
 elastic modulus .......... EMOD =  0.10000E+06
 poisson's ratio ............ NU =  0.33000E+00
 
@@ -1327,6 +1335,7 @@ MATERIAL SET    3
 unit weight ............... GRR =  0.22000E+02
 internal friction angle ... PHI =  0.50000E+02
 cohesion .................. COH =  0.10000E+04
+dilatancy angle ........... PSI =  0.00000E+00
 elastic modulus .......... EMOD =  0.35000E+06
 poisson's ratio ............ NU =  0.35000E+00
 
@@ -1347,4 +1356,10 @@ poisson's ratio ............ NU =  0.35000E+00
      4       164  154      -0.1600E+02 -0.1800E+02      -0.8000E+01 -0.9000E+01
 
      5       154  153      -0.1800E+02 -0.2000E+02      -0.9000E+01 -0.1000E+02
+
+
+
+
+=============== GRAVITY LOADING ===============
+
 
