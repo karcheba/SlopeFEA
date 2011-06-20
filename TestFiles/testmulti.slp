@@ -147,7 +147,7 @@ Column Width = 6
 Row Height = 3
 Number of Load Steps = 5
 Number of Iterations = 200
-Number of Print Lines = 10
+Number of Print Lines = 2
 Load Factor = 1
 Gravity Factor = 1
 

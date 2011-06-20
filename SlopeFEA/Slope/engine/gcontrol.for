@@ -119,7 +119,7 @@
      +            LFACT, GFACT                ! load factor, gravity factor
       ALLOCATE( COORDS(NDIM,NNOD),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating COORDS."
-      ALLOCATE( PLOADS(NDIM,NNOD),  STAT=ierr)
+      ALLOCATE( PLOADS(NVAR,NNOD),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating PLOADS."
       ALLOCATE( IX(NNOD*NVAR),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating IX."
@@ -354,23 +354,23 @@
 !     node data
   110 FORMAT(//,
      +  '===================== NODE INFORMATION =====================')
-  111 FORMAT(//, 3X, 'NODE', 8X, 'COORDS (X,Y,..)', 8X, 'FIX (U,V,..)',
-     +        8X, 'PLOADS (U,V,..)', //)
+  111 FORMAT(/, 3X, 'NODE', 8X, 'COORDS (X,Y,..)', 8X, 'FIX (U,V,..)',
+     +        8X, 'PLOADS (U,V,..)', /)
   112 FORMAT(1X, I5, 5X, F10.3, 2X, F10.3, 5X, 2I5,
-     +        5X, F10.3, 2X, F10.3, /)
+     +        5X, F10.3, 2X, F10.3)
 !
 !     element data
   120 FORMAT(//,
      +  '================= BODY ELEMENT INFORMATION =================')
-  121 FORMAT(//, 3X, 'ELEMENT', 9X, 'NODES', 9X, 'MTL', 8X, 'AREA',
-     +        8X, 'CENTROID (X,Y,..)', //)
-  122 FORMAT(1X, I5, 5X, 3I5, 5X, I3, 5X, E12.4, 5X, 2F10.3, /)
+  121 FORMAT(/, 3X, 'ELEMENT', 9X, 'NODES', 9X, 'MTL', 8X, 'AREA',
+     +        8X, 'CENTROID (X,Y,..)', /)
+  122 FORMAT(1X, I5, 5X, 3I5, 5X, I3, 5X, E12.4, 5X, 2F10.3)
 !
 !     stiffness matrix statistics (packed band storage)
   130 FORMAT(//,
      +  '=============== STIFFNESS MATRIX INFORMATION ===============')
-  131 FORMAT(//, 1X, '# of degrees of freedom ... NNET = ', I7,
-     +        /, 1X, '# of codiagonal bands .... LBAND = ', I7, /)
+  131 FORMAT(/, 1X, '# of degrees of freedom ... NNET = ', I7,
+     +        /, 1X, '# of codiagonal bands .... LBAND = ', I7)
 !
   140 FORMAT(//,
      +  '==================== MATERIAL PROPERTIES ===================')
@@ -383,10 +383,10 @@
      +        /, 'elastic modulus .......... EMOD = ', E12.5,
      +        /, 'poisson''s ratio ............ NU = ', E12.5  )
 !
-  150 FORMAT(///,
+  150 FORMAT(//,
      +  '=============== TRACTION ELEMENT INFORMATION ===============')
-  151 FORMAT(//, 3X, 'ELEMENT', 6X, 'NODES', 15X, 'TNF', 20X, 'TSF', //)
-  152 FORMAT(1X, I5, 5X, 2I5, 5X, 2E12.4, 5X, 2E12.4, /)
+  151 FORMAT(/, 3X, 'ELEMENT', 6X, 'NODES', 15X, 'TNF', 20X, 'TSF', /)
+  152 FORMAT(1X, I5, 5X, 2I5, 5X, 2E12.4, 5X, 2E12.4)
 !
       RETURN
 !
@@ -419,7 +419,8 @@
 !
 !     solution space
       DEALLOCATE( TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, 
-     +            GSTIF, fGSTIF, ESTIF )
+     +            GSTIF, fGSTIF, ESTIF,
+     +            EVOL, EVOL0, EVOLi, DIA, EVOLB, FBAR )
 !
       RETURN
 !
@@ -668,16 +669,16 @@
 ! ......................................................................
 !     write analysis results (displacements and stresses) to file
 ! ......................................................................
-      SUBROUTINE OUTPUT (factor)
+      SUBROUTINE OUTPUT (factor, tfact)
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(IN) :: factor    ! final load factor
+      REAL(dk), INTENT(IN) :: factor, tfact    ! final load factor and total load factor
       REAL(dk) :: lcoords(NDIM,NNODEL), ldisp(NVAR), sig(4)    ! local coords and stresses
       INTEGER(ik) :: inod, j, i1, i2, ii, iel, mtype   ! loop vars and material type
 !
 !     write final load factor for this loading sequence
-      WRITE(outp,100) factor
+      WRITE(outp,100) factor*tfact
 !
 !     write node displacements to outp
       WRITE(outp,110)
@@ -713,6 +714,128 @@
       RETURN
 !
       END SUBROUTINE OUTPUT
+!
+!
+! ......................................................................
+! .... SMOOTH ..........................................................
+! ......................................................................
+!     write smoothed results to nod and ele files
+! ......................................................................
+      SUBROUTINE SMOOTH ()
+!
+      IMPLICIT NONE
+!
+      REAL(dk) :: p,q, d, ldisp(NVAR), larea, s1,s2, theta, st(NNODEL)
+      REAL(dk), DIMENSION(NNODEL) :: eXX,eYY,eXY,eZZ,eFBAR
+      REAL(dk), DIMENSION(NNOD) :: pXX,pYY,pXY,pZZ,pFBAR
+      INTEGER(ik) :: inod, iel, ivar, ii
+!
+!     initialize
+      DIA(:) = 0.0D0
+      pXX(:) = 0.0D0
+      pYY(:) = 0.0D0
+      pXY(:) = 0.0D0
+      pZZ(:) = 0.0D0
+      pFBAR(:) = 0.0D0
+!
+!     map element areas and stresses to nodes
+      WRITE(ele,10)   ! write results header
+      DO iel = 1,NEL
+!
+        LJ(1:NNODEL) = ICO(1:NNODEL, iel)   ! get local connectivity
+        larea = AREA(iel) / NNODEL          ! get local area
+!
+!       local to global mapping
+        st(:) = larea;            CALL MAPLD(DIA,st,NNODEL)
+        eXX(:) = larea*SXX(iel);  CALL MAPLD(pXX,eXX,NNODEL)
+        eYY(:) = larea*SYY(iel);  CALL MAPLD(pYY,eYY,NNODEL)
+        eXY(:) = larea*SXY(iel);  CALL MAPLD(pXY,eXY,NNODEL)
+        eZZ(:) = larea*SZZ(iel);  CALL MAPLD(pZZ,eZZ,NNODEL)
+        eFBAR(:) = larea*FBAR(iel);  CALL MAPLD(pFBAR,eFBAR,NNODEL)
+!
+!       compute stress invariants
+        p = 0.5D0*(SXX(iel) + SYY(iel))
+        q = SQRT(0.25D0*(SXX(iel) - SYY(iel))**2 + SXY(iel)**2)
+        s1 = p+q
+        s2 = p-q
+        d = SXX(iel) - SYY(iel) + 1.0D-14
+!
+!       compute angle of shear plane
+        IF (ABS(d/SQRT(p**2 + q**2)) .LT. 1.0D-5) THEN
+          IF (SXY(iel) .GE. 0.0D0) THEN
+            theta = -45.0D0
+          ELSE
+            theta = 45.0D0
+          END IF
+        ELSE
+          theta = (90.0D0/PI) * ATAN(2.0D0*SXY(iel)/d)
+        END IF
+!
+!       write to element data file
+        WRITE(ele,11) iel, LJ(1:NNODEL),
+     +                SXX(iel), SYY(iel), SXY(iel), SZZ(iel), FBAR(iel),
+     +                p, q, s1, s2, theta
+!
+      END DO
+!
+!     compute smoothed values at nodes
+      pXX(:) = pXX(:) / DIA(:)
+      pYY(:) = pYY(:) / DIA(:)
+      pXY(:) = pXY(:) / DIA(:)
+      pZZ(:) = pZZ(:) / DIA(:)
+      pFBAR(:) = pFBAR(:) / DIA(:)
+      WRITE(nod,20)   ! write results header
+      DO inod = 1,NNOD
+!
+!       compute stress invariants
+        p = 0.5D0*(pXX(inod)+pYY(inod))
+        q = SQRT(0.25D0*(pXX(inod)-pYY(inod))**2 + pXY(inod)**2)
+        s1 = p+q
+        s2 = p-q
+        d = pXX(inod) - pYY(inod) + 1.0D-14
+!
+!       compute angle of shear plane
+        IF (ABS(d/SQRT(p**2 + q**2)) .LT. 1.0D-5) THEN
+          IF (pXY(inod) .GE. 0.0D0) THEN
+            theta = -45.0D0
+          ELSE
+            theta = 45.0D0
+          END IF
+        ELSE
+          theta = (90.0D0/PI) * ATAN(2.0D0*pXY(inod)/d)
+        END IF
+!
+!       get node displacements
+        ldisp(:) = 0.0D0
+        DO ivar = 1,NVAR
+          ii = inod*NVAR - NVAR + ivar
+          IF (IX(ii) .NE. 0) ldisp(ivar) = TDISP(IX(ii))
+        END DO
+!
+!       write to node data file
+        WRITE(nod,21) inod, COORDS(:,inod), ldisp(:),
+     +                pXX(inod), pYY(inod), pXY(inod), pZZ(inod),
+     +                pFBAR(inod), p, q, s1, s2, theta
+!
+      END DO
+!
+!     format statements
+   10 FORMAT(//,
+     +        2X, "IEL", 6X, "ICO", 18X, "SXX", 12X, "SYY", 12X, "SXY",
+     +        12X, "SZZ", 11X, "FBAR", 14X, "p", 14X, "q", 13X, "s1",
+     +        13X, "s2", 10X, "theta", /)
+   11 FORMAT(I5, 3I5, 10E15.6)
+!
+   20 FORMAT(//,
+     +        1X, "INOD", 8X, "COORDS (X,Y,..)", 16X, "DISP (U,V,..)",
+     +        20X, "SXX", 12X, "SYY", 12X, "SXY", 12X, "SZZ",
+     +        11X, "FBAR", 14X, "p", 14X, "q", 13X, "s1",
+     +        13X, "s2", 10X, "theta", /)
+   21 FORMAT(I5, 2E15.6, 2E15.6, 10E15.6)
+!
+      RETURN
+!
+      END SUBROUTINE SMOOTH
 !
 !
       END MODULE gcontrol

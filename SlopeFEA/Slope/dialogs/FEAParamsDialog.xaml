@@ -32,7 +32,7 @@
 <Window x:Class="SlopeFEA.FEAParamsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FEA Parameters" Height="325" Width="325" MinHeight="325" MinWidth="325"
+        Title="FEA Parameters" Height="325" Width="350" MinHeight="325" MinWidth="325"
         Background="WhiteSmoke"
         Topmost="False" 
         WindowStartupLocation="CenterOwner" 
@@ -44,26 +44,26 @@
         <TextBox Height="23" HorizontalAlignment="Center" Margin="60,-210,0,0" Name="colWidth" VerticalAlignment="Center" Width="75" />
         <Label Content="m" Height="28" HorizontalAlignment="Center" Margin="190,-210,0,0" Name="colWidthUnits" VerticalAlignment="Center" />
         
-        <Label Content="Row Height" Height="28" HorizontalAlignment="Center" Margin="-110,-150,0,0" VerticalAlignment="Center" />
+        <Label Content="Row Height" Height="28" HorizontalAlignment="Center" Margin="-105,-150,0,0" VerticalAlignment="Center" />
         <TextBox Height="23" HorizontalAlignment="Center" Margin="60,-150,0,0" Name="rowHeight" VerticalAlignment="Center" Width="75" />
         <Label Content="m" Height="28" HorizontalAlignment="Center" Margin="190,-150,0,0" Name="rowHeightUnits" VerticalAlignment="Center" />
 
         <Label Content="# Load Steps" Height="28" HorizontalAlignment="Center" Margin="-110,-90,0,0" VerticalAlignment="Center" />
         <TextBox Height="23" HorizontalAlignment="Center" Margin="60,-90,0,0" Name="nStep" VerticalAlignment="Center" Width="75" />
 
-        <Label Content="# Iterations" Height="28" HorizontalAlignment="Center" Margin="-110,-40,0,0" VerticalAlignment="Center" />
-        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,-40,0,0" Name="nIter" VerticalAlignment="Center" Width="75" />
+        <Label Content="# Iterations" Height="28" HorizontalAlignment="Center" Margin="-100,-30,0,0" VerticalAlignment="Center" />
+        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,-30,0,0" Name="nIter" VerticalAlignment="Center" Width="75" />
 
-        <Label Content="# Print Lines" Height="28" HorizontalAlignment="Center" Margin="-110,20,0,0" VerticalAlignment="Center" />
-        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,20,0,0" Name="nPrint" VerticalAlignment="Center" Width="75" />
+        <Label Content="# Load Steps / Print Line" Height="28" HorizontalAlignment="Center" Margin="-170,30,0,0" VerticalAlignment="Center" />
+        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,30,0,0" Name="nPrint" VerticalAlignment="Center" Width="75" />
 
-        <Label Content="Load Factor" Height="28" HorizontalAlignment="Center" Margin="-110,80,0,0" VerticalAlignment="Center" />
-        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,80,0,0" Name="LFact" VerticalAlignment="Center" Width="75" />
+        <Label Content="Load Factor" Height="28" HorizontalAlignment="Center" Margin="-100,90,0,0" VerticalAlignment="Center" />
+        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,90,0,0" Name="LFact" VerticalAlignment="Center" Width="75" />
 
-        <Label Content="Gravity Factor" Height="28" HorizontalAlignment="Center" Margin="-110,140,0,0" VerticalAlignment="Center" />
-        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,140,0,0" Name="GFact" VerticalAlignment="Center" Width="75" />
+        <Label Content="Gravity Factor" Height="28" HorizontalAlignment="Center" Margin="-110,150,0,0" VerticalAlignment="Center" />
+        <TextBox Height="23" HorizontalAlignment="Center" Margin="60,150,0,0" Name="GFact" VerticalAlignment="Center" Width="75" />
 
-        <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,215,0,0" Name="ok" VerticalAlignment="Center" Width="60" IsDefault="True" Click="ok_Click" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,215,0,0" Name="cancel" VerticalAlignment="Center" Width="60" IsDefault="False" IsCancel="True" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Center" Margin="-70,230,0,0" Name="ok" VerticalAlignment="Center" Width="60" IsDefault="True" Click="ok_Click" />
+        <Button Content="Cancel" Height="23" HorizontalAlignment="Center" Margin="70,230,0,0" Name="cancel" VerticalAlignment="Center" Width="60" IsDefault="False" IsCancel="True" />
     </Grid>
 </Window>

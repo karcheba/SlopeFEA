@@ -82,8 +82,8 @@ Number of Material Blocks = 6
 Material Block #1
 Material Type = "sand"
 Number of Boundary Points = 11
-0, -8.59094491599113E-14, True, False, False
-40, -8.59094491599113E-14, True, False, False
+0, -8.33418547207335E-14, True, False, False
+40, -8.33418547207335E-14, True, False, False
 40, 20, True, False, False
 31, 20, False, False, False
 29.9999999999999, 20, False, False, False
@@ -106,8 +106,8 @@ Material Type = "bedrock"
 Number of Boundary Points = 4
 0, -9.99999999999999, True, True, False
 40, -9.99999999999999, True, True, False
-40, 1.07386811449889E-14, True, False, False
-0, -8.59094491599113E-14, True, False, False
+40, 6.41091190159489E-15, True, False, False
+0, -8.33418547207335E-14, True, False, False
 Number of Line Constraints = 3
 3, 0, True, False
 1, 2, True, False
@@ -188,8 +188,8 @@ FEA PARAMETERS
 Column Width = 1
 Row Height = 1
 Number of Load Steps = 5
-Number of Iterations = 200
-Number of Print Lines = 10
+Number of Iterations = 400
+Number of Print Lines = 2
 Load Factor = 1
 Gravity Factor = 1
 

@@ -52,8 +52,8 @@
       REAL(dk), INTENT(OUT) :: GLOAD(:), TLOAD(:)
       REAL(dk) :: lcoords(NDIM,NNODEL), lcoordsT(NDIM,NNODELT)  ! local coords
       REAL(dk) :: eload(NVEL), eloadT(NVELT)  ! element load vec
-      INTEGER(ik) :: mtype          ! element material type
-      INTEGER(ik) :: iel            ! loop variable
+      INTEGER(ik) :: mtype            ! element material type
+      INTEGER(ik) :: inod, ivar, ii, iel  ! loop vars
 !
 !     gravity loads
       GLOAD(:) = 0.0D0
@@ -64,8 +64,15 @@
         CALL MAPLD(GLOAD, eload, NVEL)    ! insert into global load vec
       END DO  ! body elements
 !
-!     tractions (if present)
+!     point loads and tractions (if present)
       TLOAD(:) = 0.0D0
+      DO inod = 1,NNOD    ! point loads at nodes
+        DO ivar = 1,NVAR    ! dofs
+          ii = inod*NVAR - NVAR + ivar    ! get dof index
+          IF (IX(ii) .NE. 0) TLOAD(IX(ii)) = TLOAD(IX(ii))  ! increment load
+     +                                        + PLOADS(ivar, inod)
+        END DO  ! dofs
+      END DO  ! point loads
       DO iel = 1,NELT   ! traction elements
         CALL LOCALT(iel, lcoordsT)      ! get coords of traction element
         CALL TRACT(eloadT, lcoordsT, TNF(:,iel), TSF(:,iel)) ! get traction load vec
@@ -182,6 +189,8 @@
           WRITE(his,*) "Error in factorization. Minor ", ierr,
      +                  " is not positive definite."
         END IF
+        rerr = ierr
+        RETURN
       END IF
 !
 !     *******TEST SOLVE***********
@@ -192,7 +201,6 @@
         WRITE(his,*) "Problem with solution. Invalid argument ",
      +                    -ierr
         rerr = ierr
-        CALL CLEANUP()
         RETURN
       END IF
 !
@@ -313,11 +321,12 @@
 ! ......................................................................
 !     solve the system given the appropriate load vector
 ! ......................................................................
-      SUBROUTINE FEASLV (load, load0, rerr)
+      SUBROUTINE FEASLV (load, load0, tfact, rerr)
 !
       IMPLICIT NONE
 !
       REAL(dk), INTENT(IN) :: load(:), load0(:)   ! incremental and base load vecs
+      REAL(dk), INTENT(IN) :: tfact   ! total load factor
       INTEGER(ik), INTENT(OUT) :: rerr      ! error return code, == 0 successful return, /= 0 failed
       REAL(dk) :: dfact, factor     ! factors for load stepping
       REAL(dk) :: error             ! for non-linear solver convergence
@@ -367,10 +376,11 @@
 !
 !         update displacements, stresses, error, and number of plastic/tensile points
           CALL UPDATE(DISP,TDISP,STR,error,nplast,nten,rerr)
-          IF (rerr .NE. 0)  RETURN
+          IF (rerr .NE. 0) RETURN
 !
 !         print an outp line
-          IF (MOD(NPRINT,ISTEP) .EQ. 0) THEN
+          IF (CEILING(DBLE(istep)/NPRINT)*NPRINT.EQ.istep
+     +              .OR. istep.EQ.NSTEP) THEN
 !
 !           count "???SAFE POINTS???"
             nfbar = 0
@@ -384,7 +394,7 @@
 !
 !           write data to load history file
             WRITE(his,11) istep,iter,nplast,nten,
-     +                    nfbar,error,factor,dprint
+     +                    nfbar,error,factor*tfact,dprint
 !
           END IF
 !
@@ -392,9 +402,8 @@
           IF (iter.GE.NITER .AND. error.GT.TOLER) THEN
             WRITE(his,*) '*** FAILED TO CONVERGE ***'
             rerr = -1
-            CALL OUTPUT(factor)
-!            CALL SMOOTH()
-            CALL CLEANUP()
+            CALL OUTPUT(factor, tfact)
+            CALL SMOOTH()
             RETURN
           END IF
 !
@@ -403,8 +412,8 @@
       END DO  ! load stepping
 !
 !     print outp
-      CALL OUTPUT(factor)
-!      CALL SMOOTH()
+      CALL OUTPUT(factor, tfact)
+      CALL SMOOTH()
 !
 !     format statements
   10  FORMAT(/,3X,'STEP',3X,'ITER',1X,'NPLAST',3X,'NTEN',2X,'NFBAR',
@@ -575,7 +584,7 @@
 !       check for plastic yielding and tensile points
         CALL MOHRC(PHI(mtype), PSI(mtype), COH(mtype), EMOD(mtype),
      +                NU(mtype), sig, nplast, nten, FBAR(iel), rerr)
-        IF (rerr .NE. 0)  RETURN
+        IF (rerr .NE. 0) RETURN
 !
 !       compute increase in internal forces and increment global internal forces
         lstr(:) = (sig(1)*B(1,:) + sig(2)*B(2,:) + sig(3)*B(3,:))*larea

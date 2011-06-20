@@ -50,7 +50,10 @@
 !
 !     form and decompose global stiffness matrix
       CALL STFMAT(GSTIF, rerr)
-      IF (rerr .NE. 0)  RETURN
+      IF (rerr .NE. 0) THEN
+        CALL CLEANUP()
+        RETURN
+      END IF
 !
 !     solve gravity loading
       IF (GFACT .GT. 0.0D0) THEN
@@ -58,10 +61,13 @@
         WRITE(ele,10)
         WRITE(outp,10)
         WRITE(his,10)
-   10   FORMAT(///,"=============== GRAVITY LOADING ===============",//)
+   10   FORMAT(///,"=============== GRAVITY LOADING ===============",/)
         GLOAD(:) = GFACT*GLOAD(:)
-        CALL FEASLV(GLOAD, GLOAD0, rerr)
-        IF (rerr .NE. 0)  RETURN
+        CALL FEASLV(GLOAD, GLOAD0, gfact, rerr)
+        IF (rerr .NE. 0) THEN
+          CALL CLEANUP()
+          RETURN
+        END IF
       END IF
 !
 !     solve traction loading
@@ -70,10 +76,13 @@
         WRITE(ele,20)
         WRITE(outp,20)
         WRITE(his,20)
-   20   FORMAT(///,"============== TRACTION LOADING ===============",//)
+   20   FORMAT(///,"============== TRACTION LOADING ===============",/)
         TLOAD(:) = LFACT*TLOAD(:)
-        CALL FEASLV(TLOAD, GLOAD, rerr)
-        IF (rerr .NE. 0)  RETURN
+        CALL FEASLV(TLOAD, GLOAD, lfact, rerr)
+        IF (rerr .NE. 0) THEN
+          CALL CLEANUP()
+          RETURN
+        END IF
       END IF
 !
       CALL CLEANUP()
