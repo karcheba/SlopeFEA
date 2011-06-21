@@ -150,6 +150,8 @@
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating AREA."
       ALLOCATE( CENT(NDIM,NEL),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating CENT."
+      ALLOCATE( IPL(NEL), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating IPL."
       ALLOCATE( EVOLB(NEL),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating EVOLB."
       ALLOCATE( SXX(NEL),  STAT=ierr)
@@ -168,6 +170,7 @@
       ICO(:,:)      = 0
       AREA(:)       = 0.0D0
       CENT(:,:)     = 0.0D0
+      IPL(:)        = 0
       EVOLB(:)      = 0.0D0
       SXX(:)        = 0.0D0
       SYY(:)        = 0.0D0
@@ -406,7 +409,7 @@
       DEALLOCATE( COORDS, PLOADS, IX )            ! node data
       REWIND(nod);    CLOSE(nod)
 !
-      DEALLOCATE( LJ, ICO, AREA, CENT,
+      DEALLOCATE( LJ, ICO, AREA, CENT, IPL,
      +            SXX, SYY, SXY, SZZ )            ! body element data
       REWIND(ele);    CLOSE(ele)
 !
@@ -697,7 +700,7 @@
       DO iel = 1,NEL
         CALL LOCAL(iel, lcoords, mtype)
         CALL GLOLOC(SXX,SYY,SXY,SZZ, sig, iel, .TRUE.)
-        WRITE(outp,121) iel, CENT(:,iel), sig(:)
+        WRITE(outp,121) iel, CENT(:,iel), IPL(iel), sig(:)
       END DO
 !
 !     format statements
@@ -707,9 +710,9 @@
   111 FORMAT(I5, 4E15.6)
 !
   120 FORMAT( /, "MATERIAL POINT STRESSES", /, "**********************",
-     +        //, 2X, "IEL", 11X, "LOCATION", 23X,
+     +        //, 2X, "IEL", 11X, "LOCATION", 13X, "IPL", 12X,
      +        "S11", 12X, "S22", 12X, "S12", 12X, "S33", //)
-  121 FORMAT(I5, 6E15.6)
+  121 FORMAT(I5, 2E15.6, I5, 4E15.6)
 !
       RETURN
 !

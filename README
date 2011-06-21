@@ -350,3 +350,15 @@ REVISION HISTORY:
 === (gcontrol.for) Moved check for sensible value to after reading of NVELT in INPUT() [otherwise, GFACT always gets set to 1.0 since NVELT=0, always .LT. 1 before this point]
 +++ (gcontrol.for) Added allocation and initialization of DIA [this solves the memory access violation issue, since VOLSTR() was trying to use DIA before it was allocated]
 +++ (SlopeFEA3Node.for, feUtility.for) Added an error return code, rerr, to STFMAT(), FEASLV(), UPDATE(), MOHRC(), and SlopeFEA3Node() to avoid using STOP [since this also kills the calling program]
+
+
+[20 June 2011]
+
+{v1.0.0.10}
+=== (TestFiles/, engine/) Testing and making adjustments to how errors are handled and how output is formatted
+
+
+[21 June 2011]
+
+{v1.0.0.10}
+=== Reading van Langen thesis, PLAXIS code, PLAXIS manual for more background on handling interface elements, structural elements, multi-stage analysis, and initial conditions

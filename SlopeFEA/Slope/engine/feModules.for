@@ -106,6 +106,7 @@
       INTEGER(ik), ALLOCATABLE :: LJ(:),ICO(:,:)    ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)    ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)  ! element centroid
+      INTEGER(ik), ALLOCATABLE :: IPL(:)    ! plastic points
       REAL(dk), ALLOCATABLE :: EVOLB(:)   ! element volumetric strain
       REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:), FBAR(:) ! internal stresses
 !

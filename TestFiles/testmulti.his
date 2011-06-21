@@ -4,8 +4,8 @@
 ====================================================
 
 FILE: Q:\Research\2010-2011\SlopeFEA\TestFiles\testmulti
-DATE:  6/20/2011
-TIME: 14:41:21.161
+DATE:  6/21/2011
+TIME: 11:25:25.189
 
 
 
@@ -16,4 +16,1574 @@ TIME: 14:41:21.161
 
    STEP   ITER NPLAST   NTEN  NFBAR       ERROR      FACTOR      D
 
- Error: tauMax is negative !!!
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           11
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           64
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           82
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           91
+ Warning: tauMax is negative !!!
+ Element           11
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           14
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           22
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           24
+ Warning: tauMax is negative !!!
+ Element           25
+ Warning: tauMax is negative !!!
+ Element           26
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           33
+ Warning: tauMax is negative !!!
+ Element           34
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           40
+ Warning: tauMax is negative !!!
+ Element           41
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           48
+ Warning: tauMax is negative !!!
+ Element           49
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           56
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           64
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           91
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           25
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           11
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           82
+ Warning: tauMax is negative !!!
+ Element           84
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           11
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           14
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           22
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           24
+ Warning: tauMax is negative !!!
+ Element           25
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           33
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           40
+ Warning: tauMax is negative !!!
+ Element           41
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           48
+ Warning: tauMax is negative !!!
+ Element           49
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           56
+ Warning: tauMax is negative !!!
+ Element           57
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           64
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           91
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           14
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           24
+ Warning: tauMax is negative !!!
+ Element           25
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           40
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          150
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          154
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          156
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          161
+ Warning: tauMax is negative !!!
+ Element          162
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          167
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          161
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          167
+ Warning: tauMax is negative !!!
+ Element          168
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          174
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element            9
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          175
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          175
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          150
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          154
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          156
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          161
+ Warning: tauMax is negative !!!
+ Element          162
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          167
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element            9
+ Warning: tauMax is negative !!!
+ Element          146
+ Warning: tauMax is negative !!!
+ Element          147
+ Warning: tauMax is negative !!!
+ Element          148
+ Warning: tauMax is negative !!!
+ Element          149
+ Warning: tauMax is negative !!!
+ Element          152
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          155
+ Warning: tauMax is negative !!!
+ Element          158
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          160
+ Warning: tauMax is negative !!!
+ Element          161
+ Warning: tauMax is negative !!!
+ Element          164
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          166
+ Warning: tauMax is negative !!!
+ Element          167
+ Warning: tauMax is negative !!!
+ Element          168
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          174
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element            9
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          153
+ Warning: tauMax is negative !!!
+ Element          159
+ Warning: tauMax is negative !!!
+ Element          165
+ Warning: tauMax is negative !!!
+ Element          170
+ Warning: tauMax is negative !!!
+ Element          171
+ Warning: tauMax is negative !!!
+ Element          172
+ Warning: tauMax is negative !!!
+ Element          173
+ Warning: tauMax is negative !!!
+ Element          175
+ Warning: tauMax is negative !!!
+ Element          176
+ Warning: tauMax is negative !!!
+ Element          177
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          180
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          175
+ Warning: tauMax is negative !!!
+ Element          178
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element          181
+ Warning: tauMax is negative !!!
+ Element          182
+ Warning: tauMax is negative !!!
+ Element          183
+ Warning: tauMax is negative !!!
+ Element          184
+ Warning: tauMax is negative !!!
+ Element          185
+ Warning: tauMax is negative !!!
+ Element            7
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element           10
+ Warning: tauMax is negative !!!
+ Element          179
+ Warning: tauMax is negative !!!
+ Element            8
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           11
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           40
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           48
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           56
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           64
+ Warning: tauMax is negative !!!
+ Element           65
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           70
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           72
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           77
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ Warning: tauMax is negative !!!
+ Element           12
+ Warning: tauMax is negative !!!
+ Element           13
+ Warning: tauMax is negative !!!
+ Element           14
+ Warning: tauMax is negative !!!
+ Element           15
+ Warning: tauMax is negative !!!
+ Element           16
+ Warning: tauMax is negative !!!
+ Element           17
+ Warning: tauMax is negative !!!
+ Element           18
+ Warning: tauMax is negative !!!
+ Element           19
+ Warning: tauMax is negative !!!
+ Element           20
+ Warning: tauMax is negative !!!
+ Element           21
+ Warning: tauMax is negative !!!
+ Element           22
+ Warning: tauMax is negative !!!
+ Element           23
+ Warning: tauMax is negative !!!
+ Element           24
+ Warning: tauMax is negative !!!
+ Element           25
+ Warning: tauMax is negative !!!
+ Element           26
+ Warning: tauMax is negative !!!
+ Element           27
+ Warning: tauMax is negative !!!
+ Element           28
+ Warning: tauMax is negative !!!
+ Element           29
+ Warning: tauMax is negative !!!
+ Element           30
+ Warning: tauMax is negative !!!
+ Element           31
+ Warning: tauMax is negative !!!
+ Element           32
+ Warning: tauMax is negative !!!
+ Element           33
+ Warning: tauMax is negative !!!
+ Element           35
+ Warning: tauMax is negative !!!
+ Element           36
+ Warning: tauMax is negative !!!
+ Element           37
+ Warning: tauMax is negative !!!
+ Element           38
+ Warning: tauMax is negative !!!
+ Element           39
+ Warning: tauMax is negative !!!
+ Element           40
+ Warning: tauMax is negative !!!
+ Element           44
+ Warning: tauMax is negative !!!
+ Element           45
+ Warning: tauMax is negative !!!
+ Element           46
+ Warning: tauMax is negative !!!
+ Element           47
+ Warning: tauMax is negative !!!
+ Element           48
+ Warning: tauMax is negative !!!
+ Element           52
+ Warning: tauMax is negative !!!
+ Element           53
+ Warning: tauMax is negative !!!
+ Element           54
+ Warning: tauMax is negative !!!
+ Element           55
+ Warning: tauMax is negative !!!
+ Element           60
+ Warning: tauMax is negative !!!
+ Element           61
+ Warning: tauMax is negative !!!
+ Element           62
+ Warning: tauMax is negative !!!
+ Element           63
+ Warning: tauMax is negative !!!
+ Element           68
+ Warning: tauMax is negative !!!
+ Element           69
+ Warning: tauMax is negative !!!
+ Element           71
+ Warning: tauMax is negative !!!
+ Element           73
+ Warning: tauMax is negative !!!
+ Element           74
+ Warning: tauMax is negative !!!
+ Element           75
+ Warning: tauMax is negative !!!
+ Element           76
+ Warning: tauMax is negative !!!
+ Element           78
+ Warning: tauMax is negative !!!
+ Element           79
+ Warning: tauMax is negative !!!
+ Element           80
+ Warning: tauMax is negative !!!
+ Element           85
+ *** FAILED TO CONVERGE ***

@@ -376,7 +376,7 @@
 !
 !         update displacements, stresses, error, and number of plastic/tensile points
           CALL UPDATE(DISP,TDISP,STR,error,nplast,nten,rerr)
-          IF (rerr .NE. 0) RETURN
+!          IF (rerr .NE. 0) RETURN
 !
 !         print an outp line
           IF (CEILING(DBLE(istep)/NPRINT)*NPRINT.EQ.istep
@@ -583,8 +583,9 @@
 !
 !       check for plastic yielding and tensile points
         CALL MOHRC(PHI(mtype), PSI(mtype), COH(mtype), EMOD(mtype),
-     +                NU(mtype), sig, nplast, nten, FBAR(iel), rerr)
-        IF (rerr .NE. 0) RETURN
+     +                NU(mtype), sig, nplast, nten, FBAR(iel), IPL(iel),
+     +                rerr)
+        IF (rerr .NE. 0) WRITE(his,*) "Element ", iel
 !
 !       compute increase in internal forces and increment global internal forces
         lstr(:) = (sig(1)*B(1,:) + sig(2)*B(2,:) + sig(3)*B(3,:))*larea
@@ -604,7 +605,7 @@
 !     evaluate plastic state according to Mohr-Coulomb failure criterion
 ! ......................................................................
       SUBROUTINE MOHRC (sphi, spsi, cohs, emod, nu, sig,
-     +                      nplast, nten, fbarel,
+     +                      nplast, nten, fbarel, iplel,
      +                      rerr)
 !
       IMPLICIT NONE
@@ -613,16 +614,17 @@
       REAL(dk), INTENT(INOUT) :: sig(:)                     !  stress state
       INTEGER(ik), INTENT(OUT) :: nplast, nten    ! count of plastic/tensile points
       INTEGER(ik), INTENT(OUT) :: rerr            ! error return code, == 0 successful return, /= 0 failed
-      REAL(dk), INTENT(OUT) :: fbarel
-      REAL(dk) :: gmod, sxe, sstar, tstar
-      REAL(dk) :: sinalf, cosalf
-      REAL(dk) :: sig1,sig2,sig3, sig1T,sig2T,sig3T, sFail
-      INTEGER(ik) :: isigZZ, iArea
-      REAL(dk) :: f21,f32,f31
-      REAL(dk) :: nu1, nu2, nuQ, psiRat, psiMin, psiMet, psiNu
-      REAL(dk) :: hA, hB, hC
-      REAL(dk) :: dsp1,dsp2,dsp3, a11,a12, deter, rlam31,rlam32,rlam21
-      REAL(dk) :: dsstar,dtstar, dspXX,dspYY,dspXY,dspZZ, tauMax
+      REAL(dk), INTENT(OUT) :: fbarel           ! mean Mohr-Coulomb criterion
+      INTEGER(ik), INTENT(OUT) :: iplel         ! == 0 if point is elastic, == 1 if point is plastic
+      REAL(dk) :: gmod, sxe, sstar, tstar       ! shear modulus, stress invariants
+      REAL(dk) :: sinalf, cosalf                ! for Mohr-Coulomb model
+      REAL(dk) :: sig1,sig2,sig3, sig1T,sig2T,sig3T, sFail  ! principal stresses
+      INTEGER(ik) :: isigZZ, iArea              ! switches for stress sorting and plastic failure type
+      REAL(dk) :: f21,f32,f31             ! Mohr-Coulomb criteria
+      REAL(dk) :: nu1, nu2, nuQ, psiRat, psiMin, psiMet, psiNu  ! for plastic point calculation
+      REAL(dk) :: hA, hB, hC              ! for plastic point calculation
+      REAL(dk) :: dsp1,dsp2,dsp3, a11,a12, deter, rlam31,rlam32,rlam21  ! for bringing principal stresses back to yield surface
+      REAL(dk) :: dsstar,dtstar, dspXX,dspYY,dspXY,dspZZ, tauMax  ! for bringing global stresses back to yield surface
 !
 !     initialize return code
       rerr = 0
@@ -636,7 +638,7 @@
       tstar = SQRT(sxe**2 + sig(3)**2)
       sinalf = 0.0D0
       cosalf = 1.0D0
-      IF (tstar > 0.0D0) THEN
+      IF (tstar .GT. 0.0D0) THEN
         sinalf = sig(3) / tstar
         cosalf = sxe / tstar
       END IF
@@ -668,9 +670,12 @@
       fbarel = -0.5D0*(sig3-sig1) / (0.5D0*(sig3+sig1) - cohs)
 !
 !     if point is plastic, bring it back to yield surface
-      IF (f32 .GT. 0.0D0) THEN
+      IF (      f31.GT.0.0D0
+     +    .OR.  f32.GT.0.0D0
+     +    .OR.  f21.GT.0.0D0) THEN
 !
         nplast = nplast + 1     ! increment count of plastic points
+        iplel = 1     ! indicate point is plastic
 !
 !       compute poisson's ratio terms
         nu1 = 1.0D0 - 2.0D0*nu
@@ -714,9 +719,9 @@
             rlam31 = (f31*a11 - f32*a12) / deter
             rlam32 = (f32*a11 - f31*a12) / deter
             rlam21 = 0.0D0
-            dsp1 = rlam31*psiMin + rlam32*psiNu
-            dsp2 = rlam31*psiNu + rlam32*psiMin
-            dsp3 = rlam31*psiMet + rlam32*psiMet
+            dsp1 = rlam31*psiMin  + rlam32*psiNu
+            dsp2 = rlam31*psiNu   + rlam32*psiMin
+            dsp3 = rlam31*psiMet  + rlam32*psiMet
 !
           CASE (2)            ! shear
 !
@@ -736,9 +741,9 @@
             rlam31 = (f31*a11 - f21*a12) / deter
             rlam32 = 0.0D0
             rlam21 = (f21*a11 - f31*a12) / deter
-            dsp1 = rlam31*psiMin + rlam21*psiMin
-            dsp2 = rlam31*psiNu + rlam21*psiMet
-            dsp3 = rlam31*psiMet + rlam21*psiNu
+            dsp1 = rlam31*psiMin  + rlam21*psiMin
+            dsp2 = rlam31*psiNu   + rlam21*psiMet
+            dsp3 = rlam31*psiMet  + rlam21*psiNu
 !
         END SELECT
 !
@@ -756,37 +761,40 @@
           END IF
         END IF
 !
-!     compute Cartesian stress components
-      SELECT CASE (isigZZ)
-        CASE (1)
-          dtstar = 0.5D0 * (dsp3-dsp2)
-          dsstar = 0.5D0 * (dsp3+dsp2)
-          dspZZ = dsp1
-        CASE (2)
-          dtstar = 0.5D0 * (dsp3-dsp1)
-          dsstar = 0.5D0 * (dsp3+dsp1)
-          dspZZ = dsp2
-        CASE (3)
-          dtstar = 0.5D0 * (dsp2-dsp1)
-          dsstar = 0.5D0 * (dsp2+dsp1)
-          dspZZ = dsp3
-      END SELECT
+!       compute Cartesian stress components
+        SELECT CASE (isigZZ)
+          CASE (1)
+            dtstar = 0.5D0 * (dsp3-dsp2)
+            dsstar = 0.5D0 * (dsp3+dsp2)
+            dspZZ = dsp1
+          CASE (2)
+            dtstar = 0.5D0 * (dsp3-dsp1)
+            dsstar = 0.5D0 * (dsp3+dsp1)
+            dspZZ = dsp2
+          CASE (3)
+            dtstar = 0.5D0 * (dsp2-dsp1)
+            dsstar = 0.5D0 * (dsp2+dsp1)
+            dspZZ = dsp3
+        END SELECT
 !
-      dspXX = (dsstar + dtstar*cosalf)
-      dspYY = (dsstar - dtstar*cosalf)
-      dspXY = dtstar*sinalf
-      sig(1) = sig(1) - dspXX
-      sig(2) = sig(2) - dspYY
-      sig(3) = sig(3) - dspXY
-      sig(4) = sig(4) - dspZZ
+        dspXX = (dsstar + dtstar*cosalf)
+        dspYY = (dsstar - dtstar*cosalf)
+        dspXY = dtstar*sinalf
+        sig(1) = sig(1) - dspXX
+        sig(2) = sig(2) - dspYY
+        sig(3) = sig(3) - dspXY
+        sig(4) = sig(4) - dspZZ
 !
-!     compute tauMax to check accuracy
-      tauMax = 0.5D0 * (sig3 - dsp3 - sig1 + dsp1)
-      IF (tauMax .LT. -1.0D-6) THEN
-        WRITE(his,*) "Error: tauMax is negative !!!"
-        rerr = -1
-        RETURN
-      END IF
+!       compute tauMax to check accuracy
+        tauMax = 0.5D0 * (sig3 - dsp3 - sig1 + dsp1)
+        IF (tauMax .LE. -1.0D-6) THEN
+          WRITE(his,*) "Warning: tauMax is negative !!!"
+          rerr = -1
+        END IF
+!
+      ELSE  ! elastic point
+!
+        iplel = 0   ! indicate point is elastic
 !
       END IF  ! plastic point
 !
