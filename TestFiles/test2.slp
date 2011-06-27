@@ -110,7 +110,7 @@ Gravity Factor = 1
 ANALYSIS STATUS
 --------------------------------
 
-Analysis Type = FEA3NodedTri
+Analysis Type = FEA4NodedQuad
 Verified = True
 Meshed = True
 Analyzed = False

@@ -936,7 +936,7 @@ namespace SlopeFEA
                     /*NNOD=*/ nodes.Count ,
                     /*NDIM=*/ 2 ,
                     /*NVAR=*/ 2 ,
-                    /*IREAD=*/ printNode ,
+                    /*IPRINT=*/ printNode ,
                     /*NSTEP=*/ canvas.FEAParameters.NStep ,
                     /*NITER=*/ canvas.FEAParameters.NIter ,
                     /*NPRINT=*/ canvas.FEAParameters.NPrint ,

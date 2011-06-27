@@ -126,7 +126,7 @@ FEA PARAMETERS
 Column Width = 10
 Row Height = 10
 Number of Load Steps = 5
-Number of Iterations = 200
+Number of Iterations = 600
 Number of Print Lines = 2
 Load Factor = 1.25
 Gravity Factor = 0.9
@@ -136,7 +136,7 @@ Gravity Factor = 0.9
 ANALYSIS STATUS
 --------------------------------
 
-Analysis Type = FEA3NodedTri
+Analysis Type = FEA4NodedQuad
 Verified = True
 Meshed = True
 Analyzed = False

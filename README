@@ -1,28 +1,28 @@
-PROJECT:		SlopeFEA (c) 2011 Brandon Karchewski
-				Licensed under the Academic Free License version 3.0
-					http://www.opensource.org/licenses/afl-3.0.php
+PROJECT:        SlopeFEA (c) 2011 Brandon Karchewski
+                Licensed under the Academic Free License version 3.0
+                    http://www.opensource.org/licenses/afl-3.0.php
 
-CONTACT:		Brandon Karchewski
-				Department of Civil Engineering
-				McMaster University, JHE-301
-				1280 Main St W
-				Hamilton, Ontario, Canada
-				L8S 4L7
-				p: 905-525-9140 x24287
-				f: 905-529-9688
-				e: karcheba@mcmaster.ca
+CONTACT:        Brandon Karchewski
+                Department of Civil Engineering
+                McMaster University, JHE-301
+                1280 Main St W
+                Hamilton, Ontario, Canada
+                L8S 4L7
+                p: 905-525-9140 x24287
+                f: 905-529-9688
+                e: karcheba@mcmaster.ca
 
 
 SOURCE INFORMATION:
 
 The repository for this software project is hosted on git at:
 
-		git://github.com/karcheba/SlopeFEA
+        git://github.com/karcheba/SlopeFEA
 
 As such, the code for the project is free and open source.
 The relevant license is AFLv3 (see link above).
 
-			
+            
 DESCRIPTION:
 
 This project includes a set of specialized tools for numerical analysis
@@ -75,16 +75,21 @@ of funding and resources.
 
 REFERENCES:
 
-[1]		Fredlund, D. and Krahn, J. 1977. "Comparison of slope stability methods of analysis," Canadian Geotechnical Journal, 25: 735-748.
-[2]		Stolle, D. and Guo, P. 2008. "Limit equilibrium slope stability analysis using rigid finite elements," Canadian Geotechnical Journal, 45: 653-662.
-[3]		Haupt, R. and Haupt, S. 1998.  Practical Genetic Algorithms, John Wiley and Sons, Inc., Toronto.
-[4]		McCombie, P. and Wilkinson, P. 2002. "The use of the simple genetic algorithm in finding the critical factor of safety in slope stability analysis," Computers and Geotechnics, 29: 699-714.
-[5]		Sengupta, A. and Upadhyay, A. 2005.  "An evolutionary algorithm for locating the critical failure surface in a soil slope," The Electronic Journal of Geotechnical Engineering, 10 (F).
-[6]		Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
-[7]		Marshall, A., Morgan, J., and Schonfelder, J. 1997. "Fortran 90 Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/F90Course3DayHomePage.html
-[8]		Hermanns, M. 2002. "Parallel Programming in Fortran 95 using OpenMP," Universidad Politecnica de Madrid, Spain. Available: http://www.openmp.org/presentations/miguel/F95_OpenMPv1_v2.pdf
-[9]		Basic Linear Algebra Subprograms (BLAS). Available: http://www.netlib.org/blas/ (see Publications/References page on project site for list of contributors)
-[10]	Linear Algebra Package (LAPACK). Available: http://www.netlib.org/lapack/ (see Contributors page on project site for long list of contributors)
+[1]     Fredlund, D. and Krahn, J. 1977. "Comparison of slope stability methods of analysis," Canadian Geotechnical Journal, 25: 735-748.
+[2]     Stolle, D. and Guo, P. 2008. "Limit equilibrium slope stability analysis using rigid finite elements," Canadian Geotechnical Journal, 45: 653-662.
+[3]     Haupt, R. and Haupt, S. 1998.  Practical Genetic Algorithms, John Wiley and Sons, Inc., Toronto.
+[4]     McCombie, P. and Wilkinson, P. 2002. "The use of the simple genetic algorithm in finding the critical factor of safety in slope stability analysis," Computers and Geotechnics, 29: 699-714.
+[5]     Sengupta, A. and Upadhyay, A. 2005.  "An evolutionary algorithm for locating the critical failure surface in a soil slope," The Electronic Journal of Geotechnical Engineering, 10 (F).
+[6]     Karchewski, B., Stolle, D., and Guo, P. 2011. "Determination of minimum factor of safety using a genetic algorithm and limit equilibrium analysis," 2011 Pan-Am CGS Geotechnical Conference.
+[7]     Marshall, A., Morgan, J., and Schonfelder, J. 1997. "Fortran 90 Course Notes," The University of Liverpool. Available: http://www.liv.ac.uk/HPC/F90Course3DayHomePage.html
+[8]     Hermanns, M. 2002. "Parallel Programming in Fortran 95 using OpenMP," Universidad Politecnica de Madrid, Spain. Available: http://www.openmp.org/presentations/miguel/F95_OpenMPv1_v2.pdf
+[9]     Basic Linear Algebra Subprograms (BLAS). Available: http://www.netlib.org/blas/ (see Publications/References page on project site for list of contributors)
+[10]    Linear Algebra Package (LAPACK). Available: http://www.netlib.org/lapack/ (see Contributors page on project site for long list of contributors)
+[11]    van Langen, H. 1991. "Numerical Analysis of Soil-Structure Interaction," Ph.D. Thesis. Delft.
+[12]    PLAXIS b.v. 2003. PLAXIS Version 8 Reference Manual, Delft.
+[13]    Dill, E.H. 2007. Continuum Mechanics, CRC Press, New York.
+[14]    Talpaert, Y.R. 2002. Tensor Analysis and Continuum Mechanics, Kluwer Academic Publishers, Boston.
+[15]    Stolle, D. 2007. Introduction to the Finite Element Method, McMaster University, Hamilton.
 
 
 REVISION HISTORY:
@@ -256,7 +261,7 @@ REVISION HISTORY:
 {v1.0.0.10}
 === (FemMC3.for) [not included in project] Dissected code for the purpose of understanding the procedure and developing analysis code
 +++ (FortranWrappers.cs, DLLtest.dll, DLLtest.for, DLLtest.o) Created to determine how to to call a Fortran procedure from C#, passing in the appropriate file name; it works!
-		[Note: This took longer than expected due to a number of tricky aspects related to name mangling by the Fortran compiler, the differences in how C# and Fortran store strings, and the lack of case sensitivity in Fortran]
+        [Note: This took longer than expected due to a number of tricky aspects related to name mangling by the Fortran compiler, the differences in how C# and Fortran store strings, and the lack of case sensitivity in Fortran]
 +++ (SlopeFEA.for) Created and added some lines for opening input files
 +++ (feModules.for) Created, added GCONTROL module
 +++ (gcontrol.for) Module file for GCONTROL [will contain procedures for input, mapping, etc.]
@@ -285,7 +290,7 @@ REVISION HISTORY:
 
 {v1.0.0.10}
 +++ (gcontrol.for) Added to INPUT() subroutine
-+++	(gcontrol.for) Completed INPUT() subroutine
++++    (gcontrol.for) Completed INPUT() subroutine
 +++ (gcontrol.for) Added CLEANUP() subroutine to deallocate and rewind in preparation for subsequent runs
 +++ (Test Files/*.out) Tested INPUT(), BANDWH(), CLEANUP()
 +++ (gcontrol.for) Added allocation of TLOAD, GLOAD, STR, GLOAD0, DISP, TDISP, GSTIF, ESTIF to INPUT() and deallocation to CLEANUP()
@@ -361,4 +366,20 @@ REVISION HISTORY:
 [21 June 2011]
 
 {v1.0.0.10}
-=== Reading van Langen thesis, PLAXIS code, PLAXIS manual for more background on handling interface elements, structural elements, multi-stage analysis, and initial conditions
+=== Reading [11], PLAXIS code, and [12] for more background on handling interface elements, structural elements, multi-stage analysis, and initial conditions
+
+
+[22-27 June 2011]
+
+{v1.0.0.10}
+=== Reading/reviewing relevant sections of [13], [14], [15] for background on elasticity theory, vector/tensor algebra, interpolation, and generalized coordinates
+
+
+[27 June 2011]
+
+{v1.0.0.10}
++++ (SlopeFEA3Node.for) Copied NUMERIC, MPROPERTY, NODES, ELEMENTS, TRACTIONS, GCONTROL, and FEUTILITY modules into SlopeFEA3Node.for so that the program is self-contained and it can be easily Saved As.. and modified to create closely related programs
+--- (feModules.for, gcontrol.for, feUtility.for) Deleted
++++ (SlopeFEA4Node.for) Copied code from SlopeFEA3Node.for for modification
+=== (SlopeFEA4Node.for) Modified BMATRX() and calls to it
++++ (SlopeFEA4Node.for) Added JACOBQ() for computing Jacobian matrix of transformation

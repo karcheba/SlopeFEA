@@ -372,7 +372,7 @@
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in deallocating lcoords."
 !
       CALL BANDWH()     ! compute number of codiagonal bands
-      WRITE(outp,130) 
+      WRITE(outp,130)   ! stiffness matrix data header
       WRITE(outp,131) NNET, LBAND ! write stiffness matrix stats to outp
       ALLOCATE( TLOAD(NNET),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(outp,*) "Error in allocating TLOAD."
@@ -464,22 +464,21 @@
 !     node data
   110 FORMAT(//,
      +  '===================== NODE INFORMATION =====================')
-  111 FORMAT(/, 3X, 'NODE', 8X, 'COORDS (X,Y,..)', 8X, 'FIX (U,V,..)',
-     +        8X, 'PLOADS (U,V,..)', /)
-  112 FORMAT(1X, I5, 5X, F10.3, 2X, F10.3, 5X, 2I5,
-     +        5X, F10.3, 2X, F10.3)
+  111 FORMAT(/, 1X, 'NODE', 8X, 'COORDS (X,Y,..)', 8X, 'FIX (U,V,..)',
+     +        9X, 'PLOADS (U,V,..)', /)
+  112 FORMAT(I5, 2E15.6, 2I7, 2E15.6)
 !
 !     element data
   120 FORMAT(//,
      +  '================= BODY ELEMENT INFORMATION =================')
-  121 FORMAT(/, 3X, 'ELEMENT', 9X, 'NODES', 9X, 'MTL', 8X, 'AREA',
-     +        8X, 'CENTROID (X,Y,..)', /)
-  122 FORMAT(1X, I5, 5X, 3I5, 5X, I3, 5X, E12.4, 5X, 2F10.3)
+  121 FORMAT(/, 1X, 'ELEMENT', 8X, 'NODES', 9X, 'MTL', 11X, 'AREA',
+     +        7X, 'CENTROID (X,Y,..)', /)
+  122 FORMAT(I8, 4I5, I5, E15.6, 2E15.6)
 !
 !     stiffness matrix statistics (packed band storage)
   130 FORMAT(//,
      +  '=============== STIFFNESS MATRIX INFORMATION ===============')
-  131 FORMAT(/, 1X, '# of degrees of freedom ... NNET = ', I7,
+  131 FORMAT( /, 1X, '# of degrees of freedom ... NNET = ', I7,
      +        /, 1X, '# of codiagonal bands .... LBAND = ', I7)
 !
   140 FORMAT(//,
@@ -495,8 +494,8 @@
 !
   150 FORMAT(//,
      +  '=============== TRACTION ELEMENT INFORMATION ===============')
-  151 FORMAT(/, 3X, 'ELEMENT', 6X, 'NODES', 15X, 'TNF', 20X, 'TSF', /)
-  152 FORMAT(1X, I5, 5X, 2I5, 5X, 2E12.4, 5X, 2E12.4)
+  151 FORMAT(/, 1X, 'ELEMENT', 5X, 'NODES', 18X, 'TNF', 27X, 'TSF', /)
+  152 FORMAT(I8, 2I7, 2E15.6, 2E15.6)
 !
       RETURN
 !
@@ -790,7 +789,7 @@
 !     write final load factor for this loading sequence
       WRITE(outp,100) factor*tfact
 !
-!     write node displacements to outp
+!     write node displacements to output
       WRITE(outp,110)
       DO inod = 1,NNOD
         i2 = NVAR*inod;  i1 = i2-NVAR+1; ii = 1
@@ -802,7 +801,7 @@
         WRITE(outp,111) inod, COORDS(:,inod), ldisp(:)
       END DO
 !
-!     write element stresses to outp
+!     write element stresses to output
       WRITE(outp,120)
       DO iel = 1,NEL
         CALL LOCAL(iel, lcoords, mtype)
@@ -811,7 +810,7 @@
       END DO
 !
 !     format statements
-  100 FORMAT( //, "OUTPUT FOR LOAD FACTOR = ", E13.5)
+  100 FORMAT( //, "OUTPUT FOR LOAD FACTOR = ", E15.6)
   110 FORMAT( /, "NODE DISPLACEMENTS", /, "**********************",
      +        //, 1X, "INOD", 12X , "COORDS", 24X, "DISP", /)
   111 FORMAT(I5, 4E15.6)
@@ -1166,19 +1165,21 @@
 ! ......................................................................
 !     compute stiffness matrix for each element
 ! ......................................................................
-      SUBROUTINE STIFF (ESTIF, lcoords, mtype, area)
+      SUBROUTINE STIFF (ESTIF, lcoords, mtype, larea)
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(IN) :: lcoords(:,:), area    ! element coords and area
+      REAL(dk), INTENT(IN) :: lcoords(:,:), larea    ! element coords and area
       INTEGER(ik), INTENT(IN) :: mtype              ! element material type
       REAL(dk), INTENT(OUT) :: ESTIF(:,:)           ! element stiff mat
       REAL(dk) :: D(3,3), B(3,NVEL)         ! constitutive and kinematic matrices
+      REAL(dk), PARAMETER :: r = 0.5D0
+      REAL(dk), PARAMETER :: s = 0.5D0      ! integration points (quadrature)
 !
       ESTIF(:,:) = 0.0D0    ! initialize element stiff mat
       CALL DMATRX(D, EMOD(mtype), NU(mtype))   ! get constitutive matrix
-      CALL BMATRX(B, lcoords, area)            ! get kinematic matrix
-      ESTIF = area*MATMUL(TRANSPOSE(B),MATMUL(D,B)) ! compute element stiffness
+      CALL BMATRX(B, r,s, lcoords)            ! get kinematic matrix
+      ESTIF = larea*MATMUL(TRANSPOSE(B),MATMUL(D,B)) ! compute element stiffness
 !
       RETURN
 !
@@ -1196,7 +1197,7 @@
 !
       REAL(dk), INTENT(IN) :: emod, nu    ! elastic modulus and poisson's ratio
       REAL(dk), INTENT(OUT) :: D(:,:)     ! constitutive matrix
-      REAL(dk) :: emod1, nu1              ! for calculation
+      REAL(dk) :: emod1, nu1              ! plane strain properties
 !
       D(:,:) = 0.0D0    ! intialize constitutive matrix
 !
@@ -1217,31 +1218,71 @@
 ! ......................................................................
 !     compute kinematic matrix for each element
 ! ......................................................................
-      SUBROUTINE BMATRX (B, lcoords, area)
+      SUBROUTINE BMATRX (B, r,s, lcoords)
 !
       IMPLICIT NONE
 !
-      REAL(dk), INTENT(IN) :: lcoords(:,:), area  ! element coords and area
-      REAL(dk), INTENT(OUT) :: B(:,:)             ! kinematic matrix
-      REAL(dk) :: invArea     ! for calc efficiency
+      REAL(dk), INTENT(IN) :: r,s, lcoords(:,:)   ! integration points and local coords
+      REAL(dk), INTENT(OUT) :: B(3,NVEL)          ! kinematic matrix
+      REAL(dk) :: detJ, Jinv(2,2), dNdrds(2,4), Bcomp(2,4)  ! for computing kinematic matrix
 !
-      B(:,:) = 0.0D0    ! intialize kinematic matrix
-      invArea = 2.0D0 / area  ! compute 2/area
+!     get Jacobian of transformation
+      CALL JACOBQ( r,s, lcoords, detJ, Jinv, dNdrds)
 !
-      B(1,1) = (lcoords(2,2)-lcoords(2,3)) * invArea
-      B(1,3) = (lcoords(2,3)-lcoords(2,1)) * invArea
-      B(1,5) = (lcoords(2,1)-lcoords(2,2)) * invArea
+!     compute B matrix components
+      Bcomp = MATMUL(Jinv, dNdrds)
 !
-      B(2,2) = (lcoords(1,3)-lcoords(1,2)) * invArea
-      B(2,4) = (lcoords(1,1)-lcoords(1,3)) * invArea
-      B(2,6) = (lcoords(1,2)-lcoords(1,1)) * invArea
-!
-      B(3,2:6:2) = B(1,1:5:2)
-      B(3,1:5:2) = B(2,2:6:2)
+!     assemble B matrix
+      B(:,:) = 0.0D0
+      B(1,1:NVEL:NVAR) = Bcomp(1,:)
+      B(2,2:NVEL:NVAR) = Bcomp(2,:)
+      B(3,1:NVEL:NVAR) = B(2,2:NVEL:NVAR)
+      B(3,2:NVEL:NVAR) = B(1,1:NVEL:NVAR)
 !
       RETURN
 !
       END SUBROUTINE BMATRX
+!
+!
+! ......................................................................
+! .... JACOBQ ..........................................................
+! ......................................................................
+!     compute Jacobian of transformation for quadrilateral element
+! ......................................................................
+      SUBROUTINE JACOBQ ( r,s, lcoords, detJ, Jinv, dNdrds)
+!
+      IMPLICIT NONE
+!
+      REAL(dk), INTENT(IN) :: r,s, lcoords(:,:)     ! integration points and local coords
+      REAL(dk), INTENT(OUT) :: detJ, Jinv(2,2), dNdrds(2,4) ! for computing Jacobian
+      REAL(dk) :: dxdr,dxds, dydr,dyds      ! for computing Jacobian
+!
+!     compute derivatives of shape functions
+      dNdrds(:,:) = 0.0D0
+      dNdrds(1,1) = -(1-s);   dNdrds(2,1) = -(1-r)
+      dNdrds(1,2) =  (1-s);   dNdrds(2,2) = -r
+      dNdrds(1,3) =  s;       dNdrds(2,3) =  r
+      dNdrds(1,4) = -s;       dNdrds(2,4) =  (1-r)
+!
+!     compute components of Jacobian
+      dxdr = DOT_PRODUCT(dNdrds(1,:), lcoords(1,:))
+      dxds = DOT_PRODUCT(dNdrds(2,:), lcoords(1,:))
+      dydr = DOT_PRODUCT(dNdrds(1,:), lcoords(2,:))
+      dyds = DOT_PRODUCT(dNdrds(2,:), lcoords(2,:))
+!
+!     compute determinant of Jacobian
+      detJ = dxdr*dyds - dydr*dxds
+!
+!     compute components of inverse Jacobian
+      Jinv(:,:) = 0.0D0
+      Jinv(1,1) =  dyds / detJ
+      Jinv(2,1) = -dxds / detJ
+      Jinv(1,2) = -dydr / detJ
+      Jinv(2,2) =  dxdr / detJ
+!
+      RETURN
+!
+      END SUBROUTINE JACOBQ
 !
 !
 ! ......................................................................
@@ -1306,7 +1347,7 @@
           CALL UPDATE(DISP,TDISP,STR,error,nplast,nten,rerr)
 !          IF (rerr .NE. 0) RETURN
 !
-!         print an outp line
+!         print an output line
           IF (CEILING(DBLE(istep)/NPRINT)*NPRINT.EQ.istep
      +              .OR. istep.EQ.NSTEP) THEN
 !
@@ -1339,7 +1380,7 @@
 !
       END DO  ! load stepping
 !
-!     print outp
+!     print output
       CALL OUTPUT(factor, tfact)
       CALL SMOOTH()
 !
@@ -1384,6 +1425,8 @@
       REAL(dk), INTENT(IN) :: disp(:)
       REAL(dk) :: lcoords(NDIM,NNODEL), ldisp(nvel), larea   ! local coords and displacements
       REAL(dk) :: B(3,NVEL), ev, sumEV     ! for computing element vol strain
+      REAL(dk), PARAMETER :: r = 0.5D0
+      REAL(dk), PARAMETER :: s = 0.5D0      ! integration points (centroid for constant strain element)
       INTEGER(ik) :: iel, mtype     ! loop var and material type
 !
 !     initialize nodal volumetric strain
@@ -1404,15 +1447,15 @@
         END WHERE
 !
 !       get B matrix (kinematic relationship, disp -> strain)
-        CALL BMATRX(B, lcoords, larea)
+        CALL BMATRX(B, r,s, lcoords)
 !
 !       get element connectivity (efficiency, avoid multiple access to ICO)
         LJ(1:NNODEL) = ICO(1:NNODEL,iel)
 !
 !       increment vol strain and influence area
         ev = DOT_PRODUCT(B(1,:),ldisp(:)) + DOT_PRODUCT(B(2,:),ldisp(:))
-        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL)) + ev*area*ONE_THIRD
-        DIA(LJ(1:NNODEL)) = DIA(LJ(1:NNODEL)) + area*ONE_THIRD
+        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL)) + ev*area*0.25D0
+        DIA(LJ(1:NNODEL)) = DIA(LJ(1:NNODEL)) + area*0.25D0
 !
       END DO
 !
@@ -1425,7 +1468,7 @@
       EVOL(:) = EVOLi(:)
       DO iel = 1,NEL
         LJ(1:NNODEL) = ICO(1:NNODEL,iel)
-        larea = AREA(iel) / 12.0D0
+        larea = AREA(iel) / 12.0D0          ! ?????????????????????????????
         sumEV = SUM(EVOL0(LJ(1:NNODEL)))
         EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL))
      +                + larea*(sumEV + EVOL0(LJ(1:NNODEL)))
@@ -1462,6 +1505,8 @@
       REAL(dk) :: ldisp(NVEL), lstr(NVEL)     ! local displacement and stress increments
       REAL(dk) :: B(3,NVEL), D(3,3), ST(4)    ! kinematic and constitutive matrices
       REAL(dk) :: sig(4), dsig(3), eps(3), evc  ! el stress/strain, vol strain corr
+      REAL(dk), PARAMETER :: r = 0.5D0
+      REAL(dk), PARAMETER :: s = 0.5D0
       INTEGER(ik) :: i, iel, mtype
 !
 !     initialize outps
@@ -1489,7 +1534,7 @@
 !
 !       get element kinematic, constitutive, local sxx/syy/szz/sxy
         larea = AREA(iel)
-        CALL BMATRX(B, lcoords, larea)
+        CALL BMATRX(B, r,s, lcoords)
         CALL DMATRX(D, EMOD(mtype), NU(mtype))
         CALL GLOLOC(SXX,SYY,SXY,SZZ, sig, iel, .TRUE.)
 !
@@ -1738,12 +1783,12 @@
 ! **** MAIN PROGRAM ****************************************************
 ! **********************************************************************
 !     Non-Linear Finite Element Analysis
-!     3-Noded Triangular Body Elements (Linear Interpolation)
+!     4-Noded Quadrilateral Body Elements (Linear Interpolation)
 !     2-Noded Linear Traction Elements (Linear Interpolation)
 !     Mohr-Coulomb Failure Criterion (Linear Elastic, Perfectly Plastic)
 ! **********************************************************************
-      SUBROUTINE SLOPEFEA3NODE (fpath)
-!      PROGRAM SLOPEFEA3NODE
+      SUBROUTINE SLOPEFEA4NODE (fpath)
+!      PROGRAM SLOPEFEA4NODE
       USE GCONTROL    ! controls inputs, grid, and elements
       USE FEUTILITY   ! utility functions for FEA solver
 !
@@ -1803,5 +1848,5 @@
 !
       RETURN
 !
-      END SUBROUTINE SLOPEFEA3NODE
-!      END PROGRAM SLOPEFEA3NODE
+      END SUBROUTINE SLOPEFEA4NODE
+!      END PROGRAM SLOPEFEA4NODE

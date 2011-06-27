@@ -560,6 +560,8 @@ namespace SlopeFEA
 
         public void RunAnalysis ()
         {
+            string[] path;
+
             switch ( AnalysisType )
             {
                 case AnalysisType.Bishop:
@@ -588,10 +590,17 @@ namespace SlopeFEA
                     }
                     break;
 
-                default:
-                    string[] path = FilePath.Split( '.' );
+                case AnalysisType.FEA3NodedTri:
+                    path = FilePath.Split( '.' );
                     FortranWrappers.slopefea3node_( path[0] , path[0].Length + 1 );
-                    MessageBox.Show( "Run FEA code." , "FEA Analysis" );
+                    MessageBox.Show( "Run FEA 3 Node code." , "FEA Analysis" );
+                    this.IsAnalyzed = true;
+                    break;
+
+                default:
+                    path = FilePath.Split( '.' );
+                    FortranWrappers.slopefea4node_( path[0] , path[0].Length + 1 );
+                    MessageBox.Show( "Run FEA 4 Node code." , "FEA Analysis" );
                     this.IsAnalyzed = true;
                     break;
             }
