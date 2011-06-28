@@ -36,8 +36,8 @@
         Title="Plot Results" Height="500" Width="700"
         Icon="/Slope;component/icons/slopeIcon.ico" WindowStartupLocation="CenterOwner"
         Background="WhiteSmoke">
-    <Grid>
-        <DockPanel Height="23" HorizontalAlignment="Stretch" Name="menuDock" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="2">
+    <Grid Name="contentGrid">
+        <DockPanel Name="menuPanel" Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="2">
             <Menu Height="23" Name="mainMenu" Width="Auto" BorderBrush="#FF8C8E94" OpacityMask="{x:Null}" BorderThickness="1">
                 <MenuItem Header="_View" Name="viewMenu">
                     <MenuItem Header="_Pan" Click="pan_Click">

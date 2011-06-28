@@ -39,6 +39,7 @@ namespace SlopeFEA
     public partial class AxisOptionsDialog : Window
     {
         private SlopeCanvas canvas;
+        private SlopePlotCanvas plotCanvas;
 
         public AxisOptionsDialog ( Window owner, SlopeCanvas canvas )
         {
@@ -46,6 +47,41 @@ namespace SlopeFEA
 
             this.Owner = owner;
             this.canvas = canvas;
+
+            xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
+            xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
+            xMajor.Text = String.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
+            xMinor.Text = String.Format( "{0}" , canvas.XMinorDivisions );
+
+            yMax.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
+            yMin.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
+            yMajor.Text = String.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
+            yMinor.Text = String.Format( "{0}" , canvas.YMinorDivisions );
+
+            string units;
+            switch ( canvas.Units )
+            {
+                case Units.Metres: units = "m"; break;
+                case Units.Millimetres: units = "mm"; break;
+                case Units.Feet: units = "ft"; break;
+                default: units = "in"; break;
+            }
+
+            xMaxUnits.Content = units;
+            xMinUnits.Content = units;
+            xMajorUnits.Content = units;
+
+            yMaxUnits.Content = units;
+            yMinUnits.Content = units;
+            yMajorUnits.Content = units;
+        }
+
+        public AxisOptionsDialog ( Window owner , SlopePlotCanvas canvas )
+        {
+            InitializeComponent();
+
+            this.Owner = owner;
+            this.plotCanvas = canvas;
 
             xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
             xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
@@ -202,20 +238,38 @@ namespace SlopeFEA
             diff = ratio - Math.Truncate( ratio );
             ymin += Math.Abs( diff ) < 0.5 ? -diff * ymajor : Math.Sign( diff ) * (1 - Math.Abs( diff )) * ymajor;
 
-            canvas.XAxisMax = xmax;
-            canvas.XAxisMin = xmin;
-            canvas.XMajorDivision = xmajor;
-            canvas.XMinorDivisions = xminor;
+            if ( canvas != null )
+            {
+                canvas.XAxisMax = xmax;
+                canvas.XAxisMin = xmin;
+                canvas.XMajorDivision = xmajor;
+                canvas.XMinorDivisions = xminor;
 
-            canvas.YAxisMax = ymax;
-            canvas.YAxisMin = ymin;
-            canvas.YMajorDivision = ymajor;
-            canvas.YMinorDivisions = yminor;
+                canvas.YAxisMax = ymax;
+                canvas.YAxisMin = ymin;
+                canvas.YMajorDivision = ymajor;
+                canvas.YMinorDivisions = yminor;
 
-            canvas.BuildAxes();
-            canvas.CentreAndFitExtents( true );
+                canvas.BuildAxes();
+                canvas.CentreAndFitExtents( true );
 
-            canvas.IsSaved = false;
+                canvas.IsSaved = false;
+            }
+            else if ( plotCanvas != null )
+            {
+                plotCanvas.XAxisMax = xmax;
+                plotCanvas.XAxisMin = xmin;
+                plotCanvas.XMajorDivision = xmajor;
+                plotCanvas.XMinorDivisions = xminor;
+
+                plotCanvas.YAxisMax = ymax;
+                plotCanvas.YAxisMin = ymin;
+                plotCanvas.YMajorDivision = ymajor;
+                plotCanvas.YMinorDivisions = yminor;
+
+                plotCanvas.BuildAxes();
+                plotCanvas.CentreAndFitExtents( true );
+            }
 
             this.DialogResult = true;
         }

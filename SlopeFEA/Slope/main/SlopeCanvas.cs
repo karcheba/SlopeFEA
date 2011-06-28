@@ -3206,30 +3206,18 @@ namespace SlopeFEA
                 Vector delta = new Vector( 0 , deltaY );
 
                 // Update grid point locations
-                for ( int i = 0 ; i < gridPoints.Count ; i++ )
-                {
-                    gridPoints[i].Translate( delta );
-                }
+                gridPoints.ForEach( delegate( GridPoint gp ) { gp.Translate( delta ); } );
 
                 // Update boundary shape
                 boundary.Translate( delta );
 
                 // Update material blocks
-                for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-                {
-                    materialBlocks[i].Translate( delta );
-                }
+                materialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
 
                 // Update FEA elements
-                for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
-                {
-                    FEAQuadElements[i].Translate( delta );
-                }
-                for ( int i = 0 ; i < FEATriElements.Count ; i++ )
-                {
-                    FEATriElements[i].Translate( delta );
-                }
-
+                FEATriElements.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
+                FEAQuadElements.ForEach( delegate( fe4NodedQuadElement element ) { element.Translate( delta ); } );
+                
                 // Update drawing line
                 Point p;
                 for ( int i = 0 ; i < drawLine.Points.Count ; i++ )
@@ -3243,7 +3231,7 @@ namespace SlopeFEA
                 if ( criticalSurface != null ) criticalSurface.Translate( delta );
 
                 // Update run surfaces
-                for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Translate( delta );
+                runSurfaces.ForEach( delegate( DisplayCircularSurface rs ) { rs.Translate( delta ); } );
             }
         }
 
