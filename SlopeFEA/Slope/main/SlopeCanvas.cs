@@ -595,6 +595,7 @@ namespace SlopeFEA
                     FortranWrappers.slopefea3node_( path[0] , path[0].Length + 1 );
                     MessageBox.Show( "Run FEA 3 Node code." , "FEA Analysis" );
                     this.IsAnalyzed = true;
+                    SaveInputFile( FilePath );
                     break;
 
                 default:
@@ -602,6 +603,7 @@ namespace SlopeFEA
                     FortranWrappers.slopefea4node_( path[0] , path[0].Length + 1 );
                     MessageBox.Show( "Run FEA 4 Node code." , "FEA Analysis" );
                     this.IsAnalyzed = true;
+                    SaveInputFile( FilePath );
                     break;
             }
         }
@@ -1273,7 +1275,7 @@ namespace SlopeFEA
             }
 
             /*
-             * Refresh X axis
+             * Refresh Y axis
              */
             yAxis.Children.Clear();
 
@@ -1487,7 +1489,6 @@ namespace SlopeFEA
             {
                 if ( xAxis.Children[i] is Line )
                 {
-
                     line = xAxis.Children[i] as Line;
                     line.X1 = line.X2 += delta.X;
                 }
@@ -1518,29 +1519,17 @@ namespace SlopeFEA
              */
 
             // Update grid point locations
-            for ( int i = 0 ; i < gridPoints.Count ; i++ )
-            {
-                gridPoints[i].Translate( delta );
-            }
+            gridPoints.ForEach( delegate( GridPoint gp ) { gp.Translate( delta ); } );
 
             // Update boundary shape
             boundary.Translate( delta );
 
             // Update material blocks
-            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-            {
-                materialBlocks[i].Translate( delta );
-            }
+            materialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
 
             // Update FEA elements
-            for ( int i = 0 ; i < FEATriElements.Count ; i++ )
-            {
-                FEATriElements[i].Translate( delta );
-            }
-            for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
-            {
-                FEAQuadElements[i].Translate( delta );
-            }
+            FEATriElements.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
+            FEAQuadElements.ForEach( delegate( fe4NodedQuadElement element ) { element.Translate( delta ); } );
 
             // Update drawing line
             Point p;
@@ -1556,7 +1545,7 @@ namespace SlopeFEA
             if ( criticalSurface != null ) criticalSurface.Translate( delta );
 
             // Update run surfaces
-            for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Translate( delta );
+            runSurfaces.ForEach( delegate( DisplayCircularSurface rs ) { rs.Translate( delta ); } );
         }
 
 
@@ -1641,29 +1630,17 @@ namespace SlopeFEA
              */
 
             // Zoom grid point locations
-            for ( int i = 0 ; i < gridPoints.Count ; i++ )
-            {
-                gridPoints[i].Zoom( factor , centre );
-            }
+            gridPoints.ForEach( delegate( GridPoint gp ) { gp.Zoom( factor , centre ); } );
 
             // Zoom boundary shape
             boundary.Zoom( factor , centre );
 
             // Zoom material blocks
-            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-            {
-                materialBlocks[i].Zoom( factor , centre );
-            }
+            materialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.Zoom( factor , centre ); } );
 
             // Zoom FEA elements
-            for ( int i = 0 ; i < FEATriElements.Count ; i++ )
-            {
-                FEATriElements[i].Zoom( factor , centre );
-            }
-            for ( int i = 0 ; i < FEAQuadElements.Count ; i++ )
-            {
-                FEAQuadElements[i].Zoom( factor , centre );
-            }
+            FEATriElements.ForEach( delegate( fe3NodedTriElement element ) { element.Zoom( factor , centre ); } );
+            FEAQuadElements.ForEach( delegate( fe4NodedQuadElement element ) { element.Zoom( factor , centre ); } );
 
             // Zoom drawing line
             Point p;
@@ -1679,7 +1656,7 @@ namespace SlopeFEA
             if ( criticalSurface != null ) criticalSurface.Zoom( factor , centre );
 
             // Zoom run surfaces
-            for ( int i = 0 ; i < runSurfaces.Count ; i++ ) runSurfaces[i].Zoom( factor , centre );
+            runSurfaces.ForEach( delegate( DisplayCircularSurface rs ) { rs.Zoom( factor , centre ); } );
         }
 
 
@@ -1725,6 +1702,17 @@ namespace SlopeFEA
 
                 if ( p.Y < yMaxPix ) { yMaxPix = p.Y; foundExtents = true; }
                 else if ( p.Y > yMinPix ) { yMinPix = p.Y; foundExtents = true; }
+            }
+            foreach ( MaterialBlock mb in materialBlocks )
+            {
+                foreach ( Point p in mb.Boundary.Points )
+                {
+                    if ( p.X > xMaxPix ) { xMaxPix = p.X; foundExtents = true; }
+                    else if ( p.X < xMinPix ) { xMinPix = p.X; foundExtents = true; }
+
+                    if ( p.Y < yMaxPix ) { yMaxPix = p.Y; foundExtents = true; }
+                    else if ( p.Y > yMinPix ) { yMinPix = p.Y; foundExtents = true; }
+                }
             }
 
             // Convert extents back to pixels if they are outside specified extents
@@ -1917,29 +1905,18 @@ namespace SlopeFEA
 
         public void ClearMaterialSelections ()
         {
-            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-            {
-                materialBlocks[i].IsSelected = false;
-            }
+            materialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.IsSelected = false; } );
         }
 
         public void ClearBoundaryPointSelections ()
         {
-            for ( int i = 0 ; i < boundary.BoundaryPoints.Count ; i++ )
-            {
-                boundary.BoundaryPoints[i].IsSelected = false;
-            }
+            boundary.BoundaryPoints.ForEach( delegate( DrawingPoint p ) { p.IsSelected = false; } );
         }
 
         public void ClearMaterialBoundaryPointSelections ()
         {
-            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-            {
-                for ( int j = 0 ; j < materialBlocks[i].BoundaryPoints.Count ; j++ )
-                {
-                    materialBlocks[i].BoundaryPoints[j].IsSelected = false;
-                }
-            }
+            materialBlocks.ForEach( delegate( MaterialBlock mb )
+            { mb.BoundaryPoints.ForEach( delegate( DrawingPoint p ) { p.IsSelected = false; } ); } );
         }
 
 

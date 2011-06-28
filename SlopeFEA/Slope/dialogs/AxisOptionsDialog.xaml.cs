@@ -40,13 +40,12 @@ namespace SlopeFEA
     {
         private SlopeCanvas canvas;
 
-        public AxisOptionsDialog ( Window owner )
+        public AxisOptionsDialog ( Window owner, SlopeCanvas canvas )
         {
             InitializeComponent();
 
             this.Owner = owner;
-
-            canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
+            this.canvas = canvas;
 
             xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
             xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );

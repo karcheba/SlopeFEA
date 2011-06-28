@@ -141,6 +141,9 @@
     <Compile Include="engine\Matrix.cs" />
     <Compile Include="engine\MeshGen.cs" />
     <Compile Include="main\NativeMethods.cs" />
+    <Compile Include="dialogs\PlotResultsWindow.xaml.cs">
+      <DependentUpon>PlotResultsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -157,6 +160,7 @@
     <Compile Include="dialogs\VerifyDialog.xaml.cs">
       <DependentUpon>VerifyDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SlopePlotCanvas.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -277,6 +281,10 @@
     <Page Include="dialogs\VerifyDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="dialogs\PlotResultsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

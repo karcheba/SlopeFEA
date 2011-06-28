@@ -255,6 +255,7 @@
                     <MenuItem Header="Show _Critical Surface" IsCheckable="True" Click="showCritical_Click" />
                     <MenuItem Header="_View Run Results..." Click="viewResults_Click" />
                     <Separator />
+                    <MenuItem Header="_Plot Results..." Click="plotResults_Click"/>
                     <MenuItem Header="_Open Output File" Click="outputFile_Click" />
                 </MenuItem>
                 <MenuItem Header="_Help">

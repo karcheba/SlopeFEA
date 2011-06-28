@@ -654,7 +654,7 @@ namespace SlopeFEA
             }
             if ( currCanvas == null ) return;
 
-            AxisOptionsDialog dlg = new AxisOptionsDialog( this );
+            AxisOptionsDialog dlg = new AxisOptionsDialog( this , currCanvas );
             dlg.ShowDialog();
         }
 
@@ -1470,6 +1470,20 @@ namespace SlopeFEA
                 currCanvas.CancelDrawing();
                 currCanvas.DrawMode = DrawModes.PrintPoint;
                 currCanvas.Cursor = ((TextBlock) this.Resources["printPointCursor"]).Cursor;
+            }
+        }
+
+        private void plotResults_Click ( object sender , RoutedEventArgs e )
+        {
+            Grid currGrid = windowManager.SelectedContent as Grid;
+
+            SlopeCanvas currCanvas = null;
+            if ( currGrid != null ) currCanvas = currGrid.Children[2] as SlopeCanvas;
+
+            if ( currCanvas != null )
+            {
+                PlotResultsWindow plotWin = new PlotResultsWindow( this , currCanvas );
+                plotWin.ShowDialog();
             }
         }
     }
