@@ -161,9 +161,13 @@
       <DependentUpon>VerifyDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="main\SlopePlotCanvas.cs" />
+    <Compile Include="dialogs\SetMagnificationDialog.xaml.cs">
+      <DependentUpon>SetMagnificationDialog.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\app.manifest" />
@@ -283,6 +287,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="dialogs\PlotResultsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="dialogs\SetMagnificationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

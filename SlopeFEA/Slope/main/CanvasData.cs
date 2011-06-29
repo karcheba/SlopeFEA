@@ -40,6 +40,7 @@ using System.Windows.Shapes;
 namespace SlopeFEA
 {
     public enum DrawModes { Select , Boundaries , Materials , Pan , ZoomArea , MovePoints , AddPoints , PrintPoint , FixX , FixY , PointLoad , LineLoad };
+    public enum PlotModes { DeformedMesh , DisplacementVectors , PlasticPoints , SmoothedStress , UnSmoothedStress };
     public enum Units { Metres , Millimetres , Feet , Inches };
     public enum Scales
     {
@@ -1635,6 +1636,104 @@ namespace SlopeFEA
         }
     }
 
+    public class DisplacementVector
+    {
+        private SlopePlotCanvas canvas;
+        private List<Polyline> plotLines;
+        private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
+                                Spos = Math.Sin( 0.75 * Math.PI ) ,
+                                Cneg = Cpos ,
+                                Sneg = -Spos;
+        private Point plotPoint;
+        private List<double> disps;
+        private Vector dir;
+        private double magnitude;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="canvas">Parent drawing canvas</param>
+        public DisplacementVector ( SlopePlotCanvas canvas, Point plotPoint,List<double>disps )
+        {
+            // set parent drawing canvas
+            this.canvas = canvas;
+
+            // set plotting location and disp values
+            this.plotPoint = plotPoint;
+            this.disps = disps;
+
+            // get magnitude and direction of displacement vector
+            this.dir = new Vector( disps[0] , -disps[1] );
+            this.magnitude = dir.Length;
+            this.dir /= magnitude;
+
+            // create plotting lines for constraints
+            plotLines = new List<Polyline>();
+            Polyline newLine;
+            for ( int i = 0 ; i < 18 ; i++ )
+            {
+                newLine = new Polyline();
+                newLine.Fill = Brushes.Red;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.0;
+                newLine.Stroke = Brushes.Red;
+                newLine.Points.Add( new Point() );
+                newLine.Points.Add( new Point() );
+                plotLines.Add( newLine );
+            }
+
+            Update();
+        }
+
+        public List<Polyline> PlotLines { get { return this.plotLines; } }
+
+        public void Translate ( Vector delta )
+        {
+            plotPoint += delta;
+            Update();
+        }
+
+        public void Zoom ( double factor , Point centre )
+        {
+            plotPoint = centre + factor * (plotPoint - centre);
+            Update();
+        }
+
+        public void Update ()
+        {
+            // get units dependent scaling factor
+            double factor;
+            switch ( canvas.Units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            double scaleFactor = canvas.Magnification * magnitude / (canvas.Scale * factor) * canvas.DpiX;
+            Point headPoint = plotPoint + scaleFactor * dir;
+
+            double xprime , yprime;
+
+            // disp arrow shaft
+            plotLines[0].Points[0] = plotPoint;
+            plotLines[0].Points[1] = headPoint;
+            // disp arrow head 1
+            plotLines[1].Points[0] = headPoint;
+            plotLines[1].Points[1] = (Point) (5 * dir);
+            xprime = plotLines[1].Points[1].X * Cpos - plotLines[1].Points[1].Y * Spos + plotLines[1].Points[0].X;
+            yprime = plotLines[1].Points[1].X * Spos + plotLines[1].Points[1].Y * Cpos + plotLines[1].Points[0].Y;
+            plotLines[1].Points[1] = new Point( xprime , yprime );
+            // disp arrow head 2
+            plotLines[2].Points[0] = headPoint;
+            plotLines[2].Points[1] = (Point) (5 * dir);
+            xprime = plotLines[2].Points[1].X * Cneg - plotLines[2].Points[1].Y * Sneg + plotLines[2].Points[0].X;
+            yprime = plotLines[2].Points[1].X * Sneg + plotLines[2].Points[1].Y * Cneg + plotLines[2].Points[0].Y;
+            plotLines[2].Points[1] = new Point( xprime , yprime );
+        }
+    }
+
 
     public class ZoomRect
     {
@@ -1653,6 +1752,7 @@ namespace SlopeFEA
     public class MaterialBlock
     {
         private SlopeCanvas canvas;
+        private SlopePlotCanvas plotCanvas;
         private bool isSelected;
         private MaterialType material;
         private List<DrawingPoint> boundaryPoints;
@@ -1688,6 +1788,30 @@ namespace SlopeFEA
             pointLoads = new List<PointLoad>();
 
             SortPoints();
+        }
+
+        public MaterialBlock ( SlopePlotCanvas canvas , MaterialType mtl, Point[] pts )
+        {
+            this.plotCanvas = canvas;
+
+            Boundary = new Polygon();
+            boundaryPoints = new List<DrawingPoint>();
+            Boundary.Stroke = Brushes.Black;
+            Boundary.StrokeThickness = 0.8;
+            Boundary.Fill = mtl.Fill;
+            Boundary.Opacity = 0.6;
+            Boundary.Visibility = Visibility.Visible;
+
+            for ( int i = 0 ; i < pts.Length - 1 ; i++ )
+            {
+                Boundary.Points.Add( pts[i] );
+            }
+
+            Material = mtl;
+
+            lineConstraints = new List<LineConstraint>();
+            lineLoads = new List<LineLoad>();
+            pointLoads = new List<PointLoad>();
         }
 
         public bool IsSelected
@@ -2187,7 +2311,8 @@ namespace SlopeFEA
                 p.X += delta.X;
                 p.Y += delta.Y;
                 Boundary.Points[i] = p;
-                boundaryPoints[i].Translate( delta );
+
+                if ( canvas != null ) boundaryPoints[i].Translate( delta );
             }
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
@@ -2204,7 +2329,8 @@ namespace SlopeFEA
                 p.X = centre.X + factor * (p.X - centre.X);
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
-                boundaryPoints[i].Zoom( factor , centre );
+
+                if ( canvas != null ) boundaryPoints[i].Zoom( factor , centre );
             }
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
@@ -2214,7 +2340,7 @@ namespace SlopeFEA
 
         private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
-            if ( canvas.DrawMode == DrawModes.Select ) this.IsSelected = true;
+            if ( canvas != null && canvas.DrawMode == DrawModes.Select ) this.IsSelected = true;
         }
 
         public int CheckIntersecting ()

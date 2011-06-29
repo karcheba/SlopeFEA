@@ -89,23 +89,25 @@
                     <MenuItem Header="_Axis Options..." Click="axisOptions_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Plot" Name="plotMenu">
-                    <MenuItem Header="Deformed _Mesh" IsChecked="True" Click="plotDeformedMesh_Click" />
-                    <MenuItem Header="_Displacement Vectors" Click="plotDisplacementVectors_Click" />
-                    <MenuItem Header="_Plastic Points" Click="plotPlasticPoints_Click" />
-                    <MenuItem Header="_Smoothed Stress">
-                        <MenuItem Header="S-_XX" Click="plotSmoothStress_Click"/>
-                        <MenuItem Header="S-_YY" Click="plotSmoothStress_Click"/>
-                        <MenuItem Header="S-_XY" Click="plotSmoothStress_Click"/>
-                        <MenuItem Header="S-_ZZ" Click="plotSmoothStress_Click"/>
-                        <MenuItem Header="_F-bar" Click="plotSmoothStress_Click"/>
+                    <MenuItem Name="deformedMesh" Header="Deformed _Mesh" IsChecked="True" Click="plotDeformedMesh_Click" />
+                    <MenuItem Name="displacementVectors" Header="_Displacement Vectors" Click="plotDisplacementVectors_Click" />
+                    <MenuItem Name="plasticPoints" Header="_Plastic Points" Click="plotPlasticPoints_Click" />
+                    <MenuItem Header="_Smoothed Stress" Name="smoothMenu">
+                        <MenuItem Name="smoothXX" Header="S-_XX" Click="plotSmoothStress_Click"/>
+                        <MenuItem Name="smoothYY" Header="S-_YY" Click="plotSmoothStress_Click"/>
+                        <MenuItem Name="smoothXY" Header="S-_XY" Click="plotSmoothStress_Click"/>
+                        <MenuItem Name="smoothZZ" Header="S-_ZZ" Click="plotSmoothStress_Click"/>
+                        <MenuItem Name="smoothFbar" Header="_F-bar" Click="plotSmoothStress_Click"/>
                     </MenuItem>
-                    <MenuItem Header="_UnSmoothed Stress" >
-                        <MenuItem Header="S-_XX" Click="plotUnSmoothStress_Click"/>
-                        <MenuItem Header="S-_YY" Click="plotUnSmoothStress_Click"/>
-                        <MenuItem Header="S-_XY" Click="plotUnSmoothStress_Click"/>
-                        <MenuItem Header="S-_ZZ" Click="plotUnSmoothStress_Click"/>
-                        <MenuItem Header="_F-bar" Click="plotUnSmoothStress_Click"/>
+                    <MenuItem Header="_UnSmoothed Stress" Name="unSmoothMenu">
+                        <MenuItem Name="unSmoothXX" Header="S-_XX" Click="plotUnSmoothStress_Click"/>
+                        <MenuItem Name="unSmoothYY" Header="S-_YY" Click="plotUnSmoothStress_Click"/>
+                        <MenuItem Name="unSmoothXY" Header="S-_XY" Click="plotUnSmoothStress_Click"/>
+                        <MenuItem Name="unSmoothZZ" Header="S-_ZZ" Click="plotUnSmoothStress_Click"/>
+                        <MenuItem Name="unSmoothFbar" Header="_F-bar" Click="plotUnSmoothStress_Click"/>
                     </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Set Ma_gnification..." Name="setMag" Click="setMag_Click"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

@@ -395,3 +395,8 @@ REVISION HISTORY:
 [29 June 2011]
 
 {v1.0.0.11}
+=== (SlopeFEA3Node.for) Changed ICO to ICOT in LOCALT(); this was causing the traction load vector to be formed incorrectly since connectivity was being set against the wrong list
++++ (PlotResultsWindow.xaml, PlotResultsWindow.xaml.cs, SlopePlotCanvas.cs) Added dialog and associated properties for setting of Magnification
++++ (SlopePlotCanvas.cs) Added optional autoMag parameter to PlotDeformedMesh() and PlotDisplacementVectors()
++++ (CanvasData.cs) Added DisplacementVector class
++++ (SlopePlotCanvas.cs) Created PlotDisplacementVectors() method

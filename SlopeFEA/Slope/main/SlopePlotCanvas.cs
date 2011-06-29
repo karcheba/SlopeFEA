@@ -53,9 +53,11 @@ namespace SlopeFEA
         private List<MaterialType> materialTypes;
         private FEAParams feaParams;
         private List<MaterialBlock> substructs;
-        private List<fe3NodedTriElement> triMesh, deformedTriMesh;
+        private List<fe3NodedTriElement> deformedTriMesh;
         private List<feNode> nodes , deformedNodes;
         private List<List<double>> disp;
+        private List<DisplacementVector> dispVectors;
+        private PlotModes plotMode;
         private double maxDisp;
 
 
@@ -85,8 +87,11 @@ namespace SlopeFEA
             LoadNodeData();
 
             // Initialize mesh
-            triMesh = new List<fe3NodedTriElement>();
+            substructs = new List<MaterialBlock>();
             deformedTriMesh = new List<fe3NodedTriElement>();
+
+            // Initialize disp vectors
+            dispVectors = new List<DisplacementVector>();
         }
 
 
@@ -104,6 +109,10 @@ namespace SlopeFEA
         public double OriginOffsetY { get; set; }               // (0,0) -> BL corner
 
         public double Scale { get; set; }                       // Plotting scale (actual units / screen unit)
+        public double Magnification { get; set; }               // Plotting magnification
+
+        public double DpiX { get { return this.dpiX; } }
+        public double DpiY { get { return this.dpiY; } }
 
         public double XAxisMax { get; set; }
         public double XAxisMin { get; set; }                    // Plotting axis extents (in actual units)
@@ -117,6 +126,34 @@ namespace SlopeFEA
         public int YMinorDivisions { get; set; }
 
         public bool IsScaled { get; set; }                      // Toggle for initial display setup
+
+        public PlotModes PlotMode
+        {
+            get { return this.plotMode; }
+            set
+            {
+                this.plotMode = value;
+
+                switch ( value )
+                {
+                    case PlotModes.DisplacementVectors:
+                        PlotDisplacementVectors();
+                        break;
+                    case PlotModes.PlasticPoints:
+                        PlotPlasticPoints();
+                        break;
+                    case PlotModes.SmoothedStress:
+                        PlotSmoothedStress();
+                        break;
+                    case PlotModes.UnSmoothedStress:
+                        PlotUnSmoothedStress();
+                        break;
+                    default:
+                        PlotDeformedMesh();
+                        break;
+                }
+            }
+        }
 
 
         // ----------------------------------
@@ -301,23 +338,29 @@ namespace SlopeFEA
                 }
             }
 
+            /*
+             * Refresh magnification label
+             */
+            TextBlock plotMag = (TextBlock) ((Grid) ((Grid) this.Parent).Children[2]).Children[7];
+            plotMag.Text = "Magnification: " + Math.Round( Magnification , 2 );
 
             /*
              * Refresh drawing canvas
              */
             this.Children.Clear();
 
-            // Add drawing Polygon objects back on top
+            // Add substructs first ...
+            substructs.ForEach( delegate( MaterialBlock mb ) { this.Children.Add( mb.Boundary ); } );
 
-            // Add reference elements on top of polygons
-            triMesh.ForEach(
-                delegate( fe3NodedTriElement element ) { this.Children.Add( element.Boundary ); } );
-
-            // Add deformed elements on top of reference elements
+            // ... then add deformed elements on top of substructs ...
             deformedTriMesh.ForEach(
                 delegate( fe3NodedTriElement element ) { this.Children.Add( element.Boundary ); } );
 
-            // Add temporary drawing objects on top of everything
+            // ... then add displacement vectors on top of deformed mesh (these will never be present simultaneously) ...
+            dispVectors.ForEach(
+                delegate( DisplacementVector dv ) { dv.PlotLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } ); } );
+
+            // ... then add temporary drawing objects on top of everything
             this.Children.Add( zoomRect.Boundary );
         }
 
@@ -375,10 +418,15 @@ namespace SlopeFEA
             /*
              * Translate plotting canvas components
              */
+
+            // Update substructs
+            substructs.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
             
             // Update FEA elements
-            triMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
             deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
+
+            // Update disp vectors
+            dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
         }
 
 
@@ -391,6 +439,10 @@ namespace SlopeFEA
         {
             // Update plotting scale
             Scale /= factor;
+
+            // Update scale display
+            TextBlock plotScale = (TextBlock) ((Grid) ((Grid) this.Parent).Children[2]).Children[6];
+            plotScale.Text = "Scale: " + Math.Round( Scale , 2 ) + ":1";
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // Modify display of scale
@@ -443,9 +495,14 @@ namespace SlopeFEA
              * Zoom canvas plotting components
              */
 
+            // Zoom substructs
+            substructs.ForEach( delegate( MaterialBlock mb ) { mb.Zoom( factor , centre ); } );
+
             // Zoom FEA elements
-            triMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Zoom( factor , centre ); } );
             deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Zoom( factor , centre ); } );
+
+            // Zoom disp vectors
+            dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Zoom( factor , centre ); } );
         }
 
 
@@ -553,6 +610,99 @@ namespace SlopeFEA
 
 
         /// <summary>
+        /// Gets substruct (material block data) from file
+        /// </summary>
+        public void LoadSubstructData ()
+        {
+            if ( !File.Exists( FilePath ) )
+            {
+                MessageBox.Show( "Could not find input data file." , "Error" );
+                return;
+            }
+
+            // get canvas dimensions/properties
+            double originX = OriginOffsetX ,
+                   originY = OriginOffsetY ,
+                   scale = Scale ,
+                   yHeight = ActualHeight;
+            Units units = Units;
+
+            // get units dependent scaling factor
+            double factor;
+            switch ( units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            // Load material blocks from source canvas
+            substructs = new List<MaterialBlock>();
+            using ( TextReader tr = new StreamReader( FilePath ) )
+            {
+                // advance to material block data
+                while ( !tr.ReadLine().Contains( "MATERIAL BLOCK DATA" ) ) ;
+
+                tr.ReadLine();
+                tr.ReadLine();
+
+                int numMaterialBlocks = int.Parse( tr.ReadLine().Split( '=' )[1] );
+
+                tr.ReadLine();
+
+                if ( numMaterialBlocks > 0 )
+                {
+                    MaterialBlock newMaterialBlock;
+                    MaterialType newMaterialType;
+                    Point[] materialBoundPoints;
+                    string materialName;
+                    int numMaterialBoundPoints , numLineConstraints , numLineLoads , numPointLoads;
+                    double xCoord , yCoord;
+                    string[] coords;
+
+                    for ( int i = 0 ; i < numMaterialBlocks ; i++ )
+                    {
+                        tr.ReadLine();
+
+                        materialName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
+
+                        numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
+
+                        materialBoundPoints = new Point[numMaterialBoundPoints + 1];
+
+                        for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
+                        {
+                            coords = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
+                            xCoord = double.Parse( coords[0] );
+                            yCoord = double.Parse( coords[1] );
+                            materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
+                            materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
+                        }
+
+                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
+
+                        newMaterialBlock = new MaterialBlock( this , newMaterialType , materialBoundPoints );
+
+                        numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numLineConstraints ; j++ ) tr.ReadLine();
+
+                        numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numLineLoads ; j++ ) tr.ReadLine();
+
+                        numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        for ( int j = 0 ; j < numPointLoads ; j++ ) tr.ReadLine();
+
+                        substructs.Add( newMaterialBlock );
+
+                        tr.ReadLine();
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Gets node data from output file
         /// </summary>
         public void LoadNodeData ()
@@ -579,8 +729,8 @@ namespace SlopeFEA
             {
                 int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
 
-                // advance to line containing "TRACTION LOADING" header
-                while ( !tr.ReadLine().Contains( "TRACTION LOADING" ) ) ;
+                // advance to line containing "GRAVITY LOADING" header
+                while ( !tr.ReadLine().Contains( "GRAVITY LOADING" ) ) ;
 
                 tr.ReadLine();
                 tr.ReadLine();
@@ -606,11 +756,20 @@ namespace SlopeFEA
             }
         }
 
+        public void ClearPlots ()
+        {
+            deformedTriMesh.Clear();
+            dispVectors.Clear();
+        }
+
         /// <summary>
         /// Plots deformed mesh output
         /// </summary>
-        public void PlotDeformedMesh ()
+        public void PlotDeformedMesh ( bool autoMag = true )
         {
+            // clear existing plots
+            ClearPlots();
+
             // get canvas dimensions/properties
             double originX = OriginOffsetX ,
                    originY = OriginOffsetY ,
@@ -632,7 +791,7 @@ namespace SlopeFEA
             double x , y;
 
             // on first call (from constructor) read from file
-            if ( triMesh.Count == 0 )
+            if ( deformedTriMesh.Count == 0 )
             {
                 string[] pathSplit = FilePath.Split( '.' );
 
@@ -654,13 +813,6 @@ namespace SlopeFEA
                     {
                         lineSplit = tr.ReadLine().Split( '\t' );
 
-                        triMesh.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
-                            nodes[int.Parse( lineSplit[1] )] ,
-                            nodes[int.Parse( lineSplit[2] )] ,
-                            nodes[int.Parse( lineSplit[3] )] ,
-                            materialTypes[int.Parse( lineSplit[4] ) - 1] ,
-                            false ) );
-
                         deformedTriMesh.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
                             nodes[int.Parse( lineSplit[1] )] ,
                             nodes[int.Parse( lineSplit[2] )] ,
@@ -669,37 +821,18 @@ namespace SlopeFEA
                             false ) );
                     }
                 }
-
-                triMesh.ForEach( delegate( fe3NodedTriElement element ) {
-
-                    newPolygon = new Polygon();
-                    newPolygon.StrokeThickness = 0.6;
-                    newPolygon.Stroke = Brushes.Black;
-                    newPolygon.Opacity = 1.0 /*0.8*/;
-                    newPolygon.Fill = Brushes.Transparent /* element.Material.Fill*/;
-                    
-                    foreach ( feNode node in element.Nodes )
-                    {
-                        x = node.X / (scale * factor) * dpiX + originX;
-                        y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                        newPolygon.Points.Add( new Point( x , y ) );
-                    }
-
-                    element.Boundary = newPolygon;
-                } );
             }
 
-            // set reference mesh bounds to visible
-            triMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Boundary.Stroke = Brushes.Black; } );
+            // compute magnification
+            if ( autoMag ) Magnification = 0.25 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
 
             // compute deformed coordinates
-            double mag = 0.25 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
             deformedNodes = new List<feNode>() { null };
             for ( int i = 1 ; i < nodes.Count ; i++ )
             {
                 deformedNodes.Add( new feNode( i , false ,
-                    nodes[i].X + mag * disp[i][0] ,
-                    nodes[i].Y + mag * disp[i][1] ) );
+                    nodes[i].X + Magnification * disp[i][0] ,
+                    nodes[i].Y + Magnification * disp[i][1] ) );
             }
 
             // set mesh to deformed coords
@@ -727,6 +860,75 @@ namespace SlopeFEA
 
             // refresh plotting axes
             BuildAxes();
+        }
+
+
+        /// <summary>
+        /// Plots a vector at each node indicating direction
+        /// and relative magnitude of displacement
+        /// </summary>
+        public void PlotDisplacementVectors ( bool autoMag = true )
+        {
+            // clear existing plots
+            ClearPlots();
+
+            // get canvas dimensions/properties
+            double originX = OriginOffsetX ,
+                   originY = OriginOffsetY ,
+                   scale = Scale ,
+                   yHeight = ActualHeight;
+            Units units = Units;
+
+            // get units dependent scaling factor
+            double factor;
+            switch ( units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            double x , y;
+
+            // compute magnification
+            if ( autoMag ) Magnification = 0.5 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
+
+            // plot the disp vectors
+            dispVectors = new List<DisplacementVector>();
+            for ( int i = 1 ; i < nodes.Count ; i++ )
+            {
+                x = nodes[i].X / (scale * factor) * dpiX + originX;
+                y = yHeight - (nodes[i].Y / (scale * factor) * dpiY + originY);
+                dispVectors.Add( new DisplacementVector( this , new Point( x , y ) , disp[i] ) );
+            }
+
+            BuildAxes();
+        }
+
+
+        /// <summary>
+        /// Plots an indicator at each plastic point
+        /// </summary>
+        public void PlotPlasticPoints ()
+        {
+        }
+
+
+        /// <summary>
+        /// Plots colour scaled contours based on polynomial
+        /// smoothed stresses at each node.
+        /// </summary>
+        public void PlotSmoothedStress ()
+        {
+        }
+
+
+        /// <summary>
+        /// Plots colour scaled stress in each element
+        /// </summary>
+        public void PlotUnSmoothedStress ()
+        {
         }
 
 
@@ -949,8 +1151,11 @@ namespace SlopeFEA
                 yAxis = (Grid) ((Grid) this.Parent).Children[1];
                 infoBlock = (Grid) ((Grid) this.Parent).Children[2];
 
-                // Construct axes and grid
-                PlotDeformedMesh();
+                // Initialize substructs for plotting
+                LoadSubstructData();
+
+                // Set plot mode and construct axes and grid
+                PlotMode = PlotModes.DeformedMesh;
 
                 // Centre and fit view
                 CentreAndFitExtents( true );
@@ -976,9 +1181,14 @@ namespace SlopeFEA
 
                 Vector delta = new Vector( 0 , deltaY );
 
+                // Update substructs
+                substructs.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
+
                 // Update FEA elements
-                triMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
                 deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
+
+                // Update disp vectors
+                dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
             }
         }
     }

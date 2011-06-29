@@ -653,7 +653,7 @@
 !     get local connectivity
       DO j = 1,NNODELT    ! traction element nodes
         i1 = NVAR*(j-1)   ! local offset
-        i2 = NVAR*(ICO(j,iel)-1)  ! global offset
+        i2 = NVAR*(ICOT(j,iel)-1)  ! global offset
         DO i = 1,NVAR   ! dofs
           LJ(i+i1) = IX(i+i2)   ! map global to local
         END DO  ! dofs
