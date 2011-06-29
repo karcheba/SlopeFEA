@@ -98,6 +98,22 @@ namespace SlopeFEA
             infoBlock.Width = infoBlockWidth;
             plottingGrid.Children.Add( infoBlock );
 
+            // Add plotting elements to infoBlock
+            Border infoBlockBorder = new Border();
+            infoBlockBorder.BorderBrush = Brushes.DimGray;
+            infoBlockBorder.VerticalAlignment = VerticalAlignment.Stretch;
+            infoBlockBorder.HorizontalAlignment = HorizontalAlignment.Stretch;
+            infoBlockBorder.BorderThickness = new Thickness( 1 );
+            infoBlockBorder.Margin = new Thickness( 0 );
+            infoBlock.Children.Add( infoBlockBorder );
+
+            Image infoBlockLogo = new Image();
+            infoBlockLogo.Height = 128;
+            infoBlockLogo.Width = 128;
+            infoBlockLogo.HorizontalAlignment = HorizontalAlignment.Center;
+            infoBlockLogo.VerticalAlignment = VerticalAlignment.Top;
+            infoBlockLogo.Margin=new Thickness(0,
+
             // Create SlopePlotCanvas object for drawing surface
             SlopePlotCanvas drawingCanvas = new SlopePlotCanvas( canvas );
             drawingCanvas.Background = Brushes.White;

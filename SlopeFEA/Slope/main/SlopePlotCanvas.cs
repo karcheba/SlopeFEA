@@ -52,6 +52,7 @@ namespace SlopeFEA
         private Grid xAxis , yAxis, infoBlock;
         private List<MaterialType> materialTypes;
         private FEAParams feaParams;
+        private List<MaterialBlock> substructs;
         private List<fe3NodedTriElement> triMesh, deformedTriMesh;
         private List<feNode> nodes , deformedNodes;
         private List<List<double>> disp;
@@ -578,8 +579,8 @@ namespace SlopeFEA
             {
                 int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
 
-                // advance to line containing "GRAVITY LOADING" header
-                while ( !tr.ReadLine().Contains( "GRAVITY LOADING" ) ) ;
+                // advance to line containing "TRACTION LOADING" header
+                while ( !tr.ReadLine().Contains( "TRACTION LOADING" ) ) ;
 
                 tr.ReadLine();
                 tr.ReadLine();
@@ -949,7 +950,7 @@ namespace SlopeFEA
                 infoBlock = (Grid) ((Grid) this.Parent).Children[2];
 
                 // Construct axes and grid
-                BuildAxes();
+                PlotDeformedMesh();
 
                 // Centre and fit view
                 CentreAndFitExtents( true );

@@ -383,3 +383,15 @@ REVISION HISTORY:
 +++ (SlopeFEA4Node.for) Copied code from SlopeFEA3Node.for for modification
 === (SlopeFEA4Node.for) Modified BMATRX() and calls to it
 +++ (SlopeFEA4Node.for) Added JACOBQ() for computing Jacobian matrix of transformation
+
+
+[28 June 2011]
+
+{v1.0.0.11}
++++ (dialogs/PlotResultsWindow.xaml, dialogs/PlotResultsWindow.xaml.cs, main/SlopePlotCanvas.cs) Created for viewing and plotting results; this window/dialog essentially behaves as a reduced version of the main program with some specialized plotting tools
++++ (SlopePlotCanvas.cs) Added plotting of deformed mesh
+
+
+[29 June 2011]
+
+{v1.0.0.11}
