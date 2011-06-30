@@ -400,3 +400,32 @@ REVISION HISTORY:
 +++ (SlopePlotCanvas.cs) Added optional autoMag parameter to PlotDeformedMesh() and PlotDisplacementVectors()
 +++ (CanvasData.cs) Added DisplacementVector class
 +++ (SlopePlotCanvas.cs) Created PlotDisplacementVectors() method
+
+
+[30 June 2011]
+
+{v1.0.0.11}
++++ (CanvasData.cs) Changed size of arrow head in DisplacementVector.Update() to Max(5, 0.5*scaleFactor) so that the arrow head size will approach zero as the magnitude of the displacement does
+=== Planning a tool for specifying load phases/cases; it is likely that this will require modifications/additions to how the base program, mesh generator, and analysis programs handle data so it is important to have a solid plan before coding the tool
+        Plan (in no particular order):  - Replace "Assign Materials" dialog with an actual window that resembles a reduced version of the input program (similar to plotting window, but different toolset)
+                                                - Must contain: i)      Ability to define a new load phase (assignment of material type, specification of load factor for each point/line load, specification of defined fixities, indication of which load phase initial stress field should be taken from, whether to set displacements to zero, perhaps specification of analysis parameters such as NSTEP, NITER, etc.)
+                                                                ii)     Ability to return to and modify all parameters of previously defined load phases
+                                                                iii)    Will not be allowed to add or remove any of the components; all loads, material blocks, material types, etc. must be defined in the input program; only will have ability to turn items "on" or "off" (perhaps on a factored scale with the loads)
+                                                                iv)     Will have only one draw mode: DrawModes.Select; therefore, all components must be able to receive a click to modify their state
+                                                                v)      Will have the familiar zoom/pan tools, but no grid, specified scale, or axis options
+                                        - For mesh generator:   i)      Add data structure to feSubstruct, fe3NodedTriElement, and fe4NodedTriElement to store a list of MaterialTypes indicating the type of material during each phase
+                                                                ii)     Add data structure to feLineLoad, fePointLoad, and fe2NodedBoundElement to indicate the load factor during each phase
+                                                                iii)    Add data structure to feNode indicating whether the dofs are free/fixed during each phase
+                                                                iv)     Generate mesh for all material blocks (including "NULL" blocks since they may contain material during some phases)
+                                                                iv)     In "nod" file, indicate number of phases, NPHASE, on top line, fixities during each phase following connectivity, and load factors during each phase following point loads
+                                                                v)      In "ele" file print list of material types during each phase following connectivity ("0" indicates the block has NULL material, or is "turned off" during that phase)
+                                                                vi)     In "bel" file print list of load factors during each phase following connectivity and load values
+                                                                vii)    Create "phs" file to store information about each phase such as: which phase to load stresses from, whether to reset displacements
+                                        - For analysis code:    i)      Add reading and associated allocation of the above information to INPUT()
+                                                                i)      Remove "gravity loading" step in main program
+                                                                ii)     Place "traction loading" step inside a loop over NPHASE
+                                                                iii)    Move construction of stiffness matrix and load vector inside the NPHASE loop since GSTIF and TLOAD will need to be rebuilt for each PHASE
+                                                                iv)     Add output of diplacements and stresses for each phase to a .PXX file (where XX = phase number) so that they can be re-read from arbitrary future phases at the beginning of the NPHASE loop
+                                        - For plotting tool:    i)      Add ability to select the phase from which to plot output
+        This task will likely take about 1-2 weeks to be sure everything is working correctly, but when complete will make the code significantly more powerful and capable of handling much more realistic cases
++++ (CanvasData.cs) Added MouseLeftButtonUp() methods to PointLoad and LineLoad classes to allow modification by direct clicks on the arrows
