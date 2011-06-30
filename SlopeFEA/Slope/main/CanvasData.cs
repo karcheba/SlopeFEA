@@ -1310,6 +1310,8 @@ namespace SlopeFEA
                 newLine.Points.Add( new Point() );
                 loadLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
 
             Update();
@@ -1412,6 +1414,51 @@ namespace SlopeFEA
             loadLines.ForEach( delegate( Polyline line ) { canvas.Children.Remove( line ); } );
             loadLines.Clear();
         }
+
+        /// <summary>
+        /// Override for left-click selection
+        /// </summary>
+        /// <param name="sender">Reference to sending object.</param>
+        /// <param name="e">Mouse event arguments.</param>
+        private void MouseLeftButtonUp ( object sender , MouseEventArgs e )
+        {
+            if ( canvas.DrawMode == DrawModes.Select
+                || canvas.DrawMode == DrawModes.PointLoad )
+            {
+                // start dialog for user input
+                AddPointLoadDialog dlg = new AddPointLoadDialog( canvas , this );
+                dlg.ShowDialog();
+
+                // if there is no load in horizontal or vertical direction, delete the load ...
+                if ( !this.IsLoadedX && !this.IsLoadedY )
+                {
+                    this.Delete();
+
+                    MaterialBlock parent = null;
+                    foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                    {
+                        if ( mb.PointLoads.Contains( this ) )
+                        {
+                            parent = mb;
+                            break;
+                        }
+                    }
+                    if ( parent != null ) parent.PointLoads.Remove( this );
+                }
+
+                // ... otherwise update its visibility and plotting location
+                else
+                {
+                    this.Update();
+                }
+
+                if ( dlg.DialogResult == true )
+                {
+                    canvas.IsSaved = false;
+                    canvas.IsVerified = false;
+                }
+            }
+        }
     }
 
 
@@ -1479,6 +1526,8 @@ namespace SlopeFEA
                 newLine.Points.Add( new Point() );
                 loadLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
 
             Update();
@@ -1634,6 +1683,51 @@ namespace SlopeFEA
             loadLines.ForEach( delegate( Polyline line ) { canvas.Children.Remove( line ); } );
             loadLines.Clear();
         }
+
+        /// <summary>
+        /// Override for left-click selection
+        /// </summary>
+        /// <param name="sender">Reference to sending object.</param>
+        /// <param name="e">Mouse event arguments.</param>
+        private void MouseLeftButtonUp ( object sender , MouseEventArgs e )
+        {
+            if ( canvas.DrawMode == DrawModes.Select
+                || canvas.DrawMode == DrawModes.LineLoad )
+            {
+                // start dialog for user input
+                AddLineLoadDialog dlg = new AddLineLoadDialog( canvas , this );
+                dlg.ShowDialog();
+
+                // if there is no load in horizontal or vertical direction, delete the load ...
+                if ( !this.IsLoadedN && !this.IsLoadedT )
+                {
+                    this.Delete();
+
+                    MaterialBlock parent = null;
+                    foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                    {
+                        if ( mb.LineLoads.Contains( this ) )
+                        {
+                            parent = mb;
+                            break;
+                        }
+                    }
+                    if ( parent != null ) parent.LineLoads.Remove( this );
+                }
+
+                // ... otherwise update its visibility and plotting location
+                else
+                {
+                    this.Update();
+                }
+
+                if ( dlg.DialogResult == true )
+                {
+                    canvas.IsSaved = false;
+                    canvas.IsVerified = false;
+                }
+            }
+        }
     }
 
     public class DisplacementVector
@@ -1670,9 +1764,11 @@ namespace SlopeFEA
             // create plotting lines for constraints
             plotLines = new List<Polyline>();
             Polyline newLine;
-            for ( int i = 0 ; i < 18 ; i++ )
+            for ( int i = 0 ; i < 3 ; i++ )
             {
                 newLine = new Polyline();
+                newLine.StrokeStartLineCap = PenLineCap.Triangle;
+                newLine.StrokeEndLineCap = PenLineCap.Triangle;
                 newLine.Fill = Brushes.Red;
                 newLine.Opacity = 1.0;
                 newLine.StrokeThickness = 1.0;
@@ -1712,6 +1808,7 @@ namespace SlopeFEA
             }
 
             double scaleFactor = canvas.Magnification * magnitude / (canvas.Scale * factor) * canvas.DpiX;
+            double arrowSize = Math.Min( 5 , 0.5 * scaleFactor );
             Point headPoint = plotPoint + scaleFactor * dir;
 
             double xprime , yprime;
@@ -1721,13 +1818,13 @@ namespace SlopeFEA
             plotLines[0].Points[1] = headPoint;
             // disp arrow head 1
             plotLines[1].Points[0] = headPoint;
-            plotLines[1].Points[1] = (Point) (5 * dir);
+            plotLines[1].Points[1] = (Point) (arrowSize * dir);
             xprime = plotLines[1].Points[1].X * Cpos - plotLines[1].Points[1].Y * Spos + plotLines[1].Points[0].X;
             yprime = plotLines[1].Points[1].X * Spos + plotLines[1].Points[1].Y * Cpos + plotLines[1].Points[0].Y;
             plotLines[1].Points[1] = new Point( xprime , yprime );
             // disp arrow head 2
             plotLines[2].Points[0] = headPoint;
-            plotLines[2].Points[1] = (Point) (5 * dir);
+            plotLines[2].Points[1] = (Point) (arrowSize * dir);
             xprime = plotLines[2].Points[1].X * Cneg - plotLines[2].Points[1].Y * Sneg + plotLines[2].Points[0].X;
             yprime = plotLines[2].Points[1].X * Sneg + plotLines[2].Points[1].Y * Cneg + plotLines[2].Points[0].Y;
             plotLines[2].Points[1] = new Point( xprime , yprime );

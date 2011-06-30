@@ -45,8 +45,8 @@ Number of Material Types = 3
 Material #1
 Name = "bedrock"
 Colour = #FFCBE2C9
-Phi = 50
-Coh = 1000
+Phi = 60
+Coh = 10000
 Psi = 0
 Gamma = 22
 Emod = 350000
@@ -59,17 +59,17 @@ Phi = 90
 Coh = 10000
 Psi = 0
 Gamma = 24
-Emod = 350000
+Emod = 26600000
 Nu = 0.25
 
 Material #3
 Name = "sand"
 Colour = #FFF9F5C1
-Phi = 42
-Coh = 0
+Phi = 35
+Coh = 5
 Psi = 0
 Gamma = 16
-Emod = 150000
+Emod = 100000
 Nu = 0.33
 
 
@@ -188,7 +188,7 @@ FEA PARAMETERS
 Column Width = 1
 Row Height = 1
 Number of Load Steps = 5
-Number of Iterations = 600
+Number of Iterations = 2000
 Number of Print Lines = 1
 Load Factor = 1
 Gravity Factor = 1
