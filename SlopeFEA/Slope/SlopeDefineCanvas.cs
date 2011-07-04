@@ -38,7 +38,7 @@ using System.Windows.Shapes;
 
 namespace SlopeFEA
 {
-    public partial class SlopePlotCanvas : Canvas
+    public partial class SlopeDefineCanvas : Canvas
     {
         private SlopeCanvas source;
         private bool panning , zooming;
@@ -47,22 +47,15 @@ namespace SlopeFEA
         private int mouseDelta = 0;
         private Point transPoint;
         private ZoomRect zoomRect;
-        private Grid xAxis , yAxis, infoBlock;
+        private Grid xAxis , yAxis , inputBlock;
         private List<MaterialType> materialTypes;
         private FEAParams feaParams;
         private List<MaterialBlock> substructs;
-        private List<fe3NodedTriElement> deformedTriMesh;
-        private List<feNode> nodes , deformedNodes;
-        private List<List<double>> disp;
-        private List<DisplacementVector> dispVectors;
-        private PlotModes plotMode;
-        private double maxDisp;
-
 
         /// <summary>
         /// (Constructor) Adds various drawing Polygons.
         /// </summary>
-        public SlopePlotCanvas ( SlopeCanvas source )
+        public SlopeDefineCanvas ( SlopeCanvas source )
         {
             this.source = source;
             this.analysisType = source.AnalysisType;
@@ -70,7 +63,7 @@ namespace SlopeFEA
             this.dpiY = source.DpiY;
             this.FilePath = source.FilePath;
 
-            this.SizeChanged += new SizeChangedEventHandler( SlopePlotCanvas_SizeChanged );
+            this.SizeChanged += new SizeChangedEventHandler( SlopeDefineCanvas_SizeChanged );
 
             // For zooming to a particular area
             zoomRect = new ZoomRect();
@@ -81,16 +74,10 @@ namespace SlopeFEA
             // Initialize list of FEA parameters
             feaParams = source.FEAParameters;
 
-            // Initialize node data
-            LoadNodeData();
-
-            // Initialize mesh
+            // Initialize block data
             substructs = new List<MaterialBlock>();
-            deformedTriMesh = new List<fe3NodedTriElement>();
-
-            // Initialize disp vectors
-            dispVectors = new List<DisplacementVector>();
         }
+
 
 
         // ----------------------------------
@@ -107,7 +94,6 @@ namespace SlopeFEA
         public double OriginOffsetY { get; set; }               // (0,0) -> BL corner
 
         public double Scale { get; set; }                       // Plotting scale (actual units / screen unit)
-        public double Magnification { get; set; }               // Plotting magnification
 
         public double DpiX { get { return this.dpiX; } }
         public double DpiY { get { return this.dpiY; } }
@@ -124,34 +110,6 @@ namespace SlopeFEA
         public int YMinorDivisions { get; set; }
 
         public bool IsScaled { get; set; }                      // Toggle for initial display setup
-
-        public PlotModes PlotMode
-        {
-            get { return this.plotMode; }
-            set
-            {
-                this.plotMode = value;
-
-                switch ( value )
-                {
-                    case PlotModes.DisplacementVectors:
-                        PlotDisplacementVectors();
-                        break;
-                    case PlotModes.PlasticPoints:
-                        PlotPlasticPoints();
-                        break;
-                    case PlotModes.SmoothedStress:
-                        PlotSmoothedStress();
-                        break;
-                    case PlotModes.UnSmoothedStress:
-                        PlotUnSmoothedStress();
-                        break;
-                    default:
-                        PlotDeformedMesh();
-                        break;
-                }
-            }
-        }
 
 
         // ----------------------------------
@@ -337,12 +295,6 @@ namespace SlopeFEA
             }
 
             /*
-             * Refresh magnification label
-             */
-            TextBlock plotMag = (TextBlock) ((Grid) ((Grid) this.Parent).Children[2]).Children[7];
-            plotMag.Text = "Magnification: " + Math.Round( Magnification , 2 );
-
-            /*
              * Refresh drawing canvas
              */
             this.Children.Clear();
@@ -350,13 +302,44 @@ namespace SlopeFEA
             // Add substructs first ...
             substructs.ForEach( delegate( MaterialBlock mb ) { this.Children.Add( mb.Boundary ); } );
 
-            // ... then add deformed elements on top of substructs ...
-            deformedTriMesh.ForEach(
-                delegate( fe3NodedTriElement element ) { this.Children.Add( element.Boundary ); } );
+            // ... then add constraints and loads on top of substructs ...
+            substructs.ForEach(
+                delegate( MaterialBlock mb )
+                {
+                    mb.BoundaryPoints.ForEach(
+                        delegate( DrawingPoint dp )
+                        {
+                            dp.FixLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } );
+                        } );
 
-            // ... then add displacement vectors on top of deformed mesh (these will never be present simultaneously) ...
-            dispVectors.ForEach(
-                delegate( DisplacementVector dv ) { dv.PlotLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } ); } );
+                    mb.LineConstraints.ForEach(
+                        delegate( LineConstraint lc )
+                        {
+                            lc.FixLines.ForEach(
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
+                        } );
+
+                    mb.LineLoads.ForEach(
+                        delegate( LineLoad ll )
+                        {
+                            ll.LoadLines.ForEach(
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
+                        } );
+
+                    mb.PointLoads.ForEach(
+                        delegate( PointLoad pl )
+                        {
+                            pl.LoadLines.ForEach(
+                                delegate( Polyline l ) { if ( !this.Children.Contains( l ) )this.Children.Add( l ); } );
+                        } );
+                } );
+
+            // ... then add vertex points on top of polygons, constraints/loads
+            substructs.ForEach( delegate( MaterialBlock mb )
+            {
+                mb.BoundaryPoints.ForEach(
+                    delegate( DrawingPoint dp ) { this.Children.Add( dp.Dot ); } );
+            } );
 
             // ... then add temporary drawing objects on top of everything
             this.Children.Add( zoomRect.Boundary );
@@ -419,12 +402,6 @@ namespace SlopeFEA
 
             // Update substructs
             substructs.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
-            
-            // Update FEA elements
-            deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
-
-            // Update disp vectors
-            dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
         }
 
 
@@ -437,10 +414,6 @@ namespace SlopeFEA
         {
             // Update plotting scale
             Scale /= factor;
-
-            // Update scale display
-            TextBlock plotScale = (TextBlock) ((Grid) ((Grid) this.Parent).Children[2]).Children[6];
-            plotScale.Text = "Scale: " + Math.Round( Scale , 2 ) + ":1";
 
             // Update plotting origin (in pixels)
             OriginOffsetX = centre.X + factor * (OriginOffsetX - centre.X);
@@ -491,12 +464,6 @@ namespace SlopeFEA
 
             // Zoom substructs
             substructs.ForEach( delegate( MaterialBlock mb ) { mb.Zoom( factor , centre ); } );
-
-            // Zoom FEA elements
-            deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Zoom( factor , centre ); } );
-
-            // Zoom disp vectors
-            dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Zoom( factor , centre ); } );
         }
 
 
@@ -603,6 +570,28 @@ namespace SlopeFEA
         }
 
 
+        public void ClearMaterialSelections ()
+        {
+            substructs.ForEach( delegate( MaterialBlock mb ) { mb.IsSelected = false; } );
+        }
+
+        public void ClearMaterialBoundaryPointSelections ()
+        {
+            substructs.ForEach( delegate( MaterialBlock mb )
+            { mb.BoundaryPoints.ForEach( delegate( DrawingPoint p ) { p.IsSelected = false; } ); } );
+        }
+
+
+        /// <summary>
+        /// Unhighlight any selected items
+        /// </summary>
+        public void ClearSelections ()
+        {
+            ClearMaterialSelections();
+            ClearMaterialBoundaryPointSelections();
+        }
+
+
         /// <summary>
         /// Gets substruct (material block data) from file
         /// </summary>
@@ -647,23 +636,30 @@ namespace SlopeFEA
 
                 if ( numMaterialBlocks > 0 )
                 {
-                    MaterialBlock newMaterialBlock;
-                    MaterialType newMaterialType;
+                    MaterialBlock block;
+                    MaterialType mtl;
                     Point[] materialBoundPoints;
+                    bool[] isFixedX;
+                    bool[] isFixedY;
+                    bool[] isPrintPoint;
                     string materialName;
                     int numMaterialBoundPoints , numLineConstraints , numLineLoads , numPointLoads;
                     double xCoord , yCoord;
-                    string[] coords;
+                    string[] coords , lineConstraint , lineLoad , pointLoad;
 
                     for ( int i = 0 ; i < numMaterialBlocks ; i++ )
                     {
                         tr.ReadLine();
 
                         materialName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
+                        mtl = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
                         materialBoundPoints = new Point[numMaterialBoundPoints + 1];
+                        isFixedX = new bool[numMaterialBoundPoints + 1];
+                        isFixedY = new bool[numMaterialBoundPoints + 1];
+                        isPrintPoint = new bool[numMaterialBoundPoints + 1];
 
                         for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {
@@ -672,258 +668,60 @@ namespace SlopeFEA
                             yCoord = double.Parse( coords[1] );
                             materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
+                            isFixedX[j] = coords[2] == Boolean.TrueString;
+                            isFixedY[j] = coords[3] == Boolean.TrueString;
+                            isPrintPoint[j] = coords[4] == Boolean.TrueString;
                         }
 
-                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
-
-                        newMaterialBlock = new MaterialBlock( this , newMaterialType , materialBoundPoints );
+                        block = new MaterialBlock( this , mtl , materialBoundPoints );
+                        for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
+                        {
+                            block.BoundaryPoints[j].IsFixedX = isFixedX[j];
+                            block.BoundaryPoints[j].IsFixedY = isFixedY[j];
+                            block.BoundaryPoints[j].IsPrintPoint = isPrintPoint[j];
+                        }
 
                         numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
-                        for ( int j = 0 ; j < numLineConstraints ; j++ ) tr.ReadLine();
+                        for ( int j = 0 ; j < numLineConstraints ; j++ )
+                        {
+                            lineConstraint = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
+                            block.LineConstraints.Add( new LineConstraint( this ,
+                                block.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                                block.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                                lineConstraint[2] == Boolean.TrueString ,
+                                lineConstraint[3] == Boolean.TrueString ) );
+                        }
 
                         numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
-                        for ( int j = 0 ; j < numLineLoads ; j++ ) tr.ReadLine();
+                        for ( int j = 0 ; j < numLineLoads ; j++ )
+                        {
+                            lineLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
+                            block.LineLoads.Add( new LineLoad( this ,
+                                block.BoundaryPoints[int.Parse( lineLoad[0] )] ,
+                                block.BoundaryPoints[int.Parse( lineLoad[1] )] ,
+                                lineLoad[2] == Boolean.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                                lineLoad[5] == Boolean.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
+                        }
 
                         numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
-                        for ( int j = 0 ; j < numPointLoads ; j++ ) tr.ReadLine();
+                        for ( int j = 0 ; j < numPointLoads ; j++ )
+                        {
+                            pointLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
+                            block.PointLoads.Add( new PointLoad( this ,
+                                block.BoundaryPoints[int.Parse( pointLoad[0] )] ,
+                                pointLoad[1] == Boolean.TrueString , double.Parse( pointLoad[2] ) ,
+                                pointLoad[3] == Boolean.TrueString , double.Parse( pointLoad[4] ) ) );
+                        }
 
-                        substructs.Add( newMaterialBlock );
+                        substructs.Add( block );
 
                         tr.ReadLine();
                     }
                 }
             }
         }
+        
 
-
-        /// <summary>
-        /// Gets node data from output file
-        /// </summary>
-        public void LoadNodeData ()
-        {
-            string[] pathSplit = FilePath.Split( '.' );
-
-            // Find node file
-            pathSplit[1] = "nod";
-            string nodePath = String.Join( "." , pathSplit );
-            if ( !File.Exists( nodePath ) )
-            {
-                MessageBox.Show( "Could not find node data file." , "Error" );
-                return;
-            }
-
-            // Load node data from file
-            // N.B.: nodes list is initialized with a null to 
-            //          account for 1 based indexing in Fortran
-            nodes = new List<feNode>() { null };
-            disp = new List<List<double>>() { null };
-            maxDisp = 0.0;
-            double currDisp;
-            using ( TextReader tr = new StreamReader( nodePath ) )
-            {
-                int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
-
-                // advance to line containing "GRAVITY LOADING" header
-                while ( !tr.ReadLine().Contains( "GRAVITY LOADING" ) ) ;
-
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-
-                string[] lineSplit;
-                for ( int i = 1 ; i <= nnod ; i++ )
-                {
-                    lineSplit = tr.ReadLine().Split( new char[] { ' ' } , StringSplitOptions.RemoveEmptyEntries );
-
-                    nodes.Add( new feNode( int.Parse( lineSplit[0] ) , false , 
-                                            double.Parse( lineSplit[1] ) , 
-                                            double.Parse( lineSplit[2] ) ) );
-
-                    disp.Add( new List<double>(){   double.Parse(lineSplit[3]),
-                                                    double.Parse(lineSplit[4])} );
-
-                    currDisp = Math.Sqrt( Math.Pow( disp[i][0] , 2 ) + Math.Pow( disp[i][1] , 2 ) );
-                    if ( currDisp > maxDisp ) maxDisp = currDisp;
-                }
-            }
-        }
-
-        public void ClearPlots ()
-        {
-            deformedTriMesh.Clear();
-            dispVectors.Clear();
-        }
-
-        /// <summary>
-        /// Plots deformed mesh output
-        /// </summary>
-        public void PlotDeformedMesh ( bool autoMag = true )
-        {
-            // clear existing plots
-            ClearPlots();
-
-            // get canvas dimensions/properties
-            double originX = OriginOffsetX ,
-                   originY = OriginOffsetY ,
-                   scale = Scale ,
-                   yHeight = ActualHeight;
-            Units units = Units;
-
-            // get units dependent scaling factor
-            double factor;
-            switch ( units )
-            {
-                case Units.Metres: factor = 0.0254; break;
-                case Units.Millimetres: factor = 25.4; break;
-                case Units.Feet: factor = 1.0 / 12.0; break;
-                default: factor = 1.0; break;
-            }
-
-            Polygon newPolygon;
-            double x , y;
-
-            // on first call (from constructor) read from file
-            if ( deformedTriMesh.Count == 0 )
-            {
-                string[] pathSplit = FilePath.Split( '.' );
-
-                // Find element file
-                pathSplit[1] = "ele";
-                string elementPath = String.Join( "." , pathSplit );
-                if ( !File.Exists( elementPath ) )
-                {
-                    MessageBox.Show( "Could not find element data file." , "Error" );
-                    return;
-                }
-
-                string[] lineSplit;
-                using ( TextReader tr = new StreamReader( elementPath ) )
-                {
-                    int nel = int.Parse( tr.ReadLine().Split( '\t' )[0] );
-
-                    for ( int i = 0 ; i < nel ; i++ )
-                    {
-                        lineSplit = tr.ReadLine().Split( '\t' );
-
-                        deformedTriMesh.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
-                            nodes[int.Parse( lineSplit[1] )] ,
-                            nodes[int.Parse( lineSplit[2] )] ,
-                            nodes[int.Parse( lineSplit[3] )] ,
-                            materialTypes[int.Parse( lineSplit[4] ) - 1] ,
-                            false ) );
-                    }
-                }
-            }
-
-            // compute magnification
-            if ( autoMag ) Magnification = 0.25 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
-
-            // compute deformed coordinates
-            deformedNodes = new List<feNode>() { null };
-            for ( int i = 1 ; i < nodes.Count ; i++ )
-            {
-                deformedNodes.Add( new feNode( i , false ,
-                    nodes[i].X + Magnification * disp[i][0] ,
-                    nodes[i].Y + Magnification * disp[i][1] ) );
-            }
-
-            // set mesh to deformed coords
-            deformedTriMesh.ForEach( delegate( fe3NodedTriElement element )
-            {
-                element.Nodes[0] = deformedNodes[element.Nodes[0].Number];
-                element.Nodes[1] = deformedNodes[element.Nodes[1].Number];
-                element.Nodes[2] = deformedNodes[element.Nodes[2].Number];
-
-                newPolygon = new Polygon();
-                newPolygon.StrokeThickness = 0.8;
-                newPolygon.Stroke = Brushes.Red;
-                newPolygon.Opacity = /*1.0*/ 0.8;
-                newPolygon.Fill = /*Brushes.White*/ element.Material.Fill;
-
-                foreach ( feNode node in element.Nodes )
-                {
-                    x = node.X / (scale * factor) * dpiX + originX;
-                    y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-                    newPolygon.Points.Add( new Point( x , y ) );
-                }
-
-                element.Boundary = newPolygon;
-            } );
-
-            // refresh plotting axes
-            BuildAxes();
-        }
-
-
-        /// <summary>
-        /// Plots a vector at each node indicating direction
-        /// and relative magnitude of displacement
-        /// </summary>
-        public void PlotDisplacementVectors ( bool autoMag = true )
-        {
-            // clear existing plots
-            ClearPlots();
-
-            // get canvas dimensions/properties
-            double originX = OriginOffsetX ,
-                   originY = OriginOffsetY ,
-                   scale = Scale ,
-                   yHeight = ActualHeight;
-            Units units = Units;
-
-            // get units dependent scaling factor
-            double factor;
-            switch ( units )
-            {
-                case Units.Metres: factor = 0.0254; break;
-                case Units.Millimetres: factor = 25.4; break;
-                case Units.Feet: factor = 1.0 / 12.0; break;
-                default: factor = 1.0; break;
-            }
-
-            double x , y;
-
-            // compute magnification
-            if ( autoMag ) Magnification = 0.5 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
-
-            // plot the disp vectors
-            dispVectors = new List<DisplacementVector>();
-            for ( int i = 1 ; i < nodes.Count ; i++ )
-            {
-                x = nodes[i].X / (scale * factor) * dpiX + originX;
-                y = yHeight - (nodes[i].Y / (scale * factor) * dpiY + originY);
-                dispVectors.Add( new DisplacementVector( this , new Point( x , y ) , disp[i] ) );
-            }
-
-            BuildAxes();
-        }
-
-
-        /// <summary>
-        /// Plots an indicator at each plastic point
-        /// </summary>
-        public void PlotPlasticPoints ()
-        {
-        }
-
-
-        /// <summary>
-        /// Plots colour scaled contours based on polynomial
-        /// smoothed stresses at each node.
-        /// </summary>
-        public void PlotSmoothedStress ()
-        {
-        }
-
-
-        /// <summary>
-        /// Plots colour scaled stress in each element
-        /// </summary>
-        public void PlotUnSmoothedStress ()
-        {
-        }
 
 
         // ----------------------------------
@@ -967,11 +765,50 @@ namespace SlopeFEA
 
                 case (DrawModes.Select):
                     {
-                        
+                        /*
+                         * De-select objects as appropriate
+                         */
+
+                        // If shift is down, allow multiple selection of same object type
+                        if ( Keyboard.IsKeyDown( Key.LeftShift ) || Keyboard.IsKeyDown( Key.RightShift ) )
+                        {
+                            // If mouse is not over a substruct, clear selected substructs
+                            if ( substructs.Find( delegate( MaterialBlock mb ) { return mb.IsMouseOver; } ) == null )
+                            {
+                                ClearMaterialSelections();
+                            }
+
+                            // If mouse is not over a boundary point, clear selected boundary points
+                            bool foundMaterialBoundPoint = false;
+                            for ( int i = 0 ; i < substructs.Count ; i++ )
+                            {
+                                if ( substructs[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } ) != null )
+                                {
+                                    foundMaterialBoundPoint = true;
+                                    break;
+                                }
+                            }
+                            if ( !foundMaterialBoundPoint ) ClearMaterialBoundaryPointSelections();
+                        }
+                        // Otherwise, clear all selections to prepare for new selection
+                        else
+                        {
+                            ClearSelections();
+                        }
+
+                        // Set selection status for substructs/boundary points
+                        substructs.ForEach(
+                            delegate( MaterialBlock mb )
+                            {
+                                if ( mb.IsMouseOver ) mb.IsSelected = true;
+                                mb.BoundaryPoints.ForEach(
+                                    delegate( DrawingPoint bp ) { if ( bp.IsMouseOver )bp.IsSelected = true; } );
+                            } );
                     }
                     break;
             }
         }
+        
 
 
         protected override void OnMouseMove ( MouseEventArgs e )
@@ -1120,7 +957,7 @@ namespace SlopeFEA
         // ----------------------------------
 
 
-        private void SlopePlotCanvas_SizeChanged ( object sender , SizeChangedEventArgs e )
+        private void SlopeDefineCanvas_SizeChanged ( object sender , SizeChangedEventArgs e )
         {
             // This only occurs once, immediately after canvas intialization
             if ( !IsScaled )
@@ -1143,16 +980,16 @@ namespace SlopeFEA
                 // Get axis references
                 xAxis = (Grid) ((Grid) this.Parent).Children[0];
                 yAxis = (Grid) ((Grid) this.Parent).Children[1];
-                infoBlock = (Grid) ((Grid) this.Parent).Children[2];
+                inputBlock = (Grid) ((Grid) this.Parent).Children[2];
 
                 // Initialize substructs for plotting
                 LoadSubstructData();
 
-                // Set plot mode and construct axes and grid
-                PlotMode = PlotModes.DeformedMesh;
-
                 // Centre and fit view
                 CentreAndFitExtents( true );
+
+                // Build drawing axes
+                BuildAxes();
 
                 IsScaled = true;
             }
@@ -1177,12 +1014,6 @@ namespace SlopeFEA
 
                 // Update substructs
                 substructs.ForEach( delegate( MaterialBlock mb ) { mb.Translate( delta ); } );
-
-                // Update FEA elements
-                deformedTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
-
-                // Update disp vectors
-                dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
             }
         }
     }

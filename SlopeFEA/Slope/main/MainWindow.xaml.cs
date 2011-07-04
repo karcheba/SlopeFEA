@@ -1098,22 +1098,52 @@ namespace SlopeFEA
 
             if ( currCanvas != null )
             {
-                AssignMaterialDialog dlg = new AssignMaterialDialog( this );
-                dlg.ShowDialog();
-
-                if ( dlg.DialogResult == true )
+                switch ( currCanvas.AnalysisType )
                 {
-                    if ( dlg.SelectedMaterial != null )
-                    {
-                        for ( int i = 0 ; i < currCanvas.MaterialBlocks.Count ; i++ )
+                    case AnalysisType.Bishop:
+                        AssignMaterialDialog bishopDlg = new AssignMaterialDialog( this );
+                        bishopDlg.ShowDialog();
+                        if ( bishopDlg.DialogResult == true )
                         {
-                            if ( currCanvas.MaterialBlocks[i].IsSelected )
+                            if ( bishopDlg.SelectedMaterial != null )
                             {
-                                currCanvas.MaterialBlocks[i].Material = dlg.SelectedMaterial;
-                                currCanvas.IsSaved = false;
+                                for ( int i = 0 ; i < currCanvas.MaterialBlocks.Count ; i++ )
+                                {
+                                    if ( currCanvas.MaterialBlocks[i].IsSelected )
+                                    {
+                                        currCanvas.MaterialBlocks[i].Material = bishopDlg.SelectedMaterial;
+                                        currCanvas.IsSaved = false;
+                                    }
+                                }
                             }
                         }
-                    }
+                        break;
+                    case AnalysisType.RFEM:
+                        AssignMaterialDialog rfemDlg = new AssignMaterialDialog( this );
+                        rfemDlg.ShowDialog();
+                        if ( rfemDlg.DialogResult == true )
+                        {
+                            if ( rfemDlg.SelectedMaterial != null )
+                            {
+                                for ( int i = 0 ; i < currCanvas.MaterialBlocks.Count ; i++ )
+                                {
+                                    if ( currCanvas.MaterialBlocks[i].IsSelected )
+                                    {
+                                        currCanvas.MaterialBlocks[i].Material = rfemDlg.SelectedMaterial;
+                                        currCanvas.IsSaved = false;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case AnalysisType.FEA3NodedTri:
+                        DefineAnalysisWindow fea3nodeDlg = new DefineAnalysisWindow( this , currCanvas );
+                        fea3nodeDlg.ShowDialog();
+                        break;
+                    default:
+                        DefineAnalysisWindow fea4nodeDlg = new DefineAnalysisWindow( this , currCanvas );
+                        fea4nodeDlg.ShowDialog();
+                        break;
                 }
             }
         }

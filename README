@@ -429,3 +429,11 @@ REVISION HISTORY:
                                         - For plotting tool:    i)      Add ability to select the phase from which to plot output
         This task will likely take about 1-2 weeks to be sure everything is working correctly, but when complete will make the code significantly more powerful and capable of handling much more realistic cases
 +++ (CanvasData.cs) Added MouseLeftButtonUp() methods to PointLoad and LineLoad classes to allow modification by direct clicks on the arrows
+
+
+[4 July 2011]
+
+{v1.0.0.12}
++++ (DefineAnalysisWindow.xaml, DefineAnalysisWindow.xaml.cs, SlopeDefineCanvas.cs) Created for analysis phase definition
++++ (MainWindow.xaml.cs) Added calls to DefineAnalysisWindow() to addMaterials_Click()
++++ (CanvasData.cs) Added constructors to DrawingPoint, MaterialBlock, LineConstraint, LineLoad, and PointLoad for SlopeDefineCanvas

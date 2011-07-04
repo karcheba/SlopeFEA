@@ -818,6 +818,7 @@ namespace SlopeFEA
     public class DrawingPoint
     {
         private SlopeCanvas canvas;
+        private SlopeDefineCanvas defineCanvas;
         private object parent;
         private Point point;
         private Ellipse dot;
@@ -869,6 +870,54 @@ namespace SlopeFEA
             dot.Stroke = Brushes.Black;
             dot.Fill = Brushes.Black;
             dot.Opacity = 0.7;
+            dot.MouseLeftButtonDown += new MouseButtonEventHandler( MouseLeftButtonDown );
+
+            canvas.Children.Add( dot );
+        }
+
+        public DrawingPoint ( SlopeDefineCanvas canvas , object parent , Point pt )
+        {
+            this.defineCanvas = canvas;
+            this.parent = parent;
+            this.point = pt;
+
+            fixLines = new List<Polyline>();
+            Polyline newLine;
+            for ( int i = 0 ; i < 4 ; i++ )
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.5;
+                newLine.Stroke = Brushes.Blue;
+                fixLines.Add( newLine );
+                canvas.Children.Add( newLine );
+            }
+
+            fixLines[0].Points.Add( new Point( point.X - 7 , point.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( point.X + 7 , point.Y - 3.5 ) );
+
+            fixLines[1].Points.Add( new Point( point.X - 7 , point.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( point.X + 7 , point.Y + 3.5 ) );
+
+            fixLines[2].Points.Add( new Point( point.X - 3.5 , point.Y + 7 ) );
+            fixLines[2].Points.Add( new Point( point.X - 3.5 , point.Y - 7 ) );
+
+            fixLines[3].Points.Add( new Point( point.X + 3.5 , point.Y + 7 ) );
+            fixLines[3].Points.Add( new Point( point.X + 3.5 , point.Y - 7 ) );
+
+
+            dot = new Ellipse();
+            dot.HorizontalAlignment = HorizontalAlignment.Left;
+            dot.VerticalAlignment = VerticalAlignment.Top;
+            dot.Height = 7;
+            dot.Width = 7;
+            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
+            dot.Stroke = Brushes.Black;
+            dot.Fill = Brushes.Black;
+            dot.Opacity = 0.7;
+            dot.Visibility = Visibility.Hidden;
             dot.MouseLeftButtonDown += new MouseButtonEventHandler( MouseLeftButtonDown );
 
             canvas.Children.Add( dot );
@@ -1115,16 +1164,19 @@ namespace SlopeFEA
         /// <param name="e">Mouse event arguments.</param>
         private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
-            if ( canvas.DrawMode == DrawModes.Select
-                || canvas.DrawMode == DrawModes.AddPoints
-                || canvas.DrawMode == DrawModes.MovePoints
-                || canvas.DrawMode == DrawModes.FixX
-                || canvas.DrawMode == DrawModes.FixY
-                || canvas.DrawMode == DrawModes.PointLoad
-                || canvas.DrawMode == DrawModes.LineLoad
-                || canvas.DrawMode == DrawModes.PrintPoint )
+            if ( canvas != null )
             {
-                this.IsSelected = true;
+                if ( canvas.DrawMode == DrawModes.Select
+                    || canvas.DrawMode == DrawModes.AddPoints
+                    || canvas.DrawMode == DrawModes.MovePoints
+                    || canvas.DrawMode == DrawModes.FixX
+                    || canvas.DrawMode == DrawModes.FixY
+                    || canvas.DrawMode == DrawModes.PointLoad
+                    || canvas.DrawMode == DrawModes.LineLoad
+                    || canvas.DrawMode == DrawModes.PrintPoint )
+                {
+                    this.IsSelected = true;
+                }
             }
         }
     }
@@ -1132,6 +1184,7 @@ namespace SlopeFEA
     public class LineConstraint
     {
         private SlopeCanvas canvas;
+        private SlopeDefineCanvas defineCanvas;
         private bool isFixedX , isFixedY;
         private List<Polyline> fixLines;
 
@@ -1141,6 +1194,57 @@ namespace SlopeFEA
         {
             // set parent drawing canvas
             this.canvas = canvas;
+
+            // create list of boundary nodes for the constraint
+            Nodes = new List<DrawingPoint>() { p1 , p2 };
+
+            // set constraints on boundary nodes
+            Nodes[0].IsFixedX = fixX || Nodes[0].IsFixedX;
+            Nodes[0].IsFixedY = fixY || Nodes[0].IsFixedY;
+            Nodes[1].IsFixedX = fixX || Nodes[1].IsFixedX;
+            Nodes[1].IsFixedY = fixY || Nodes[1].IsFixedY;
+
+            // compute the point at which to plot the constraint
+            MidPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+
+            // create plotting lines for constraints
+            fixLines = new List<Polyline>();
+            Polyline newLine;
+            for ( int i = 0 ; i < 4 ; i++ )
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.5;
+                newLine.Stroke = Brushes.Blue;
+                fixLines.Add( newLine );
+                canvas.Children.Add( newLine );
+            }
+
+            fixLines[0].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y - 3.5 ) );
+            fixLines[0].Points.Add( new Point( MidPoint.X + 7 , MidPoint.Y - 3.5 ) );
+
+            fixLines[1].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y + 3.5 ) );
+            fixLines[1].Points.Add( new Point( MidPoint.X + 7 , MidPoint.Y + 3.5 ) );
+
+            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5 , MidPoint.Y + 7 ) );
+            fixLines[2].Points.Add( new Point( MidPoint.X - 3.5 , MidPoint.Y - 7 ) );
+
+            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
+            fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
+
+            // set visibility of constraints
+            this.IsFixedX = fixX;
+            this.IsFixedY = fixY;
+        }
+
+        public LineConstraint ( SlopeDefineCanvas canvas ,
+                                DrawingPoint p1 , DrawingPoint p2 ,
+                                bool fixX , bool fixY )
+        {
+            // set parent drawing canvas
+            this.defineCanvas = canvas;
 
             // create list of boundary nodes for the constraint
             Nodes = new List<DrawingPoint>() { p1 , p2 };
@@ -1262,6 +1366,7 @@ namespace SlopeFEA
     public class PointLoad
     {
         private SlopeCanvas canvas;
+        private SlopeDefineCanvas defineCanvas;
         private double xLoad , yLoad;
         private bool isLoadedX , isLoadedY;
         private List<Polyline> loadLines;
@@ -1285,6 +1390,53 @@ namespace SlopeFEA
         {
             // set parent drawing canvas
             this.canvas = canvas;
+
+            // set parent node
+            this.Node = node;
+
+            // set load state
+            this.isLoadedX = isLoadedX;
+            this.xLoad = xLoad;
+            this.isLoadedY = isLoadedY;
+            this.yLoad = yLoad;
+
+            // create plotting lines for constraints
+            loadLines = new List<Polyline>();
+            Polyline newLine;
+            for ( int i = 0 ; i < 6 ; i++ )
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.75;
+                newLine.Stroke = Brushes.Blue;
+                newLine.Points.Add( new Point() );
+                newLine.Points.Add( new Point() );
+                loadLines.Add( newLine );
+                canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
+            }
+
+            Update();
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="canvas">Parent drawing canvas</param>
+        /// <param name="node">Parent node</param>
+        /// <param name="isLoadedX">Is load applied in the horizontal direction?</param>
+        /// <param name="xLoad">Value of horizontal load</param>
+        /// <param name="isLoadedY">Is load applied in the vertical direction?</param>
+        /// <param name="yLoad">Value of vertical load</param>
+        public PointLoad ( SlopeDefineCanvas canvas , DrawingPoint node ,
+                                bool isLoadedX , double xLoad ,
+                                bool isLoadedY , double yLoad )
+        {
+            // set parent drawing canvas
+            this.defineCanvas = canvas;
 
             // set parent node
             this.Node = node;
@@ -1422,40 +1574,43 @@ namespace SlopeFEA
         /// <param name="e">Mouse event arguments.</param>
         private void MouseLeftButtonUp ( object sender , MouseEventArgs e )
         {
-            if ( canvas.DrawMode == DrawModes.Select
-                || canvas.DrawMode == DrawModes.PointLoad )
+            if ( canvas != null )
             {
-                // start dialog for user input
-                AddPointLoadDialog dlg = new AddPointLoadDialog( canvas , this );
-                dlg.ShowDialog();
-
-                // if there is no load in horizontal or vertical direction, delete the load ...
-                if ( !this.IsLoadedX && !this.IsLoadedY )
+                if ( canvas.DrawMode == DrawModes.Select
+                    || canvas.DrawMode == DrawModes.PointLoad )
                 {
-                    this.Delete();
+                    // start dialog for user input
+                    AddPointLoadDialog dlg = new AddPointLoadDialog( canvas , this );
+                    dlg.ShowDialog();
 
-                    MaterialBlock parent = null;
-                    foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                    // if there is no load in horizontal or vertical direction, delete the load ...
+                    if ( !this.IsLoadedX && !this.IsLoadedY )
                     {
-                        if ( mb.PointLoads.Contains( this ) )
+                        this.Delete();
+
+                        MaterialBlock parent = null;
+                        foreach ( MaterialBlock mb in canvas.MaterialBlocks )
                         {
-                            parent = mb;
-                            break;
+                            if ( mb.PointLoads.Contains( this ) )
+                            {
+                                parent = mb;
+                                break;
+                            }
                         }
+                        if ( parent != null ) parent.PointLoads.Remove( this );
                     }
-                    if ( parent != null ) parent.PointLoads.Remove( this );
-                }
 
-                // ... otherwise update its visibility and plotting location
-                else
-                {
-                    this.Update();
-                }
+                    // ... otherwise update its visibility and plotting location
+                    else
+                    {
+                        this.Update();
+                    }
 
-                if ( dlg.DialogResult == true )
-                {
-                    canvas.IsSaved = false;
-                    canvas.IsVerified = false;
+                    if ( dlg.DialogResult == true )
+                    {
+                        canvas.IsSaved = false;
+                        canvas.IsVerified = false;
+                    }
                 }
             }
         }
@@ -1468,6 +1623,7 @@ namespace SlopeFEA
     public class LineLoad
     {
         private SlopeCanvas canvas;
+        private SlopeDefineCanvas defineCanvas;
         private double nLoad1 , nLoad2 , tLoad1 , tLoad2;
         private bool isLoadedN , isLoadedT;
         private List<Polyline> loadLines;
@@ -1497,6 +1653,63 @@ namespace SlopeFEA
         {
             // set parent drawing canvas
             this.canvas = canvas;
+
+            // create list of boundary nodes for the load
+            Nodes = new List<DrawingPoint>() { p1 , p2 };
+
+            PlotPoints = new List<Point>() { new Point() , new Point() , new Point() };
+
+            // set load state
+            this.isLoadedN = isLoadedN;
+            this.nLoad1 = nLoad1;
+            this.nLoad2 = nLoad2;
+            this.isLoadedT = isLoadedT;
+            this.tLoad1 = tLoad1;
+            this.tLoad2 = tLoad2;
+
+            // create plotting lines for constraints
+            loadLines = new List<Polyline>();
+            Polyline newLine;
+            for ( int i = 0 ; i < 18 ; i++ )
+            {
+                newLine = new Polyline();
+                newLine.Visibility = Visibility.Hidden;
+                newLine.Fill = Brushes.Blue;
+                newLine.Opacity = 1.0;
+                newLine.StrokeThickness = 1.25;
+                newLine.Stroke = Brushes.Blue;
+                newLine.Points.Add( new Point() );
+                newLine.Points.Add( new Point() );
+                loadLines.Add( newLine );
+                canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
+            }
+
+            Update();
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="canvas">Parent drawing canvas</param>
+        /// <param name="p1">Node 1 (assumed to be sorted CCW)</param>
+        /// <param name="p2">Node 2 (assumed to be sorted CCW)</param>
+        /// <param name="isLoadedN">Is load applied in the normal direction?</param>
+        /// <param name="nLoad1">Value of normal load at node 1.</param>
+        /// <param name="nLoad2">Value of normal load at node 2.</param>
+        /// <param name="isLoadedT">Is load applied in the tangential direction?</param>
+        /// <param name="tLoad1">Value of tangential load at node 1.</param>
+        /// <param name="tLoad2">Value of tangential load at node 2.</param>
+        public LineLoad ( SlopeDefineCanvas canvas ,
+                                DrawingPoint p1 , DrawingPoint p2 ,
+                                bool isLoadedN ,
+                                double nLoad1 , double nLoad2 ,
+                                bool isLoadedT ,
+                                double tLoad1 , double tLoad2 )
+        {
+            // set parent drawing canvas
+            this.defineCanvas = canvas;
 
             // create list of boundary nodes for the load
             Nodes = new List<DrawingPoint>() { p1 , p2 };
@@ -1691,40 +1904,43 @@ namespace SlopeFEA
         /// <param name="e">Mouse event arguments.</param>
         private void MouseLeftButtonUp ( object sender , MouseEventArgs e )
         {
-            if ( canvas.DrawMode == DrawModes.Select
-                || canvas.DrawMode == DrawModes.LineLoad )
+            if ( canvas != null )
             {
-                // start dialog for user input
-                AddLineLoadDialog dlg = new AddLineLoadDialog( canvas , this );
-                dlg.ShowDialog();
-
-                // if there is no load in horizontal or vertical direction, delete the load ...
-                if ( !this.IsLoadedN && !this.IsLoadedT )
+                if ( canvas.DrawMode == DrawModes.Select
+                    || canvas.DrawMode == DrawModes.LineLoad )
                 {
-                    this.Delete();
+                    // start dialog for user input
+                    AddLineLoadDialog dlg = new AddLineLoadDialog( canvas , this );
+                    dlg.ShowDialog();
 
-                    MaterialBlock parent = null;
-                    foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                    // if there is no load in horizontal or vertical direction, delete the load ...
+                    if ( !this.IsLoadedN && !this.IsLoadedT )
                     {
-                        if ( mb.LineLoads.Contains( this ) )
+                        this.Delete();
+
+                        MaterialBlock parent = null;
+                        foreach ( MaterialBlock mb in canvas.MaterialBlocks )
                         {
-                            parent = mb;
-                            break;
+                            if ( mb.LineLoads.Contains( this ) )
+                            {
+                                parent = mb;
+                                break;
+                            }
                         }
+                        if ( parent != null ) parent.LineLoads.Remove( this );
                     }
-                    if ( parent != null ) parent.LineLoads.Remove( this );
-                }
 
-                // ... otherwise update its visibility and plotting location
-                else
-                {
-                    this.Update();
-                }
+                    // ... otherwise update its visibility and plotting location
+                    else
+                    {
+                        this.Update();
+                    }
 
-                if ( dlg.DialogResult == true )
-                {
-                    canvas.IsSaved = false;
-                    canvas.IsVerified = false;
+                    if ( dlg.DialogResult == true )
+                    {
+                        canvas.IsSaved = false;
+                        canvas.IsVerified = false;
+                    }
                 }
             }
         }
@@ -1850,21 +2066,37 @@ namespace SlopeFEA
     {
         private SlopeCanvas canvas;
         private SlopePlotCanvas plotCanvas;
+        private SlopeDefineCanvas defineCanvas;
         private bool isSelected;
         private MaterialType material;
         private List<DrawingPoint> boundaryPoints;
         private List<LineConstraint> lineConstraints;
         private List<LineLoad> lineLoads;
         private List<PointLoad> pointLoads;
+        private static SolidColorBrush selectFill;
 
         public MaterialBlock ( SlopeCanvas canvas , Point[] pts )
         {
             this.canvas = canvas;
 
+            if ( selectFill == null )
+            {
+                Color selectColour = new Color();
+                selectColour = new Color();
+                selectColour.A = 20;
+                selectColour.R = 255;
+                selectColour.G = 0;
+                selectColour.B = 0;
+                selectFill = new SolidColorBrush( selectColour );
+            }
+
             Boundary = new Polygon();
             boundaryPoints = new List<DrawingPoint>();
             Boundary.Stroke = Brushes.Black;
             Boundary.StrokeThickness = 1.1;
+            Boundary.StrokeLineJoin = PenLineJoin.Round;
+            Boundary.StrokeStartLineCap = PenLineCap.Round;
+            Boundary.StrokeEndLineCap = PenLineCap.Round;
             Boundary.Fill = Brushes.WhiteSmoke;
             Boundary.Opacity = 0.8;
             Boundary.MouseLeftButtonDown += new MouseButtonEventHandler( this.MouseLeftButtonDown );
@@ -1895,6 +2127,9 @@ namespace SlopeFEA
             boundaryPoints = new List<DrawingPoint>();
             Boundary.Stroke = Brushes.Black;
             Boundary.StrokeThickness = 0.8;
+            Boundary.StrokeLineJoin = PenLineJoin.Round;
+            Boundary.StrokeStartLineCap = PenLineCap.Round;
+            Boundary.StrokeEndLineCap = PenLineCap.Round;
             Boundary.Fill = mtl.Fill;
             Boundary.Opacity = 0.6;
             Boundary.Visibility = Visibility.Visible;
@@ -1911,6 +2146,36 @@ namespace SlopeFEA
             pointLoads = new List<PointLoad>();
         }
 
+        public MaterialBlock ( SlopeDefineCanvas canvas , MaterialType mtl , Point[] pts )
+        {
+            this.defineCanvas = canvas;
+
+            Boundary = new Polygon();
+            boundaryPoints = new List<DrawingPoint>();
+            Boundary.Stroke = Brushes.Black;
+            Boundary.StrokeThickness = 0.8;
+            Boundary.StrokeLineJoin = PenLineJoin.Round;
+            Boundary.StrokeStartLineCap = PenLineCap.Round;
+            Boundary.StrokeEndLineCap = PenLineCap.Round;
+            Boundary.Fill = mtl.Fill;
+            Boundary.Opacity = 0.8;
+            Boundary.Visibility = Visibility.Visible;
+
+            for ( int i = 0 ; i < pts.Length - 1 ; i++ )
+            {
+                Boundary.Points.Add( pts[i] );
+                boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
+            }
+
+            Material = mtl;
+
+            lineConstraints = new List<LineConstraint>();
+            lineLoads = new List<LineLoad>();
+            pointLoads = new List<PointLoad>();
+
+            SortPoints();
+        }
+
         public bool IsSelected
         {
             get
@@ -1922,6 +2187,7 @@ namespace SlopeFEA
                 this.isSelected = value;
 
                 Boundary.Stroke = value ? Brushes.Red : Brushes.Black;
+                Boundary.Fill = value ? selectFill : material.Fill;
             }
         }
 
@@ -2409,7 +2675,7 @@ namespace SlopeFEA
                 p.Y += delta.Y;
                 Boundary.Points[i] = p;
 
-                if ( canvas != null ) boundaryPoints[i].Translate( delta );
+                if ( canvas != null || defineCanvas != null ) boundaryPoints[i].Translate( delta );
             }
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
@@ -2427,7 +2693,7 @@ namespace SlopeFEA
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
 
-                if ( canvas != null ) boundaryPoints[i].Zoom( factor , centre );
+                if ( canvas != null || defineCanvas != null ) boundaryPoints[i].Zoom( factor , centre );
             }
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
@@ -2437,7 +2703,9 @@ namespace SlopeFEA
 
         private void MouseLeftButtonDown ( object sender , MouseEventArgs e )
         {
-            if ( canvas != null && canvas.DrawMode == DrawModes.Select ) this.IsSelected = true;
+            if ( (canvas != null && canvas.DrawMode == DrawModes.Select)
+                    || (defineCanvas != null && defineCanvas.DrawMode == DrawModes.Select) )
+                this.IsSelected = true;
         }
 
         public int CheckIntersecting ()

@@ -100,6 +100,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dialogs\DefineAnalysisWindow.xaml.cs">
+      <DependentUpon>DefineAnalysisWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="dialogs\AddLineLoadDialog.xaml.cs">
       <DependentUpon>AddLineLoadDialog.xaml</DependentUpon>
     </Compile>
@@ -164,6 +167,7 @@
     <Compile Include="dialogs\SetMagnificationDialog.xaml.cs">
       <DependentUpon>SetMagnificationDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SlopeDefineCanvas.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -234,6 +238,10 @@
     <Resource Include="icons\ZoomOut.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="dialogs\DefineAnalysisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="dialogs\AddLineLoadDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
