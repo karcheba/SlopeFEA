@@ -111,6 +111,8 @@ namespace SlopeFEA
 
         public bool IsScaled { get; set; }                      // Toggle for initial display setup
 
+        public List<MaterialBlock> Substructs { get { return this.substructs; } }
+
 
         // ----------------------------------
         // UTILITY FUNCTIONS
@@ -980,7 +982,7 @@ namespace SlopeFEA
                 // Get axis references
                 xAxis = (Grid) ((Grid) this.Parent).Children[0];
                 yAxis = (Grid) ((Grid) this.Parent).Children[1];
-                inputBlock = (Grid) ((Grid) this.Parent).Children[2];
+                inputBlock = (Grid) ((ScrollViewer) ((Grid) this.Parent).Children[2]).Content;
 
                 // Initialize substructs for plotting
                 LoadSubstructData();

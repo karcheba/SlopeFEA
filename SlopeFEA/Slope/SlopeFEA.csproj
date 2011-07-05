@@ -100,6 +100,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dialogs\ActivateFixityDialog.xaml.cs">
+      <DependentUpon>ActivateFixityDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="dialogs\DefineAnalysisWindow.xaml.cs">
       <DependentUpon>DefineAnalysisWindow.xaml</DependentUpon>
     </Compile>
@@ -166,6 +169,9 @@
     <Compile Include="main\SlopePlotCanvas.cs" />
     <Compile Include="dialogs\SetMagnificationDialog.xaml.cs">
       <DependentUpon>SetMagnificationDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="dialogs\SetFixityDialog.xaml.cs">
+      <DependentUpon>SetFixityDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="SlopeDefineCanvas.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -238,6 +244,10 @@
     <Resource Include="icons\ZoomOut.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="dialogs\ActivateFixityDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="dialogs\DefineAnalysisWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -299,6 +309,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="dialogs\SetMagnificationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="dialogs\SetFixityDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

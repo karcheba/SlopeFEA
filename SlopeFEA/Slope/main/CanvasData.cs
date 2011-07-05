@@ -819,19 +819,20 @@ namespace SlopeFEA
     {
         private SlopeCanvas canvas;
         private SlopeDefineCanvas defineCanvas;
-        private object parent;
+        private SlopeBoundary parentBoundary;
+        private List<MaterialBlock> parentBlocks;
         private Point point;
         private Ellipse dot;
         private bool isSelected;
         private bool isPrintPoint;
-        private bool isFixedX;
-        private bool isFixedY;
+        private bool isFixedX , isFixActiveX , isFixedY , isFixActiveY;
         private List<Polyline> fixLines;
 
         public DrawingPoint ( SlopeCanvas canvas , object parent , Point pt )
         {
             this.canvas = canvas;
-            this.parent = parent;
+            if ( parent is SlopeBoundary ) this.parentBoundary = parent as SlopeBoundary;
+            else if ( parent is MaterialBlock ) this.parentBlocks = new List<MaterialBlock>() { parent as MaterialBlock };
             this.point = pt;
 
             fixLines = new List<Polyline>();
@@ -846,6 +847,8 @@ namespace SlopeFEA
                 newLine.Stroke = Brushes.Blue;
                 fixLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( fixLines_MouseLeftButtonUp );
             }
 
             fixLines[0].Points.Add( new Point( point.X - 7 , point.Y - 3.5 ) );
@@ -878,7 +881,8 @@ namespace SlopeFEA
         public DrawingPoint ( SlopeDefineCanvas canvas , object parent , Point pt )
         {
             this.defineCanvas = canvas;
-            this.parent = parent;
+            if ( parent is SlopeBoundary ) this.parentBoundary = parent as SlopeBoundary;
+            else if ( parent is MaterialBlock ) this.parentBlocks = new List<MaterialBlock>() { parent as MaterialBlock };
             this.point = pt;
 
             fixLines = new List<Polyline>();
@@ -893,6 +897,8 @@ namespace SlopeFEA
                 newLine.Stroke = Brushes.Blue;
                 fixLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( fixLines_MouseLeftButtonUp );
             }
 
             fixLines[0].Points.Add( new Point( point.X - 7 , point.Y - 3.5 ) );
@@ -973,23 +979,28 @@ namespace SlopeFEA
 
         public bool IsFixedX
         {
-            get
-            {
-                return this.isFixedX;
-            }
+            get { return this.isFixedX; }
             set
             {
                 this.isFixedX = value;
+                this.IsFixActiveX = value;
                 fixLines[2].Visibility = fixLines[3].Visibility = value ? Visibility.Visible : Visibility.Hidden;
+            }
+        }
+
+        public bool IsFixActiveX
+        {
+            get { return this.isFixActiveX; }
+            set
+            {
+                this.isFixActiveX = value;
+                fixLines[2].Opacity = fixLines[3].Opacity = value ? 1.0 : 0.2;
             }
         }
 
         public bool IsFixedY
         {
-            get
-            {
-                return this.isFixedY;
-            }
+            get { return this.isFixedY; }
             set
             {
                 this.isFixedY = value;
@@ -997,74 +1008,71 @@ namespace SlopeFEA
             }
         }
 
+        public bool IsFixActiveY
+        {
+            get { return this.isFixActiveY; }
+            set
+            {
+                this.isFixActiveY = value;
+                fixLines[0].Opacity = fixLines[1].Opacity = value ? 1.0 : 0.2;
+            }
+        }
+
         public Point Point { get { return this.point; } }
         public Ellipse Dot { get { return this.dot; } }
         public bool IsMouseOver { get { return dot.IsMouseOver; } }
-        public object Parent { get { return parent; } }
+        public SlopeBoundary ParentBoundary { get { return parentBoundary; } }
+        public List<MaterialBlock> ParentBlocks { get { return parentBlocks; } }
         public List<Polyline> FixLines { get { return fixLines; } }
 
         public void Delete ()
         {
-            SlopeBoundary boundary = parent as SlopeBoundary;
-            MaterialBlock material = parent as MaterialBlock;
-
-            if ( boundary != null )
+            if ( ParentBoundary != null )
             {
-                for ( int i = 0 ; i < boundary.Boundary.Points.Count ; i++ )
+                for ( int i = 0 ; i < ParentBoundary.Boundary.Points.Count ; i++ )
                 {
-                    if ( boundary.Boundary.Points[i] == this.Point ) boundary.Boundary.Points.RemoveAt( i );
+                    if ( ParentBoundary.Boundary.Points[i] == this.Point ) ParentBoundary.Boundary.Points.RemoveAt( i );
                 }
 
                 canvas.Children.Remove( this.Dot );
-                boundary.BoundaryPoints.Remove( this );
+                ParentBoundary.BoundaryPoints.Remove( this );
 
-                if ( boundary.BoundaryPoints.Count <= 2 )
-                {
-                    while ( boundary.BoundaryPoints.Count > 0 )
-                    {
-                        boundary.BoundaryPoints[0].Delete();
-                    }
-                    boundary.Boundary.Points.Clear();
-                    boundary.Delete();
-                }
+                if ( ParentBoundary.BoundaryPoints.Count <= 2 ) ParentBoundary.Delete();
             }
 
-            if ( material != null )
+            if ( ParentBlocks != null )
             {
-                for ( int i = 0 ; i < material.Boundary.Points.Count ; i++ )
-                {
-                    if ( material.Boundary.Points[i] == this.Point ) material.Boundary.Points.RemoveAt( i );
-                }
+                ParentBlocks.ForEach(
+                    delegate( MaterialBlock mb )
+                    {
+                        for ( int i = 0 ; i < mb.Boundary.Points.Count ; i++ )
+                        {
+                            if ( mb.Boundary.Points[i] == this.Point ) mb.Boundary.Points.RemoveAt( i );
+                        }
+
+                        mb.BoundaryPoints.Remove( this );
+
+                        // check if line constraints contain the node and delete them
+                        List<LineConstraint> existingLCs = mb.LineConstraints.FindAll( delegate( LineConstraint lc ) { return lc.Nodes.Contains( this ); } );
+                        existingLCs.ForEach( delegate( LineConstraint lc ) { lc.Delete(); mb.LineConstraints.Remove( lc ); } );
+                        existingLCs.Clear();
+
+                        // check if line loads contain the node and delete them
+                        List<LineLoad> existingLLs = mb.LineLoads.FindAll( delegate( LineLoad ll ) { return ll.Nodes.Contains( this ); } );
+                        existingLLs.ForEach( delegate( LineLoad ll ) { ll.Delete(); mb.LineLoads.Remove( ll ); } );
+                        existingLLs.Clear();
+
+                        // check if point loads contain the node and delete them
+                        List<PointLoad> existingPLs = mb.PointLoads.FindAll( delegate( PointLoad pl ) { return pl.Node == this; } );
+                        existingPLs.ForEach( delegate( PointLoad pl ) { pl.Delete(); mb.PointLoads.Remove( pl ); } );
+                        existingPLs.Clear();
+
+                        if ( mb.BoundaryPoints.Count <= 2 ) mb.Delete();
+                    } );
 
                 canvas.Children.Remove( this.Dot );
-                material.BoundaryPoints.Remove( this );
-
-                if ( material.BoundaryPoints.Count <= 2 )
-                {
-                    while ( material.BoundaryPoints.Count > 0 )
-                    {
-                        material.BoundaryPoints[0].Delete();
-                    }
-                    material.Boundary.Points.Clear();
-                    material.Delete();
-                }
 
                 ClearFixLines();
-
-                // check if line constraints contain the node and delete them
-                List<LineConstraint> existingLCs = material.LineConstraints.FindAll( delegate( LineConstraint lc ) { return lc.Nodes.Contains( this ); } );
-                existingLCs.ForEach( delegate( LineConstraint lc ) { lc.Delete(); material.LineConstraints.Remove( lc ); } );
-                existingLCs.Clear();
-
-                // check if line loads contain the node and delete them
-                List<LineLoad> existingLLs = material.LineLoads.FindAll( delegate( LineLoad ll ) { return ll.Nodes.Contains( this ); } );
-                existingLLs.ForEach( delegate( LineLoad ll ) { ll.Delete(); material.LineLoads.Remove( ll ); } );
-                existingLLs.Clear();
-
-                // check if point loads contain the node and delete them
-                List<PointLoad> existingPLs = material.PointLoads.FindAll( delegate( PointLoad pl ) { return pl.Node == this; } );
-                existingPLs.ForEach( delegate( PointLoad pl ) { pl.Delete(); material.PointLoads.Remove( pl ); } );
-                existingPLs.Clear();
             }
         }
 
@@ -1116,44 +1124,66 @@ namespace SlopeFEA
         /// <param name="delta">Move vector.</param>
         public void Move ( Vector delta )
         {
-            // attempt to cast parent object
-            SlopeBoundary boundary = parent as SlopeBoundary;
-            MaterialBlock material = parent as MaterialBlock;
-
-            // initialize index of point
-            int boundPointIndex = -1;
-
-            // obtain the index from the appropriate parent object
-            if ( boundary != null ) boundPointIndex = boundary.Boundary.Points.IndexOf( point );
-            else if ( material != null ) boundPointIndex = material.Boundary.Points.IndexOf( point );
-
-            // shift the point, its display circle, and its fixity lines
-            point += delta;
-            dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
-            Point p;
-            foreach ( Polyline l in fixLines )
+            if ( ParentBoundary != null )
             {
-                p = l.Points[0];
-                p += delta;
-                l.Points[0] = p;
+                // initialize index of point
+                int boundPointIndex = -1;
 
-                p = l.Points[1];
-                p += delta;
-                l.Points[1] = p;
+                // obtain the index from the appropriate parent object
+                boundPointIndex = ParentBoundary.Boundary.Points.IndexOf( point );
+
+                // shift the point, its display circle, and its fixity lines
+                point += delta;
+                dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
+                Point p;
+                foreach ( Polyline l in fixLines )
+                {
+                    p = l.Points[0];
+                    p += delta;
+                    l.Points[0] = p;
+
+                    p = l.Points[1];
+                    p += delta;
+                    l.Points[1] = p;
+                }
+
+                // update associated polygons, line constraints, line loads, and point loads
+                ParentBoundary.Boundary.Points[boundPointIndex] = point;
             }
-
-            // update associated polygons, line constraints, line loads, and point loads
-            if ( boundary != null ) boundary.Boundary.Points[boundPointIndex] = point;
-            else if ( material != null )
+            else if ( ParentBlocks != null )
             {
-                material.Boundary.Points[boundPointIndex] = point;
+                // initialize index of point
+                int boundPointIndex = -1;
 
-                material.LineConstraints.ForEach(
-                    delegate( LineConstraint lc ) { if ( lc.Nodes.Contains( this ) )lc.UpdateLocation(); } );
-                material.LineLoads.ForEach(
-                    delegate( LineLoad ll ) { if ( ll.Nodes.Contains( this ) )ll.Update(); } );
-                material.PointLoads.ForEach(
-                    delegate( PointLoad pl ) { if ( pl.Node == this )pl.Update(); } );
+                // obtain the index from the appropriate parent objects and update
+                ParentBlocks.ForEach(
+                    delegate( MaterialBlock mb )
+                    {
+                        boundPointIndex = mb.Boundary.Points.IndexOf( point );
+                        mb.Boundary.Points[boundPointIndex] = point + delta;
+
+                        mb.LineConstraints.ForEach(
+                        delegate( LineConstraint lc ) { if ( lc.Nodes.Contains( this ) )lc.Update(); } );
+                        mb.LineLoads.ForEach(
+                            delegate( LineLoad ll ) { if ( ll.Nodes.Contains( this ) )ll.Update(); } );
+                        mb.PointLoads.ForEach(
+                            delegate( PointLoad pl ) { if ( pl.Node == this )pl.Update(); } );
+                    } );
+
+                // shift the point, its display circle, and its fixity lines
+                point += delta;
+                dot.Margin = new Thickness( point.X - 0.5 * dot.Width , point.Y - 0.5 * dot.Height , 0 , 0 );
+                Point p;
+                foreach ( Polyline l in fixLines )
+                {
+                    p = l.Points[0];
+                    p += delta;
+                    l.Points[0] = p;
+
+                    p = l.Points[1];
+                    p += delta;
+                    l.Points[1] = p;
+                }
             }
         }
 
@@ -1179,13 +1209,43 @@ namespace SlopeFEA
                 }
             }
         }
+
+        /// <summary>
+        /// Override for left-click selection
+        /// </summary>
+        /// <param name="sender">Reference to sending object.</param>
+        /// <param name="e">Mouse event arguments.</param>
+        private void fixLines_MouseLeftButtonUp ( object sender , MouseEventArgs e )
+        {
+            if ( canvas != null )
+            {
+                if ( canvas.DrawMode == DrawModes.Select
+                    || canvas.DrawMode == DrawModes.LineLoad )
+                {
+                    // start dialog for user input
+                    SetFixityDialog dlg = new SetFixityDialog( canvas , this );
+                    dlg.ShowDialog();
+
+                    if ( dlg.DialogResult == true )
+                    {
+                        canvas.IsSaved = false;
+                        canvas.IsVerified = false;
+                    }
+                }
+            }
+            else if ( defineCanvas != null )
+            {
+                ActivateFixityDialog dlg = new ActivateFixityDialog( defineCanvas , this );
+                dlg.ShowDialog();
+            }
+        }
     }
 
     public class LineConstraint
     {
         private SlopeCanvas canvas;
         private SlopeDefineCanvas defineCanvas;
-        private bool isFixedX , isFixedY;
+        private bool isFixedX , isActiveX , isFixedY , isActiveY;
         private List<Polyline> fixLines;
 
         public LineConstraint ( SlopeCanvas canvas ,
@@ -1220,6 +1280,8 @@ namespace SlopeFEA
                 newLine.Stroke = Brushes.Blue;
                 fixLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
 
             fixLines[0].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y - 3.5 ) );
@@ -1271,6 +1333,8 @@ namespace SlopeFEA
                 newLine.Stroke = Brushes.Blue;
                 fixLines.Add( newLine );
                 canvas.Children.Add( newLine );
+
+                newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
 
             fixLines[0].Points.Add( new Point( MidPoint.X - 7 , MidPoint.Y - 3.5 ) );
@@ -1297,13 +1361,11 @@ namespace SlopeFEA
 
         public bool IsFixedX
         {
-            get
-            {
-                return this.isFixedX;
-            }
+            get { return this.isFixedX; }
             set
             {
                 this.isFixedX = value;
+                this.IsActiveX = value;
 
                 fixLines[2].Visibility = fixLines[3].Visibility = value ? Visibility.Visible : Visibility.Hidden;
 
@@ -1312,6 +1374,17 @@ namespace SlopeFEA
                     Nodes[0].IsFixedX = value;
                     Nodes[1].IsFixedX = value;
                 }
+            }
+        }
+
+        public bool IsActiveX
+        {
+            get { return this.isActiveX; }
+            set
+            {
+                this.isActiveX = value;
+
+                fixLines[2].Opacity = fixLines[3].Opacity = value ? 1.0 : 0.2;
             }
         }
 
@@ -1324,6 +1397,7 @@ namespace SlopeFEA
             set
             {
                 this.isFixedY = value;
+                this.IsActiveY = value;
 
                 fixLines[0].Visibility = fixLines[1].Visibility = value ? Visibility.Visible : Visibility.Hidden;
 
@@ -1335,7 +1409,18 @@ namespace SlopeFEA
             }
         }
 
-        public void UpdateLocation ()
+        public bool IsActiveY
+        {
+            get { return this.isActiveY; }
+            set
+            {
+                this.isActiveY = value;
+
+                fixLines[0].Opacity = fixLines[1].Opacity = value ? 1.0 : 0.2;
+            }
+        }
+
+        public void Update ()
         {
             DrawingPoint p1 = Nodes[0] , p2 = Nodes[1];
 
@@ -1359,6 +1444,61 @@ namespace SlopeFEA
         {
             fixLines.ForEach( delegate( Polyline line ) { canvas.Children.Remove( line ); } );
             fixLines.Clear();
+        }
+
+        /// <summary>
+        /// Override for left-click selection
+        /// </summary>
+        /// <param name="sender">Reference to sending object.</param>
+        /// <param name="e">Mouse event arguments.</param>
+        private void MouseLeftButtonUp ( object sender , MouseEventArgs e )
+        {
+            if ( canvas != null )
+            {
+                if ( canvas.DrawMode == DrawModes.Select
+                    || canvas.DrawMode == DrawModes.LineLoad )
+                {
+                    // start dialog for user input
+                    SetFixityDialog dlg = new SetFixityDialog( canvas , this );
+                    dlg.ShowDialog();
+
+                    // if there is no load in horizontal or vertical direction, delete the load ...
+                    if ( !this.IsFixedX && !this.IsFixedY )
+                    {
+                        this.Delete();
+
+                        MaterialBlock parent = null;
+                        foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                        {
+                            if ( mb.LineConstraints.Contains( this ) )
+                            {
+                                parent = mb;
+                                break;
+                            }
+                        }
+                        if ( parent != null ) parent.LineConstraints.Remove( this );
+                    }
+
+                    // ... otherwise update its visibility and plotting location
+                    else
+                    {
+                        this.Update();
+                    }
+
+                    if ( dlg.DialogResult == true )
+                    {
+                        canvas.IsSaved = false;
+                        canvas.IsVerified = false;
+                    }
+                }
+            }
+            else if ( defineCanvas != null )
+            {
+                ActivateFixityDialog dlg = new ActivateFixityDialog( defineCanvas , this );
+                dlg.ShowDialog();
+
+                this.Update();
+            }
         }
     }
 
@@ -2077,18 +2217,18 @@ namespace SlopeFEA
 
         public MaterialBlock ( SlopeCanvas canvas , Point[] pts )
         {
-            this.canvas = canvas;
-
             if ( selectFill == null )
             {
                 Color selectColour = new Color();
                 selectColour = new Color();
                 selectColour.A = 20;
-                selectColour.R = 255;
+                selectColour.R = 200;
                 selectColour.G = 0;
                 selectColour.B = 0;
                 selectFill = new SolidColorBrush( selectColour );
             }
+
+            this.canvas = canvas;
 
             Boundary = new Polygon();
             boundaryPoints = new List<DrawingPoint>();
@@ -2106,8 +2246,29 @@ namespace SlopeFEA
 
             for ( int i = 0 ; i < pts.Length - 1 ; i++ )
             {
-                Boundary.Points.Add( pts[i] );
-                boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
+                // check if point is same as existing point
+                bool foundPoint = false;
+                foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                {
+                    foreach ( DrawingPoint p in mb.BoundaryPoints )
+                    {
+                        if ( (pts[i] - p.Point).Length < p.Dot.Width / 2 )
+                        {
+                            Boundary.Points.Add( p.Point );
+                            boundaryPoints.Add( p );
+                            p.ParentBlocks.Add( this );
+                            foundPoint = true;
+                            break;
+                        }
+                    }
+                    if ( foundPoint ) break;
+                }
+
+                if ( !foundPoint )
+                {
+                    Boundary.Points.Add( pts[i] );
+                    boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
+                }
             }
 
             Material = new MaterialType();
@@ -2163,8 +2324,29 @@ namespace SlopeFEA
 
             for ( int i = 0 ; i < pts.Length - 1 ; i++ )
             {
-                Boundary.Points.Add( pts[i] );
-                boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
+                // check if point is same as existing point
+                bool foundPoint = false;
+                foreach ( MaterialBlock mb in canvas.Substructs )
+                {
+                    foreach ( DrawingPoint p in mb.BoundaryPoints )
+                    {
+                        if ( (pts[i] - p.Point).Length < p.Dot.Width / 2 )
+                        {
+                            Boundary.Points.Add( p.Point );
+                            boundaryPoints.Add( p );
+                            p.ParentBlocks.Add( this );
+                            foundPoint = true;
+                            break;
+                        }
+                    }
+                    if ( foundPoint ) break;
+                }
+
+                if ( !foundPoint )
+                {
+                    Boundary.Points.Add( pts[i] );
+                    boundaryPoints.Add( new DrawingPoint( canvas , this , pts[i] ) );
+                }
             }
 
             Material = mtl;
@@ -2262,11 +2444,16 @@ namespace SlopeFEA
         {
             canvas.Children.Remove( this.Boundary );
 
-            for ( int i = 0 ; i < boundaryPoints.Count ; i++ )
-            {
-                canvas.Children.Remove( boundaryPoints[i].Dot );
-                boundaryPoints[i].ClearFixLines();
-            }
+            boundaryPoints.ForEach(
+                delegate( DrawingPoint p )
+                {
+                    if ( p.ParentBlocks.Count == 1 )
+                    {
+                        canvas.Children.Remove( p.Dot );
+                        p.ClearFixLines();
+                    }
+                    else p.ParentBlocks.Remove( this );
+                } );
             Boundary.Points.Clear();
 
             LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.Delete(); } );
@@ -2276,7 +2463,7 @@ namespace SlopeFEA
             canvas.MaterialBlocks.Remove( this );
         }
 
-        public void AddPoint ( DrawingPoint p1 , DrawingPoint p2 )
+        public DrawingPoint AddPoint ( DrawingPoint p1 , DrawingPoint p2, DrawingPoint pNew )
         {
             // find point indices in list
             int index1 = BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == p1; } );
@@ -2285,8 +2472,8 @@ namespace SlopeFEA
             // if points were not successfully found
             if ( index1 == -1 || index2 == -1 )
             {
-                MessageBox.Show( "Points not found on block." , "Fix X error" );
-                return;
+                MessageBox.Show( "Points not found on block." , "Error" );
+                return null;
             }
 
             // ensure max and min as appropriate
@@ -2304,8 +2491,18 @@ namespace SlopeFEA
 
             if ( (index2 - index1) == 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
-                DrawingPoint newNode = new DrawingPoint( canvas , this , newPoint );
+                DrawingPoint newNode;
+                Point newPoint;
+                if ( pNew == null )
+                {
+                    newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                    newNode = new DrawingPoint( canvas , this , newPoint );
+                }
+                else
+                {
+                    newNode = pNew;
+                    newPoint = pNew.Point;
+                }
                 BoundaryPoints.Insert( index2 , newNode );
                 Boundary.Points.Insert( index2 , newPoint );
 
@@ -2357,11 +2554,23 @@ namespace SlopeFEA
 
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
+
+                return newNode;
             }
             else if ( index2 == 0 && index1 == BoundaryPoints.Count - 1 )
             {
-                Point newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
-                DrawingPoint newNode = new DrawingPoint( canvas , this , newPoint );
+                DrawingPoint newNode;
+                Point newPoint;
+                if ( pNew == null )
+                {
+                    newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
+                    newNode = new DrawingPoint( canvas , this , newPoint );
+                }
+                else
+                {
+                    newNode = pNew;
+                    newPoint = pNew.Point;
+                }
                 BoundaryPoints.Add( newNode );
                 Boundary.Points.Add( newPoint );
 
@@ -2413,10 +2622,13 @@ namespace SlopeFEA
 
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
+
+                return newNode;
             }
             else
             {
                 MessageBox.Show( "Points must be different and adjacent." , "Error" );
+                return null;
             }
         }
 
@@ -2674,11 +2886,18 @@ namespace SlopeFEA
                 p.X += delta.X;
                 p.Y += delta.Y;
                 Boundary.Points[i] = p;
-
-                if ( canvas != null || defineCanvas != null ) boundaryPoints[i].Translate( delta );
             }
 
-            LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
+            if ( canvas != null || defineCanvas != null )
+            {
+                boundaryPoints.ForEach(
+                    delegate( DrawingPoint dp )
+                    {
+                        if ( dp.ParentBlocks.IndexOf( this ) == 0 ) dp.Translate( delta );
+                    } );
+            }
+
+            LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.Update(); } );
             LineLoads.ForEach( delegate( LineLoad ll ) { ll.Update(); } );
             PointLoads.ForEach( delegate( PointLoad pl ) { pl.Update(); } );
         }
@@ -2692,11 +2911,18 @@ namespace SlopeFEA
                 p.X = centre.X + factor * (p.X - centre.X);
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
-
-                if ( canvas != null || defineCanvas != null ) boundaryPoints[i].Zoom( factor , centre );
             }
 
-            LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.UpdateLocation(); } );
+            if ( canvas != null || defineCanvas != null )
+            {
+                boundaryPoints.ForEach(
+                    delegate( DrawingPoint dp )
+                    {
+                        if ( dp.ParentBlocks.IndexOf( this ) == 0 ) dp.Zoom( factor , centre );
+                    } );
+            }
+
+            LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.Update(); } );
             LineLoads.ForEach( delegate( LineLoad ll ) { ll.Update(); } );
             PointLoads.ForEach( delegate( PointLoad pl ) { pl.Update(); } );
         }

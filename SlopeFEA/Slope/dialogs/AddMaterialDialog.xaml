@@ -42,7 +42,7 @@
         <ComboBox Height="23" HorizontalAlignment="Center" Margin="0,-275,0,0" Width="200" Name="materialList" VerticalAlignment="Center" Text="" IsEditable="True" SelectionChanged="materialList_SelectionChanged">
             <ComboBoxItem Content="Add new material..." IsSelected="True" />
         </ComboBox>
-        <GroupBox Header="Properties" Height="240" HorizontalAlignment="Stretch" Margin="10,0,10,0" Name="groupBox1" VerticalAlignment="Center" FontWeight="Bold" >
+        <GroupBox Header="Properties" Height="240" HorizontalAlignment="Stretch" Margin="10,0,10,0" VerticalAlignment="Center" FontWeight="Bold" >
             <Grid>
                 <Rectangle Height="20" HorizontalAlignment="Center" Margin="-170,-160,0,0" Name="colour" Stroke="Black" VerticalAlignment="Center" Width="30" StrokeThickness="1.5" Fill="{x:Null}" />
                 <Button Content="Select Colour..." Height="23" HorizontalAlignment="Center" Margin="60,-160,0,0" Name="chooseColour" VerticalAlignment="Center" Width="150" FontWeight="Normal" Click="chooseColour_Click" />

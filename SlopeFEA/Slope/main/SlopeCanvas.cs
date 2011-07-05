@@ -1414,7 +1414,7 @@ namespace SlopeFEA
                     mb.BoundaryPoints.ForEach(
                         delegate( DrawingPoint dp )
                         {
-                            dp.FixLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } );
+                            dp.FixLines.ForEach( delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
                         } );
 
                     mb.LineConstraints.ForEach(
@@ -1444,7 +1444,7 @@ namespace SlopeFEA
             materialBlocks.ForEach( delegate( MaterialBlock mb )
             {
                 mb.BoundaryPoints.ForEach(
-                    delegate( DrawingPoint dp ) { this.Children.Add( dp.Dot ); } );
+                    delegate( DrawingPoint dp ) { if ( !this.Children.Contains( dp.Dot ) ) this.Children.Add( dp.Dot ); } );
             } );
 
             // Add analysis results on top of problem definition
@@ -2513,30 +2513,29 @@ namespace SlopeFEA
 
                         if ( addPoints.Count == 2 )
                         {
-                            SlopeBoundary sb = addPoints[0].Parent as SlopeBoundary;
-                            MaterialBlock mb = addPoints[0].Parent as MaterialBlock;
-
-                            if ( sb != null )
+                            bool added = false;
+                            DrawingPoint newPoint = null;
+                            if ( addPoints[0].ParentBoundary != null && addPoints[1].ParentBoundary != null )
                             {
-                                if ( sb != (addPoints[1].Parent as SlopeBoundary) )
-                                {
-                                    MessageBox.Show( "Points must be on the same block." , "Error" );
-                                }
-                                else
-                                {
-                                    sb.AddPoint( addPoints[0] , addPoints[1] );
-                                }
+                                boundary.AddPoint( addPoints[0] , addPoints[1] );
+                                added = true;
                             }
-                            else if ( mb != null )
+                            else if ( addPoints[0].ParentBlocks != null && addPoints[1].ParentBlocks != null )
                             {
-                                if ( mb != (addPoints[1].Parent as MaterialBlock) )
-                                {
-                                    MessageBox.Show( "Points must be on the same block." , "Error" );
-                                }
-                                else
-                                {
-                                    mb.AddPoint( addPoints[0] , addPoints[1] );
-                                }
+                                addPoints[0].ParentBlocks.ForEach(
+                                    delegate( MaterialBlock mb )
+                                    {
+                                        if ( addPoints[1].ParentBlocks.Contains( mb ) )
+                                        {
+                                            newPoint = mb.AddPoint( addPoints[0] , addPoints[1] , newPoint );
+                                            added = true;
+                                        }
+                                    } );
+                            }
+
+                            if ( !added )
+                            {
+                                MessageBox.Show( "Points must be on the same block." , "Error" );
                             }
 
                             addPoints.Clear();
@@ -2564,19 +2563,21 @@ namespace SlopeFEA
 
                         if ( fixPoints.Count == 2 )
                         {
-                            MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
-
-                            if ( mb != null )
+                            bool added = false;
+                            if ( fixPoints[0].ParentBlocks != null && fixPoints[1].ParentBlocks!=null)
                             {
-                                if ( mb != (fixPoints[1].Parent as MaterialBlock) )
-                                {
-                                    MessageBox.Show( "Points must be on the same block." , "Error" );
-                                }
-                                else
-                                {
-                                    mb.FixX( fixPoints[0] , fixPoints[1] );
-                                }
+                                fixPoints[0].ParentBlocks.ForEach(
+                                    delegate( MaterialBlock mb )
+                                    {
+                                        if ( fixPoints[1].ParentBlocks.Contains( mb ) )
+                                        {
+                                            mb.FixX( fixPoints[0] , fixPoints[1] );
+                                            added = true;
+                                        }
+                                    } );
                             }
+
+                            if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
 
                             fixPoints.Clear();
                             ClearSelections();
@@ -2603,19 +2604,21 @@ namespace SlopeFEA
 
                         if ( fixPoints.Count == 2 )
                         {
-                            MaterialBlock mb = fixPoints[0].Parent as MaterialBlock;
-
-                            if ( mb != null )
+                            bool added = false;
+                            if ( fixPoints[0].ParentBlocks != null && fixPoints[1].ParentBlocks != null )
                             {
-                                if ( mb != (fixPoints[1].Parent as MaterialBlock) )
-                                {
-                                    MessageBox.Show( "Points must be on the same block." , "Error" );
-                                }
-                                else
-                                {
-                                    mb.FixY( fixPoints[0] , fixPoints[1] );
-                                }
+                                fixPoints[0].ParentBlocks.ForEach(
+                                    delegate( MaterialBlock mb )
+                                    {
+                                        if ( fixPoints[1].ParentBlocks.Contains( mb ) )
+                                        {
+                                            mb.FixY( fixPoints[0] , fixPoints[1] );
+                                            added = true;
+                                        }
+                                    } );
                             }
+
+                            if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
 
                             fixPoints.Clear();
                             ClearSelections();
@@ -2633,9 +2636,9 @@ namespace SlopeFEA
                             if ( loadPoint != null ) break;
                         }
 
-                        if ( loadPoint != null )
+                        if ( loadPoint != null && loadPoint.ParentBlocks != null )
                         {
-                            MaterialBlock mb = loadPoint.Parent as MaterialBlock;
+                            MaterialBlock mb = loadPoint.ParentBlocks[0];
 
                             if ( mb != null ) mb.ApplyPointLoad( loadPoint );
 
@@ -2663,19 +2666,21 @@ namespace SlopeFEA
 
                         if ( loadPoints.Count == 2 )
                         {
-                            MaterialBlock mb = loadPoints[0].Parent as MaterialBlock;
-
-                            if ( mb != null )
+                            bool added = false;
+                            if ( loadPoints[0].ParentBlocks != null && loadPoints[1].ParentBlocks != null )
                             {
-                                if ( mb != (loadPoints[1].Parent as MaterialBlock) )
+                                foreach ( MaterialBlock mb in loadPoints[0].ParentBlocks )
                                 {
-                                    MessageBox.Show( "Points must be on the same block." , "Error" );
-                                }
-                                else
-                                {
-                                    mb.ApplyLineLoad( loadPoints[0] , loadPoints[1] );
+                                    if ( loadPoints[1].ParentBlocks.Contains( mb ) )
+                                    {
+                                        mb.ApplyLineLoad( loadPoints[0] , loadPoints[1] );
+                                        added = true;
+                                        break;
+                                    }
                                 }
                             }
+
+                            if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
 
                             loadPoints.Clear();
                             ClearSelections();
@@ -2688,6 +2693,46 @@ namespace SlopeFEA
                     {
                         if ( moving )
                         {
+                            if ( movingBoundPoint.ParentBlocks != null )
+                            {
+                                foreach ( MaterialBlock mb in materialBlocks )
+                                {
+                                    foreach ( DrawingPoint dp in mb.BoundaryPoints )
+                                    {
+                                        if ( dp != movingBoundPoint && (dp.Point - movingBoundPoint.Point).Length < dp.Dot.Width / 2 )
+                                        {
+                                            foreach ( MaterialBlock pb in movingBoundPoint.ParentBlocks )
+                                            {
+                                                if ( !dp.ParentBlocks.Contains( pb ) ) dp.ParentBlocks.Add( pb );
+                                                int index = pb.BoundaryPoints.FindIndex( delegate( DrawingPoint pbdp ) { return pbdp == movingBoundPoint; } );
+                                                if ( index >= 0 )
+                                                {
+                                                    pb.BoundaryPoints[index] = dp;
+                                                    pb.Boundary.Points[index] = dp.Point;
+                                                }
+
+                                                // check if line constraints contain the node and update them
+                                                List<LineConstraint> existingLCs = pb.LineConstraints.FindAll( delegate( LineConstraint lc ) { return lc.Nodes.Contains( movingBoundPoint ); } );
+                                                existingLCs.ForEach( delegate( LineConstraint lc ) { for ( int i = 0 ; i < lc.Nodes.Count ; i++ ) if ( lc.Nodes[i] == movingBoundPoint ) lc.Nodes[i] = dp; lc.Update(); } );
+                                                existingLCs.Clear();
+
+                                                // check if line loads contain the node and update them
+                                                List<LineLoad> existingLLs = pb.LineLoads.FindAll( delegate( LineLoad ll ) { return ll.Nodes.Contains( movingBoundPoint ); } );
+                                                existingLLs.ForEach( delegate( LineLoad ll ) { for ( int i = 0 ; i < ll.Nodes.Count ; i++ ) if ( ll.Nodes[i] == movingBoundPoint ) ll.Nodes[i] = dp; ll.Update(); } );
+                                                existingLLs.Clear();
+
+                                                // check if point loads contain the node and delete them
+                                                List<PointLoad> existingPLs = pb.PointLoads.FindAll( delegate( PointLoad pl ) { return pl.Node == movingBoundPoint; } );
+                                                existingPLs.ForEach( delegate( PointLoad pl ) { pl.Node = dp; pl.Update(); } );
+                                                existingPLs.Clear();
+                                            }
+
+                                            this.Children.Remove( movingBoundPoint.Dot );
+                                        }
+                                    }
+                                }
+                            }
+
                             moving = false;
                             caughtCtrl = false;
                             movingBoundPoint = null;
@@ -3089,6 +3134,7 @@ namespace SlopeFEA
                 {
                     // Add new material block
                     MaterialBlock newMaterialBlock = new MaterialBlock( this , points );
+                    newMaterialBlock.Material = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == "NULL"; } );
                     materialBlocks.Add( newMaterialBlock );
                 }
 

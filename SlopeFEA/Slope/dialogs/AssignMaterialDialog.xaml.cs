@@ -49,10 +49,7 @@ namespace SlopeFEA
 
             canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
 
-            for ( int i = 0 ; i < canvas.MaterialTypes.Count ; i++ )
-            {
-                materialList.Items.Add( canvas.MaterialTypes[i] );
-            }
+            canvas.MaterialTypes.ForEach( delegate( MaterialType mt ) { materialList.Items.Add( mt ); } );
 
             materialList.SelectedIndex = 0;
 
