@@ -28,6 +28,7 @@
  ************************************************************************/
 
 using System.Windows;
+using System.Collections.Generic;
 
 namespace SlopeFEA
 {
@@ -43,7 +44,7 @@ namespace SlopeFEA
         public ActivateFixityDialog ( SlopeDefineCanvas canvas , LineConstraint lc )
         {
             InitializeComponent();
-
+            
             this.canvas = canvas;
 
             this.lc = lc;
@@ -72,6 +73,27 @@ namespace SlopeFEA
             {
                 lc.IsActiveX = (bool) isFixedX.IsChecked;
                 lc.IsActiveY = (bool) isFixedY.IsChecked;
+
+                List<LineConstraint> existingLCs = new List<LineConstraint>();
+                existingLCs.Add( lc );
+                DrawingPoint endNode = lc.Nodes[0];
+                foreach ( MaterialBlock mb in canvas.Substructs )
+                {
+                    existingLCs.AddRange( mb.LineConstraints.FindAll( delegate( LineConstraint lc0 ) { return !existingLCs.Contains( lc0 ) && lc0.Nodes.Contains( endNode ); } ) );
+                }
+                endNode.IsFixActiveX = endNode.IsFixActiveY = false;
+                existingLCs.ForEach( delegate( LineConstraint lc0 ) { endNode.IsFixActiveX = endNode.IsFixActiveX || lc0.IsActiveX; endNode.IsFixActiveY = endNode.IsFixActiveY || lc0.IsActiveY; } );
+                existingLCs.Clear();
+
+                existingLCs.Add( lc );
+                endNode = lc.Nodes[1];
+                foreach ( MaterialBlock mb in canvas.Substructs )
+                {
+                    existingLCs.AddRange( mb.LineConstraints.FindAll( delegate( LineConstraint lc0 ) { return !existingLCs.Contains( lc0 ) && lc0.Nodes.Contains( endNode ); } ) );
+                }
+                endNode.IsFixActiveX = endNode.IsFixActiveY = false;
+                existingLCs.ForEach( delegate( LineConstraint lc0 ) { endNode.IsFixActiveX = endNode.IsFixActiveX || lc0.IsActiveX; endNode.IsFixActiveY = endNode.IsFixActiveY || lc0.IsActiveY; } );
+                existingLCs.Clear();
             }
             else if ( p != null )
             {

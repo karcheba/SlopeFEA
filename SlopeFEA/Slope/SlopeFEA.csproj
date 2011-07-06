@@ -173,7 +173,7 @@
     <Compile Include="dialogs\SetFixityDialog.xaml.cs">
       <DependentUpon>SetFixityDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SlopeDefineCanvas.cs" />
+    <Compile Include="main\SlopeDefineCanvas.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -224,10 +224,8 @@
     <Resource Include="icons\New.ico" />
     <Resource Include="icons\Open.ico" />
     <Resource Include="icons\Pan.ico" />
-    <Resource Include="icons\RollerX.cur" />
-    <Resource Include="icons\RollerX.ico" />
-    <Resource Include="icons\RollerY.cur" />
-    <Resource Include="icons\RollerY.ico" />
+    <Resource Include="icons\Roller.cur" />
+    <Resource Include="icons\Roller.ico" />
     <Resource Include="icons\Run.ico" />
     <Resource Include="icons\Save.ico" />
     <Resource Include="icons\SaveAll.ico" />

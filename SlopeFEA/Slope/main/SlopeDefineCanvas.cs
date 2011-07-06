@@ -311,7 +311,7 @@ namespace SlopeFEA
                     mb.BoundaryPoints.ForEach(
                         delegate( DrawingPoint dp )
                         {
-                            dp.FixLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } );
+                            dp.FixLines.ForEach( delegate( Polyline l ) { if ( !this.Children.Contains( l ) ) this.Children.Add( l ); } );
                         } );
 
                     mb.LineConstraints.ForEach(
@@ -340,7 +340,7 @@ namespace SlopeFEA
             substructs.ForEach( delegate( MaterialBlock mb )
             {
                 mb.BoundaryPoints.ForEach(
-                    delegate( DrawingPoint dp ) { this.Children.Add( dp.Dot ); } );
+                    delegate( DrawingPoint dp ) { if ( !this.Children.Contains( dp.Dot ) ) this.Children.Add( dp.Dot ); } );
             } );
 
             // ... then add temporary drawing objects on top of everything
@@ -658,10 +658,10 @@ namespace SlopeFEA
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
-                        materialBoundPoints = new Point[numMaterialBoundPoints + 1];
-                        isFixedX = new bool[numMaterialBoundPoints + 1];
-                        isFixedY = new bool[numMaterialBoundPoints + 1];
-                        isPrintPoint = new bool[numMaterialBoundPoints + 1];
+                        materialBoundPoints = new Point[numMaterialBoundPoints];
+                        isFixedX = new bool[numMaterialBoundPoints];
+                        isFixedY = new bool[numMaterialBoundPoints];
+                        isPrintPoint = new bool[numMaterialBoundPoints];
 
                         for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {

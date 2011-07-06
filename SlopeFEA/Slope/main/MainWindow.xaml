@@ -48,8 +48,7 @@
             <TextBlock x:Key="addPointsCursor" Cursor="/Slope;component/icons/AddPoint.cur"/>
             <TextBlock x:Key="movePointsCursor" Cursor="/Slope;component/icons/MovePoint.cur"/>
             <TextBlock x:Key="printPointCursor" Cursor="/Slope;component/icons/PrintPoint.cur"/>
-            <TextBlock x:Key="rollerXCursor" Cursor="/Slope;component/icons/RollerX.cur"/>
-            <TextBlock x:Key="rollerYCursor" Cursor="/Slope;component/icons/RollerY.cur"/>
+            <TextBlock x:Key="fixityCursor" Cursor="/Slope;component/icons/Roller.cur"/>
 			<TextBlock x:Key="pointLoadCursor" Cursor="/Slope;component/icons/PointLoad.cur"/>
 			<TextBlock x:Key="lineLoadCursor" Cursor="/Slope;component/icons/LineLoad.cur"/>
         </ResourceDictionary>
@@ -186,14 +185,9 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
-                    <MenuItem Header="Horizontal Fi_xity" Click="fixX_Click">
+                    <MenuItem Header="_Fixities" Click="fixity_Click">
                         <MenuItem.Icon>
-                            <Image Source="/Slope;component/icons/RollerY.ico"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Header="Vertical Fixit_y" Click="fixY_Click">
-                        <MenuItem.Icon>
-                            <Image Source="/Slope;component/icons/RollerX.ico"/>
+                            <Image Source="/Slope;component/icons/Roller.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator/>
@@ -471,25 +465,14 @@
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>
-                    <Button Name="toolFixX" Click="fixX_Click" ToolTipService.InitialShowDelay="750">
-                        <Image Source="/Slope;component/icons/RollerY.ico"/>
+                    <Button Name="toolFixity" Click="fixity_Click" ToolTipService.InitialShowDelay="750">
+                        <Image Source="/Slope;component/icons/Roller.ico"/>
                         <Button.ToolTip>
                             <StackPanel>
-                                <TextBlock Text="Apply Horizontal Fixity" FontWeight="DemiBold"/>
+                                <TextBlock Text="Apply Fixities" FontWeight="DemiBold"/>
                                 <TextBlock/>
                                 <TextBlock Text="Click adjacent key points on the same block to"/>
-                                <TextBlock Text="apply kinematic boundary condition in X-direction."/>
-                            </StackPanel>
-                        </Button.ToolTip>
-                    </Button>
-                    <Button Name="toolFixY" Click="fixY_Click" ToolTipService.InitialShowDelay="750">
-                        <Image Source="/Slope;component/icons/RollerX.ico"/>
-                        <Button.ToolTip>
-                            <StackPanel>
-                                <TextBlock Text="Apply Vertical Fixity" FontWeight="DemiBold"/>
-                                <TextBlock/>
-                                <TextBlock Text="Click adjacent key points on the same block to"/>
-                                <TextBlock Text="apply kinematic boundary condition in Y-direction."/>
+                                <TextBlock Text="apply kinematic boundary conditions."/>
                             </StackPanel>
                         </Button.ToolTip>
                     </Button>

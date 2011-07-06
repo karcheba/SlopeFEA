@@ -663,7 +663,7 @@ namespace SlopeFEA
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
-                        materialBoundPoints = new Point[numMaterialBoundPoints + 1];
+                        materialBoundPoints = new Point[numMaterialBoundPoints];
 
                         for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {

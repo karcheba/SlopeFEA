@@ -151,16 +151,9 @@ namespace SlopeFEA.Properties {
             }
         }
         
-        internal static System.Drawing.Icon RollerX {
+        internal static System.Drawing.Icon Roller {
             get {
-                object obj = ResourceManager.GetObject("RollerX", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Icon RollerY {
-            get {
-                object obj = ResourceManager.GetObject("RollerY", resourceCulture);
+                object obj = ResourceManager.GetObject("Roller", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

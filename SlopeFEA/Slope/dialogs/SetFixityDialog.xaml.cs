@@ -28,6 +28,7 @@
  ************************************************************************/
 
 using System.Windows;
+using System.Collections.Generic;
 
 namespace SlopeFEA
 {
@@ -68,6 +69,27 @@ namespace SlopeFEA
             {
                 lc.IsFixedX = (bool) isFixedX.IsChecked;
                 lc.IsFixedY = (bool) isFixedY.IsChecked;
+
+                List<LineConstraint> existingLCs = new List<LineConstraint>();
+                existingLCs.Add( lc );
+                DrawingPoint endNode = lc.Nodes[0];
+                foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                {
+                    existingLCs.AddRange( mb.LineConstraints.FindAll( delegate( LineConstraint lc0 ) { return !existingLCs.Contains( lc0 ) && lc0.Nodes.Contains( endNode ); } ) );
+                }
+                endNode.IsFixedX = endNode.IsFixedY = false;
+                existingLCs.ForEach( delegate( LineConstraint lc0 ) { endNode.IsFixedX = endNode.IsFixedX || lc0.IsFixedX; endNode.IsFixedY = endNode.IsFixedY || lc0.IsFixedY; } );
+                existingLCs.Clear();
+
+                existingLCs.Add( lc );
+                endNode = lc.Nodes[1];
+                foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                {
+                    existingLCs.AddRange( mb.LineConstraints.FindAll( delegate( LineConstraint lc0 ) { return !existingLCs.Contains( lc0 ) && lc0.Nodes.Contains( endNode ); } ) );
+                }
+                endNode.IsFixedX = endNode.IsFixedY = false;
+                existingLCs.ForEach( delegate( LineConstraint lc0 ) { endNode.IsFixedX = endNode.IsFixedX || lc0.IsFixedX; endNode.IsFixedY = endNode.IsFixedY || lc0.IsFixedY; } );
+                existingLCs.Clear();
             }
             else if ( p != null )
             {

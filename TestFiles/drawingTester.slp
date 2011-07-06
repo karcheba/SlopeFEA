@@ -1,0 +1,111 @@
+*****************************************
+
+        Slope 2011 Input File
+
+        Project Name: drawingTester
+
+*****************************************
+
+--------------------------------
+PLOTTING DATA
+--------------------------------
+
+Units = m, kPa, kN/m^3
+
+XAxisMax = 100
+XAxisMin = 0
+YAxisMax = 50
+YAxisMin = 0
+
+XMajorDivision = 10
+YMajorDivision = 10
+
+XMinorDivisions = 5
+YMinorDivisions = 5
+
+
+--------------------------------
+BOUNDARY GEOMETRY DATA
+--------------------------------
+
+Number of Boundary Points = 0
+
+
+--------------------------------
+MATERIAL TYPE DATA
+--------------------------------
+
+Number of Material Types = 0
+
+
+--------------------------------
+MATERIAL BLOCK DATA
+--------------------------------
+
+Number of Material Blocks = 2
+
+Material Block #1
+Material Type = "NULL"
+Number of Boundary Points = 6
+44.49604743083, 4.74308300395258, False, False, False
+68.3921458340985, 20.1726215968982, True, True, False
+48.3130944506993, 33.690408158163, False, False, False
+25.2300904981301, 32.9789457075702, False, False, False
+-1.8054826243995, 31.5560208063844, False, False, False
+1.01778656126479, 6.16600790513836, False, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 2
+2, 3, False, 0, 0, False, 0, 0
+3, 4, False, 0, 0, False, 0, 0
+Number of Point Loads = 0
+
+Material Block #2
+Material Type = "NULL"
+Number of Boundary Points = 6
+-1.8054826243995, 31.5560208063844, False, False, False
+25.2300904981301, 32.9789457075702, False, False, False
+48.3130944506993, 33.690408158163, False, False, False
+68.3921458340985, 20.1726215968982, True, True, False
+76.3537549407114, 51.699604743083, False, False, False
+24.100790513834, 52.2529644268775, False, False, False
+Number of Line Constraints = 0
+Number of Line Loads = 2
+0, 1, False, 0, 0, False, 0, 0
+1, 2, False, 0, 0, False, 0, 0
+Number of Point Loads = 0
+
+
+--------------------------------
+GENETIC ALGORITHM PARAMETERS
+--------------------------------
+
+Population = 15
+Generations = 100
+Fittest Proportion = 0.1
+Mating Pool Proportion = 0.5
+Crossover Probability = 0.7
+Mutation Probability = 0.25
+Slice Width = 10
+
+
+--------------------------------
+FEA PARAMETERS
+--------------------------------
+
+Column Width = 1
+Row Height = 1
+Number of Load Steps = 5
+Number of Iterations = 200
+Number of Print Lines = 10
+Load Factor = 1
+Gravity Factor = 1
+
+
+--------------------------------
+ANALYSIS STATUS
+--------------------------------
+
+Analysis Type = Bishop
+Verified = False
+Meshed = False
+Analyzed = False

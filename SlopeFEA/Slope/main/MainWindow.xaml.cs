@@ -1408,44 +1408,6 @@ namespace SlopeFEA
             }
         }
 
-        private void fixX_Click ( object sender , RoutedEventArgs e )
-        {
-            Grid currGrid = windowManager.SelectedContent as Grid;
-
-            SlopeCanvas currCanvas = null;
-            if ( currGrid != null )
-            {
-                currCanvas = currGrid.Children[2] as SlopeCanvas;
-            }
-
-            if ( currCanvas != null )
-            {
-                currCanvas.ClearSelections();
-                currCanvas.CancelDrawing();
-                currCanvas.DrawMode = DrawModes.FixX;
-                currCanvas.Cursor = ((TextBlock) this.Resources["rollerYCursor"]).Cursor;
-            }
-        }
-
-        private void fixY_Click ( object sender , RoutedEventArgs e )
-        {
-            Grid currGrid = windowManager.SelectedContent as Grid;
-
-            SlopeCanvas currCanvas = null;
-            if ( currGrid != null )
-            {
-                currCanvas = currGrid.Children[2] as SlopeCanvas;
-            }
-
-            if ( currCanvas != null )
-            {
-                currCanvas.ClearSelections();
-                currCanvas.CancelDrawing();
-                currCanvas.DrawMode = DrawModes.FixY;
-                currCanvas.Cursor = ((TextBlock) this.Resources["rollerXCursor"]).Cursor;
-            }
-        }
-
         private void pointLoad_Click ( object sender , RoutedEventArgs e )
         {
             Grid currGrid = windowManager.SelectedContent as Grid;
@@ -1514,6 +1476,25 @@ namespace SlopeFEA
             {
                 PlotResultsWindow plotWin = new PlotResultsWindow( this , currCanvas );
                 plotWin.ShowDialog();
+            }
+        }
+
+        private void fixity_Click ( object sender , RoutedEventArgs e )
+        {
+            Grid currGrid = windowManager.SelectedContent as Grid;
+
+            SlopeCanvas currCanvas = null;
+            if ( currGrid != null )
+            {
+                currCanvas = currGrid.Children[2] as SlopeCanvas;
+            }
+
+            if ( currCanvas != null )
+            {
+                currCanvas.ClearSelections();
+                currCanvas.CancelDrawing();
+                currCanvas.DrawMode = DrawModes.Fixities;
+                currCanvas.Cursor = ((TextBlock) this.Resources["fixityCursor"]).Cursor;
             }
         }
     }

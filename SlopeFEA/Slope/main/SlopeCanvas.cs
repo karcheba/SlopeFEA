@@ -908,7 +908,7 @@ namespace SlopeFEA
 
                 if ( numBoundPoints > 0 )
                 {
-                    Point[] boundPoints = new Point[numBoundPoints + 1];
+                    Point[] boundPoints = new Point[numBoundPoints];
                     double xCoord , yCoord;
                     string[] coords;
                     for ( int i = 0 ; i < numBoundPoints ; i++ )
@@ -986,10 +986,10 @@ namespace SlopeFEA
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
-                        materialBoundPoints = new Point[numMaterialBoundPoints + 1];
-                        isFixedX = new bool[numMaterialBoundPoints + 1];
-                        isFixedY = new bool[numMaterialBoundPoints + 1];
-                        isPrintPoint = new bool[numMaterialBoundPoints + 1];
+                        materialBoundPoints = new Point[numMaterialBoundPoints];
+                        isFixedX = new bool[numMaterialBoundPoints];
+                        isFixedY = new bool[numMaterialBoundPoints];
+                        isPrintPoint = new bool[numMaterialBoundPoints];
 
                         for ( int j = 0 ; j < numMaterialBoundPoints ; j++ )
                         {
@@ -1859,10 +1859,16 @@ namespace SlopeFEA
                 return;
             }
 
-            for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-            {
-                deletedBoundPoints.InsertRange( 0 , materialBlocks[i].BoundaryPoints.FindAll( delegate( DrawingPoint bp ) { return bp.IsSelected; } ) );
-            }
+            materialBlocks.ForEach(
+                delegate( MaterialBlock mb )
+                {
+                    deletedBoundPoints.AddRange( mb.BoundaryPoints.FindAll(
+                        delegate( DrawingPoint p ) { return !deletedBoundPoints.Contains( p ) && p.IsSelected; } ) );
+                } );
+            //for ( int i = 0 ; i < materialBlocks.Count ; i++ )
+            //{
+            //    deletedBoundPoints.InsertRange( 0 , materialBlocks[i].BoundaryPoints.FindAll( delegate( DrawingPoint bp ) { return bp.IsSelected; } ) );
+            //}
             if ( deletedBoundPoints.Count > 0 )
             {
                 string countMsg = deletedBoundPoints.Count == 1 ? " this material boundary point" : " these " + deletedBoundPoints.Count + " material boundary points";
@@ -2545,48 +2551,7 @@ namespace SlopeFEA
                     break;
 
 
-                case (DrawModes.FixX):
-                    {
-                        DrawingPoint fixPoint = null;
-                        for ( int i = 0 ; i < materialBlocks.Count ; i++ )
-                        {
-                            fixPoint = materialBlocks[i].BoundaryPoints.Find( delegate( DrawingPoint bp ) { return bp.IsMouseOver; } );
-                            if ( fixPoint != null ) break;
-                        }
-
-                        if ( fixPoint != null ) fixPoints.Add( fixPoint );
-                        else
-                        {
-                            fixPoints.Clear();
-                            ClearSelections();
-                        }
-
-                        if ( fixPoints.Count == 2 )
-                        {
-                            bool added = false;
-                            if ( fixPoints[0].ParentBlocks != null && fixPoints[1].ParentBlocks!=null)
-                            {
-                                fixPoints[0].ParentBlocks.ForEach(
-                                    delegate( MaterialBlock mb )
-                                    {
-                                        if ( fixPoints[1].ParentBlocks.Contains( mb ) )
-                                        {
-                                            mb.FixX( fixPoints[0] , fixPoints[1] );
-                                            added = true;
-                                        }
-                                    } );
-                            }
-
-                            if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
-
-                            fixPoints.Clear();
-                            ClearSelections();
-                        }
-                    }
-                    break;
-
-
-                case (DrawModes.FixY):
+                case (DrawModes.Fixities):
                     {
                         DrawingPoint fixPoint = null;
                         for ( int i = 0 ; i < materialBlocks.Count ; i++ )
@@ -2607,18 +2572,17 @@ namespace SlopeFEA
                             bool added = false;
                             if ( fixPoints[0].ParentBlocks != null && fixPoints[1].ParentBlocks != null )
                             {
-                                fixPoints[0].ParentBlocks.ForEach(
-                                    delegate( MaterialBlock mb )
+                                foreach ( MaterialBlock mb in fixPoints[0].ParentBlocks )
+                                {
+                                    if ( fixPoints[1].ParentBlocks.Contains( mb ) )
                                     {
-                                        if ( fixPoints[1].ParentBlocks.Contains( mb ) )
-                                        {
-                                            mb.FixY( fixPoints[0] , fixPoints[1] );
-                                            added = true;
-                                        }
-                                    } );
+                                        added = mb.ApplyFixity( fixPoints[0] , fixPoints[1] );
+                                        if ( added ) break;
+                                    }
+                                }
                             }
 
-                            if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
+                            if ( !added ) MessageBox.Show( "Points must be on the same material block." , "Error" );
 
                             fixPoints.Clear();
                             ClearSelections();
@@ -2695,41 +2659,19 @@ namespace SlopeFEA
                         {
                             if ( movingBoundPoint.ParentBlocks != null )
                             {
+                                bool merged = false;
                                 foreach ( MaterialBlock mb in materialBlocks )
                                 {
                                     foreach ( DrawingPoint dp in mb.BoundaryPoints )
                                     {
                                         if ( dp != movingBoundPoint && (dp.Point - movingBoundPoint.Point).Length < dp.Dot.Width / 2 )
                                         {
-                                            foreach ( MaterialBlock pb in movingBoundPoint.ParentBlocks )
-                                            {
-                                                if ( !dp.ParentBlocks.Contains( pb ) ) dp.ParentBlocks.Add( pb );
-                                                int index = pb.BoundaryPoints.FindIndex( delegate( DrawingPoint pbdp ) { return pbdp == movingBoundPoint; } );
-                                                if ( index >= 0 )
-                                                {
-                                                    pb.BoundaryPoints[index] = dp;
-                                                    pb.Boundary.Points[index] = dp.Point;
-                                                }
-
-                                                // check if line constraints contain the node and update them
-                                                List<LineConstraint> existingLCs = pb.LineConstraints.FindAll( delegate( LineConstraint lc ) { return lc.Nodes.Contains( movingBoundPoint ); } );
-                                                existingLCs.ForEach( delegate( LineConstraint lc ) { for ( int i = 0 ; i < lc.Nodes.Count ; i++ ) if ( lc.Nodes[i] == movingBoundPoint ) lc.Nodes[i] = dp; lc.Update(); } );
-                                                existingLCs.Clear();
-
-                                                // check if line loads contain the node and update them
-                                                List<LineLoad> existingLLs = pb.LineLoads.FindAll( delegate( LineLoad ll ) { return ll.Nodes.Contains( movingBoundPoint ); } );
-                                                existingLLs.ForEach( delegate( LineLoad ll ) { for ( int i = 0 ; i < ll.Nodes.Count ; i++ ) if ( ll.Nodes[i] == movingBoundPoint ) ll.Nodes[i] = dp; ll.Update(); } );
-                                                existingLLs.Clear();
-
-                                                // check if point loads contain the node and delete them
-                                                List<PointLoad> existingPLs = pb.PointLoads.FindAll( delegate( PointLoad pl ) { return pl.Node == movingBoundPoint; } );
-                                                existingPLs.ForEach( delegate( PointLoad pl ) { pl.Node = dp; pl.Update(); } );
-                                                existingPLs.Clear();
-                                            }
-
-                                            this.Children.Remove( movingBoundPoint.Dot );
+                                            dp.Merge( movingBoundPoint );
+                                            merged = true;
+                                            break;
                                         }
                                     }
+                                    if ( merged ) break;
                                 }
                             }
 
@@ -3086,11 +3028,8 @@ namespace SlopeFEA
                     case DrawModes.AddPoints:
                         this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["addPointsCursor"])).Cursor;
                         break;
-                    case DrawModes.FixX:
-                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["rollerYCursor"])).Cursor;
-                        break;
-                    case DrawModes.FixY:
-                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["rollerXCursor"])).Cursor;
+                    case DrawModes.Fixities:
+                        this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["fixityCursor"])).Cursor;
                         break;
                     case DrawModes.PointLoad:
                         this.Cursor = ((TextBlock) (((MainWindow) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Parent).Resources["pointLoadCursor"])).Cursor;
@@ -3118,24 +3057,33 @@ namespace SlopeFEA
 
             if ( drawing )
             {
+                // Remove rubber banding point
+                drawLine.Points.RemoveAt( drawLine.Points.Count - 1 );
+
                 // Get array of drawing points
                 Point[] points = new Point[drawLine.Points.Count];
                 drawLine.Points.CopyTo( points , 0 );
 
                 if ( DrawMode == DrawModes.Boundaries )
                 {
-                    // Remove existing boundary
-                    this.Children.Remove( boundary.Boundary );
+                    if ( points.Length > 2 )
+                    {
+                        // Remove existing boundary
+                        this.Children.Remove( boundary.Boundary );
 
-                    // Add new boundary
-                    boundary = new SlopeBoundary( this , points );
+                        // Add new boundary
+                        boundary = new SlopeBoundary( this , points );
+                    }
                 }
                 else if ( DrawMode == DrawModes.Materials )
                 {
-                    // Add new material block
-                    MaterialBlock newMaterialBlock = new MaterialBlock( this , points );
-                    newMaterialBlock.Material = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == "NULL"; } );
-                    materialBlocks.Add( newMaterialBlock );
+                    if ( points.Length > 2 )
+                    {
+                        // Add new material block
+                        MaterialBlock newMaterialBlock = new MaterialBlock( this , points );
+                        newMaterialBlock.Material = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == "NULL"; } );
+                        materialBlocks.Add( newMaterialBlock );
+                    }
                 }
 
                 BuildAxes();
