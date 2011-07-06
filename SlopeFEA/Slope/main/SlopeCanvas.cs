@@ -2646,6 +2646,19 @@ namespace SlopeFEA
 
                             if ( !added ) MessageBox.Show( "Points must be on the same block." , "Error" );
 
+                            MaterialBlocks.ForEach(
+                                delegate( MaterialBlock mb )
+                                {
+                                    for ( int i = mb.LineLoads.Count - 1 ; i >= 0 ; i-- )
+                                    {
+                                        if ( !mb.LineLoads[i].IsLoadedN && !mb.LineLoads[i].IsLoadedT )
+                                        {
+                                            mb.LineLoads[i].Delete();
+                                            mb.LineLoads.RemoveAt( i );
+                                        }
+                                    }
+                                } );
+
                             loadPoints.Clear();
                             ClearSelections();
                         }

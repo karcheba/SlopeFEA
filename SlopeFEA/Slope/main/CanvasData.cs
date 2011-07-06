@@ -1201,17 +1201,33 @@ namespace SlopeFEA
                 otherPL.Delete();
             }
 
-            // merge the actual points
             foreach ( MaterialBlock mb in other.ParentBlocks )
             {
+                // merge the actual points
                 int index = mb.BoundaryPoints.FindIndex( delegate( DrawingPoint p ) { return p == other; } );
                 mb.BoundaryPoints[index] = this;
                 mb.Boundary.Points[index] = this.Point;
                 if ( !this.ParentBlocks.Contains( mb ) ) this.ParentBlocks.Add( mb );
 
                 // eliminate oddities such as LineLoads and LineConstraints containing duplicate points
-                mb.LineLoads.RemoveAll( delegate( LineLoad ll ) { return ll.Nodes[0] == this && ll.Nodes[1] == this; } );
-                mb.LineConstraints.RemoveAll( delegate( LineConstraint lc ) { return lc.Nodes[0] == this && lc.Nodes[1] == this; } );
+                for ( int i = mb.LineLoads.Count - 1 ; i >= 0 ; i-- )
+                {
+                    if ( (!mb.LineLoads[i].IsLoadedN && !mb.LineLoads[i].IsLoadedT)
+                        || (mb.LineLoads[i].Nodes[0] == this && mb.LineLoads[i].Nodes[1] == this) )
+                    {
+                        mb.LineLoads[i].Delete();
+                        mb.LineLoads.RemoveAt( i );
+                    }
+                }
+                for ( int i = mb.LineConstraints.Count - 1 ; i >= 0 ; i-- )
+                {
+                    if ( (!mb.LineConstraints[i].IsFixedX && !mb.LineConstraints[i].IsFixedY)
+                        || (mb.LineConstraints[i].Nodes[0] == this && mb.LineConstraints[i].Nodes[1] == this) )
+                    {
+                        mb.LineConstraints[i].Delete();
+                        mb.LineConstraints.RemoveAt( i );
+                    }
+                }
             }
 
             other.ParentBlocks.Clear();
@@ -1659,16 +1675,10 @@ namespace SlopeFEA
                     {
                         this.Delete();
 
-                        MaterialBlock parent = null;
                         foreach ( MaterialBlock mb in canvas.MaterialBlocks )
                         {
-                            if ( mb.LineConstraints.Contains( this ) )
-                            {
-                                parent = mb;
-                                break;
-                            }
+                            mb.LineConstraints.RemoveAll( delegate( LineConstraint lc ) { return lc == this; } );
                         }
-                        if ( parent != null ) parent.LineConstraints.Remove( this );
                     }
 
                     // ... otherwise update its visibility and plotting location
@@ -1820,6 +1830,7 @@ namespace SlopeFEA
             {
                 this.isLoadedX = value;
                 if ( !value ) this.XLoad = 0.0;
+                this.Update();
             }
         }
         public bool IsLoadedY 
@@ -1829,6 +1840,7 @@ namespace SlopeFEA
             {
                 this.isLoadedY = value;
                 if ( !value ) this.YLoad = 0.0;
+                this.Update();
             }
         }
 
@@ -2744,142 +2756,9 @@ namespace SlopeFEA
                 }
                 BoundaryPoints.Insert( index2 , newNode );
                 Boundary.Points.Insert( index2 , newPoint );
-
-                //// if a line constraint exists between these two points, remove it and create two in its place
-                //List<LineConstraint> existingLCs = new List<LineConstraint>();
-                //List<MaterialBlock> existingParents = new List<MaterialBlock>();
-                //canvas.MaterialBlocks.ForEach(
-                //    delegate( MaterialBlock mb )
-                //    {
-                //        existingLCs.AddRange( mb.LineConstraints.FindAll(
-                //            delegate( LineConstraint lc )
-                //            {
-                //                if ( lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ) )
-                //                {
-                //                    existingParents.Add( mb );
-                //                    return true;
-                //                }
-                //                else return false;
-                //            } ) );
-                //    } );
-                ////LineConstraint existingLC = this.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
-                //// create the two new line constraints
-                //LineConstraint newLC1 = new LineConstraint( canvas , p1 , newNode , false , false );
-                //LineConstraint newLC2 = new LineConstraint( canvas , newNode , p2 , false , false );
-                //existingLCs.ForEach(
-                //    delegate( LineConstraint lc )
-                //    //if ( existingLC != null )
-                //    {
-                //        // match the new node fixity to the line constraint
-                //        //newNode.IsFixedX = existingLC.IsFixedX;
-                //        //newNode.IsFixedY = existingLC.IsFixedY;
-                //        newNode.IsFixedX = newNode.IsFixedX || lc.IsFixedX;
-                //        newNode.IsFixedY = newNode.IsFixedY || lc.IsFixedY;
-                //        newLC1.IsFixedX = newLC1.IsFixedX || lc.IsFixedX;
-                //        newLC1.IsFixedY = newLC1.IsFixedY || lc.IsFixedY;
-                //        newLC2.IsFixedX = newLC2.IsFixedX || lc.IsFixedX;
-                //        newLC2.IsFixedY = newLC2.IsFixedY || lc.IsFixedY;
-
-                //        // create the two new line constraints
-                //        //LineConstraint newLC1 = new LineConstraint( canvas ,
-                //        //    p1 , newNode , existingLC.IsFixedX , existingLC.IsFixedY );
-                //        //LineConstraint newLC2 = new LineConstraint( canvas ,
-                //        //    newNode , p2 , existingLC.IsFixedX , existingLC.IsFixedY );
-
-                //        // clear the existing plotting lines, remove the existing constraint, and add the new constraints
-                //        //existingLC.Delete();
-                //        //LineConstraints.Remove( existingLC );
-                //        //LineConstraints.Add( newLC1 );
-                //        //LineConstraints.Add( newLC2 );
-                //        existingParents.ForEach( delegate( MaterialBlock mb ) { mb.LineConstraints.Remove( lc ); } );
-                //        lc.Delete();
-                //    } );
-                //existingParents.ForEach( delegate( MaterialBlock mb ) { mb.LineConstraints.Add( newLC1 ); mb.LineConstraints.Add( newLC2 ); } );
-                //existingLCs.Clear(); existingParents.Clear();
-
-
-                //// if a line load exists between these two points, remove it and create two in its place
-                ////LineLoad existingLL = this.LineLoads.Find( delegate( LineLoad ll ) { return ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ); } );
-                //List<LineLoad> existingLLs = new List<LineLoad>();
-                //canvas.MaterialBlocks.ForEach(
-                //    delegate( MaterialBlock mb )
-                //    {
-                //        existingLLs.AddRange( mb.LineLoads.FindAll(
-                //            delegate( LineLoad ll )
-                //            {
-                //                if ( ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ) )
-                //                {
-                //                    existingParents.Add( mb );
-                //                    return true;
-                //                }
-                //                else return false;
-                //            } ) );
-                //    } );
-                //LineLoad newLL1 = new LineLoad( canvas , p1 , newNode , false , 0 , 0 , false , 0 , 0 );
-                //LineLoad newLL2 = new LineLoad( canvas , newNode , p2 , false , 0 , 0 , false , 0 , 0 );
-                //existingLLs.ForEach(
-                //    delegate( LineLoad ll )
-                //    //if ( existingLL != null )
-                //    {
-                //        // create two new line loads
-                //        //LineLoad newLL1 = new LineLoad( canvas ,
-                //        //    p1 , newNode ,
-                //        //    existingLL.IsLoadedN ,
-                //        //    existingLL.NLoad1 , 0.5 * (existingLL.NLoad1 + existingLL.NLoad2) ,
-                //        //    existingLL.IsLoadedT ,
-                //        //    existingLL.TLoad1 , 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
-                //        //LineLoad newLL2 = new LineLoad( canvas ,
-                //        //    newNode , p2 ,
-                //        //    existingLL.IsLoadedN ,
-                //        //    newLL1.NLoad2 , existingLL.NLoad2 ,
-                //        //    existingLL.IsLoadedT ,
-                //        //    newLL1.TLoad2 , existingLL.TLoad2 );
-                //        newLL1.IsLoadedN = newLL1.IsLoadedN || ll.IsLoadedN;
-                //        if ( newLL1.IsLoadedN )
-                //        {
-                //            newLL1.NLoad1 += ll.NLoad1;
-                //            newLL1.NLoad2 += 0.5 * (ll.NLoad1 + ll.NLoad2);
-                //        }
-                //        newLL1.IsLoadedT = newLL1.IsLoadedT || ll.IsLoadedT;
-                //        if ( newLL1.IsLoadedT )
-                //        {
-                //            newLL1.TLoad1 += ll.TLoad1;
-                //            newLL1.TLoad2 += 0.5 * (ll.TLoad1 + ll.TLoad2);
-                //        }
-
-                //        newLL2.IsLoadedN = newLL2.IsLoadedN || ll.IsLoadedN;
-                //        if ( newLL2.IsLoadedN )
-                //        {
-                //            newLL2.NLoad1 += 0.5 * (ll.NLoad1 + ll.NLoad2);
-                //            newLL2.NLoad2 += ll.NLoad2;
-                //        }
-                //        newLL2.IsLoadedT = newLL2.IsLoadedT || ll.IsLoadedT;
-                //        if ( newLL2.IsLoadedT )
-                //        {
-                //            newLL2.TLoad1 += 0.5 * (ll.TLoad1 + ll.TLoad2);
-                //            newLL2.TLoad2 += ll.TLoad2;
-                //        }
-
-                //        // clear the existing plotting lines, remove the existing line load, and add the new line loads
-                //        //existingLL.Delete();
-                //        //LineLoads.Remove( existingLL );
-                //        //LineLoads.Add( newLL1 );
-                //        //LineLoads.Add( newLL2 );
-                //        existingParents.ForEach( delegate( MaterialBlock mb ) { mb.LineLoads.Remove( ll ); } );
-                //        ll.Delete();
-                //    } );
-                //LineLoads.Add( newLL1 ); LineLoads.Add( newLL2 );
-                //existingLLs.Clear(); existingParents.Clear();
-
-                //canvas.IsSaved = false;
-                //canvas.IsVerified = false;
-
-                //return newNode;
             }
             else if ( index2 == 0 && index1 == BoundaryPoints.Count - 1 )
             {
-                //DrawingPoint newNode;
-                //Point newPoint;
                 if ( pNew == null )
                 {
                     newPoint = new Point( 0.5 * (p1.Point.X + p2.Point.X) , 0.5 * (p1.Point.Y + p2.Point.Y) );
@@ -2893,57 +2772,6 @@ namespace SlopeFEA
                 }
                 BoundaryPoints.Add( newNode );
                 Boundary.Points.Add( newPoint );
-
-                // if a line constraint exists between these two points, remove it and create two in its place
-                //LineConstraint existingLC = this.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
-                //if ( existingLC != null )
-                //{
-                //    // match the new node fixity to the line constraint
-                //    newNode.IsFixedX = existingLC.IsFixedX;
-                //    newNode.IsFixedY = existingLC.IsFixedY;
-
-                //    // create the two new line constraints
-                //    LineConstraint newLC1 = new LineConstraint( canvas ,
-                //        p1 , newNode , existingLC.IsFixedX , existingLC.IsFixedY );
-                //    LineConstraint newLC2 = new LineConstraint( canvas ,
-                //        newNode , p2 , existingLC.IsFixedX , existingLC.IsFixedY );
-
-                //    // clear the existing plotting lines, remove the existing constraint, and add the new constraints
-                //    existingLC.Delete();
-                //    LineConstraints.Remove( existingLC );
-                //    LineConstraints.Add( newLC1 );
-                //    LineConstraints.Add( newLC2 );
-                //}
-
-                //// if a line load exists between these two points, remove it and create two in its place
-                //LineLoad existingLL = this.LineLoads.Find( delegate( LineLoad ll ) { return ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ); } );
-                //if ( existingLL != null )
-                //{
-                //    // create two new line loads
-                //    LineLoad newLL1 = new LineLoad( canvas ,
-                //        p1 , newNode ,
-                //        existingLL.IsLoadedN ,
-                //        existingLL.NLoad1 , 0.5 * (existingLL.NLoad1 + existingLL.NLoad2) ,
-                //        existingLL.IsLoadedT ,
-                //        existingLL.TLoad1 , 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
-                //    LineLoad newLL2 = new LineLoad( canvas ,
-                //        newNode , p2 ,
-                //        existingLL.IsLoadedN ,
-                //        newLL1.NLoad2 , existingLL.NLoad2 ,
-                //        existingLL.IsLoadedT ,
-                //        newLL1.TLoad2 , existingLL.TLoad2 );
-
-                //    // clear the existing plotting lines, remove the existing line load, and add the new line loads
-                //    existingLL.Delete();
-                //    LineLoads.Remove( existingLL );
-                //    LineLoads.Add( newLL1 );
-                //    LineLoads.Add( newLL2 );
-                //}
-
-                //canvas.IsSaved = false;
-                //canvas.IsVerified = false;
-
-                //return newNode;
             }
             else
             {
@@ -2968,17 +2796,13 @@ namespace SlopeFEA
                             else return false;
                         } ) );
                 } );
-            //LineConstraint existingLC = this.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
             // create the two new line constraints
             LineConstraint newLC1 = new LineConstraint( canvas , p1 , newNode , false , false );
             LineConstraint newLC2 = new LineConstraint( canvas , newNode , p2 , false , false );
             existingLCs.ForEach(
                 delegate( LineConstraint lc )
-                //if ( existingLC != null )
                 {
                     // match the new node fixity to the line constraint
-                    //newNode.IsFixedX = existingLC.IsFixedX;
-                    //newNode.IsFixedY = existingLC.IsFixedY;
                     newNode.IsFixedX = newNode.IsFixedX || lc.IsFixedX;
                     newNode.IsFixedY = newNode.IsFixedY || lc.IsFixedY;
                     newLC1.IsFixedX = newLC1.IsFixedX || lc.IsFixedX;
@@ -2986,17 +2810,7 @@ namespace SlopeFEA
                     newLC2.IsFixedX = newLC2.IsFixedX || lc.IsFixedX;
                     newLC2.IsFixedY = newLC2.IsFixedY || lc.IsFixedY;
 
-                    // create the two new line constraints
-                    //LineConstraint newLC1 = new LineConstraint( canvas ,
-                    //    p1 , newNode , existingLC.IsFixedX , existingLC.IsFixedY );
-                    //LineConstraint newLC2 = new LineConstraint( canvas ,
-                    //    newNode , p2 , existingLC.IsFixedX , existingLC.IsFixedY );
-
                     // clear the existing plotting lines, remove the existing constraint, and add the new constraints
-                    //existingLC.Delete();
-                    //LineConstraints.Remove( existingLC );
-                    //LineConstraints.Add( newLC1 );
-                    //LineConstraints.Add( newLC2 );
                     existingParents.ForEach( delegate( MaterialBlock mb ) { mb.LineConstraints.Remove( lc ); } );
                     lc.Delete();
                 } );
@@ -3005,7 +2819,6 @@ namespace SlopeFEA
 
 
             // if a line load exists between these two points, remove it and create two in its place
-            //LineLoad existingLL = this.LineLoads.Find( delegate( LineLoad ll ) { return ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ); } );
             List<LineLoad> existingLLs = new List<LineLoad>();
             canvas.MaterialBlocks.ForEach(
                 delegate( MaterialBlock mb )
@@ -3025,21 +2838,7 @@ namespace SlopeFEA
             LineLoad newLL2 = new LineLoad( canvas , newNode , p2 , false , 0 , 0 , false , 0 , 0 );
             existingLLs.ForEach(
                 delegate( LineLoad ll )
-                //if ( existingLL != null )
                 {
-                    // create two new line loads
-                    //LineLoad newLL1 = new LineLoad( canvas ,
-                    //    p1 , newNode ,
-                    //    existingLL.IsLoadedN ,
-                    //    existingLL.NLoad1 , 0.5 * (existingLL.NLoad1 + existingLL.NLoad2) ,
-                    //    existingLL.IsLoadedT ,
-                    //    existingLL.TLoad1 , 0.5 * (existingLL.TLoad1 + existingLL.TLoad2) );
-                    //LineLoad newLL2 = new LineLoad( canvas ,
-                    //    newNode , p2 ,
-                    //    existingLL.IsLoadedN ,
-                    //    newLL1.NLoad2 , existingLL.NLoad2 ,
-                    //    existingLL.IsLoadedT ,
-                    //    newLL1.TLoad2 , existingLL.TLoad2 );
                     newLL1.IsLoadedN = newLL1.IsLoadedN || ll.IsLoadedN;
                     if ( newLL1.IsLoadedN )
                     {
@@ -3067,15 +2866,32 @@ namespace SlopeFEA
                     }
 
                     // clear the existing plotting lines, remove the existing line load, and add the new line loads
-                    //existingLL.Delete();
-                    //LineLoads.Remove( existingLL );
-                    //LineLoads.Add( newLL1 );
-                    //LineLoads.Add( newLL2 );
                     existingParents.ForEach( delegate( MaterialBlock mb ) { mb.LineLoads.Remove( ll ); } );
                     ll.Delete();
                 } );
             LineLoads.Add( newLL1 ); LineLoads.Add( newLL2 );
             existingLLs.Clear(); existingParents.Clear();
+
+            foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+            {
+                for ( int i = mb.LineLoads.Count - 1 ; i >= 0 ; i-- )
+                {
+                    if ( !mb.LineLoads[i].IsLoadedN && !mb.LineLoads[i].IsLoadedT )
+                    {
+                        mb.LineLoads[i].Delete();
+                        mb.LineLoads.RemoveAt( i );
+                    }
+                }
+
+                for ( int i = mb.LineConstraints.Count - 1 ; i >= 0 ; i-- )
+                {
+                    if ( !mb.LineConstraints[i].IsFixedX && !mb.LineConstraints[i].IsFixedY )
+                    {
+                        mb.LineConstraints[i].Delete();
+                        mb.LineConstraints.RemoveAt( i );
+                    }
+                }
+            }
 
             canvas.IsSaved = false;
             canvas.IsVerified = false;
@@ -3117,12 +2933,6 @@ namespace SlopeFEA
                 SetFixityDialog dlg = new SetFixityDialog( canvas , p1 );
                 dlg.ShowDialog();
 
-                //bool fix = !p1.IsFixedX;
-                //p1.IsFixedX = fix;
-
-                //if ( !fix ) LineConstraints.ForEach(
-                //      delegate( LineConstraint lc ) { if ( lc.Nodes.Contains( p1 ) )lc.IsFixedX = fix; } );
-
                 if ( dlg.DialogResult == true )
                 {
                     canvas.IsSaved = false;
@@ -3138,7 +2948,6 @@ namespace SlopeFEA
 
                 if ( existingLC != null )
                 {
-                    //existingLC.IsFixedX = !existingLC.IsFixedX;
                     SetFixityDialog dlg = new SetFixityDialog( canvas , existingLC );
                     dlg.ShowDialog();
 
@@ -3151,7 +2960,6 @@ namespace SlopeFEA
                 }
                 else
                 {
-                    //LineConstraints.Add( new LineConstraint( canvas , p1 , p2 , true , false ) );
                     LineConstraint newLC = new LineConstraint( canvas , p1 , p2 , false , false );
                     SetFixityDialog dlg = new SetFixityDialog( canvas , newLC );
                     dlg.ShowDialog();
@@ -3168,6 +2976,7 @@ namespace SlopeFEA
                         canvas.IsSaved = false;
                         canvas.IsVerified = false;
                     }
+
                     added = true;
                 }
             }
@@ -3180,11 +2989,6 @@ namespace SlopeFEA
             }
 
             // remove any line constraints that are both unfixed
-            //for ( int i = LineConstraints.Count - 1 ; i >= 0 ; i-- )
-            //{
-            //    if ( !(LineConstraints[i].IsFixedX) && !(LineConstraints[i].IsFixedY) )
-            //        LineConstraints.RemoveAt( i );
-            //}
             canvas.MaterialBlocks.ForEach(
                 delegate( MaterialBlock mb )
                 {
