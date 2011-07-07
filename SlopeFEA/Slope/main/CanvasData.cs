@@ -1004,6 +1004,7 @@ namespace SlopeFEA
             set
             {
                 this.isFixedY = value;
+                this.IsFixActiveY = value;
                 fixLines[0].Visibility = fixLines[1].Visibility = value ? Visibility.Visible : Visibility.Hidden;
             }
         }
@@ -1160,14 +1161,14 @@ namespace SlopeFEA
                                     if ( otherLL.IsLoadedN )
                                     {
                                         ll.IsLoadedN = true;
-                                        ll.NLoad1 += otherLL.NLoad2;
-                                        ll.NLoad2 += otherLL.NLoad1;
+                                        ll.NLoad1 -= otherLL.NLoad2;
+                                        ll.NLoad2 -= otherLL.NLoad1;
                                     }
                                     if ( otherLL.IsLoadedT )
                                     {
                                         ll.IsLoadedT = true;
-                                        ll.TLoad1 += otherLL.TLoad2;
-                                        ll.TLoad2 += otherLL.TLoad1;
+                                        ll.TLoad1 -= otherLL.TLoad2;
+                                        ll.TLoad2 -= otherLL.TLoad1;
                                     }
 
                                     // delete the LineLoad formerly containing other point, leaving only a single summed LineLoad
@@ -2509,7 +2510,7 @@ namespace SlopeFEA
                 {
                     if ( this.BoundaryPoints.Contains( lc.Nodes[0] ) && this.BoundaryPoints.Contains( lc.Nodes[1] ) )
                     {
-                        this.LineConstraints.Add( lc );
+                        if ( !this.LineConstraints.Contains( lc ) ) this.LineConstraints.Add( lc );
                     }
                 }
             }
@@ -2600,7 +2601,7 @@ namespace SlopeFEA
                 {
                     if ( this.BoundaryPoints.Contains( lc.Nodes[0] ) && this.BoundaryPoints.Contains( lc.Nodes[1] ) )
                     {
-                        this.LineConstraints.Add( lc );
+                        if ( !this.LineConstraints.Contains( lc ) ) this.LineConstraints.Add( lc );
                     }
                 }
             }

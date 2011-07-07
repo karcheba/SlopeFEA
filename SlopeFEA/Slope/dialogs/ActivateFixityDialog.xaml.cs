@@ -65,6 +65,20 @@ namespace SlopeFEA
             isFixedY.IsEnabled = p.IsFixedY;
             isFixedX.IsChecked = p.IsFixActiveX;
             isFixedY.IsChecked = p.IsFixActiveY;
+
+            List<LineConstraint> attachedLCs = new List<LineConstraint>();
+            canvas.Substructs.ForEach(
+                delegate( MaterialBlock mb )
+                {
+                    attachedLCs.AddRange( mb.LineConstraints.FindAll( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p ); } ) );
+                } );
+            attachedLCs.ForEach(
+                delegate( LineConstraint lc )
+                {
+                    if ( lc.IsActiveX ) isFixedX.IsEnabled = false;
+                    if ( lc.IsActiveY ) isFixedY.IsEnabled = false;
+                } );
+            attachedLCs.Clear();
         }
 
         private void ok_Click ( object sender , RoutedEventArgs e )

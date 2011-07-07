@@ -640,6 +640,7 @@ namespace SlopeFEA
                 {
                     MaterialBlock block;
                     MaterialType mtl;
+                    LineConstraint newLC, existingLC;
                     Point[] materialBoundPoints;
                     bool[] isFixedX;
                     bool[] isFixedY;
@@ -687,11 +688,27 @@ namespace SlopeFEA
                         for ( int j = 0 ; j < numLineConstraints ; j++ )
                         {
                             lineConstraint = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            block.LineConstraints.Add( new LineConstraint( this ,
+                            newLC = new LineConstraint( this ,
                                 block.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
                                 block.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
                                 lineConstraint[2] == Boolean.TrueString ,
-                                lineConstraint[3] == Boolean.TrueString ) );
+                                lineConstraint[3] == Boolean.TrueString );
+                            existingLC = null;
+                            foreach ( MaterialBlock mb in substructs )
+                            {
+                                existingLC = mb.LineConstraints.Find(
+                                    delegate( LineConstraint lc )
+                                    {
+                                        return lc.Nodes.Contains( newLC.Nodes[0] ) && lc.Nodes.Contains( newLC.Nodes[1] );
+                                    } );
+                                if ( existingLC != null ) break;
+                            }
+                            if ( existingLC != null )
+                            {
+                                if ( !block.LineConstraints.Contains( existingLC ) )
+                                    block.LineConstraints.Add( existingLC );
+                            }
+                            else block.LineConstraints.Add( newLC );
                         }
 
                         numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );

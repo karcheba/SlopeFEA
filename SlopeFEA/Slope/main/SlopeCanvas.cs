@@ -969,6 +969,7 @@ namespace SlopeFEA
                 {
                     MaterialBlock newMaterialBlock;
                     MaterialType newMaterialType;
+                    LineConstraint newLineConstraint, existingLineConstraint;
                     Point[] materialBoundPoints;
                     bool[] isFixedX;
                     bool[] isFixedY;
@@ -1015,11 +1016,28 @@ namespace SlopeFEA
                         for ( int j = 0 ; j < numLineConstraints ; j++ )
                         {
                             lineConstraint = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            newMaterialBlock.LineConstraints.Add( new LineConstraint( this ,
+                            newLineConstraint = new LineConstraint( this ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
                                 lineConstraint[2] == Boolean.TrueString ,
-                                lineConstraint[3] == Boolean.TrueString ) );
+                                lineConstraint[3] == Boolean.TrueString );
+                            existingLineConstraint = null;
+                            foreach ( MaterialBlock mb in materialBlocks )
+                            {
+                                existingLineConstraint = mb.LineConstraints.Find(
+                                    delegate( LineConstraint lc )
+                                    {
+                                        return lc.Nodes.Contains( newLineConstraint.Nodes[0] )
+                                            && lc.Nodes.Contains( newLineConstraint.Nodes[1] );
+                                    } );
+                                if ( existingLineConstraint != null ) break;
+                            }
+                            if ( existingLineConstraint != null )
+                            {
+                                if ( !newMaterialBlock.LineConstraints.Contains( existingLineConstraint ) )
+                                    newMaterialBlock.LineConstraints.Add( existingLineConstraint );
+                            }
+                            else newMaterialBlock.LineConstraints.Add( newLineConstraint );
                         }
 
                         numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
