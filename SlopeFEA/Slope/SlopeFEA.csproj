@@ -116,6 +116,12 @@
       <DependentUpon>AddPointLoadDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="engine\FortranWrappers.cs" />
+    <Compile Include="dialogs\FactorLineLoadDialog.xaml.cs">
+      <DependentUpon>FactorLineLoadDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="dialogs\FactorPointLoadDialog.xaml.cs">
+      <DependentUpon>FactorPointLoadDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="main\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -273,6 +279,14 @@
     <Page Include="dialogs\AxisOptionsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="dialogs\FactorLineLoadDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="dialogs\FactorPointLoadDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="main\ClosableHeader.xaml">
       <Generator>MSBuild:Compile</Generator>

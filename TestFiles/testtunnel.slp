@@ -106,7 +106,7 @@ Material Type = "bedrock"
 Number of Boundary Points = 4
 0, -10, True, True, False
 40, -10, True, True, False
-40, 6.41091190159489E-15, True, False, False
+40, -8.33418547207335E-14, True, False, False
 0, -8.33418547207335E-14, True, False, False
 Number of Line Constraints = 3
 3, 0, True, False
@@ -156,8 +156,8 @@ Number of Point Loads = 0
 Material Block #6
 Material Type = "concrete"
 Number of Boundary Points = 6
-30, 35, False, False, False
-30, 20, False, False, False
+29.9999999999999, 35, False, False, False
+29.9999999999999, 20, False, False, False
 31, 20, False, False, False
 31, 21, False, False, False
 31, 34, False, False, False
@@ -202,3 +202,11 @@ Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = True
+
+
+--------------------------------
+ANALYSIS PHASES
+--------------------------------
+
+Number of Analysis Phases = 0
+

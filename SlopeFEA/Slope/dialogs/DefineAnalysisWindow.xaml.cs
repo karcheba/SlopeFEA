@@ -52,9 +52,12 @@ namespace SlopeFEA
         private List<MaterialType> materialTypes;
         private MaterialType selectedMaterial;
         private Rectangle materialFill;
-        private ComboBox materialList;
+        private ComboBox materialList, phaseList, beginPhaseList;
+        private CheckBox resetDisplacements;
+        private TextBox loadSteps , iterations , printLines , gravityFactor;
         private TextBlock phiValue , cohValue , psiValue , gammaValue , emodValue , nuValue;
         private Label phiUnits , cohUnits , psiUnits , gammaUnits , emodUnits;
+        private Button add , modify , delete;
 
         public DefineAnalysisWindow ( Window owner , SlopeCanvas canvas )
         {
@@ -142,7 +145,7 @@ namespace SlopeFEA
             phaseBox.VerticalAlignment = VerticalAlignment.Top;
             phaseBox.HorizontalAlignment = HorizontalAlignment.Stretch;
             phaseBox.Margin = new Thickness( 15 , 30 , 15 , 0 );
-            phaseBox.Height = 300;
+            phaseBox.Height = 250;
             inputBlock.Children.Add( phaseBox );
 
             // Parent.Content.Children[1].Content = Grid for phase data GroupBox elements
@@ -151,6 +154,176 @@ namespace SlopeFEA
             phaseGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
             phaseGrid.Margin = new Thickness( 0 );
             phaseBox.Content = phaseGrid;
+
+            // Label for AnalysisPhase ComboBox
+            Label phaseListLabel = new Label();
+            phaseListLabel.Content = "Phase:";
+            phaseListLabel.Height = 28;
+            phaseListLabel.Width = 80;
+            phaseListLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            phaseListLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            phaseListLabel.VerticalAlignment = VerticalAlignment.Center;
+            phaseListLabel.Margin = new Thickness( -180 , -170 , 0 , 0 );
+            phaseListLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( phaseListLabel );
+
+            // Name of selected AnalysisPhase
+            phaseList = new ComboBox();
+            phaseList.Text = "Add new analysis phase...";
+            phaseList.Height = 23;
+            phaseList.Width = 160;
+            phaseList.HorizontalAlignment = HorizontalAlignment.Center;
+            phaseList.VerticalAlignment = VerticalAlignment.Center;
+            phaseList.Margin = new Thickness( 70 , -170 , 0 , 0 );
+            phaseList.FontWeight = FontWeights.Normal;
+            phaseList.IsEditable = true;
+            phaseList.SelectionChanged += new SelectionChangedEventHandler( phaseList_SelectionChanged );
+            phaseGrid.Children.Add( phaseList );
+
+            // Label for AnalysisPhase ComboBox
+            Label beginPhaseLabel = new Label();
+            beginPhaseLabel.Content = "Begin From:";
+            beginPhaseLabel.Height = 28;
+            beginPhaseLabel.Width = 80;
+            beginPhaseLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            beginPhaseLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            beginPhaseLabel.VerticalAlignment = VerticalAlignment.Center;
+            beginPhaseLabel.Margin = new Thickness( -180 , -110 , 0 , 0 );
+            beginPhaseLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( beginPhaseLabel );
+
+            // Name of AnalysisPhase to begin from
+            beginPhaseList = new ComboBox();
+            beginPhaseList.Height = 23;
+            beginPhaseList.Width = 160;
+            beginPhaseList.HorizontalAlignment = HorizontalAlignment.Center;
+            beginPhaseList.VerticalAlignment = VerticalAlignment.Center;
+            beginPhaseList.Margin = new Thickness( 70 , -110 , 0 , 0 );
+            beginPhaseList.FontWeight = FontWeights.Normal;
+            beginPhaseList.IsEditable = false;
+            phaseGrid.Children.Add( beginPhaseList );
+
+            // CheckBox for reset displacements option
+            resetDisplacements = new CheckBox();
+            resetDisplacements.Content = "Reset displacements to zero?";
+            resetDisplacements.Height = 23;
+            resetDisplacements.Width = 180;
+            resetDisplacements.HorizontalAlignment = HorizontalAlignment.Center;
+            resetDisplacements.VerticalAlignment = VerticalAlignment.Center;
+            resetDisplacements.HorizontalContentAlignment = HorizontalAlignment.Center;
+            resetDisplacements.Margin = new Thickness( 0 , -50 , 0 , 0 );
+            resetDisplacements.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( resetDisplacements );
+
+            // Label for number of load steps
+            Label loadStepsLabel = new Label();
+            loadStepsLabel.Content = "# Load Steps";
+            loadStepsLabel.Height = 28;
+            loadStepsLabel.Width = 150;
+            loadStepsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            loadStepsLabel.VerticalAlignment = VerticalAlignment.Center;
+            loadStepsLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            loadStepsLabel.Margin = new Thickness( -120 , 26 , 0 , 0 );
+            loadStepsLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( loadStepsLabel );
+
+            // TextBox for number of load steps
+            loadSteps = new TextBox();
+            loadSteps.Height = 23;
+            loadSteps.Width = 90;
+            loadSteps.HorizontalAlignment = HorizontalAlignment.Center;
+            loadSteps.VerticalAlignment = VerticalAlignment.Center;
+            loadSteps.Margin = new Thickness( 140 , 26 , 0 , 0 );
+            loadSteps.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( loadSteps );
+
+            // Label for number of iterations
+            Label iterationsLabel = new Label();
+            iterationsLabel.Content = "# Iterations";
+            iterationsLabel.Height = 28;
+            iterationsLabel.Width = 150;
+            iterationsLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            iterationsLabel.VerticalAlignment = VerticalAlignment.Center;
+            iterationsLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            iterationsLabel.Margin = new Thickness( -120 , 78 , 0 , 0 );
+            iterationsLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( iterationsLabel );
+
+            // TextBox for number of iterations
+            iterations = new TextBox();
+            iterations.Height = 23;
+            iterations.Width = 90;
+            iterations.HorizontalAlignment = HorizontalAlignment.Center;
+            iterations.VerticalAlignment = VerticalAlignment.Center;
+            iterations.Margin = new Thickness( 140 , 78 , 0 , 0 );
+            iterations.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( iterations );
+
+            // Label for number of load steps/print line
+            Label printLinesLabel = new Label();
+            printLinesLabel.Content = "# Load Steps / Print Line";
+            printLinesLabel.Height = 28;
+            printLinesLabel.Width = 150;
+            printLinesLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            printLinesLabel.VerticalAlignment = VerticalAlignment.Center;
+            printLinesLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            printLinesLabel.Margin = new Thickness( -120 , 132 , 0 , 0 );
+            printLinesLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( printLinesLabel );
+
+            // TextBox for number of load steps/print line
+            printLines = new TextBox();
+            printLines.Height = 23;
+            printLines.Width = 90;
+            printLines.HorizontalAlignment = HorizontalAlignment.Center;
+            printLines.VerticalAlignment = VerticalAlignment.Center;
+            printLines.Margin = new Thickness( 140 , 132 , 0 , 0 );
+            printLines.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( printLines );
+
+            // Label for gravity factor
+            Label gravityLabel = new Label();
+            gravityLabel.Content = "Gravity Factor";
+            gravityLabel.Height = 28;
+            gravityLabel.Width = 150;
+            gravityLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            gravityLabel.VerticalAlignment = VerticalAlignment.Center;
+            gravityLabel.HorizontalContentAlignment = HorizontalAlignment.Right;
+            gravityLabel.Margin = new Thickness( -120 , 184 , 0 , 0 );
+            gravityLabel.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( gravityLabel );
+
+            // TextBox for gravity factor
+            gravityFactor = new TextBox();
+            gravityFactor.Height = 23;
+            gravityFactor.Width = 90;
+            gravityFactor.HorizontalAlignment = HorizontalAlignment.Center;
+            gravityFactor.VerticalAlignment = VerticalAlignment.Center;
+            gravityFactor.Margin = new Thickness( 140 , 184 , 0 , 0 );
+            gravityFactor.FontWeight = FontWeights.Normal;
+            phaseGrid.Children.Add( gravityFactor );
+
+
+            /*
+             * Initialize analysis phase parameters
+             */
+
+            for ( int i = 1 ; i < canvas.FEAPhases.Count ; i++ )
+            {
+                phaseList.Items.Add( canvas.FEAPhases[i] );
+            }
+
+            for ( int i = 0 ; i < canvas.FEAPhases.Count ; i++ )
+            {
+                beginPhaseList.Items.Add( canvas.FEAPhases[i] );
+            }
+
+            //phaseList.SelectedIndex = 0;
+
+
+            /*
+             * MaterialType selection data
+             */
 
             // Parent.Content.Children[2] = MaterialType GroupBox
             GroupBox materialBox = new GroupBox();
@@ -431,37 +604,39 @@ namespace SlopeFEA
              */
 
             // Parent.Content.Children[3] = Add button
-            Button addButton = new Button();
-            addButton.Content = "Add";
-            addButton.Height = 23;
-            addButton.Width = buttonWidth;
-            addButton.VerticalAlignment = VerticalAlignment.Top;
-            addButton.HorizontalAlignment = HorizontalAlignment.Center;
-            addButton.Margin = new Thickness( -buttonOffset , materialBox.Margin.Top + materialBox.Height + 30 , 0 , 15 );
-            addButton.Click += new RoutedEventHandler( addButton_Click );
-            inputBlock.Children.Add( addButton );
+            add = new Button();
+            add.Content = "Add";
+            add.Height = 23;
+            add.Width = buttonWidth;
+            add.VerticalAlignment = VerticalAlignment.Top;
+            add.HorizontalAlignment = HorizontalAlignment.Center;
+            add.Margin = new Thickness( -buttonOffset , materialBox.Margin.Top + materialBox.Height + 30 , 0 , 15 );
+            add.Click += new RoutedEventHandler( add_Click );
+            inputBlock.Children.Add( add );
 
             // Parent.Content.Children[4] = Modify button
-            Button modifyButton = new Button();
-            modifyButton.Content = "Modify";
-            modifyButton.Height = 23;
-            modifyButton.Width = buttonWidth;
-            modifyButton.VerticalAlignment = VerticalAlignment.Top;
-            modifyButton.HorizontalAlignment = HorizontalAlignment.Center;
-            modifyButton.Margin = new Thickness( 0 , addButton.Margin.Top , 0 , 15 );
-            modifyButton.Click += new RoutedEventHandler( modifyButton_Click );
-            inputBlock.Children.Add( modifyButton );
+            modify = new Button();
+            modify.Content = "Modify";
+            modify.Height = 23;
+            modify.Width = buttonWidth;
+            modify.VerticalAlignment = VerticalAlignment.Top;
+            modify.HorizontalAlignment = HorizontalAlignment.Center;
+            modify.Margin = new Thickness( 0 , add.Margin.Top , 0 , 15 );
+            modify.Click += new RoutedEventHandler( modify_Click );
+            modify.IsEnabled = false;
+            inputBlock.Children.Add( modify );
 
             // Parent.Content.Children[5] = Delete button
-            Button deleteButton = new Button();
-            deleteButton.Content = "Delete";
-            deleteButton.Height = 23;
-            deleteButton.Width = buttonWidth;
-            deleteButton.VerticalAlignment = VerticalAlignment.Top;
-            deleteButton.HorizontalAlignment = HorizontalAlignment.Center;
-            deleteButton.Margin = new Thickness( buttonOffset , addButton.Margin.Top , 0 , 15 );
-            deleteButton.Click += new RoutedEventHandler( deleteButton_Click );
-            inputBlock.Children.Add( deleteButton );
+            delete = new Button();
+            delete.Content = "Delete";
+            delete.Height = 23;
+            delete.Width = buttonWidth;
+            delete.VerticalAlignment = VerticalAlignment.Top;
+            delete.HorizontalAlignment = HorizontalAlignment.Center;
+            delete.Margin = new Thickness( buttonOffset , add.Margin.Top , 0 , 15 );
+            delete.Click += new RoutedEventHandler( delete_Click );
+            delete.IsEnabled = false;
+            inputBlock.Children.Add( delete );
 
 
 
@@ -569,6 +744,56 @@ namespace SlopeFEA
          * INPUT AREA EVENT HANDLERS
          */
 
+        private void phaseList_SelectionChanged ( object sender , SelectionChangedEventArgs e )
+        {
+            if ( phaseList.SelectedItem is AnalysisPhase )
+            {
+                add.IsEnabled = false;
+                modify.IsEnabled = true;
+                delete.IsEnabled = true;
+
+                AnalysisPhase currPhase = phaseList.SelectedItem as AnalysisPhase;
+
+                beginPhaseList.SelectedItem = currPhase.BeginPhase;
+                resetDisplacements.IsChecked = currPhase.ResetDisplacements;
+
+                loadSteps.Text = currPhase.NSteps.ToString();
+                iterations.Text = currPhase.NIterations.ToString();
+                printLines.Text = currPhase.NPrintLines.ToString();
+                gravityFactor.Text = Math.Round( currPhase.GravityFactor , 2 ).ToString();
+
+                int phase = currPhase.Number - 1;
+                for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
+                {
+                    inputCanvas.Substructs[i].Material = canvas.MaterialBlocks[i].PhaseMaterials[phase];
+                }
+
+                inputCanvas.ClearSelections();
+            }
+            else
+            {
+                if ( this.IsInitialized )
+                {
+                    add.IsEnabled = true;
+                    modify.IsEnabled = false;
+                    delete.IsEnabled = false;
+
+                    beginPhaseList.SelectedItem = canvas.FEAPhases[0];
+                    resetDisplacements.IsChecked = false;
+
+                    loadSteps.Text = "";
+                    iterations.Text = "";
+                    printLines.Text = "";
+                    gravityFactor.Text = "";
+
+                    int nullIndex = canvas.MaterialTypes.Count - 1;
+                    inputCanvas.Substructs.ForEach( delegate( MaterialBlock mb ) { mb.Material = canvas.MaterialTypes[nullIndex]; } );
+
+                    inputCanvas.ClearSelections();
+                }
+            }
+        }
+
         private void materialList_SelectionChanged ( object sender , SelectionChangedEventArgs e )
         {
             selectedMaterial = materialList.SelectedItem as MaterialType;
@@ -602,15 +827,90 @@ namespace SlopeFEA
             inputCanvas.Substructs.ForEach( delegate( MaterialBlock mb ) { if ( mb.IsSelected ) mb.Material = selectedMaterial; } );
         }
 
-        private void addButton_Click ( object sender , RoutedEventArgs e )
+        private void add_Click ( object sender , RoutedEventArgs e )
+        {
+            if ( phaseList.Text == "Add new analysis phase..." || phaseList.Text == "" )
+            {
+                MessageBox.Show( "Must give the phase a name." , "Error" );
+                return;
+            }
+
+            if ( phaseList.Text == "NULL" )
+            {
+                MessageBox.Show( "NULL phase name is reserved." , "Error" );
+                return;
+            }
+
+            if ( !(beginPhaseList.SelectedItem is AnalysisPhase) )
+            {
+                MessageBox.Show( "Must select an analysis phase to begin from.\nSelect NULL phase for \"stress-free\" state." , "Error" );
+                return;
+            }
+
+            int nsteps;
+            if ( !int.TryParse( loadSteps.Text , out nsteps ) || nsteps < 1 )
+            {
+                MessageBox.Show( "Number of load steps must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            int niter;
+            if ( !int.TryParse( iterations.Text , out niter ) || niter < 1 )
+            {
+                MessageBox.Show( "Number of iterations must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            int nprint;
+            if ( !int.TryParse( printLines.Text , out nprint ) || nprint < 1 )
+            {
+                MessageBox.Show( "Number of iterations / print line must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            double gfact;
+            if ( !double.TryParse( gravityFactor.Text , out gfact ) || gfact < 0 )
+            {
+                MessageBox.Show( "Gravity factor must be a positive value." , "Error" );
+                return;
+            }
+
+            AnalysisPhase newPhase = new AnalysisPhase( canvas.FEAPhases.Count ,
+                phaseList.Text ,
+                beginPhaseList.SelectedItem as AnalysisPhase ,
+                (bool) resetDisplacements.IsChecked ,
+                nsteps , niter , nprint , gfact );
+
+            canvas.FEAPhases.Add( newPhase );
+
+            MaterialType currMaterial;
+            for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
+            {
+                currMaterial = inputCanvas.Substructs[i].Material;
+                inputCanvas.Substructs[i].PhaseMaterials.Add( currMaterial );
+                canvas.MaterialBlocks[i].PhaseMaterials.Add( currMaterial );
+            }
+
+            beginPhaseList.Items.Clear();
+            canvas.FEAPhases.ForEach( delegate( AnalysisPhase ap ) { beginPhaseList.Items.Add( ap ); } );
+
+            phaseList.Items.Clear();
+            phaseList.Items.Add( "Add new analysis phase..." );
+            for ( int i = 1 ; i < canvas.FEAPhases.Count ; i++ )
+            {
+                phaseList.Items.Add( canvas.FEAPhases[i] );
+            }
+            phaseList.SelectedIndex = 0;
+            phaseList.Focus();
+
+            canvas.IsSaved = false;
+        }
+
+        private void modify_Click ( object sender , RoutedEventArgs e )
         {
         }
 
-        private void modifyButton_Click ( object sender , RoutedEventArgs e )
-        {
-        }
-
-        private void deleteButton_Click ( object sender , RoutedEventArgs e )
+        private void delete_Click ( object sender , RoutedEventArgs e )
         {
         }
     }

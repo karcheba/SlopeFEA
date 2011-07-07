@@ -65,6 +65,7 @@ namespace SlopeFEA
         private BackgroundWorker analysisWorker;
         private DisplayCircularSurface criticalSurface;
         private List<DisplayCircularSurface> runSurfaces;
+        private List<AnalysisPhase> feaPhases;
 
         /// <summary>
         /// (Constructor) Adds various drawing Polygons.
@@ -121,6 +122,9 @@ namespace SlopeFEA
 
             // Initialize list of surfaces
             runSurfaces = new List<DisplayCircularSurface>();
+
+            // Initialize list of analysis phases
+            feaPhases = new List<AnalysisPhase>() { new AnalysisPhase( 0 , "NULL" , null , true , 0 , 0 , 0 , 0 ) };
         }
 
         private void InitializeBackgroundWorker ()
@@ -494,6 +498,8 @@ namespace SlopeFEA
         public GAParams GeneticAlgorithmParameters { get { return this.genAlgParams; } }
         public FEAParams FEAParameters { get { return this.feaParams; } }
 
+        public List<AnalysisPhase> FEAPhases { get { return this.feaPhases; } }
+
 
         // ----------------------------------
         // UTILITY FUNCTIONS
@@ -828,6 +834,40 @@ namespace SlopeFEA
                 tw.WriteLine( "Verified = {0}" , this.IsVerified );
                 tw.WriteLine( "Meshed = {0}" , this.IsMeshed );
                 tw.WriteLine( "Analyzed = {0}" , this.IsAnalyzed );
+
+                tw.WriteLine();
+                tw.WriteLine();
+
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine( "ANALYSIS PHASES" );
+                tw.WriteLine( "--------------------------------" );
+                tw.WriteLine();
+
+                tw.WriteLine( "Number of Analysis Phases = {0}" , FEAPhases.Count - 1 );
+
+                tw.WriteLine();
+
+                for ( int i = 1 ; i < FEAPhases.Count ; i++ )
+                {
+                    tw.WriteLine( "Phase #{0}" , FEAPhases[i].Number );
+
+                    tw.WriteLine( "Name = \"{0}\"" , FEAPhases[i].Name );
+                    tw.WriteLine( "Begin Phase = \"{0}\"" , FEAPhases[i].BeginPhase.Name );
+                    tw.WriteLine( "Reset Displacements=\"{0}\"" , FEAPhases[i].ResetDisplacements );
+
+                    tw.WriteLine( "Number of Load Steps = {0}" , FEAPhases[i].NSteps );
+                    tw.WriteLine( "Number of Iterations = {0}" , FEAPhases[i].NIterations );
+                    tw.WriteLine( "Number of Load Steps / Print Line = {0}" , FEAPhases[i].NPrintLines );
+                    tw.WriteLine( "Gravity Factor = {0}" , FEAPhases[i].GravityFactor );
+
+                    for ( int j = 0 ; j < MaterialBlocks.Count ; j++ )
+                    {
+                        tw.WriteLine( "Material Block #{0}" , j + 1 );
+                        tw.WriteLine( MaterialBlocks[j].PhaseMaterials[i - 1].Name );
+                    }
+
+                    tw.WriteLine();
+                }
             }
 
             this.IsSaved = true;
@@ -1129,6 +1169,51 @@ namespace SlopeFEA
                                         == Boolean.TrueString;
 
                 this.ShowCritical = this.IsAnalyzed;
+
+
+                tr.ReadLine();      //
+                tr.ReadLine();      //
+                tr.ReadLine();      // --------------------------------
+                tr.ReadLine();      // ANALYSIS PHASES
+                tr.ReadLine();      // --------------------------------
+                tr.ReadLine();      //
+
+                int numAnalysisPhases = int.Parse( tr.ReadLine().Split( '=' )[1] );
+
+                tr.ReadLine();
+
+                if ( numAnalysisPhases > 0 )
+                {
+                    AnalysisPhase beginPhase;
+                    int number , nstep , niter , nprint;
+                    string name , beginName, mtlType;
+                    bool reset;
+                    double gfact;
+
+                    for ( int i = 0 ; i < numAnalysisPhases ; i++ )
+                    {
+                        number = int.Parse( tr.ReadLine().Split( '#' )[1] );
+                        name = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
+                        beginName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
+                        beginPhase = FEAPhases.Find( delegate( AnalysisPhase ap ) { return ap.Name == beginName; } );
+                        reset = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1] == Boolean.TrueString;
+                        nstep = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        niter = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        nprint = int.Parse( tr.ReadLine().Split( '=' )[1] );
+                        gfact = double.Parse( tr.ReadLine().Split( '=' )[1] );
+
+                        for ( int j = 0 ; j < MaterialBlocks.Count ; j++ )
+                        {
+                            tr.ReadLine();
+                            mtlType = tr.ReadLine();
+                            MaterialBlocks[j].PhaseMaterials.Add( MaterialTypes.Find( delegate( MaterialType mt ) { return mt.Name == mtlType; } ) );
+                        }
+
+                        tr.ReadLine();
+
+                        FEAPhases.Add( new AnalysisPhase( number , name , beginPhase , reset , nstep , niter , nprint , gfact ) );
+                    }
+                }
             }
 
             ClosableCanvasTabItem parentTab = (ClosableCanvasTabItem) ((Grid) this.Parent).Parent;

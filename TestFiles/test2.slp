@@ -113,3 +113,11 @@ Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = True
+
+
+--------------------------------
+ANALYSIS PHASES
+--------------------------------
+
+Number of Analysis Phases = 0
+

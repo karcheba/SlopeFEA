@@ -1137,10 +1137,12 @@ namespace SlopeFEA
                         }
                         break;
                     case AnalysisType.FEA3NodedTri:
+                        currCanvas.SaveInputFile( currCanvas.FilePath );
                         DefineAnalysisWindow fea3nodeDlg = new DefineAnalysisWindow( this , currCanvas );
                         fea3nodeDlg.ShowDialog();
                         break;
                     default:
+                        currCanvas.SaveInputFile( currCanvas.FilePath );
                         DefineAnalysisWindow fea4nodeDlg = new DefineAnalysisWindow( this , currCanvas );
                         fea4nodeDlg.ShowDialog();
                         break;

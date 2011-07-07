@@ -437,3 +437,27 @@ REVISION HISTORY:
 +++ (DefineAnalysisWindow.xaml, DefineAnalysisWindow.xaml.cs, SlopeDefineCanvas.cs) Created for analysis phase definition
 +++ (MainWindow.xaml.cs) Added calls to DefineAnalysisWindow() to addMaterials_Click()
 +++ (CanvasData.cs) Added constructors to DrawingPoint, MaterialBlock, LineConstraint, LineLoad, and PointLoad for SlopeDefineCanvas
+
+
+[5-7 July 2011]
+
+{v1.0.0.12}
+=== Working on analysis phase definition tool; status check-in:
+    Contains:   - "Define Analysis Phases" dialog
+                    - Contains:     - Drawing region for viewing and modifying substructs, contraints, and tractions
+                                    - Zoom/pan tools
+                                    - All items receive click and there are no overlapping components (i.e. two points at same location are merged into a single point referenced by multiple blocks)
+                                    - Plotting axes
+                                    - Phase data input region containg input items for analysis info and material selector
+                                    - Activate/deactivate specified kinematic constraints for lines and points
+                                    - Apply material types to blocks
+                                    - Active/deactivate and apply load factors to specified tractions and point loads
+                                    - Define new load phase (save material types, begin from phase, reset displacements, nstep, niter, nprint, gfact)
+                                            - This information is also saved in and loaded from the .slp file
+    
+    Requires:   - "Define Analysis Phases" dialog
+                    - Requires:     - Additional items in define new load phase (recording/saving of factors for point/line loads and point/line fixities)
+                                    - Modify previous load phase
+                                    - Delete previous load phase
+                - Updates to mesh generator (all listed above)
+                - Updates to analysis code (all listed above)

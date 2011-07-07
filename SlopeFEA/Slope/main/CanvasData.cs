@@ -878,11 +878,10 @@ namespace SlopeFEA
             canvas.Children.Add( dot );
         }
 
-        public DrawingPoint ( SlopeDefineCanvas canvas , object parent , Point pt )
+        public DrawingPoint ( SlopeDefineCanvas canvas , MaterialBlock parent , Point pt )
         {
             this.defineCanvas = canvas;
-            if ( parent is SlopeBoundary ) this.parentBoundary = parent as SlopeBoundary;
-            else if ( parent is MaterialBlock ) this.parentBlocks = new List<MaterialBlock>() { parent as MaterialBlock };
+            this.parentBlocks = new List<MaterialBlock>() { parent };
             this.point = pt;
 
             fixLines = new List<Polyline>();
@@ -998,6 +997,8 @@ namespace SlopeFEA
             }
         }
 
+        public List<bool> PhaseFixActiveX { get; set; }
+
         public bool IsFixedY
         {
             get { return this.isFixedY; }
@@ -1018,6 +1019,8 @@ namespace SlopeFEA
                 fixLines[0].Opacity = fixLines[1].Opacity = value ? 1.0 : 0.2;
             }
         }
+
+        public List<bool> PhaseFixActiveY { get; set; }
 
         public Point Point { get { return this.point; } }
         public Ellipse Dot { get { return this.dot; } }
@@ -1456,6 +1459,7 @@ namespace SlopeFEA
         private SlopeDefineCanvas defineCanvas;
         private bool isFixedX , isActiveX , isFixedY , isActiveY;
         private List<Polyline> fixLines;
+        private List<bool> phaseFixedX , phaseFixedY;
 
         public LineConstraint ( SlopeCanvas canvas ,
                                 DrawingPoint p1 , DrawingPoint p2 ,
@@ -1504,6 +1508,9 @@ namespace SlopeFEA
 
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
+
+            phaseFixedX = new List<bool>();
+            phaseFixedY = new List<bool>();
 
             // set visibility of constraints
             this.IsFixedX = fixX;
@@ -1558,6 +1565,9 @@ namespace SlopeFEA
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
 
+            phaseFixedX = new List<bool>();
+            phaseFixedY = new List<bool>();
+
             // set visibility of constraints
             this.IsFixedX = fixX;
             this.IsFixedY = fixY;
@@ -1597,6 +1607,8 @@ namespace SlopeFEA
             }
         }
 
+        public List<bool> PhaseFixedX { get { return this.phaseFixedX; } }
+
         public bool IsFixedY
         {
             get
@@ -1628,6 +1640,8 @@ namespace SlopeFEA
                 fixLines[0].Opacity = fixLines[1].Opacity = value ? 1.0 : 0.2;
             }
         }
+
+        public List<bool> PhaseFixedY { get { return this.phaseFixedY; } }
 
         public void Update ()
         {
@@ -1710,7 +1724,7 @@ namespace SlopeFEA
     {
         private SlopeCanvas canvas;
         private SlopeDefineCanvas defineCanvas;
-        private bool isLoadedX , isLoadedY;
+        private bool isLoadedX , isActiveX , isLoadedY , isActiveY;
         private List<Polyline> loadLines;
         private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
                                 Spos = Math.Sin( 0.75 * Math.PI ) ,
@@ -1736,12 +1750,6 @@ namespace SlopeFEA
             // set parent node
             this.Node = node;
 
-            // set load state
-            this.isLoadedX = isLoadedX;
-            this.XLoad = xLoad;
-            this.isLoadedY = isLoadedY;
-            this.YLoad = yLoad;
-
             // create plotting lines for constraints
             loadLines = new List<Polyline>();
             Polyline newLine;
@@ -1760,6 +1768,14 @@ namespace SlopeFEA
 
                 newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
+
+            // set load state
+            this.IsLoadedX = isLoadedX;
+            if ( this.IsLoadedX ) this.XFactor = 1.0;
+            this.XLoad = xLoad;
+            this.IsLoadedY = isLoadedY;
+            if ( this.IsLoadedY ) this.YFactor = 1.0;
+            this.YLoad = yLoad;
 
             Update();
         }
@@ -1783,12 +1799,6 @@ namespace SlopeFEA
             // set parent node
             this.Node = node;
 
-            // set load state
-            this.isLoadedX = isLoadedX;
-            this.XLoad = xLoad;
-            this.isLoadedY = isLoadedY;
-            this.YLoad = yLoad;
-
             // create plotting lines for constraints
             loadLines = new List<Polyline>();
             Polyline newLine;
@@ -1808,6 +1818,14 @@ namespace SlopeFEA
                 newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
 
+            // set load state
+            this.IsLoadedX = isLoadedX;
+            if ( this.IsLoadedX ) this.XFactor = 1.0;
+            this.XLoad = xLoad;
+            this.IsLoadedY = isLoadedY;
+            if ( this.IsLoadedY ) this.YFactor = 1.0;
+            this.YLoad = yLoad;
+
             Update();
         }
 
@@ -1821,6 +1839,10 @@ namespace SlopeFEA
         /// </summary>
         public List<Polyline> LoadLines { get { return this.loadLines; } }
 
+        public double XFactor { get; set; }
+        public double YFactor { get; set; }
+
+
         /// <summary>
         /// Properties indicating whether a load is applied.
         /// </summary>
@@ -1830,7 +1852,18 @@ namespace SlopeFEA
             set
             {
                 this.isLoadedX = value;
+                this.IsActiveX = value;
                 if ( !value ) this.XLoad = 0.0;
+                this.Update();
+            }
+        }
+        public bool IsActiveX
+        {
+            get { return this.isActiveX; }
+            set
+            {
+                this.isActiveX = value;
+                if ( !this.IsActiveX ) XFactor = 0.0;
                 this.Update();
             }
         }
@@ -1840,7 +1873,18 @@ namespace SlopeFEA
             set
             {
                 this.isLoadedY = value;
+                this.IsActiveY = value;
                 if ( !value ) this.YLoad = 0.0;
+                this.Update();
+            }
+        }
+        public bool IsActiveY
+        {
+            get { return this.isActiveY; }
+            set
+            {
+                this.isActiveY = value;
+                if ( !this.IsActiveY ) YFactor = 0.0;
                 this.Update();
             }
         }
@@ -1915,8 +1959,16 @@ namespace SlopeFEA
             loadLines[5].Points[1] = new Point( xprime , yprime );
 
             int i = 0;
-            for ( ; i < 3 ; i++ ) loadLines[i].Visibility = IsLoadedX ? Visibility.Visible : Visibility.Hidden;
-            for ( ; i < 6 ; i++ ) loadLines[i].Visibility = IsLoadedY ? Visibility.Visible : Visibility.Hidden;
+            for ( ; i < 3 ; i++ )
+            {
+                loadLines[i].Visibility = IsLoadedX ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i].Opacity = IsActiveX ? 1.0 : 0.2;
+            }
+            for ( ; i < 6 ; i++ )
+            {
+                loadLines[i].Visibility = IsLoadedY ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i].Opacity = IsActiveY ? 1.0 : 0.2;
+            }
         }
 
         public void Delete ()
@@ -1971,6 +2023,13 @@ namespace SlopeFEA
                     }
                 }
             }
+            else if ( defineCanvas != null )
+            {
+                FactorPointLoadDialog dlg = new FactorPointLoadDialog( defineCanvas , this );
+                dlg.ShowDialog();
+
+                this.Update();
+            }
         }
     }
 
@@ -1982,7 +2041,7 @@ namespace SlopeFEA
     {
         private SlopeCanvas canvas;
         private SlopeDefineCanvas defineCanvas;
-        private bool isLoadedN , isLoadedT;
+        private bool isLoadedN , isActiveN , isLoadedT , isActiveT;
         private List<Polyline> loadLines;
         private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
                                 Spos = Math.Sin( 0.75 * Math.PI ) ,
@@ -2016,15 +2075,7 @@ namespace SlopeFEA
 
             PlotPoints = new List<Point>() { new Point() , new Point() , new Point() };
 
-            // set load state
-            this.isLoadedN = isLoadedN;
-            this.NLoad1 = nLoad1;
-            this.NLoad2 = nLoad2;
-            this.isLoadedT = isLoadedT;
-            this.TLoad1 = tLoad1;
-            this.TLoad2 = tLoad2;
-
-            // create plotting lines for constraints
+            // create plotting lines for loads
             loadLines = new List<Polyline>();
             Polyline newLine;
             for ( int i = 0 ; i < 18 ; i++ )
@@ -2042,6 +2093,16 @@ namespace SlopeFEA
 
                 newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
+
+            // set load state
+            this.IsLoadedN = isLoadedN;
+            if ( this.IsLoadedN ) this.NFactor = 1.0;
+            this.NLoad1 = nLoad1;
+            this.NLoad2 = nLoad2;
+            this.IsLoadedT = isLoadedT;
+            if ( this.IsLoadedT ) this.TFactor = 1.0;
+            this.TLoad1 = tLoad1;
+            this.TLoad2 = tLoad2;
 
             Update();
         }
@@ -2073,15 +2134,7 @@ namespace SlopeFEA
 
             PlotPoints = new List<Point>() { new Point() , new Point() , new Point() };
 
-            // set load state
-            this.isLoadedN = isLoadedN;
-            this.NLoad1 = nLoad1;
-            this.NLoad2 = nLoad2;
-            this.isLoadedT = isLoadedT;
-            this.TLoad1 = tLoad1;
-            this.TLoad2 = tLoad2;
-
-            // create plotting lines for constraints
+            // create plotting lines for loads
             loadLines = new List<Polyline>();
             Polyline newLine;
             for ( int i = 0 ; i < 18 ; i++ )
@@ -2099,6 +2152,17 @@ namespace SlopeFEA
 
                 newLine.MouseLeftButtonUp += new MouseButtonEventHandler( MouseLeftButtonUp );
             }
+
+            // set load state
+            this.IsLoadedN = isLoadedN;
+            if ( this.IsLoadedN ) this.NFactor = 1.0;
+            this.NLoad1 = nLoad1;
+            this.NLoad2 = nLoad2;
+            this.TFactor = 1.0;
+            this.IsLoadedT = isLoadedT;
+            if ( this.IsLoadedT ) this.TFactor = 1.0;
+            this.TLoad1 = tLoad1;
+            this.TLoad2 = tLoad2;
 
             Update();
         }
@@ -2127,7 +2191,18 @@ namespace SlopeFEA
             set
             {
                 this.isLoadedN = value;
+                this.IsActiveN = value;
                 if ( !value ) NLoad1 = NLoad2 = 0.0;
+                this.Update();
+            }
+        }
+        public bool IsActiveN
+        {
+            get { return this.isActiveN; }
+            set
+            {
+                this.isActiveN = value;
+                if ( !this.IsActiveN ) NFactor = 0.0;
                 this.Update();
             }
         }
@@ -2137,10 +2212,24 @@ namespace SlopeFEA
             set
             {
                 this.isLoadedT = value;
+                this.IsActiveT = value;
                 if ( !value ) TLoad1 = TLoad2 = 0.0;
                 this.Update();
             }
         }
+        public bool IsActiveT
+        {
+            get { return this.isActiveT; }
+            set
+            {
+                this.isActiveT = value;
+                if ( !this.IsActiveT ) TFactor = 0.0;
+                this.Update();
+            }
+        }
+
+        public double NFactor { get; set; }
+        public double TFactor { get; set; }
 
         /// <summary>
         /// Normal load values.
@@ -2220,6 +2309,7 @@ namespace SlopeFEA
                 loadLines[i0].Points[0] = plotPoint - 10 * norm;
                 loadLines[i0].Points[1] = plotPoint + 10 * norm;
                 loadLines[i0].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i0].Opacity = IsActiveN ? 1.0 : 0.2;
                 // normal load arrow head 1
                 loadLines[i1].Points[0] = posNLoad ? loadLines[i0].Points[1] : loadLines[i0].Points[0];
                 loadLines[i1].Points[1] = posNLoad ? (Point) (6 * norm) : (Point) (-6 * norm);
@@ -2227,6 +2317,7 @@ namespace SlopeFEA
                 yprime = loadLines[i1].Points[1].X * Spos + loadLines[i1].Points[1].Y * Cpos + loadLines[i1].Points[0].Y;
                 loadLines[i1].Points[1] = new Point( xprime , yprime );
                 loadLines[i1].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i1].Opacity = IsActiveN ? 1.0 : 0.2;
                 // normal load arrow head 2
                 loadLines[i2].Points[0] = posNLoad ? loadLines[i0].Points[1] : loadLines[i0].Points[0];
                 loadLines[i2].Points[1] = posNLoad ? (Point) (6 * norm) : (Point) (-6 * norm);
@@ -2234,11 +2325,13 @@ namespace SlopeFEA
                 yprime = loadLines[i2].Points[1].X * Sneg + loadLines[i2].Points[1].Y * Cneg + loadLines[i2].Points[0].Y;
                 loadLines[i2].Points[1] = new Point( xprime , yprime );
                 loadLines[i2].Visibility = IsLoadedN ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i2].Opacity = IsActiveN ? 1.0 : 0.2;
 
                 // tangential load arrow shaft
                 loadLines[i3].Points[0] = plotPoint - 10 * tang;
                 loadLines[i3].Points[1] = plotPoint + 10 * tang;
                 loadLines[i3].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i3].Opacity = IsActiveT ? 1.0 : 0.2;
                 // tangential load arrow head 1
                 loadLines[i4].Points[0] = posTLoad ? loadLines[i3].Points[1] : loadLines[i3].Points[0];
                 loadLines[i4].Points[1] = posTLoad ? (Point) (6 * tang) : (Point) (-6 * tang);
@@ -2246,6 +2339,7 @@ namespace SlopeFEA
                 yprime = loadLines[i4].Points[1].X * Spos + loadLines[i4].Points[1].Y * Cpos + loadLines[i4].Points[0].Y;
                 loadLines[i4].Points[1] = new Point( xprime , yprime );
                 loadLines[i4].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i4].Opacity = IsActiveT ? 1.0 : 0.2;
                 // tangential load arrow head 2
                 loadLines[i5].Points[0] = posTLoad ? loadLines[i3].Points[1] : loadLines[i3].Points[0];
                 loadLines[i5].Points[1] = posTLoad ? (Point) (6 * tang) : (Point) (-6 * tang);
@@ -2253,6 +2347,7 @@ namespace SlopeFEA
                 yprime = loadLines[i5].Points[1].X * Sneg + loadLines[i5].Points[1].Y * Cneg + loadLines[i5].Points[0].Y;
                 loadLines[i5].Points[1] = new Point( xprime , yprime );
                 loadLines[i5].Visibility = IsLoadedT ? Visibility.Visible : Visibility.Hidden;
+                loadLines[i5].Opacity = IsActiveT ? 1.0 : 0.2;
             }
         }
 
@@ -2307,6 +2402,13 @@ namespace SlopeFEA
                         canvas.IsVerified = false;
                     }
                 }
+            }
+            else if ( defineCanvas != null )
+            {
+                FactorLineLoadDialog dlg = new FactorLineLoadDialog( defineCanvas , this );
+                dlg.ShowDialog();
+
+                this.Update();
             }
         }
     }
@@ -2439,6 +2541,7 @@ namespace SlopeFEA
         private List<LineLoad> lineLoads;
         private List<PointLoad> pointLoads;
         private static SolidColorBrush selectFill;
+        private List<MaterialType> phaseMaterials;
 
         public MaterialBlock ( SlopeCanvas canvas , Point[] pts )
         {
@@ -2515,6 +2618,8 @@ namespace SlopeFEA
                 }
             }
 
+            phaseMaterials = new List<MaterialType>();
+
             SortPoints();
         }
 
@@ -2539,6 +2644,8 @@ namespace SlopeFEA
             }
 
             Material = mtl;
+
+            phaseMaterials = new List<MaterialType>();
 
             lineConstraints = new List<LineConstraint>();
             lineLoads = new List<LineLoad>();
@@ -2606,6 +2713,8 @@ namespace SlopeFEA
                 }
             }
 
+            phaseMaterials = new List<MaterialType>();
+
             SortPoints();
         }
 
@@ -2645,6 +2754,8 @@ namespace SlopeFEA
                 this.Boundary.Fill = value.Fill != null ? value.Fill : Brushes.WhiteSmoke;
             }
         }
+
+        public List<MaterialType> PhaseMaterials { get { return this.phaseMaterials; } }
 
         public double Area
         {
@@ -3607,5 +3718,46 @@ namespace SlopeFEA
         public double Y { get { return this.location.Y; } }
         public MaterialType Material { get { return this.material; } }
         public MeshPointType Type { get { return this.type; } }
+    }
+
+
+    public class AnalysisPhase
+    {
+        public AnalysisPhase ( int number,
+            string name ,
+            AnalysisPhase begin ,
+            bool reset ,
+            int nsteps ,
+            int niterations ,
+            int nprint ,
+            double gravityFactor )
+        {
+            Number = number;
+
+            Name = name;
+            BeginPhase = begin;
+            ResetDisplacements = reset;
+
+            NSteps = nsteps;
+            NIterations = niterations;
+            NPrintLines = nprint;
+            GravityFactor = gravityFactor;
+        }
+
+        public int Number { get; set; }
+
+        public string Name { get; set; }
+        public AnalysisPhase BeginPhase { get; set; }
+        public bool ResetDisplacements { get; set; }
+
+        public int NSteps { get; set; }
+        public int NIterations { get; set; }
+        public int NPrintLines { get; set; }
+        public double GravityFactor { get; set; }
+
+        public override string ToString ()
+        {
+            return Name + " (" + Number.ToString() + ")";
+        }
     }
 }

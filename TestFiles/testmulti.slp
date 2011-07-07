@@ -100,7 +100,7 @@ Material Block #2
 Material Type = "clay"
 Number of Boundary Points = 4
 -4, 20, True, False, False
-24, 20, False, False, False
+24, 20, False, False, True
 14, 24, False, False, False
 -4, 24, True, False, False
 Number of Line Constraints = 1
@@ -159,3 +159,11 @@ Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
 Analyzed = True
+
+
+--------------------------------
+ANALYSIS PHASES
+--------------------------------
+
+Number of Analysis Phases = 0
+

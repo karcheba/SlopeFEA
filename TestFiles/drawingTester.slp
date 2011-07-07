@@ -17,11 +17,11 @@ XAxisMin = 0
 YAxisMax = 80
 YAxisMin = -60
 
-XMajorDivision = 10
-YMajorDivision = 10
+XMajorDivision = 20
+YMajorDivision = 20
 
-XMinorDivisions = 5
-YMinorDivisions = 5
+XMinorDivisions = 4
+YMinorDivisions = 4
 
 
 --------------------------------
@@ -67,8 +67,8 @@ Number of Material Blocks = 2
 Material Block #1
 Material Type = "NULL"
 Number of Boundary Points = 5
-9.3484623572037, 32.9102910258456, True, False, False
-4.21649023927519, 2.31584186127107, True, True, False
+9.34846235720368, 32.9102910258456, True, False, False
+4.21649023927515, 2.31584186127106, True, True, False
 98.0526751536296, -50.4897470116157, True, True, False
 104.763332450474, -31.9997323148386, True, False, False
 81.9936688223158, 8.7597467010762, False, False, False
@@ -78,16 +78,17 @@ Number of Line Constraints = 3
 2, 3, True, False
 Number of Line Loads = 1
 3, 4, True, -30, 30, False, 0, 0
-Number of Point Loads = 0
+Number of Point Loads = 1
+4, True, 10, True, -20
 
 Material Block #2
 Material Type = "NULL"
 Number of Boundary Points = 5
-9.3484623572037, 32.9102910258456, True, False, False
+9.34846235720368, 32.9102910258456, True, False, False
 81.9936688223158, 8.7597467010762, False, False, False
 104.763332450474, -31.9997323148386, True, False, False
 121.06754769365, 56.5963161855162, True, False, False
-65.6027721114214, 68.2419452223542, False, False, False
+52.2706159520882, 73.0526315789473, False, False, False
 Number of Line Constraints = 1
 2, 3, True, False
 Number of Line Loads = 0
@@ -128,3 +129,37 @@ Analysis Type = FEA3NodedTri
 Verified = False
 Meshed = False
 Analyzed = False
+
+
+--------------------------------
+ANALYSIS PHASES
+--------------------------------
+
+Number of Analysis Phases = 2
+
+Phase #1
+Name = "test"
+Begin Phase = "NULL"
+Reset Displacements="True"
+Number of Load Steps = 10
+Number of Iterations = 10
+Number of Load Steps / Print Line = 10
+Gravity Factor = 0.5
+Material Block #1
+clay
+Material Block #2
+sand
+
+Phase #2
+Name = "test2"
+Begin Phase = "test"
+Reset Displacements="False"
+Number of Load Steps = 10
+Number of Iterations = 10
+Number of Load Steps / Print Line = 10
+Gravity Factor = 0.9
+Material Block #1
+sand
+Material Block #2
+clay
+
