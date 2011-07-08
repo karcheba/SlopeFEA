@@ -201,6 +201,7 @@ namespace SlopeFEA
             beginPhaseList.Margin = new Thickness( 70 , -110 , 0 , 0 );
             beginPhaseList.FontWeight = FontWeights.Normal;
             beginPhaseList.IsEditable = false;
+            beginPhaseList.SelectionChanged += new SelectionChangedEventHandler( beginPhaseList_SelectionChanged );
             phaseGrid.Children.Add( beginPhaseList );
 
             // CheckBox for reset displacements option
@@ -763,9 +764,29 @@ namespace SlopeFEA
                 gravityFactor.Text = Math.Round( currPhase.GravityFactor , 2 ).ToString();
 
                 int phase = currPhase.Number - 1;
+                MaterialBlock currBlock , currSub;
+                DrawingPoint currNode;
+                LineConstraint currLC;
                 for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
                 {
-                    inputCanvas.Substructs[i].Material = canvas.MaterialBlocks[i].PhaseMaterials[phase];
+                    currBlock = canvas.MaterialBlocks[i];
+                    currSub = inputCanvas.Substructs[i];
+
+                    currSub.Material = currBlock.PhaseMaterials[phase];
+
+                    for ( int j = 0 ; j < currSub.BoundaryPoints.Count ; j++ )
+                    {
+                        currNode = currSub.BoundaryPoints[j];
+                        if ( currNode.IsFixedX ) currNode.IsFixActiveX = currBlock.BoundaryPoints[j].PhaseFixActiveX[phase];
+                        if ( currNode.IsFixedY ) currNode.IsFixActiveY = currBlock.BoundaryPoints[j].PhaseFixActiveY[phase];
+                    }
+
+                    for ( int j = 0 ; j < currSub.LineConstraints.Count ; j++ )
+                    {
+                        currLC = currSub.LineConstraints[j];
+                        if ( currLC.IsFixedX ) currLC.IsActiveX = currBlock.LineConstraints[j].PhaseFixedX[phase];
+                        if ( currLC.IsFixedY ) currLC.IsActiveY = currBlock.LineConstraints[j].PhaseFixedY[phase];
+                    }
                 }
 
                 inputCanvas.ClearSelections();
@@ -786,11 +807,88 @@ namespace SlopeFEA
                     printLines.Text = "";
                     gravityFactor.Text = "";
 
-                    int nullIndex = canvas.MaterialTypes.Count - 1;
-                    inputCanvas.Substructs.ForEach( delegate( MaterialBlock mb ) { mb.Material = canvas.MaterialTypes[nullIndex]; } );
+                    MaterialType nullMaterial = canvas.MaterialTypes[canvas.MaterialTypes.Count - 1];
+                    inputCanvas.Substructs.ForEach(
+                        delegate( MaterialBlock mb )
+                        {
+                            mb.Material = nullMaterial;
+                            mb.BoundaryPoints.ForEach(
+                                delegate( DrawingPoint p )
+                                {
+                                    p.IsFixActiveX = p.IsFixedX;
+                                    p.IsFixActiveY = p.IsFixedY;
+                                } );
+                            mb.LineConstraints.ForEach(
+                                delegate( LineConstraint lc )
+                                {
+                                    lc.IsActiveX = lc.IsFixedX;
+                                    lc.IsActiveY = lc.IsFixedY;
+                                } );
+                        } );
 
                     inputCanvas.ClearSelections();
                 }
+            }
+        }
+
+
+        private void beginPhaseList_SelectionChanged ( object sender , SelectionChangedEventArgs e )
+        {
+            if ( beginPhaseList.SelectedItem is AnalysisPhase )
+            {
+                AnalysisPhase currPhase = beginPhaseList.SelectedItem as AnalysisPhase;
+
+                int phase = currPhase.Number - 1;
+                MaterialBlock currBlock , currSub;
+                DrawingPoint currNode;
+                LineConstraint currLC;
+                if ( phase >= 0 )
+                {
+                    for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
+                    {
+                        currBlock = canvas.MaterialBlocks[i];
+                        currSub = inputCanvas.Substructs[i];
+
+                        currSub.Material = currBlock.PhaseMaterials[phase];
+
+                        for ( int j = 0 ; j < currSub.BoundaryPoints.Count ; j++ )
+                        {
+                            currNode = currSub.BoundaryPoints[j];
+                            if ( currNode.IsFixedX ) currNode.IsFixActiveX = currBlock.BoundaryPoints[j].PhaseFixActiveX[phase];
+                            if ( currNode.IsFixedY ) currNode.IsFixActiveY = currBlock.BoundaryPoints[j].PhaseFixActiveY[phase];
+                        }
+
+                        for ( int j = 0 ; j < currSub.LineConstraints.Count ; j++ )
+                        {
+                            currLC = currSub.LineConstraints[j];
+                            if ( currLC.IsFixedX ) currLC.IsActiveX = currBlock.LineConstraints[j].PhaseFixedX[phase];
+                            if ( currLC.IsFixedY ) currLC.IsActiveY = currBlock.LineConstraints[j].PhaseFixedY[phase];
+                        }
+                    }
+                }
+                else
+                {
+                    MaterialType nullMaterial = canvas.MaterialTypes[canvas.MaterialTypes.Count - 1];
+                    inputCanvas.Substructs.ForEach(
+                        delegate( MaterialBlock mb )
+                        {
+                            mb.Material = nullMaterial;
+                            mb.BoundaryPoints.ForEach(
+                                delegate( DrawingPoint p )
+                                {
+                                    p.IsFixActiveX = p.IsFixedX;
+                                    p.IsFixActiveY = p.IsFixedY;
+                                } );
+                            mb.LineConstraints.ForEach(
+                                delegate( LineConstraint lc )
+                                {
+                                    lc.IsActiveX = lc.IsFixedX;
+                                    lc.IsActiveY = lc.IsFixedY;
+                                } );
+                        } );
+                }
+
+                inputCanvas.ClearSelections();
             }
         }
 
@@ -882,13 +980,39 @@ namespace SlopeFEA
                 nsteps , niter , nprint , gfact );
 
             canvas.FEAPhases.Add( newPhase );
+            int numPhases = canvas.FEAPhases.Count - 1;
 
             MaterialType currMaterial;
+            MaterialBlock currBlock , currSub;
+            DrawingPoint currNode;
+            LineConstraint currLC;
             for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
             {
-                currMaterial = inputCanvas.Substructs[i].Material;
-                inputCanvas.Substructs[i].PhaseMaterials.Add( currMaterial );
-                canvas.MaterialBlocks[i].PhaseMaterials.Add( currMaterial );
+                currSub = inputCanvas.Substructs[i];
+                currBlock = canvas.MaterialBlocks[i];
+
+                currMaterial = currSub.Material;
+                currBlock.PhaseMaterials.Add( currMaterial );
+
+                for ( int j = 0 ; j < currSub.BoundaryPoints.Count ; j++ )
+                {
+                    currNode = currBlock.BoundaryPoints[j];
+                    if ( currNode.PhaseFixActiveX.Count < numPhases )
+                    {
+                        currNode.PhaseFixActiveX.Add( currSub.BoundaryPoints[j].IsFixActiveX );
+                        currNode.PhaseFixActiveY.Add( currSub.BoundaryPoints[j].IsFixActiveY );
+                    }
+                }
+
+                for ( int j = 0 ; j < currSub.LineConstraints.Count ; j++ )
+                {
+                    currLC = currBlock.LineConstraints[j];
+                    if ( currLC.PhaseFixedX.Count < numPhases )
+                    {
+                        currLC.PhaseFixedX.Add( currSub.LineConstraints[j].IsActiveX );
+                        currLC.PhaseFixedY.Add( currSub.LineConstraints[j].IsActiveY );
+                    }
+                }
             }
 
             beginPhaseList.Items.Clear();

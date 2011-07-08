@@ -864,6 +864,20 @@ namespace SlopeFEA
                     {
                         tw.WriteLine( "Material Block #{0}" , j + 1 );
                         tw.WriteLine( MaterialBlocks[j].PhaseMaterials[i - 1].Name );
+
+                        for ( int k = 0 ; k < MaterialBlocks[j].BoundaryPoints.Count ; k++ )
+                        {
+                            tw.WriteLine( "{0},{1}" ,
+                                MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX[i - 1] ,
+                                MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveY[i - 1] );
+                        }
+
+                        for ( int k = 0 ; k < MaterialBlocks[j].LineConstraints.Count ; k++ )
+                        {
+                            tw.WriteLine( "{0},{1}" ,
+                                MaterialBlocks[j].LineConstraints[k].PhaseFixedX[i - 1] ,
+                                MaterialBlocks[j].LineConstraints[k].PhaseFixedY[i - 1] );
+                        }
                     }
 
                     tw.WriteLine();
@@ -1187,6 +1201,7 @@ namespace SlopeFEA
                     AnalysisPhase beginPhase;
                     int number , nstep , niter , nprint;
                     string name , beginName, mtlType;
+                    string[] fixActive;
                     bool reset;
                     double gfact;
 
@@ -1207,6 +1222,26 @@ namespace SlopeFEA
                             tr.ReadLine();
                             mtlType = tr.ReadLine();
                             MaterialBlocks[j].PhaseMaterials.Add( MaterialTypes.Find( delegate( MaterialType mt ) { return mt.Name == mtlType; } ) );
+
+                            for ( int k = 0 ; k < MaterialBlocks[j].BoundaryPoints.Count ; k++ )
+                            {
+                                fixActive = tr.ReadLine().Split( ',' );
+                                if ( MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX.Count <= i )
+                                {
+                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX.Add( fixActive[0] == Boolean.TrueString );
+                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveY.Add( fixActive[1] == Boolean.TrueString );
+                                }
+                            }
+
+                            for ( int k = 0 ; k < MaterialBlocks[j].LineConstraints.Count ; k++ )
+                            {
+                                fixActive = tr.ReadLine().Split( ',' );
+                                if ( MaterialBlocks[j].LineConstraints[k].PhaseFixedX.Count <= i )
+                                {
+                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedX.Add( fixActive[0] == Boolean.TrueString );
+                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedY.Add( fixActive[1] == Boolean.TrueString );
+                                }
+                            }
                         }
 
                         tr.ReadLine();

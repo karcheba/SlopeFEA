@@ -459,5 +459,8 @@ REVISION HISTORY:
                     - Requires:     - Additional items in define new load phase (recording/saving of factors for point/line loads and point/line fixities)
                                     - Modify previous load phase
                                     - Delete previous load phase
+                - SlopeFEA Main Program:
+                    - Requires:     - Updates to MaterialBlock, PointLoad, LineLoad, LineConstraint, DrawingPoint constructors to add "dummy" items to analysis phase lists if phases are already present
+                                    - Updates to merge point operation in order to merge analysis phase data
                 - Updates to mesh generator (all listed above)
                 - Updates to analysis code (all listed above)

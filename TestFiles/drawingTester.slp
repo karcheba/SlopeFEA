@@ -12,16 +12,16 @@ PLOTTING DATA
 
 Units = m, kPa, kN/m^3
 
-XAxisMax = 120
+XAxisMax = 100
 XAxisMin = 0
-YAxisMax = 80
-YAxisMin = -60
+YAxisMax = 50
+YAxisMin = 0
 
-XMajorDivision = 20
-YMajorDivision = 20
+XMajorDivision = 10
+YMajorDivision = 10
 
-XMinorDivisions = 4
-YMinorDivisions = 4
+XMinorDivisions = 5
+YMinorDivisions = 5
 
 
 --------------------------------
@@ -39,7 +39,7 @@ Number of Material Types = 2
 
 Material #1
 Name = "sand"
-Colour = #FFF4E9A6
+Colour = #FFF9F9A2
 Phi = 30
 Coh = 0
 Psi = 0
@@ -49,7 +49,7 @@ Nu = 0.33
 
 Material #2
 Name = "clay"
-Colour = #FFF7D5B3
+Colour = #FFFAE398
 Phi = 5
 Coh = 40
 Psi = 0
@@ -66,31 +66,25 @@ Number of Material Blocks = 2
 
 Material Block #1
 Material Type = "NULL"
-Number of Boundary Points = 5
-9.34846235720368, 32.9102910258456, True, False, False
-4.21649023927515, 2.31584186127106, True, True, False
-98.0526751536296, -50.4897470116157, True, True, False
-104.763332450474, -31.9997323148386, True, False, False
-81.9936688223158, 8.7597467010762, False, False, False
-Number of Line Constraints = 3
-1, 2, True, True
-0, 1, True, False
-2, 3, True, False
-Number of Line Loads = 1
-3, 4, True, -30, 30, False, 0, 0
-Number of Point Loads = 1
-4, True, 10, True, -20
+Number of Boundary Points = 4
+5.54511278195489, 37.2932330827068, True, True, False
+11.7105263157895, 10.0751879699248, False, False, False
+58.6278195488722, -0.751879699248117, False, False, False
+81.9360902255639, 17.8947368421053, True, True, False
+Number of Line Constraints = 1
+3, 0, True, True
+Number of Line Loads = 0
+Number of Point Loads = 0
 
 Material Block #2
 Material Type = "NULL"
-Number of Boundary Points = 5
-9.34846235720368, 32.9102910258456, True, False, False
-81.9936688223158, 8.7597467010762, False, False, False
-104.763332450474, -31.9997323148386, True, False, False
-121.06754769365, 56.5963161855162, True, False, False
-52.2706159520882, 73.0526315789473, False, False, False
+Number of Boundary Points = 4
+5.54511278195489, 37.2932330827068, True, True, False
+81.9360902255639, 17.8947368421053, True, True, False
+78.1766917293233, 46.3157894736842, False, False, False
+32.9135338345865, 48.8721804511278, False, False, False
 Number of Line Constraints = 1
-2, 3, True, False
+1, 0, True, True
 Number of Line Loads = 0
 Number of Point Loads = 0
 
@@ -135,7 +129,7 @@ Analyzed = False
 ANALYSIS PHASES
 --------------------------------
 
-Number of Analysis Phases = 2
+Number of Analysis Phases = 3
 
 Phase #1
 Name = "test"
@@ -146,9 +140,19 @@ Number of Iterations = 10
 Number of Load Steps / Print Line = 10
 Gravity Factor = 0.5
 Material Block #1
-clay
-Material Block #2
 sand
+True,True
+False,False
+False,False
+True,True
+True,True
+Material Block #2
+clay
+True,True
+True,True
+False,False
+False,False
+True,True
 
 Phase #2
 Name = "test2"
@@ -157,9 +161,42 @@ Reset Displacements="False"
 Number of Load Steps = 10
 Number of Iterations = 10
 Number of Load Steps / Print Line = 10
-Gravity Factor = 0.9
+Gravity Factor = 0.5
+Material Block #1
+clay
+True,False
+False,False
+False,False
+True,False
+True,False
+Material Block #2
+sand
+True,False
+True,False
+False,False
+False,False
+True,False
+
+Phase #3
+Name = "test3"
+Begin Phase = "test2"
+Reset Displacements="False"
+Number of Load Steps = 10
+Number of Iterations = 10
+Number of Load Steps / Print Line = 10
+Gravity Factor = 0.5
 Material Block #1
 sand
+False,False
+False,False
+False,False
+False,False
+False,False
 Material Block #2
-clay
+sand
+False,False
+False,False
+False,False
+False,False
+False,False
 

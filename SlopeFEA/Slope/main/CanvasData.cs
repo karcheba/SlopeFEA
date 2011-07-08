@@ -827,6 +827,7 @@ namespace SlopeFEA
         private bool isPrintPoint;
         private bool isFixedX , isFixActiveX , isFixedY , isFixActiveY;
         private List<Polyline> fixLines;
+        private List<bool> phaseFixActiveX , phaseFixActiveY;
 
         public DrawingPoint ( SlopeCanvas canvas , object parent , Point pt )
         {
@@ -874,6 +875,9 @@ namespace SlopeFEA
             dot.Fill = Brushes.Black;
             dot.Opacity = 0.7;
             dot.MouseLeftButtonDown += new MouseButtonEventHandler( MouseLeftButtonDown );
+
+            phaseFixActiveX = new List<bool>();
+            phaseFixActiveY = new List<bool>();
 
             canvas.Children.Add( dot );
         }
@@ -924,6 +928,9 @@ namespace SlopeFEA
             dot.Opacity = 0.7;
             dot.Visibility = Visibility.Hidden;
             dot.MouseLeftButtonDown += new MouseButtonEventHandler( MouseLeftButtonDown );
+
+            phaseFixActiveX = new List<bool>();
+            phaseFixActiveY = new List<bool>();
 
             canvas.Children.Add( dot );
         }
@@ -997,7 +1004,7 @@ namespace SlopeFEA
             }
         }
 
-        public List<bool> PhaseFixActiveX { get; set; }
+        public List<bool> PhaseFixActiveX { get { return this.phaseFixActiveX; } }
 
         public bool IsFixedY
         {
@@ -1020,7 +1027,7 @@ namespace SlopeFEA
             }
         }
 
-        public List<bool> PhaseFixActiveY { get; set; }
+        public List<bool> PhaseFixActiveY { get { return this.phaseFixActiveY; } }
 
         public Point Point { get { return this.point; } }
         public Ellipse Dot { get { return this.dot; } }
