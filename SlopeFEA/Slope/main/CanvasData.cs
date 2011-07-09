@@ -1733,6 +1733,8 @@ namespace SlopeFEA
         private SlopeDefineCanvas defineCanvas;
         private bool isLoadedX , isActiveX , isLoadedY , isActiveY;
         private List<Polyline> loadLines;
+        private List<bool> phaseActiveX , phaseActiveY;
+        private List<double> phaseFactorX , phaseFactorY;
         private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
                                 Spos = Math.Sin( 0.75 * Math.PI ) ,
                                 Cneg = Cpos ,
@@ -1784,6 +1786,12 @@ namespace SlopeFEA
             if ( this.IsLoadedY ) this.YFactor = 1.0;
             this.YLoad = yLoad;
 
+            // Initialize analysis phase lists
+            phaseActiveX = new List<bool>();
+            phaseActiveY = new List<bool>();
+            phaseFactorX = new List<double>();
+            phaseFactorY = new List<double>();
+
             Update();
         }
 
@@ -1833,6 +1841,12 @@ namespace SlopeFEA
             if ( this.IsLoadedY ) this.YFactor = 1.0;
             this.YLoad = yLoad;
 
+            // Initialize analysis phase lists
+            phaseActiveX = new List<bool>();
+            phaseActiveY = new List<bool>();
+            phaseFactorX = new List<double>();
+            phaseFactorY = new List<double>();
+
             Update();
         }
 
@@ -1849,6 +1863,8 @@ namespace SlopeFEA
         public double XFactor { get; set; }
         public double YFactor { get; set; }
 
+        public List<double> PhaseFactorX { get { return this.phaseFactorX; } }
+        public List<double> PhaseFactorY { get { return this.phaseFactorY; } }
 
         /// <summary>
         /// Properties indicating whether a load is applied.
@@ -1874,6 +1890,7 @@ namespace SlopeFEA
                 this.Update();
             }
         }
+        public List<bool> PhaseActiveX { get { return this.phaseActiveX; } }
         public bool IsLoadedY 
         { 
             get { return this.isLoadedY; }
@@ -1895,6 +1912,7 @@ namespace SlopeFEA
                 this.Update();
             }
         }
+        public List<bool> PhaseActiveY { get { return this.phaseActiveY; } }
 
         /// <summary>
         /// Horizontal load value.

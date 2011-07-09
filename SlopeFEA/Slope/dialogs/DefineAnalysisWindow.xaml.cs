@@ -787,6 +787,8 @@ namespace SlopeFEA
                         if ( currLC.IsFixedX ) currLC.IsActiveX = currBlock.LineConstraints[j].PhaseFixedX[phase];
                         if ( currLC.IsFixedY ) currLC.IsActiveY = currBlock.LineConstraints[j].PhaseFixedY[phase];
                     }
+
+                    for(int j=0;j
                 }
 
                 inputCanvas.ClearSelections();
@@ -986,6 +988,7 @@ namespace SlopeFEA
             MaterialBlock currBlock , currSub;
             DrawingPoint currNode;
             LineConstraint currLC;
+            PointLoad currPL;
             for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
             {
                 currSub = inputCanvas.Substructs[i];
@@ -1011,6 +1014,18 @@ namespace SlopeFEA
                     {
                         currLC.PhaseFixedX.Add( currSub.LineConstraints[j].IsActiveX );
                         currLC.PhaseFixedY.Add( currSub.LineConstraints[j].IsActiveY );
+                    }
+                }
+
+                for ( int j = 0 ; j < currSub.PointLoads.Count ; j++ )
+                {
+                    currPL = currBlock.PointLoads[j];
+                    if ( currPL.PhaseActiveX.Count < numPhases )
+                    {
+                        currPL.PhaseActiveX.Add( currSub.PointLoads[j].IsActiveX );
+                        currPL.PhaseFactorX.Add( currSub.PointLoads[j].XFactor );
+                        currPL.PhaseActiveY.Add( currSub.PointLoads[j].IsActiveY );
+                        currPL.PhaseFactorY.Add( currSub.PointLoads[j].YFactor );
                     }
                 }
             }
