@@ -48,15 +48,15 @@ namespace SlopeFEA
             this.Owner = owner;
             this.canvas = canvas;
 
-            xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
-            xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
-            xMajor.Text = String.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
-            xMinor.Text = String.Format( "{0}" , canvas.XMinorDivisions );
+            xMax.Text = string.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
+            xMin.Text = string.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
+            xMajor.Text = string.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
+            xMinor.Text = string.Format( "{0}" , canvas.XMinorDivisions );
 
-            yMax.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
-            yMin.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
-            yMajor.Text = String.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
-            yMinor.Text = String.Format( "{0}" , canvas.YMinorDivisions );
+            yMax.Text = string.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
+            yMin.Text = string.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
+            yMajor.Text = string.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
+            yMinor.Text = string.Format( "{0}" , canvas.YMinorDivisions );
 
             string units;
             switch ( canvas.Units )
@@ -83,15 +83,15 @@ namespace SlopeFEA
             this.Owner = owner;
             this.plotCanvas = canvas;
 
-            xMax.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
-            xMin.Text = String.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
-            xMajor.Text = String.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
-            xMinor.Text = String.Format( "{0}" , canvas.XMinorDivisions );
+            xMax.Text = string.Format( "{0}" , Math.Round( canvas.XAxisMax , 2 ) );
+            xMin.Text = string.Format( "{0}" , Math.Round( canvas.XAxisMin , 2 ) );
+            xMajor.Text = string.Format( "{0}" , Math.Round( canvas.XMajorDivision , 2 ) );
+            xMinor.Text = string.Format( "{0}" , canvas.XMinorDivisions );
 
-            yMax.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
-            yMin.Text = String.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
-            yMajor.Text = String.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
-            yMinor.Text = String.Format( "{0}" , canvas.YMinorDivisions );
+            yMax.Text = string.Format( "{0}" , Math.Round( canvas.YAxisMax , 2 ) );
+            yMin.Text = string.Format( "{0}" , Math.Round( canvas.YAxisMin , 2 ) );
+            yMajor.Text = string.Format( "{0}" , Math.Round( canvas.YMajorDivision , 2 ) );
+            yMinor.Text = string.Format( "{0}" , canvas.YMinorDivisions );
 
             string units;
             switch ( canvas.Units )

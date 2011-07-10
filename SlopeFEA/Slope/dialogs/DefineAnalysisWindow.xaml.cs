@@ -767,6 +767,7 @@ namespace SlopeFEA
                 MaterialBlock currBlock , currSub;
                 DrawingPoint currNode;
                 LineConstraint currLC;
+                PointLoad currPL;
                 for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
                 {
                     currBlock = canvas.MaterialBlocks[i];
@@ -788,7 +789,20 @@ namespace SlopeFEA
                         if ( currLC.IsFixedY ) currLC.IsActiveY = currBlock.LineConstraints[j].PhaseFixedY[phase];
                     }
 
-                    for(int j=0;j
+                    for ( int j = 0 ; j < currSub.PointLoads.Count ; j++ )
+                    {
+                        currPL = currSub.PointLoads[j];
+                        if ( currPL.IsLoadedX )
+                        {
+                            currPL.IsActiveX = currBlock.PointLoads[j].PhaseActiveX[phase];
+                            currPL.XFactor = currBlock.PointLoads[j].PhaseFactorX[phase];
+                        }
+                        if ( currPL.IsLoadedY )
+                        {
+                            currPL.IsActiveY = currBlock.PointLoads[j].PhaseActiveY[phase];
+                            currPL.YFactor = currBlock.PointLoads[j].PhaseFactorY[phase];
+                        }
+                    }
                 }
 
                 inputCanvas.ClearSelections();
@@ -826,6 +840,14 @@ namespace SlopeFEA
                                     lc.IsActiveX = lc.IsFixedX;
                                     lc.IsActiveY = lc.IsFixedY;
                                 } );
+                            mb.PointLoads.ForEach(
+                                delegate( PointLoad pl )
+                                {
+                                    pl.IsActiveX = pl.IsLoadedX;
+                                    if ( pl.IsActiveX ) pl.XFactor = 1.0;
+                                    pl.IsActiveY = pl.IsLoadedY;
+                                    if ( pl.IsActiveY ) pl.YFactor = 1.0;
+                                } );
                         } );
 
                     inputCanvas.ClearSelections();
@@ -844,6 +866,7 @@ namespace SlopeFEA
                 MaterialBlock currBlock , currSub;
                 DrawingPoint currNode;
                 LineConstraint currLC;
+                PointLoad currPL;
                 if ( phase >= 0 )
                 {
                     for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
@@ -866,6 +889,21 @@ namespace SlopeFEA
                             if ( currLC.IsFixedX ) currLC.IsActiveX = currBlock.LineConstraints[j].PhaseFixedX[phase];
                             if ( currLC.IsFixedY ) currLC.IsActiveY = currBlock.LineConstraints[j].PhaseFixedY[phase];
                         }
+
+                        for ( int j = 0 ; j < currSub.PointLoads.Count ; j++ )
+                        {
+                            currPL = currSub.PointLoads[j];
+                            if ( currPL.IsLoadedX )
+                            {
+                                currPL.IsActiveX = currBlock.PointLoads[j].PhaseActiveX[phase];
+                                currPL.XFactor = currBlock.PointLoads[j].PhaseFactorX[phase];
+                            }
+                            if ( currPL.IsLoadedY )
+                            {
+                                currPL.IsActiveY = currBlock.PointLoads[j].PhaseActiveY[phase];
+                                currPL.YFactor = currBlock.PointLoads[j].PhaseFactorY[phase];
+                            }
+                        }
                     }
                 }
                 else
@@ -887,6 +925,14 @@ namespace SlopeFEA
                                     lc.IsActiveX = lc.IsFixedX;
                                     lc.IsActiveY = lc.IsFixedY;
                                 } );
+                            mb.PointLoads.ForEach(
+                                delegate( PointLoad pl )
+                                {
+                                    pl.IsActiveX = pl.IsLoadedX;
+                                    if ( pl.IsActiveX ) pl.XFactor = 1.0;
+                                    pl.IsActiveY = pl.IsLoadedY;
+                                    if ( pl.IsActiveY ) pl.YFactor = 1.0;
+                                } );
                         } );
                 }
 
@@ -901,12 +947,12 @@ namespace SlopeFEA
             if ( selectedMaterial != null )
             {
                 materialFill.Fill = selectedMaterial.Fill;
-                phiValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Phi , 2 ) );
-                cohValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Cohesion , 2 ) );
-                psiValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Psi , 2 ) );
-                gammaValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Gamma , 2 ) );
-                emodValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Emod , 2 ) );
-                nuValue.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Nu , 2 ) );
+                phiValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Phi , 2 ) );
+                cohValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Cohesion , 2 ) );
+                psiValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Psi , 2 ) );
+                gammaValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Gamma , 2 ) );
+                emodValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Emod , 2 ) );
+                nuValue.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Nu , 2 ) );
             }
         }
 

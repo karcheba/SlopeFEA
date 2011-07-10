@@ -67,13 +67,13 @@ namespace SlopeFEA
             double xCoord , yCoord;
             xCoord = (load.Node.Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Node.Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords.Content = String.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
+            coords.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
             isLoadedX.IsChecked = xLoad.IsEnabled = load.IsLoadedX;
-            xLoad.Text = String.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
+            xLoad.Text = string.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
             isLoadedY.IsChecked = yLoad.IsEnabled = load.IsLoadedY;
-            yLoad.Text = String.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
+            yLoad.Text = string.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
         }
 
         private void ok_Click ( object sender , RoutedEventArgs e )

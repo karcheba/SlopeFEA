@@ -53,12 +53,12 @@ namespace SlopeFEA
             if ( this.Owner is MainWindow )
             {
                 canvas = (SlopeCanvas) ((Grid) ((TabControl) ((Grid) this.Owner.Content).Children[2]).SelectedContent).Children[2];
-                scale.Text = String.Format( "{0}" , Math.Round( canvas.Scale , 2 ) );
+                scale.Text = string.Format( "{0}" , Math.Round( canvas.Scale , 2 ) );
             }
             else if ( this.Owner is PlotResultsWindow )
             {
                 plotCanvas = (SlopePlotCanvas) ((Grid) ((PlotResultsWindow) this.Owner).contentGrid.Children[1]).Children[3];
-                scale.Text = String.Format( "{0}" , Math.Round( plotCanvas.Scale , 2 ) );
+                scale.Text = string.Format( "{0}" , Math.Round( plotCanvas.Scale , 2 ) );
             }
         }
 

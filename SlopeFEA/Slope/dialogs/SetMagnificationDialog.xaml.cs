@@ -57,7 +57,7 @@ namespace SlopeFEA
             this.Owner = owner;
 
             plotCanvas = (SlopePlotCanvas) ((Grid) ((PlotResultsWindow) this.Owner).contentGrid.Children[1]).Children[3];
-            mag.Text = String.Format( "{0}" , Math.Round( plotCanvas.Magnification , 2 ) );
+            mag.Text = string.Format( "{0}" , Math.Round( plotCanvas.Magnification , 2 ) );
         }
 
         private void ok_Click ( object sender , RoutedEventArgs e )

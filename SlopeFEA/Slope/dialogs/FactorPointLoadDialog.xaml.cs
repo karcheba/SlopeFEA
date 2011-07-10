@@ -67,17 +67,17 @@ namespace SlopeFEA
             double xCoord , yCoord;
             xCoord = (load.Node.Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Node.Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords.Content = String.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
+            coords.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
             isLoadedX.IsEnabled = load.IsLoadedX;
             isLoadedX.IsChecked = xFactor.IsEnabled = load.IsActiveX;
-            xFactor.Text = String.Format( "{0}" , Math.Round( load.XFactor , 3 ) );
-            xLoad.Text = String.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
+            xFactor.Text = string.Format( "{0}" , Math.Round( load.XFactor , 3 ) );
+            xLoad.Text = string.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
             isLoadedY.IsEnabled = load.IsLoadedY;
             isLoadedY.IsChecked = yFactor.IsEnabled = load.IsActiveY;
-            yFactor.Text = String.Format( "{0}" , Math.Round( load.YFactor , 3 ) );
-            yLoad.Text = String.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
+            yFactor.Text = string.Format( "{0}" , Math.Round( load.YFactor , 3 ) );
+            yLoad.Text = string.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
         }
 
         private void ok_Click ( object sender , RoutedEventArgs e )

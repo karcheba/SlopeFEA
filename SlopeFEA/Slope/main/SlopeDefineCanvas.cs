@@ -195,7 +195,7 @@ namespace SlopeFEA
                 case Units.Feet: units = "ft"; break;
                 default: units = "in"; break;
             }
-            xLabel.Text = String.Format( "X ({0})" , units );
+            xLabel.Text = string.Format( "X ({0})" , units );
             xLabel.FontSize = 10;
             xLabel.VerticalAlignment = VerticalAlignment.Bottom;
             xLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -216,7 +216,7 @@ namespace SlopeFEA
                 xAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( xMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( xMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Top;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -253,7 +253,7 @@ namespace SlopeFEA
 
             // Add appropriate units label
             TextBlock yLabel = new TextBlock();
-            yLabel.Text = String.Format( "Y\n({0})" , units );
+            yLabel.Text = string.Format( "Y\n({0})" , units );
             yLabel.FontSize = 10;
             yLabel.TextAlignment = TextAlignment.Right;
             yLabel.VerticalAlignment = VerticalAlignment.Bottom;
@@ -274,7 +274,7 @@ namespace SlopeFEA
                 yAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( yMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( yMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Bottom;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -671,9 +671,9 @@ namespace SlopeFEA
                             yCoord = double.Parse( coords[1] );
                             materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
-                            isFixedX[j] = coords[2] == Boolean.TrueString;
-                            isFixedY[j] = coords[3] == Boolean.TrueString;
-                            isPrintPoint[j] = coords[4] == Boolean.TrueString;
+                            isFixedX[j] = coords[2] == bool.TrueString;
+                            isFixedY[j] = coords[3] == bool.TrueString;
+                            isPrintPoint[j] = coords[4] == bool.TrueString;
                         }
 
                         block = new MaterialBlock( this , mtl , materialBoundPoints );
@@ -691,8 +691,8 @@ namespace SlopeFEA
                             newLC = new LineConstraint( this ,
                                 block.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
                                 block.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
-                                lineConstraint[2] == Boolean.TrueString ,
-                                lineConstraint[3] == Boolean.TrueString );
+                                lineConstraint[2] == bool.TrueString ,
+                                lineConstraint[3] == bool.TrueString );
                             existingLC = null;
                             foreach ( MaterialBlock mb in substructs )
                             {
@@ -718,8 +718,8 @@ namespace SlopeFEA
                             block.LineLoads.Add( new LineLoad( this ,
                                 block.BoundaryPoints[int.Parse( lineLoad[0] )] ,
                                 block.BoundaryPoints[int.Parse( lineLoad[1] )] ,
-                                lineLoad[2] == Boolean.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
-                                lineLoad[5] == Boolean.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
+                                lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                                lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
                         }
 
                         numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
@@ -728,8 +728,8 @@ namespace SlopeFEA
                             pointLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
                             block.PointLoads.Add( new PointLoad( this ,
                                 block.BoundaryPoints[int.Parse( pointLoad[0] )] ,
-                                pointLoad[1] == Boolean.TrueString , double.Parse( pointLoad[2] ) ,
-                                pointLoad[3] == Boolean.TrueString , double.Parse( pointLoad[4] ) ) );
+                                pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
+                                pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) ) );
                         }
 
                         substructs.Add( block );

@@ -235,7 +235,7 @@ namespace SlopeFEA
                 case Units.Feet: units = "ft"; break;
                 default: units = "in"; break;
             }
-            xLabel.Text = String.Format( "X ({0})" , units );
+            xLabel.Text = string.Format( "X ({0})" , units );
             xLabel.FontSize = 10;
             xLabel.VerticalAlignment = VerticalAlignment.Bottom;
             xLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -256,7 +256,7 @@ namespace SlopeFEA
                 xAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( xMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( xMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Top;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -293,7 +293,7 @@ namespace SlopeFEA
 
             // Add appropriate units label
             TextBlock yLabel = new TextBlock();
-            yLabel.Text = String.Format( "Y\n({0})" , units );
+            yLabel.Text = string.Format( "Y\n({0})" , units );
             yLabel.FontSize = 10;
             yLabel.TextAlignment = TextAlignment.Right;
             yLabel.VerticalAlignment = VerticalAlignment.Bottom;
@@ -314,7 +314,7 @@ namespace SlopeFEA
                 yAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( yMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( yMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Bottom;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -705,7 +705,7 @@ namespace SlopeFEA
 
             // Find node file
             pathSplit[1] = "nod";
-            string nodePath = String.Join( "." , pathSplit );
+            string nodePath = string.Join( "." , pathSplit );
             if ( !File.Exists( nodePath ) )
             {
                 MessageBox.Show( "Could not find node data file." , "Error" );
@@ -791,7 +791,7 @@ namespace SlopeFEA
 
                 // Find element file
                 pathSplit[1] = "ele";
-                string elementPath = String.Join( "." , pathSplit );
+                string elementPath = string.Join( "." , pathSplit );
                 if ( !File.Exists( elementPath ) )
                 {
                     MessageBox.Show( "Could not find element data file." , "Error" );

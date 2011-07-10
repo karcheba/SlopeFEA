@@ -150,7 +150,7 @@ class ClosableCanvasTabItem : TabItem
 
         xStatus.Content = "X";
         yStatus.Content = "Y";
-        scaleStatus.Content = String.Format( "Scale = {0} : 1" , Math.Round( canvas.Scale , 2 ) );
+        scaleStatus.Content = string.Format( "Scale = {0} : 1" , Math.Round( canvas.Scale , 2 ) );
 
         Menu mainMenu = (Menu) ((DockPanel) ((Grid) ((TabControl) this.Parent).Parent).Children[0]).Children[0];
         MenuItem fileMenu = (MenuItem) mainMenu.Items[0];

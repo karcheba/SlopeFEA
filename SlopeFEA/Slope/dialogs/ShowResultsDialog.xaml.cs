@@ -101,7 +101,7 @@ namespace SlopeFEA
                 // loop through results file, adding an item for each run
                 while ( irun != -1 )
                 {
-                    selectRun.Items.Add( String.Format( "Run #{0}" , run++ ) );
+                    selectRun.Items.Add( string.Format( "Run #{0}" , run++ ) );
                     irun = results.FindIndex( irun + 1 , delegate( string s ) { return s.Contains( "Run #" ); } );
                 }
 
@@ -148,7 +148,7 @@ namespace SlopeFEA
 
             // find index of run number
             int irun = results.FindIndex(
-                    delegate( string s ) { return s.Contains( String.Format( "Run #{0}" , run ) ); } );
+                    delegate( string s ) { return s.Contains( string.Format( "Run #{0}" , run ) ); } );
 
             runResults.Text += results[irun] + "\n";        // add run number to results listbox
             runResults.Text += results[irun + 1] + "\n";    // add time stamp

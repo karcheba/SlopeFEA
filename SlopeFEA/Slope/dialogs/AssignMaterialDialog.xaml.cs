@@ -83,12 +83,12 @@ namespace SlopeFEA
             if ( selectedMaterial != null )
             {
                 colour.Fill = selectedMaterial.Fill;
-                phi.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Phi , 2 ) );
-                coh.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Cohesion , 2 ) );
-                psi.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Psi , 2 ) );
-                gamma.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Gamma , 2 ) );
-                emod.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Emod , 2 ) );
-                nu.Text = String.Format( "{0}" , Math.Round( selectedMaterial.Nu , 2 ) );
+                phi.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Phi , 2 ) );
+                coh.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Cohesion , 2 ) );
+                psi.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Psi , 2 ) );
+                gamma.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Gamma , 2 ) );
+                emod.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Emod , 2 ) );
+                nu.Text = string.Format( "{0}" , Math.Round( selectedMaterial.Nu , 2 ) );
             }
         }
 

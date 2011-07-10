@@ -82,7 +82,7 @@ namespace Matrix
         /// Indexer for getting an entire row or column
         /// </summary>
         /// <param name="i">The zero-based index of the row or column</param>
-        /// <param name="getcol">Boolean for getting a column (default it false, meaning return a row)</param>
+        /// <param name="getcol">bool for getting a column (default it false, meaning return a row)</param>
         /// <returns>A 1xNumCols or NumRowsx1 DenseMatrix containing the row or column called.</returns>
         public DenseMatrix this[int i , bool getcol = false]
         {
@@ -288,7 +288,7 @@ namespace Matrix
             for ( int i = 0 ; i < nrows ; i++ )
             {
                 tw.Write( "[\t" );
-                for ( int j = 0 ; j < ncols ; j++ ) tw.Write( String.Format( "{0:e6}\t" , this[i , j] ) );
+                for ( int j = 0 ; j < ncols ; j++ ) tw.Write( string.Format( "{0:e6}\t" , this[i , j] ) );
                 tw.WriteLine( "]" );
             }
         }
@@ -299,7 +299,7 @@ namespace Matrix
             {
                 for ( int i = 0 ; i < nrows ; i++ )
                 {
-                    for ( int j = 0 ; j < ncols ; j++ ) tw.Write( String.Format( "{0:e6}\t" , this[i , j] ) );
+                    for ( int j = 0 ; j < ncols ; j++ ) tw.Write( string.Format( "{0:e6}\t" , this[i , j] ) );
                     tw.WriteLine();
                 }
             }
@@ -310,9 +310,9 @@ namespace Matrix
             string output = "";
             for ( int i = 0 ; i < nrows ; i++ )
             {
-                output += String.Format( "[\t" );
-                for ( int j = 0 ; j < ncols ; j++ ) output += String.Format( "{0:e6}\t" , this[i , j] );
-                output += String.Format( "]\n" );
+                output += string.Format( "[\t" );
+                for ( int j = 0 ; j < ncols ; j++ ) output += string.Format( "{0:e6}\t" , this[i , j] );
+                output += string.Format( "]\n" );
             }
             return output;
         }
@@ -863,7 +863,7 @@ namespace Matrix
             for ( int i = 0 ; i < nrows ; i++ )
             {
                 tw.Write( "[\t" );
-                for ( int j = 0 ; j < nrows ; j++ ) tw.Write( String.Format( "{0:e6}\t" , this[i , j] ) );
+                for ( int j = 0 ; j < nrows ; j++ ) tw.Write( string.Format( "{0:e6}\t" , this[i , j] ) );
                 tw.WriteLine( "]" );
             }
         }
@@ -874,7 +874,7 @@ namespace Matrix
             {
                 for ( int i = 0 ; i < nrows ; i++ )
                 {
-                    for ( int j = 0 ; j < hbw ; j++ ) tw.Write( String.Format( "{0:e6}\t" , data[i , j] ) );
+                    for ( int j = 0 ; j < hbw ; j++ ) tw.Write( string.Format( "{0:e6}\t" , data[i , j] ) );
                     tw.WriteLine();
                 }
 
@@ -888,7 +888,7 @@ namespace Matrix
             {
                 for ( int i = 0 ; i < nrows ; i++ )
                 {
-                    for ( int j = 0 ; j < nrows ; j++ ) tw.Write( String.Format( "{0:e6}\t" , this[i , j] ) );
+                    for ( int j = 0 ; j < nrows ; j++ ) tw.Write( string.Format( "{0:e6}\t" , this[i , j] ) );
                     tw.WriteLine();
                 }
 
@@ -902,7 +902,7 @@ namespace Matrix
             for ( int i = 0 ; i < nrows ; i++ )
             {
                 output += "[\t";
-                for ( int j = 0 ; j < nrows ; j++ ) output += String.Format( "{0:e6}\t" , this[i , j] );
+                for ( int j = 0 ; j < nrows ; j++ ) output += string.Format( "{0:e6}\t" , this[i , j] );
                 output += "]\n";
             }
             return output;

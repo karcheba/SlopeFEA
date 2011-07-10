@@ -50,11 +50,11 @@ namespace SlopeFEA
 
             population.Text = canvas.GeneticAlgorithmParameters.Population.ToString();
             generations.Text = canvas.GeneticAlgorithmParameters.Generations.ToString();
-            fittest.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.FittestProportion , 3 ) );
-            mating.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MatingPoolProportion , 3 ) );
-            crossover.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.CrossoverProbability , 3 ) );
-            mutation.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MutationProbability , 3 ) );
-            slicewidth.Text = String.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.SliceWidth , 2 ) );
+            fittest.Text = string.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.FittestProportion , 3 ) );
+            mating.Text = string.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MatingPoolProportion , 3 ) );
+            crossover.Text = string.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.CrossoverProbability , 3 ) );
+            mutation.Text = string.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.MutationProbability , 3 ) );
+            slicewidth.Text = string.Format( "{0}" , Math.Round( canvas.GeneticAlgorithmParameters.SliceWidth , 2 ) );
 
             string units;
             switch ( canvas.Units )

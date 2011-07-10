@@ -275,13 +275,13 @@ namespace SlopeFEA
                                 if ( File.Exists( oldmeshpath ) || File.Exists( oldbishpath ) || File.Exists( oldrfempath ) )
                                 {
                                     // ...affix a counter to the filenames...
-                                    meshsplit[0] = String.Format( "{0}_old{1}" , meshsplit[0] , oldcount );
+                                    meshsplit[0] = string.Format( "{0}_old{1}" , meshsplit[0] , oldcount );
                                     string newmeshpath = string.Join( "." , meshsplit );
 
-                                    bishsplit[0] = String.Format( "{0}_old{1}" , bishsplit[0] , oldcount );
+                                    bishsplit[0] = string.Format( "{0}_old{1}" , bishsplit[0] , oldcount );
                                     string newbishpath = string.Join( "." , bishsplit );
 
-                                    rfemsplit[0] = String.Format( "{0}_old{1}" , rfemsplit[0] , oldcount );
+                                    rfemsplit[0] = string.Format( "{0}_old{1}" , rfemsplit[0] , oldcount );
                                     string newrfempath = string.Join( "." , rfemsplit );
 
                                     // ...and check if other previous analysis files exist...
@@ -289,13 +289,13 @@ namespace SlopeFEA
                                     {
                                         oldcount++;
 
-                                        meshsplit[0] = String.Format( "{0}{1}" , meshsplit[0].Substring( 0 , meshsplit[0].Length - 1 ) , oldcount );
+                                        meshsplit[0] = string.Format( "{0}{1}" , meshsplit[0].Substring( 0 , meshsplit[0].Length - 1 ) , oldcount );
                                         newmeshpath = string.Join( "." , meshsplit );
 
-                                        bishsplit[0] = String.Format( "{0}{1}" , bishsplit[0].Substring( 0 , bishsplit[0].Length - 1 ) , oldcount );
+                                        bishsplit[0] = string.Format( "{0}{1}" , bishsplit[0].Substring( 0 , bishsplit[0].Length - 1 ) , oldcount );
                                         newbishpath = string.Join( "." , bishsplit );
 
-                                        rfemsplit[0] = String.Format( "{0}{1}" , rfemsplit[0].Substring( 0 , rfemsplit.Length - 1 ) , oldcount );
+                                        rfemsplit[0] = string.Format( "{0}{1}" , rfemsplit[0].Substring( 0 , rfemsplit.Length - 1 ) , oldcount );
                                         newrfempath = string.Join( "." , rfemsplit );
                                     }
 
@@ -878,6 +878,15 @@ namespace SlopeFEA
                                 MaterialBlocks[j].LineConstraints[k].PhaseFixedX[i - 1] ,
                                 MaterialBlocks[j].LineConstraints[k].PhaseFixedY[i - 1] );
                         }
+
+                        for ( int k = 0 ; k < MaterialBlocks[j].PointLoads.Count ; k++ )
+                        {
+                            tw.WriteLine( "{0},{1},{2},{3}" ,
+                                MaterialBlocks[j].PointLoads[k].PhaseActiveX[i - 1] ,
+                                MaterialBlocks[j].PointLoads[k].PhaseFactorX[i - 1] ,
+                                MaterialBlocks[j].PointLoads[k].PhaseActiveY[i - 1] ,
+                                MaterialBlocks[j].PointLoads[k].PhaseFactorY[i - 1] );
+                        }
                     }
 
                     tw.WriteLine();
@@ -1053,9 +1062,9 @@ namespace SlopeFEA
                             yCoord = double.Parse( coords[1] );
                             materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
-                            isFixedX[j] = coords[2] == Boolean.TrueString;
-                            isFixedY[j] = coords[3] == Boolean.TrueString;
-                            isPrintPoint[j] = coords[4] == Boolean.TrueString;
+                            isFixedX[j] = coords[2] == bool.TrueString;
+                            isFixedY[j] = coords[3] == bool.TrueString;
+                            isPrintPoint[j] = coords[4] == bool.TrueString;
                         }
 
                         newMaterialBlock = new MaterialBlock( this , materialBoundPoints );
@@ -1073,8 +1082,8 @@ namespace SlopeFEA
                             newLineConstraint = new LineConstraint( this ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
-                                lineConstraint[2] == Boolean.TrueString ,
-                                lineConstraint[3] == Boolean.TrueString );
+                                lineConstraint[2] == bool.TrueString ,
+                                lineConstraint[3] == bool.TrueString );
                             existingLineConstraint = null;
                             foreach ( MaterialBlock mb in materialBlocks )
                             {
@@ -1101,8 +1110,8 @@ namespace SlopeFEA
                             newMaterialBlock.LineLoads.Add( new LineLoad( this ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[0] )] ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[1] )] ,
-                                lineLoad[2] == Boolean.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
-                                lineLoad[5] == Boolean.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
+                                lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                                lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
                         }
 
                         numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
@@ -1111,8 +1120,8 @@ namespace SlopeFEA
                             pointLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
                             newMaterialBlock.PointLoads.Add( new PointLoad( this ,
                                 newMaterialBlock.BoundaryPoints[int.Parse( pointLoad[0] )] ,
-                                pointLoad[1] == Boolean.TrueString , double.Parse( pointLoad[2] ) ,
-                                pointLoad[3] == Boolean.TrueString , double.Parse( pointLoad[4] ) ) );
+                                pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
+                                pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) ) );
                         }
 
                         newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
@@ -1172,15 +1181,15 @@ namespace SlopeFEA
                 }
 
                 this.IsVerified = tr.ReadLine().Split( new char[] { '=' , ' ' } , StringSplitOptions.RemoveEmptyEntries )[1]
-                                        == Boolean.TrueString;
+                                        == bool.TrueString;
 
                 this.IsMeshed = tr.ReadLine().Split( new char[] { '=' , ' ' } , StringSplitOptions.RemoveEmptyEntries )[1]
-                                        == Boolean.TrueString;
+                                        == bool.TrueString;
 
 
 
                 this.IsAnalyzed = tr.ReadLine().Split( new char[] { '=' , ' ' } , StringSplitOptions.RemoveEmptyEntries )[1]
-                                        == Boolean.TrueString;
+                                        == bool.TrueString;
 
                 this.ShowCritical = this.IsAnalyzed;
 
@@ -1201,7 +1210,7 @@ namespace SlopeFEA
                     AnalysisPhase beginPhase;
                     int number , nstep , niter , nprint;
                     string name , beginName, mtlType;
-                    string[] fixActive;
+                    string[] fixActive, loadActive;
                     bool reset;
                     double gfact;
 
@@ -1211,7 +1220,7 @@ namespace SlopeFEA
                         name = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
                         beginName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
                         beginPhase = FEAPhases.Find( delegate( AnalysisPhase ap ) { return ap.Name == beginName; } );
-                        reset = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1] == Boolean.TrueString;
+                        reset = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1] == bool.TrueString;
                         nstep = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         niter = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         nprint = int.Parse( tr.ReadLine().Split( '=' )[1] );
@@ -1228,8 +1237,8 @@ namespace SlopeFEA
                                 fixActive = tr.ReadLine().Split( ',' );
                                 if ( MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX.Count <= i )
                                 {
-                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX.Add( fixActive[0] == Boolean.TrueString );
-                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveY.Add( fixActive[1] == Boolean.TrueString );
+                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveX.Add( fixActive[0] == bool.TrueString );
+                                    MaterialBlocks[j].BoundaryPoints[k].PhaseFixActiveY.Add( fixActive[1] == bool.TrueString );
                                 }
                             }
 
@@ -1238,8 +1247,20 @@ namespace SlopeFEA
                                 fixActive = tr.ReadLine().Split( ',' );
                                 if ( MaterialBlocks[j].LineConstraints[k].PhaseFixedX.Count <= i )
                                 {
-                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedX.Add( fixActive[0] == Boolean.TrueString );
-                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedY.Add( fixActive[1] == Boolean.TrueString );
+                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedX.Add( fixActive[0] == bool.TrueString );
+                                    MaterialBlocks[j].LineConstraints[k].PhaseFixedY.Add( fixActive[1] == bool.TrueString );
+                                }
+                            }
+
+                            for ( int k = 0 ; k < MaterialBlocks[j].PointLoads.Count ; k++ )
+                            {
+                                loadActive = tr.ReadLine().Split( ',' );
+                                if ( MaterialBlocks[j].PointLoads[k].PhaseActiveX.Count <= i )
+                                {
+                                    MaterialBlocks[j].PointLoads[k].PhaseActiveX.Add( loadActive[0] == bool.TrueString );
+                                    MaterialBlocks[j].PointLoads[k].PhaseFactorX.Add( double.Parse( loadActive[1] ) );
+                                    MaterialBlocks[j].PointLoads[k].PhaseActiveY.Add( loadActive[2] == bool.TrueString );
+                                    MaterialBlocks[j].PointLoads[k].PhaseFactorY.Add( double.Parse( loadActive[3] ) );
                                 }
                             }
                         }
@@ -1370,7 +1391,7 @@ namespace SlopeFEA
                 case Units.Feet: units = "ft"; break;
                 default: units = "in"; break;
             }
-            xLabel.Text = String.Format( "X ({0})" , units );
+            xLabel.Text = string.Format( "X ({0})" , units );
             xLabel.FontSize = 10;
             xLabel.VerticalAlignment = VerticalAlignment.Bottom;
             xLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -1391,7 +1412,7 @@ namespace SlopeFEA
                 xAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( xMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( xMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Top;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -1428,7 +1449,7 @@ namespace SlopeFEA
 
             // Add appropriate units label
             TextBlock yLabel = new TextBlock();
-            yLabel.Text = String.Format( "Y\n({0})" , units );
+            yLabel.Text = string.Format( "Y\n({0})" , units );
             yLabel.FontSize = 10;
             yLabel.TextAlignment = TextAlignment.Right;
             yLabel.VerticalAlignment = VerticalAlignment.Bottom;
@@ -1449,7 +1470,7 @@ namespace SlopeFEA
                 yAxis.Children.Add( majorLine );
 
                 majorLabel = new TextBlock();
-                majorLabel.Text = String.Format( "{0}" , Math.Round( yMajor , 2 ) );
+                majorLabel.Text = string.Format( "{0}" , Math.Round( yMajor , 2 ) );
                 majorLabel.FontSize = 10;
                 majorLabel.VerticalAlignment = VerticalAlignment.Bottom;
                 majorLabel.HorizontalAlignment = HorizontalAlignment.Right;
@@ -1720,7 +1741,7 @@ namespace SlopeFEA
             StatusBar status =
                 (StatusBar) ((DockPanel) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
             StatusBarItem statusLabel = (StatusBarItem) status.Items[2];
-            statusLabel.Content = String.Format( "Scale = {0} : 1" , Math.Round( Scale , 2 ) );
+            statusLabel.Content = string.Format( "Scale = {0} : 1" , Math.Round( Scale , 2 ) );
 
             // Update plotting origin (in pixels)
             OriginOffsetX = centre.X + factor * (OriginOffsetX - centre.X);
@@ -1957,7 +1978,7 @@ namespace SlopeFEA
                 string countMsg = deletedBlocks.Count == 1 ? " this material block" : " these " + deletedBlocks.Count + " material blocks";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
+                confirmed = MessageBox.Show( string.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
                                             "Delete Material Blocks" , MessageBoxButton.YesNo );
 
                 if ( confirmed == MessageBoxResult.Yes )
@@ -1980,7 +2001,7 @@ namespace SlopeFEA
                 string countMsg = deletedBoundPoints.Count == 1 ? " this boundary point" : " these " + deletedBoundPoints.Count + " boundary points";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
+                confirmed = MessageBox.Show( string.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
                                             "Delete Boundary Points" , MessageBoxButton.YesNo );
 
                 if ( confirmed == MessageBoxResult.Yes )
@@ -2012,7 +2033,7 @@ namespace SlopeFEA
                 string countMsg = deletedBoundPoints.Count == 1 ? " this material boundary point" : " these " + deletedBoundPoints.Count + " material boundary points";
 
                 MessageBoxResult confirmed;
-                confirmed = MessageBox.Show( String.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
+                confirmed = MessageBox.Show( string.Format( "Are you sure you want to delete{0}?" , countMsg ) ,
                                             "Delete Material Boundary Points" , MessageBoxButton.YesNo );
 
                 if ( confirmed == MessageBoxResult.Yes )
@@ -2158,8 +2179,8 @@ namespace SlopeFEA
             }
 
             // Update axis units labels
-            ((TextBlock) xAxis.Children[1]).Text = String.Format( "X ({0})" , unitsLabel );
-            ((TextBlock) yAxis.Children[1]).Text = String.Format( "Y\n({0})" , unitsLabel );
+            ((TextBlock) xAxis.Children[1]).Text = string.Format( "X ({0})" , unitsLabel );
+            ((TextBlock) yAxis.Children[1]).Text = string.Format( "Y\n({0})" , unitsLabel );
 
             // If conversion is desired, convert appropriate values
             if ( convert == MessageBoxResult.Yes )
@@ -2226,7 +2247,7 @@ namespace SlopeFEA
                 (StatusBar) ((DockPanel) ((Grid) ((TabControl) ((TabItem) ((Grid) this.Parent).Parent).Parent).Parent).Children[1]).Children[0];
                 StatusBarItem statusLabel = (StatusBarItem) status.Items[2];
 
-                statusLabel.Content = String.Format( "Scale = {0}:1" , Math.Round( Scale , 2 ) );
+                statusLabel.Content = string.Format( "Scale = {0}:1" , Math.Round( Scale , 2 ) );
             }
 
             this.IsSaved = false;
@@ -3141,9 +3162,9 @@ namespace SlopeFEA
             }
 
             // Update status bar labels
-            string label = String.Format( "X = {0} {1}" , Math.Round( xCoord , 2 ) , units );
+            string label = string.Format( "X = {0} {1}" , Math.Round( xCoord , 2 ) , units );
             xCoordLabel.Content = label;
-            label = String.Format( "Y = {0} {1}" , Math.Round( yCoord , 2 ) , units );
+            label = string.Format( "Y = {0} {1}" , Math.Round( yCoord , 2 ) , units );
             yCoordLabel.Content = label;
         }
 
@@ -3475,7 +3496,7 @@ namespace SlopeFEA
                         int runs = int.Parse( contents[iruncount].Split( '=' )[1] );
 
                         // Get current run data
-                        string runheader = String.Format( "Run #{0}" , runs );
+                        string runheader = string.Format( "Run #{0}" , runs );
                         int irunline = contents.FindIndex( delegate( string s ) { return s.Contains( runheader ); } );
 
                         // Read in local minimum surface data
@@ -3526,7 +3547,7 @@ namespace SlopeFEA
                     }
                 }
 
-                MessageBox.Show( String.Format( "Global Minimum Fs = {0}\n\nLocal Minimum Fs = {1}" ,
+                MessageBox.Show( string.Format( "Global Minimum Fs = {0}\n\nLocal Minimum Fs = {1}" ,
                     globalMinSF , localMinSF ) , "Analysis Complete" );
             }
 

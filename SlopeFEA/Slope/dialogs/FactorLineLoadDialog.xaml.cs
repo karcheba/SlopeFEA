@@ -70,22 +70,22 @@ namespace SlopeFEA
             double xCoord , yCoord;
             xCoord = (load.Nodes[0].Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Nodes[0].Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords1.Content = String.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
+            coords1.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
             xCoord = (load.Nodes[1].Point.X - canvas.OriginOffsetX) / canvas.DpiX * factor * canvas.Scale;
             yCoord = (canvas.ActualHeight - load.Nodes[1].Point.Y - canvas.OriginOffsetY) / canvas.DpiY * factor * canvas.Scale;
-            coords2.Content = String.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
+            coords2.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
             isLoadedN.IsEnabled = load.IsLoadedN;
             isLoadedN.IsChecked = nFactor.IsEnabled = load.IsActiveN;
-            nFactor.Text = String.Format( "{0}" , Math.Round( load.NFactor , 3 ) );
-            nLoad1.Text = String.Format( "{0}" , Math.Round( load.NLoad1 , 2 ) );
-            nLoad2.Text = String.Format( "{0}" , Math.Round( load.NLoad2 , 2 ) );
+            nFactor.Text = string.Format( "{0}" , Math.Round( load.NFactor , 3 ) );
+            nLoad1.Text = string.Format( "{0}" , Math.Round( load.NLoad1 , 2 ) );
+            nLoad2.Text = string.Format( "{0}" , Math.Round( load.NLoad2 , 2 ) );
             isLoadedT.IsEnabled = load.IsLoadedT;
             isLoadedT.IsChecked = tFactor.IsEnabled = load.IsActiveT;
-            tFactor.Text = String.Format( "{0}" , Math.Round( load.TFactor , 3 ) );
-            tLoad1.Text = String.Format( "{0}" , Math.Round( load.TLoad1 , 2 ) );
-            tLoad2.Text = String.Format( "{0}" , Math.Round( load.TLoad2 , 2 ) );
+            tFactor.Text = string.Format( "{0}" , Math.Round( load.TFactor , 3 ) );
+            tLoad1.Text = string.Format( "{0}" , Math.Round( load.TLoad1 , 2 ) );
+            tLoad2.Text = string.Format( "{0}" , Math.Round( load.TLoad2 , 2 ) );
         }
 
         private void ok_Click ( object sender , RoutedEventArgs e )

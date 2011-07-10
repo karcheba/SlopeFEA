@@ -841,7 +841,7 @@ namespace SlopeFEA
             //{
             //    substructArea += substruct.Area;
             //}
-            //MessageBox.Show(String.Format("{0}", substructArea), "Substruct Area");
+            //MessageBox.Show(string.Format("{0}", substructArea), "Substruct Area");
 
 
 
@@ -985,7 +985,7 @@ namespace SlopeFEA
                 //{
                 //    elementArea += element.Area;
                 //}
-                //MessageBox.Show(String.Format("{0}", elementArea), "Element Area");
+                //MessageBox.Show(string.Format("{0}", elementArea), "Element Area");
             }
 
             path[path.Length - 1] = "bel";
@@ -1274,7 +1274,7 @@ namespace SlopeFEA
             //{
             //    elementArea += element.Area;
             //}
-            //MessageBox.Show(String.Format("{0}", elementArea), "Element Area");
+            //MessageBox.Show(string.Format("{0}", elementArea), "Element Area");
 
             return elements;
 

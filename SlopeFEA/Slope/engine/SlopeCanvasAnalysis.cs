@@ -575,7 +575,7 @@ namespace SlopeFEA
                 int iruncount = contents.FindIndex( delegate( string s ) { return s.Contains( "Number of Runs = " ); } );
                 int runs = int.Parse( contents[iruncount].Split( '=' )[1] );
                 runs++;
-                contents[iruncount] = String.Format( "Number of Runs = {0}" , runs );
+                contents[iruncount] = string.Format( "Number of Runs = {0}" , runs );
 
                 // Find region with critical surface information and obtain its Fs
                 int icrit = contents.FindIndex( delegate( string s ) { return s.Contains( "MOST CRITICAL SURFACE" ); } );
@@ -584,15 +584,15 @@ namespace SlopeFEA
                 // If min Fs from current run is less than all previous runs, update this section
                 if ( masterSolutions[0].SF < prevSF )
                 {
-                    contents[icrit + 2] = String.Format( "X_centre =\t{0}" , Math.Round( masterSolutions[0].X , 2 ) );
-                    contents[icrit + 3] = String.Format( "Y_centre =\t{0}" , Math.Round( masterSolutions[0].Y , 2 ) );
-                    contents[icrit + 4] = String.Format( "R =\t\t{0}" , Math.Round( masterSolutions[0].R , 2 ) );
-                    contents[icrit + 5] = String.Format( "X_enter =\t{0}" , Math.Round( masterSolutions[0].XEnter , 2 ) );
-                    contents[icrit + 6] = String.Format( "Y_enter =\t{0}" , Math.Round( masterSolutions[0].YEnter , 2 ) );
-                    contents[icrit + 7] = String.Format( "X_exit =\t{0}" , Math.Round( masterSolutions[0].XExit , 2 ) );
-                    contents[icrit + 8] = String.Format( "Y_exit =\t{0}" , Math.Round( masterSolutions[0].YExit , 2 ) );
-                    contents[icrit + 9] = String.Format( "Fs =\t\t{0}" , Math.Round( masterSolutions[0].SF , 3 ) );
-                    contents[icrit + 10] = String.Format( "Run No. =\t{0}" , runs );
+                    contents[icrit + 2] = string.Format( "X_centre =\t{0}" , Math.Round( masterSolutions[0].X , 2 ) );
+                    contents[icrit + 3] = string.Format( "Y_centre =\t{0}" , Math.Round( masterSolutions[0].Y , 2 ) );
+                    contents[icrit + 4] = string.Format( "R =\t\t{0}" , Math.Round( masterSolutions[0].R , 2 ) );
+                    contents[icrit + 5] = string.Format( "X_enter =\t{0}" , Math.Round( masterSolutions[0].XEnter , 2 ) );
+                    contents[icrit + 6] = string.Format( "Y_enter =\t{0}" , Math.Round( masterSolutions[0].YEnter , 2 ) );
+                    contents[icrit + 7] = string.Format( "X_exit =\t{0}" , Math.Round( masterSolutions[0].XExit , 2 ) );
+                    contents[icrit + 8] = string.Format( "Y_exit =\t{0}" , Math.Round( masterSolutions[0].YExit , 2 ) );
+                    contents[icrit + 9] = string.Format( "Fs =\t\t{0}" , Math.Round( masterSolutions[0].SF , 3 ) );
+                    contents[icrit + 10] = string.Format( "Run No. =\t{0}" , runs );
                 }
 
                 // Write all contents back to file
@@ -1128,7 +1128,7 @@ namespace SlopeFEA
                 // TESTING PROPERTY LIST COUNTS
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                //MessageBox.Show(String.Format(
+                //MessageBox.Show(string.Format(
                 //    "alpha count = {0}\n" +
                 //    "width count = {1}\n" +
                 //    "phi count = {2}\n" +
@@ -1588,7 +1588,7 @@ namespace SlopeFEA
                 // TESTING PROPERTY LIST COUNTS
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                //MessageBox.Show(String.Format(
+                //MessageBox.Show(string.Format(
                 //    "Number of slices, n = {0}\n" +
                 //    "K_trb count = {1}\n" +
                 //    "K_nob count = {2}\n" +

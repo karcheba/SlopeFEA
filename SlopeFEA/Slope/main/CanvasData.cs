@@ -311,13 +311,13 @@ namespace SlopeFEA
                 double scaleX = factor * canvas.Scale / canvas.DpiX;
                 double scaleY = factor * canvas.Scale / canvas.DpiY;
 
-                tw.WriteLine( String.Format( "Units = {0}" , units ) );
+                tw.WriteLine( string.Format( "Units = {0}" , units ) );
 
                 tw.WriteLine();
 
                 if ( upperSurface.Count == 0 ) CheckYMax( XMin , XMax , YMin );
 
-                tw.WriteLine( String.Format( "Number of upper surface points = {0}" , upperSurface.Count ) );
+                tw.WriteLine( string.Format( "Number of upper surface points = {0}" , upperSurface.Count ) );
 
                 tw.WriteLine();
 
@@ -328,26 +328,26 @@ namespace SlopeFEA
                 {
                     x = (p.X - xOffset) * scaleX;
                     y = (canvasHeight - p.Y - yOffset) * scaleY;
-                    tw.WriteLine( String.Format( "{0}, {1}" , x , y ) );
+                    tw.WriteLine( string.Format( "{0}, {1}" , x , y ) );
                 }
 
                 tw.WriteLine();
 
-                tw.WriteLine( String.Format( "Number of mesh lines = {0}" , meshLines.Count ) );
+                tw.WriteLine( string.Format( "Number of mesh lines = {0}" , meshLines.Count ) );
 
                 tw.WriteLine();
 
                 if ( meshLines.Count > 0 )
                 {
                     tw.WriteLine( "ML1" );
-                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[0].MeshPoints.Count ) );
+                    tw.WriteLine( string.Format( "Number of points = {0}" , meshLines[0].MeshPoints.Count ) );
 
                     x = (XMin - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[0].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
+                        tw.WriteLine( string.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
@@ -355,15 +355,15 @@ namespace SlopeFEA
 
                 for ( int i = 1 ; i < meshLines.Count - 1 ; i++ )
                 {
-                    tw.WriteLine( String.Format( "ML{0}" , i + 1 ) );
-                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[i].MeshPoints.Count ) );
+                    tw.WriteLine( string.Format( "ML{0}" , i + 1 ) );
+                    tw.WriteLine( string.Format( "Number of points = {0}" , meshLines[i].MeshPoints.Count ) );
 
                     x = (meshLines[i].Line.X1 - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[i].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
+                        tw.WriteLine( string.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
@@ -371,15 +371,15 @@ namespace SlopeFEA
 
                 if ( meshLines.Count > 1 )
                 {
-                    tw.WriteLine( String.Format( "ML{0}" , meshLines.Count ) );
-                    tw.WriteLine( String.Format( "Number of points = {0}" , meshLines[meshLines.Count - 1].MeshPoints.Count ) );
+                    tw.WriteLine( string.Format( "ML{0}" , meshLines.Count ) );
+                    tw.WriteLine( string.Format( "Number of points = {0}" , meshLines[meshLines.Count - 1].MeshPoints.Count ) );
 
                     x = (XMax - xOffset) * scaleX;
 
                     foreach ( MeshPoint mp in meshLines[meshLines.Count - 1].MeshPoints )
                     {
                         y = (canvasHeight - mp.Y - yOffset) * scaleY;
-                        tw.WriteLine( String.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
+                        tw.WriteLine( string.Format( "{0}, {1}, {2}, \"{3}\"" , x , y , mp.Type , mp.Material ) );
                     }
 
                     tw.WriteLine();
