@@ -40,6 +40,9 @@ namespace SlopeFEA
     /// </summary>
     public class feNode : IEquatable<feNode>
     {
+        private List<bool> phaseFixedX , phaseFixedY , phaseFixedZ;
+        private List<double> xLoad , yLoad , zLoad;
+
         /// <summary>
         /// Constructor for 1d FEA node.
         /// </summary>
@@ -55,13 +58,19 @@ namespace SlopeFEA
             this.Y = 0.0;
             this.Z = 0.0;
 
-            this.XLoad = 0.0;
-            this.YLoad = 0.0;
-            this.ZLoad = 0.0;
+            //this.XLoad = 0.0;
+            //this.YLoad = 0.0;
+            //this.ZLoad = 0.0;
+            xLoad = new List<double>();
+            yLoad = new List<double>();
+            zLoad = new List<double>();
 
-            this.IsFixedX = false;
-            this.IsFixedY = false;
-            this.IsFixedZ = false;
+            //this.IsFixedX = false;
+            //this.IsFixedY = false;
+            //this.IsFixedZ = false;
+            phaseFixedX = new List<bool>();
+            phaseFixedY = new List<bool>();
+            phaseFixedZ = new List<bool>();
         }
 
         /// <summary>
@@ -83,13 +92,19 @@ namespace SlopeFEA
             this.Y = y;
             this.Z = 0.0;
 
-            this.XLoad = 0.0;
-            this.YLoad = 0.0;
-            this.ZLoad = 0.0;
+            //this.XLoad = 0.0;
+            //this.YLoad = 0.0;
+            //this.ZLoad = 0.0;
+            xLoad = new List<double>();
+            yLoad = new List<double>();
+            zLoad = new List<double>();
 
-            this.IsFixedX = false;
-            this.IsFixedY = false;
-            this.IsFixedZ = false;
+            //this.IsFixedX = false;
+            //this.IsFixedY = false;
+            //this.IsFixedZ = false;
+            phaseFixedX = new List<bool>();
+            phaseFixedY = new List<bool>();
+            phaseFixedZ = new List<bool>();
         }
 
         /// <summary>
@@ -113,13 +128,19 @@ namespace SlopeFEA
             this.Y = y;
             this.Z = z;
 
-            this.XLoad = 0.0;
-            this.YLoad = 0.0;
-            this.ZLoad = 0.0;
+            //this.XLoad = 0.0;
+            //this.YLoad = 0.0;
+            //this.ZLoad = 0.0;
+            xLoad = new List<double>();
+            yLoad = new List<double>();
+            zLoad = new List<double>();
 
-            this.IsFixedX = false;
-            this.IsFixedY = false;
-            this.IsFixedZ = false;
+            //this.IsFixedX = false;
+            //this.IsFixedY = false;
+            //this.IsFixedZ = false;
+            phaseFixedX = new List<bool>();
+            phaseFixedY = new List<bool>();
+            phaseFixedZ = new List<bool>();
         }
 
         /// <summary>
@@ -146,12 +167,14 @@ namespace SlopeFEA
         /// <summary>
         /// X-direction point load property.
         /// </summary>
-        public double XLoad { get; set; }
+        //public double XLoad { get; set; }
+        public List<double> XLoad { get { return this.xLoad; } }
 
         /// <summary>
         /// Global x-fixity property.
         /// </summary>
-        public bool IsFixedX { get; set; }
+        //public bool IsFixedX { get; set; }
+        public List<bool> PhaseFixedX { get { return this.phaseFixedX; } }
 
         /// <summary>
         /// Global y-coordinate property.
@@ -161,12 +184,14 @@ namespace SlopeFEA
         /// <summary>
         /// Y-direction point load property.
         /// </summary>
-        public double YLoad { get; set; }
+        //public double YLoad { get; set; }
+        public List<double> YLoad { get { return this.yLoad; } }
 
         /// <summary>
         /// Global y-fixity property.
         /// </summary>
-        public bool IsFixedY { get; set; }
+        //public bool IsFixedY { get; set; }
+        public List<bool> PhaseFixedY { get { return this.phaseFixedY; } }
 
         /// <summary>
         /// Global z-coordinate property.
@@ -176,12 +201,14 @@ namespace SlopeFEA
         /// <summary>
         /// Z-direction point load property.
         /// </summary>
-        public double ZLoad { get; set; }
+        //public double ZLoad { get; set; }
+        public List<double> ZLoad { get { return this.zLoad; } }
 
         /// <summary>
         /// Global z-fixity property.
         /// </summary>
-        public bool IsFixedZ { get; set; }
+        //public bool IsFixedZ { get; set; }
+        public List<bool> PhaseFixedZ { get { return this.phaseFixedZ; } }
 
         /// <summary>
         /// Print point property.
@@ -213,16 +240,42 @@ namespace SlopeFEA
                 this.Z = m.Z;
             }
 
-            this.XLoad += m.XLoad;
-            this.YLoad += m.YLoad;
-            this.ZLoad += m.ZLoad;
+            if ( this.XLoad.Count > 0 )
+            {
+                if ( m.XLoad.Count > 0 )
+                {
+                    for ( int i = 0 ; i < this.XLoad.Count ; i++ )
+                    {
+                        this.XLoad[i] += m.XLoad[i];
+                        this.YLoad[i] += m.YLoad[i];
+                        this.ZLoad[i] += m.ZLoad[i];
+                    }
+                }
+            }
+            else if ( m.XLoad.Count > 0 )
+            {
+                this.XLoad.AddRange( m.XLoad );
+                this.YLoad.AddRange( m.YLoad );
+                this.ZLoad.AddRange( m.ZLoad );
+            }
+            //this.XLoad += m.XLoad;
+            //this.YLoad += m.YLoad;
+            //this.ZLoad += m.ZLoad;
 
             this.IsBoundary = this.IsBoundary || m.IsBoundary;
             this.IsLocked = this.IsLocked || m.IsLocked;
             this.Number = Math.Min( this.Number , m.Number );
-            this.IsFixedX = this.IsFixedX || m.IsFixedX;
-            this.IsFixedY = this.IsFixedY || m.IsFixedY;
-            this.IsFixedZ = this.IsFixedZ || m.IsFixedZ;
+
+            for ( int i = 0 ; i < this.PhaseFixedX.Count ; i++ )
+            {
+                this.PhaseFixedX[i] = this.PhaseFixedX[i] || m.PhaseFixedX[i];
+                this.PhaseFixedY[i] = this.PhaseFixedY[i] || m.PhaseFixedY[i];
+                this.PhaseFixedZ[i] = this.PhaseFixedZ[i] || m.PhaseFixedZ[i];
+            }
+            //this.IsFixedX = this.IsFixedX || m.IsFixedX;
+            //this.IsFixedY = this.IsFixedY || m.IsFixedY;
+            //this.IsFixedZ = this.IsFixedZ || m.IsFixedZ;
+            
             this.IsPrintPoint = this.IsPrintPoint || m.IsPrintPoint;
         }
 
@@ -640,7 +693,7 @@ namespace SlopeFEA
     /// </summary>
     public class feLineConstraint
     {
-        private bool isFixedX , isFixedY;
+        private List<bool> phaseFixedX , phaseFixedY;
 
         /// <summary>
         /// Class constructor.
@@ -650,20 +703,24 @@ namespace SlopeFEA
         /// <param name="fixX">true if x-displacement is fixed, false otherwise.</param>
         /// <param name="fixY">true if y-displacement is fixed, false otherwise.</param>
         public feLineConstraint ( Point n1 , Point n2 ,
-                                bool fixX , bool fixY )
+                                List<bool> fixX , List<bool> fixY )
         {
             // create list of boundary nodes for the constraint
             Points = new List<Point>() { n1 , n2 };
 
-            // set visibility of constraints
-            this.isFixedX = fixX;
-            this.isFixedY = fixY;
+            // set constraints
+            //this.isFixedX = fixX;
+            //this.isFixedY = fixY;
+            this.phaseFixedX = new List<bool>( fixX );
+            this.phaseFixedY = new List<bool>( fixY );
         }
 
         public List<Point> Points { get; set; }
 
-        public bool IsFixedX { get { return this.isFixedX; } }
-        public bool IsFixedY { get { return this.isFixedY; } }
+        //public bool IsFixedX { get { return this.isFixedX; } }
+        //public bool IsFixedY { get { return this.isFixedY; } }
+        public List<bool> PhaseFixedX { get { return this.phaseFixedX; } }
+        public List<bool> PhaseFixedY { get { return this.phaseFixedY; } }
     }
 
     /// <summary>
@@ -671,7 +728,7 @@ namespace SlopeFEA
     /// </summary>
     public class fePointLoad
     {
-        private double xLoad , yLoad;
+        private List<double> xLoad , yLoad;
 
         /// <summary>
         /// Constructor
@@ -682,19 +739,23 @@ namespace SlopeFEA
         /// <param name="isLoadedY">Is the node loaded in the vertical direction?</param>
         /// <param name="yLoad">Value of vertical load</param>
         public fePointLoad ( Point node ,
-                            bool isLoadedX , double xLoad ,
-                            bool isLoadedY , double yLoad )
+            /*bool isLoadedX ,*/ List<double> xLoad ,
+            /*bool isLoadedY ,*/ List<double> yLoad )
         {
             this.Point = node;
 
-            this.xLoad = isLoadedX ? xLoad : 0.0;
-            this.yLoad = isLoadedY ? yLoad : 0.0;
+            //this.xLoad = isLoadedX ? xLoad : 0.0;
+            //this.yLoad = isLoadedY ? yLoad : 0.0;
+            this.xLoad = new List<double>( xLoad );
+            this.yLoad = new List<double>( yLoad );
         }
 
         public Point Point { get; set; }
 
-        public double XLoad { get { return this.xLoad; } }
-        public double YLoad { get { return this.yLoad; } }
+        //public double XLoad { get { return this.xLoad; } }
+        //public double YLoad { get { return this.yLoad; } }
+        public List<double> XLoad { get { return this.xLoad; } }
+        public List<double> YLoad { get { return this.yLoad; } }
     }
 
 
@@ -703,7 +764,7 @@ namespace SlopeFEA
     /// </summary>
     public class feLineLoad
     {
-        private double nLoad1 , nLoad2 , tLoad1 , tLoad2;
+        private List<double> nLoad1 , nLoad2 , tLoad1 , tLoad2;
 
         /// <summary>
         /// Constructor
@@ -717,36 +778,40 @@ namespace SlopeFEA
         /// <param name="tLoad1">Value of tangential load at node 1.</param>
         /// <param name="tLoad2">Value of tangential load at node 2.</param>
         public feLineLoad ( Point n1 , Point n2 ,
-                                bool isLoadedN ,
-                                double nLoad1 , double nLoad2 ,
-                                bool isLoadedT ,
-                                double tLoad1 , double tLoad2 )
+                                //bool isLoadedN ,
+                                List<double> nLoad1 , List<double> nLoad2 ,
+                                //bool isLoadedT ,
+                                List<double> tLoad1 , List<double> tLoad2 )
         {
             // create list of boundary nodes for the load
             Points = new List<Point>() { n1 , n2 };
 
             // set load state
-            if ( isLoadedN )
-            {
-                this.nLoad1 = nLoad1;
-                this.nLoad2 = nLoad2;
-            }
-            else
-            {
-                this.nLoad1 = 0.0;
-                this.nLoad2 = 0.0;
-            }
+            this.nLoad1 = new List<double>( nLoad1 );
+            this.nLoad2 = new List<double>( nLoad2 );
+            this.tLoad1 = new List<double>( tLoad1 );
+            this.tLoad2 = new List<double>( tLoad2 );
+            //if ( isLoadedN )
+            //{
+            //    this.nLoad1 = nLoad1;
+            //    this.nLoad2 = nLoad2;
+            //}
+            //else
+            //{
+            //    this.nLoad1 = 0.0;
+            //    this.nLoad2 = 0.0;
+            //}
 
-            if ( isLoadedT )
-            {
-                this.tLoad1 = tLoad1;
-                this.tLoad2 = tLoad2;
-            }
-            else
-            {
-                this.tLoad1 = 0.0;
-                this.tLoad2 = 0.0;
-            }
+            //if ( isLoadedT )
+            //{
+            //    this.tLoad1 = tLoad1;
+            //    this.tLoad2 = tLoad2;
+            //}
+            //else
+            //{
+            //    this.tLoad1 = 0.0;
+            //    this.tLoad2 = 0.0;
+            //}
         }
 
         /// <summary>
@@ -757,14 +822,18 @@ namespace SlopeFEA
         /// <summary>
         /// Normal load values.
         /// </summary>
-        public double NLoad1 { get { return this.nLoad1; } }
-        public double NLoad2 { get { return this.nLoad2; } }
+        //public double NLoad1 { get { return this.nLoad1; } }
+        //public double NLoad2 { get { return this.nLoad2; } }
+        public List<double> NLoad1 { get { return this.nLoad1; } }
+        public List<double> NLoad2 { get { return this.nLoad2; } }
 
         /// <summary>
         /// Tangential load values.
         /// </summary>
-        public double TLoad1 { get { return this.tLoad1; } }
-        public double TLoad2 { get { return this.tLoad2; } }
+        //public double TLoad1 { get { return this.tLoad1; } }
+        //public double TLoad2 { get { return this.tLoad2; } }
+        public List<double> TLoad1 { get { return this.tLoad1; } }
+        public List<double> TLoad2 { get { return this.tLoad2; } }
     }
 
 
@@ -773,18 +842,21 @@ namespace SlopeFEA
     /// </summary>
     public class feSubstruct
     {
+        private List<MaterialType> phaseMaterials;
+
         /// <summary>
         /// Class constructor.
         /// </summary>
         /// <param name="material">The type of material contained in the block.</param>
-        public feSubstruct ( MaterialType material )
+        public feSubstruct ( List<MaterialType> materials )
         {
-            this.Material = material;
+            //this.Material = material;
+            this.phaseMaterials = materials;
 
             this.Points = new List<Point>();
-            this.IsFixedX = new List<bool>();
-            this.IsFixedY = new List<bool>();
-            this.IsPrintPoint = new List<bool>();
+            //this.IsFixedX = new List<bool>();
+            //this.IsFixedY = new List<bool>();
+            //this.IsPrintPoint = new List<bool>();
             this.LineConstraints = new List<feLineConstraint>();
             this.LineLoads = new List<feLineLoad>();
             this.PointLoads = new List<fePointLoad>();
@@ -793,7 +865,8 @@ namespace SlopeFEA
         /// <summary>
         /// Material type property.
         /// </summary>
-        public MaterialType Material { get; set; }
+        //public MaterialType Material { get; set; }
+        public List<MaterialType> PhaseMaterials { get { return this.phaseMaterials; } }
 
         /// <summary>
         /// Boundary point list property.
@@ -818,17 +891,17 @@ namespace SlopeFEA
         /// <summary>
         /// Boundary point x-fixity property.
         /// </summary>
-        public List<bool> IsFixedX { get; set; }
+        //public List<bool> IsFixedX { get; set; }
 
         /// <summary>
         /// Boundary point y-fixity property.
         /// </summary>
-        public List<bool> IsFixedY { get; set; }
+        //public List<bool> IsFixedY { get; set; }
 
         /// <summary>
         /// Boundary printing point property.
         /// </summary>
-        public List<bool> IsPrintPoint { get; set; }
+        //public List<bool> IsPrintPoint { get; set; }
 
         /// <summary>
         /// Minimum x-coordinate property.
@@ -914,8 +987,8 @@ namespace SlopeFEA
             if ( this.Area < 0 )
             {
                 Points.Reverse();
-                IsFixedX.Reverse();
-                IsFixedY.Reverse();
+                //IsFixedX.Reverse();
+                //IsFixedY.Reverse();
             }
         }
 
@@ -927,6 +1000,8 @@ namespace SlopeFEA
     /// </summary>
     public class fe2NodedBoundElement
     {
+        private List<double> nLoad1 , nLoad2 , tLoad1 , tLoad2;
+
         /// <summary>
         /// Class constructor.
         /// </summary>
@@ -939,14 +1014,17 @@ namespace SlopeFEA
         /// <param name="tLoad2">Tangential direction load at node 2.</param>
         public fe2NodedBoundElement ( int number ,
                                         feNode n1 , feNode n2 ,
-                                        double nLoad1 , double nLoad2 ,
-                                        double tLoad1 , double tLoad2 )
+                                        List<double> nLoad1 , List<double> nLoad2 ,
+                                        List<double> tLoad1 , List<double> tLoad2 )
         {
             this.Number = number;
 
             this.Nodes = new List<feNode>() { n1 , n2 };
-            this.NLoads = new List<double>() { nLoad1 , nLoad2 };
-            this.TLoads = new List<double>() { tLoad1 , tLoad2 };
+
+            //this.NLoads = new List<double>() { nLoad1 , nLoad2 };
+            //this.TLoads = new List<double>() { tLoad1 , tLoad2 };
+            this.NLoads = new List<List<double>>() { new List<double>( nLoad1 ) , new List<double>( nLoad2 ) };
+            this.TLoads = new List<List<double>>() { new List<double>( tLoad1 ) , new List<double>( tLoad2 ) };
         }
 
         /// <summary>
@@ -962,12 +1040,14 @@ namespace SlopeFEA
         /// <summary>
         /// List of normal direction loads (+ve outward for CCW node ordering).
         /// </summary>
-        public List<double> NLoads { get; set; }
+        //public List<double> NLoads { get; set; }
+        public List<List<double>> NLoads { get; set; }
 
         /// <summary>
         /// List of tangential direction loads (+ve in CCW direction, i.e. from node1 to node2)
         /// </summary>
-        public List<double> TLoads { get; set; }
+        //public List<double> TLoads { get; set; }
+        public List<List<double>> TLoads { get; set; }
 
         /// <summary>
         /// Accessor property for element length.
@@ -1026,6 +1106,7 @@ namespace SlopeFEA
     public class fe3NodedTriElement
     {
         feSubstruct parent;
+        private List<MaterialType> phaseMaterials;
 
         /// <summary>
         /// Parent unaware constructor (for use ONLY in loading existing .nod and .ele files).

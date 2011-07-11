@@ -3507,7 +3507,7 @@ namespace SlopeFEA
                     x = 0;
                 }
 
-                for ( int j = i + 1 ; j < Boundary.Points.Count ; j++ )
+                for ( int j = i + 2 ; j < Boundary.Points.Count ; j++ )
                 {
                     x3 = Boundary.Points[j].X;
                     y3 = Boundary.Points[j].Y;
@@ -3538,7 +3538,19 @@ namespace SlopeFEA
                         x = 0;
                     }
 
-                    if ( vert1 || vert2 )
+                    // Lines are collinear
+                    if ( Math.Abs( x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2) ) < 1e-8
+                        && Math.Abs( x1 * (y2 - y4) + x2 * (y4 - y1) + x4 * (y1 - y2) ) < 1e-8 )
+                    {
+                        if ( (x1 >= Math.Min( x3 , x4 ) && x1 <= Math.Max( x3 , x4 ))
+                            || (x2 >= Math.Min( x3 , x4 ) && x2 <= Math.Max( x3 , x4 ))
+                            || (x3 >= Math.Min( x1 , x2 ) && x3 <= Math.Max( x1 , x2 ))
+                            || (x4 >= Math.Min( x1 , x2 ) && x4 <= Math.Max( x1 , x2 )) )
+                        {
+                            count++;
+                        }
+                    }
+                    else if ( vert1 || vert2 )
                     {
                         if ( !vert1 )
                         {

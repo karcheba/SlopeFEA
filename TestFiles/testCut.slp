@@ -70,18 +70,13 @@ MATERIAL BLOCK DATA
 Number of Material Blocks = 5
 
 Material Block #1
-Material Type = "sand"
-Number of Boundary Points = 8
-0, 7, True, False, False
-50, 7, True, False, False
-50, 15, True, False, False
-31, 15, False, False, False
-27, 17, False, False, False
+Material Type = "NULL"
+Number of Boundary Points = 4
 21, 20, False, False, False
+50, 20, True, False, False
+50, 22, True, False, False
 17, 22, False, False, False
-0, 22, True, False, False
-Number of Line Constraints = 2
-7, 0, True, False
+Number of Line Constraints = 1
 1, 2, True, False
 Number of Line Loads = 0
 Number of Point Loads = 0
@@ -89,17 +84,6 @@ Number of Point Loads = 0
 Material Block #2
 Material Type = "NULL"
 Number of Boundary Points = 4
-21, 20, False, False, False
-50, 20, True, False, False
-50, 22, False, False, False
-17, 22, False, False, False
-Number of Line Constraints = 0
-Number of Line Loads = 0
-Number of Point Loads = 0
-
-Material Block #3
-Material Type = "NULL"
-Number of Boundary Points = 4
 27, 17, False, False, False
 50, 17, True, False, False
 50, 20, True, False, False
@@ -109,7 +93,7 @@ Number of Line Constraints = 1
 Number of Line Loads = 0
 Number of Point Loads = 0
 
-Material Block #4
+Material Block #3
 Material Type = "NULL"
 Number of Boundary Points = 4
 31, 15, False, False, False
@@ -121,8 +105,8 @@ Number of Line Constraints = 1
 Number of Line Loads = 0
 Number of Point Loads = 0
 
-Material Block #5
-Material Type = "bedrock"
+Material Block #4
+Material Type = "sand"
 Number of Boundary Points = 4
 0, 3.99999999999999, True, True, False
 50, 3.99999999999999, True, True, False
@@ -133,6 +117,25 @@ Number of Line Constraints = 3
 1, 2, True, False
 0, 1, True, True
 Number of Line Loads = 0
+Number of Point Loads = 0
+
+Material Block #5
+Material Type = "sand"
+Number of Boundary Points = 10
+31, 15, False, False, False
+27, 17, False, False, False
+21, 20, False, False, False
+17, 22, False, False, False
+10, 22, False, False, False
+6, 22, False, False, False
+0, 22, True, False, False
+0, 7, True, False, False
+50, 7, True, False, False
+50, 15, True, False, False
+Number of Line Constraints = 1
+6, 7, True, False
+Number of Line Loads = 1
+4, 5, True, -3, -3, False, 0, 0
 Number of Point Loads = 0
 
 
@@ -157,7 +160,7 @@ Column Width = 5
 Row Height = 5
 Number of Load Steps = 5
 Number of Iterations = 200
-Number of Print Lines = 2
+Number of Print Lines = 1
 Load Factor = 1
 Gravity Factor = 1
 
@@ -169,7 +172,7 @@ ANALYSIS STATUS
 Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
-Analyzed = True
+Analyzed = False
 
 
 --------------------------------
@@ -188,15 +191,10 @@ Number of Load Steps / Print Line = 3
 Gravity Factor = 1
 Material Block #1
 sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
 False,False
 True,False
 True,False
+False,False
 True,False
 Material Block #2
 sand
@@ -204,6 +202,7 @@ False,False
 True,False
 True,False
 False,False
+True,False
 Material Block #3
 sand
 False,False
@@ -212,13 +211,6 @@ True,False
 False,False
 True,False
 Material Block #4
-sand
-False,False
-True,False
-True,False
-False,False
-True,False
-Material Block #5
 bedrock
 True,True
 True,True
@@ -227,6 +219,20 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
 Phase #2
 Name = "first lift"
@@ -237,23 +243,19 @@ Number of Iterations = 200
 Number of Load Steps / Print Line = 3
 Gravity Factor = 1
 Material Block #1
-sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
-False,False
-True,False
-True,False
-True,False
-Material Block #2
 NULL
 False,False
 True,False
+True,False
 False,False
+True,False
+Material Block #2
+sand
 False,False
+True,False
+True,False
+False,False
+True,False
 Material Block #3
 sand
 False,False
@@ -262,13 +264,6 @@ True,False
 False,False
 True,False
 Material Block #4
-sand
-False,False
-True,False
-True,False
-False,False
-True,False
-Material Block #5
 bedrock
 True,True
 True,True
@@ -277,6 +272,20 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
 Phase #3
 Name = "first lift, loaded"
@@ -287,23 +296,19 @@ Number of Iterations = 200
 Number of Load Steps / Print Line = 2
 Gravity Factor = 1
 Material Block #1
-sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
-False,False
-True,False
-True,False
-True,False
-Material Block #2
 NULL
 False,False
 True,False
+True,False
 False,False
+True,False
+Material Block #2
+sand
 False,False
+True,False
+True,False
+False,False
+True,False
 Material Block #3
 sand
 False,False
@@ -312,13 +317,6 @@ True,False
 False,False
 True,False
 Material Block #4
-sand
-False,False
-True,False
-True,False
-False,False
-True,False
-Material Block #5
 bedrock
 True,True
 True,True
@@ -327,6 +325,20 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
 Phase #4
 Name = "second lift"
@@ -337,38 +349,27 @@ Number of Iterations = 200
 Number of Load Steps / Print Line = 3
 Gravity Factor = 1
 Material Block #1
-sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
+NULL
 False,False
 True,False
 True,False
+False,False
 True,False
 Material Block #2
 NULL
 False,False
-False,False
-False,False
-False,False
-Material Block #3
-NULL
-False,False
+True,False
 True,False
 False,False
 False,False
-False,False
-Material Block #4
+Material Block #3
 sand
 False,False
 True,False
 True,False
 False,False
 True,False
-Material Block #5
+Material Block #4
 bedrock
 True,True
 True,True
@@ -377,6 +378,20 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
 Phase #5
 Name = "third lift"
@@ -387,38 +402,27 @@ Number of Iterations = 200
 Number of Load Steps / Print Line = 3
 Gravity Factor = 1
 Material Block #1
-sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
+NULL
 False,False
 True,False
 True,False
+False,False
 True,False
 Material Block #2
 NULL
 False,False
 False,False
+True,False
 False,False
 False,False
 Material Block #3
-NULL
-False,False
-False,False
-False,False
-False,False
-False,False
-Material Block #4
 NULL
 False,False
 True,False
 False,False
 False,False
 False,False
-Material Block #5
+Material Block #4
 bedrock
 True,True
 True,True
@@ -427,6 +431,20 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
 Phase #6
 Name = "final"
@@ -437,38 +455,27 @@ Number of Iterations = 200
 Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
-sand
-True,False
-True,False
-True,False
-False,False
-False,False
-False,False
+NULL
 False,False
 True,False
 True,False
+False,False
 True,False
 Material Block #2
 NULL
 False,False
 False,False
+True,False
 False,False
 False,False
 Material Block #3
-NULL
-False,False
-False,False
-False,False
-False,False
-False,False
-Material Block #4
 NULL
 False,False
 True,False
 False,False
 False,False
 False,False
-Material Block #5
+Material Block #4
 bedrock
 True,True
 True,True
@@ -477,4 +484,18 @@ True,False
 True,False
 True,False
 True,True
+Material Block #5
+NULL
+False,False
+False,False
+False,False
+False,False
+False,False
+False,False
+True,False
+True,False
+True,False
+True,False
+True,False
+True,1,False,0
 
