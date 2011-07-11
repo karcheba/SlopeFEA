@@ -498,7 +498,7 @@ namespace SlopeFEA
         public GAParams GeneticAlgorithmParameters { get { return this.genAlgParams; } }
         public FEAParams FEAParameters { get { return this.feaParams; } }
 
-        public List<AnalysisPhase> FEAPhases { get { return this.feaPhases; } }
+        public List<AnalysisPhase> AnalysisPhases { get { return this.feaPhases; } }
 
 
         // ----------------------------------
@@ -843,22 +843,22 @@ namespace SlopeFEA
                 tw.WriteLine( "--------------------------------" );
                 tw.WriteLine();
 
-                tw.WriteLine( "Number of Analysis Phases = {0}" , FEAPhases.Count - 1 );
+                tw.WriteLine( "Number of Analysis Phases = {0}" , AnalysisPhases.Count - 1 );
 
                 tw.WriteLine();
 
-                for ( int i = 1 ; i < FEAPhases.Count ; i++ )
+                for ( int i = 1 ; i < AnalysisPhases.Count ; i++ )
                 {
-                    tw.WriteLine( "Phase #{0}" , FEAPhases[i].Number );
+                    tw.WriteLine( "Phase #{0}" , AnalysisPhases[i].Number );
 
-                    tw.WriteLine( "Name = \"{0}\"" , FEAPhases[i].Name );
-                    tw.WriteLine( "Begin Phase = \"{0}\"" , FEAPhases[i].BeginPhase.Name );
-                    tw.WriteLine( "Reset Displacements=\"{0}\"" , FEAPhases[i].ResetDisplacements );
+                    tw.WriteLine( "Name = \"{0}\"" , AnalysisPhases[i].Name );
+                    tw.WriteLine( "Begin Phase = \"{0}\"" , AnalysisPhases[i].BeginPhase.Name );
+                    tw.WriteLine( "Reset Displacements=\"{0}\"" , AnalysisPhases[i].ResetDisplacements );
 
-                    tw.WriteLine( "Number of Load Steps = {0}" , FEAPhases[i].NSteps );
-                    tw.WriteLine( "Number of Iterations = {0}" , FEAPhases[i].NIterations );
-                    tw.WriteLine( "Number of Load Steps / Print Line = {0}" , FEAPhases[i].NPrintLines );
-                    tw.WriteLine( "Gravity Factor = {0}" , FEAPhases[i].GravityFactor );
+                    tw.WriteLine( "Number of Load Steps = {0}" , AnalysisPhases[i].NSteps );
+                    tw.WriteLine( "Number of Iterations = {0}" , AnalysisPhases[i].NIterations );
+                    tw.WriteLine( "Number of Load Steps / Print Line = {0}" , AnalysisPhases[i].NPrintLines );
+                    tw.WriteLine( "Gravity Factor = {0}" , AnalysisPhases[i].GravityFactor );
 
                     for ( int j = 0 ; j < MaterialBlocks.Count ; j++ )
                     {
@@ -886,6 +886,15 @@ namespace SlopeFEA
                                 MaterialBlocks[j].PointLoads[k].PhaseFactorX[i - 1] ,
                                 MaterialBlocks[j].PointLoads[k].PhaseActiveY[i - 1] ,
                                 MaterialBlocks[j].PointLoads[k].PhaseFactorY[i - 1] );
+                        }
+
+                        for ( int k = 0 ; k < MaterialBlocks[j].LineLoads.Count ; k++ )
+                        {
+                            tw.WriteLine( "{0},{1},{2},{3}" ,
+                                MaterialBlocks[j].LineLoads[k].PhaseActiveN[i - 1] ,
+                                MaterialBlocks[j].LineLoads[k].PhaseFactorN[i - 1] ,
+                                MaterialBlocks[j].LineLoads[k].PhaseActiveT[i - 1] ,
+                                MaterialBlocks[j].LineLoads[k].PhaseFactorT[i - 1] );
                         }
                     }
 
@@ -1219,7 +1228,7 @@ namespace SlopeFEA
                         number = int.Parse( tr.ReadLine().Split( '#' )[1] );
                         name = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
                         beginName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
-                        beginPhase = FEAPhases.Find( delegate( AnalysisPhase ap ) { return ap.Name == beginName; } );
+                        beginPhase = AnalysisPhases.Find( delegate( AnalysisPhase ap ) { return ap.Name == beginName; } );
                         reset = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1] == bool.TrueString;
                         nstep = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         niter = int.Parse( tr.ReadLine().Split( '=' )[1] );
@@ -1263,11 +1272,23 @@ namespace SlopeFEA
                                     MaterialBlocks[j].PointLoads[k].PhaseFactorY.Add( double.Parse( loadActive[3] ) );
                                 }
                             }
+
+                            for ( int k = 0 ; k < MaterialBlocks[j].LineLoads.Count ; k++ )
+                            {
+                                loadActive = tr.ReadLine().Split( ',' );
+                                if ( MaterialBlocks[j].LineLoads[k].PhaseActiveN.Count <= i )
+                                {
+                                    MaterialBlocks[j].LineLoads[k].PhaseActiveN.Add( loadActive[0] == bool.TrueString );
+                                    MaterialBlocks[j].LineLoads[k].PhaseFactorN.Add( double.Parse( loadActive[1] ) );
+                                    MaterialBlocks[j].LineLoads[k].PhaseActiveT.Add( loadActive[2] == bool.TrueString );
+                                    MaterialBlocks[j].LineLoads[k].PhaseFactorT.Add( double.Parse( loadActive[3] ) );
+                                }
+                            }
                         }
 
                         tr.ReadLine();
 
-                        FEAPhases.Add( new AnalysisPhase( number , name , beginPhase , reset , nstep , niter , nprint , gfact ) );
+                        AnalysisPhases.Add( new AnalysisPhase( number , name , beginPhase , reset , nstep , niter , nprint , gfact ) );
                     }
                 }
             }

@@ -309,14 +309,14 @@ namespace SlopeFEA
              * Initialize analysis phase parameters
              */
 
-            for ( int i = 1 ; i < canvas.FEAPhases.Count ; i++ )
+            for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
             {
-                phaseList.Items.Add( canvas.FEAPhases[i] );
+                phaseList.Items.Add( canvas.AnalysisPhases[i] );
             }
 
-            for ( int i = 0 ; i < canvas.FEAPhases.Count ; i++ )
+            for ( int i = 0 ; i < canvas.AnalysisPhases.Count ; i++ )
             {
-                beginPhaseList.Items.Add( canvas.FEAPhases[i] );
+                beginPhaseList.Items.Add( canvas.AnalysisPhases[i] );
             }
 
             //phaseList.SelectedIndex = 0;
@@ -768,6 +768,7 @@ namespace SlopeFEA
                 DrawingPoint currNode;
                 LineConstraint currLC;
                 PointLoad currPL;
+                LineLoad currLL;
                 for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
                 {
                     currBlock = canvas.MaterialBlocks[i];
@@ -803,6 +804,21 @@ namespace SlopeFEA
                             currPL.YFactor = currBlock.PointLoads[j].PhaseFactorY[phase];
                         }
                     }
+
+                    for ( int j = 0 ; j < currSub.LineLoads.Count ; j++ )
+                    {
+                        currLL = currSub.LineLoads[j];
+                        if ( currLL.IsLoadedN )
+                        {
+                            currLL.IsActiveN = currBlock.LineLoads[j].PhaseActiveN[phase];
+                            currLL.NFactor = currBlock.LineLoads[j].PhaseFactorN[phase];
+                        }
+                        if ( currLL.IsLoadedT )
+                        {
+                            currLL.IsActiveT = currBlock.LineLoads[j].PhaseActiveT[phase];
+                            currLL.TFactor = currBlock.LineLoads[j].PhaseFactorT[phase];
+                        }
+                    }
                 }
 
                 inputCanvas.ClearSelections();
@@ -815,7 +831,7 @@ namespace SlopeFEA
                     modify.IsEnabled = false;
                     delete.IsEnabled = false;
 
-                    beginPhaseList.SelectedItem = canvas.FEAPhases[0];
+                    beginPhaseList.SelectedItem = canvas.AnalysisPhases[0];
                     resetDisplacements.IsChecked = false;
 
                     loadSteps.Text = "";
@@ -848,6 +864,14 @@ namespace SlopeFEA
                                     pl.IsActiveY = pl.IsLoadedY;
                                     if ( pl.IsActiveY ) pl.YFactor = 1.0;
                                 } );
+                            mb.LineLoads.ForEach(
+                                delegate( LineLoad ll )
+                                {
+                                    ll.IsActiveN = ll.IsLoadedN;
+                                    if ( ll.IsActiveN ) ll.NFactor = 1.0;
+                                    ll.IsActiveT = ll.IsLoadedT;
+                                    if ( ll.IsActiveT ) ll.TFactor = 1.0;
+                                } );
                         } );
 
                     inputCanvas.ClearSelections();
@@ -867,6 +891,7 @@ namespace SlopeFEA
                 DrawingPoint currNode;
                 LineConstraint currLC;
                 PointLoad currPL;
+                LineLoad currLL;
                 if ( phase >= 0 )
                 {
                     for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
@@ -904,6 +929,21 @@ namespace SlopeFEA
                                 currPL.YFactor = currBlock.PointLoads[j].PhaseFactorY[phase];
                             }
                         }
+
+                        for ( int j = 0 ; j < currSub.LineLoads.Count ; j++ )
+                        {
+                            currLL = currSub.LineLoads[j];
+                            if ( currLL.IsLoadedN )
+                            {
+                                currLL.IsActiveN = currBlock.LineLoads[j].PhaseActiveN[phase];
+                                currLL.NFactor = currBlock.LineLoads[j].PhaseFactorN[phase];
+                            }
+                            if ( currLL.IsLoadedT )
+                            {
+                                currLL.IsActiveT = currBlock.LineLoads[j].PhaseActiveT[phase];
+                                currLL.TFactor = currBlock.LineLoads[j].PhaseFactorT[phase];
+                            }
+                        }
                     }
                 }
                 else
@@ -932,6 +972,14 @@ namespace SlopeFEA
                                     if ( pl.IsActiveX ) pl.XFactor = 1.0;
                                     pl.IsActiveY = pl.IsLoadedY;
                                     if ( pl.IsActiveY ) pl.YFactor = 1.0;
+                                } );
+                            mb.LineLoads.ForEach(
+                                delegate( LineLoad ll )
+                                {
+                                    ll.IsActiveN = ll.IsLoadedN;
+                                    if ( ll.IsActiveN ) ll.NFactor = 1.0;
+                                    ll.IsActiveT = ll.IsLoadedT;
+                                    if ( ll.IsActiveT ) ll.TFactor = 1.0;
                                 } );
                         } );
                 }
@@ -1021,20 +1069,21 @@ namespace SlopeFEA
                 return;
             }
 
-            AnalysisPhase newPhase = new AnalysisPhase( canvas.FEAPhases.Count ,
+            AnalysisPhase newPhase = new AnalysisPhase( canvas.AnalysisPhases.Count ,
                 phaseList.Text ,
                 beginPhaseList.SelectedItem as AnalysisPhase ,
                 (bool) resetDisplacements.IsChecked ,
                 nsteps , niter , nprint , gfact );
 
-            canvas.FEAPhases.Add( newPhase );
-            int numPhases = canvas.FEAPhases.Count - 1;
+            canvas.AnalysisPhases.Add( newPhase );
+            int numPhases = canvas.AnalysisPhases.Count - 1;
 
             MaterialType currMaterial;
             MaterialBlock currBlock , currSub;
             DrawingPoint currNode;
             LineConstraint currLC;
             PointLoad currPL;
+            LineLoad currLL;
             for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
             {
                 currSub = inputCanvas.Substructs[i];
@@ -1074,16 +1123,28 @@ namespace SlopeFEA
                         currPL.PhaseFactorY.Add( currSub.PointLoads[j].YFactor );
                     }
                 }
+
+                for ( int j = 0 ; j < currSub.LineLoads.Count ; j++ )
+                {
+                    currLL = currBlock.LineLoads[j];
+                    if ( currLL.PhaseActiveN.Count < numPhases )
+                    {
+                        currLL.PhaseActiveN.Add( currSub.LineLoads[j].IsActiveN );
+                        currLL.PhaseFactorN.Add( currSub.LineLoads[j].NFactor );
+                        currLL.PhaseActiveT.Add( currSub.LineLoads[j].IsActiveT );
+                        currLL.PhaseFactorT.Add( currSub.LineLoads[j].TFactor );
+                    }
+                }
             }
 
             beginPhaseList.Items.Clear();
-            canvas.FEAPhases.ForEach( delegate( AnalysisPhase ap ) { beginPhaseList.Items.Add( ap ); } );
+            canvas.AnalysisPhases.ForEach( delegate( AnalysisPhase ap ) { beginPhaseList.Items.Add( ap ); } );
 
             phaseList.Items.Clear();
             phaseList.Items.Add( "Add new analysis phase..." );
-            for ( int i = 1 ; i < canvas.FEAPhases.Count ; i++ )
+            for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
             {
-                phaseList.Items.Add( canvas.FEAPhases[i] );
+                phaseList.Items.Add( canvas.AnalysisPhases[i] );
             }
             phaseList.SelectedIndex = 0;
             phaseList.Focus();
@@ -1093,10 +1154,146 @@ namespace SlopeFEA
 
         private void modify_Click ( object sender , RoutedEventArgs e )
         {
+            if ( !(beginPhaseList.SelectedItem is AnalysisPhase) )
+            {
+                MessageBox.Show( "Must select an analysis phase to begin from.\nSelect NULL phase for \"stress-free\" state." , "Error" );
+                return;
+            }
+
+            AnalysisPhase currPhase = phaseList.SelectedItem as AnalysisPhase ,
+                beginPhase = beginPhaseList.SelectedItem as AnalysisPhase;
+
+            if ( beginPhase.Number >= currPhase.Number )
+            {
+                MessageBox.Show( "Beginning analysis phase must be earlier than the current phase." , "Error" );
+                return;
+            }
+
+            int nsteps;
+            if ( !int.TryParse( loadSteps.Text , out nsteps ) || nsteps < 1 )
+            {
+                MessageBox.Show( "Number of load steps must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            int niter;
+            if ( !int.TryParse( iterations.Text , out niter ) || niter < 1 )
+            {
+                MessageBox.Show( "Number of iterations must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            int nprint;
+            if ( !int.TryParse( printLines.Text , out nprint ) || nprint < 1 )
+            {
+                MessageBox.Show( "Number of iterations / print line must be an integer >= 1." , "Error" );
+                return;
+            }
+
+            double gfact;
+            if ( !double.TryParse( gravityFactor.Text , out gfact ) || gfact < 0 )
+            {
+                MessageBox.Show( "Gravity factor must be a positive value." , "Error" );
+                return;
+            }
+
+            currPhase.BeginPhase = beginPhase;
+            currPhase.ResetDisplacements = (bool) resetDisplacements.IsChecked;
+            currPhase.NSteps = nsteps;
+            currPhase.NIterations = niter;
+            currPhase.NPrintLines = nprint;
+            currPhase.GravityFactor = gfact;
+
+            int phase = currPhase.Number - 1;
+
+            MaterialType currMaterial;
+            MaterialBlock currBlock , currSub;
+            DrawingPoint currNode;
+            LineConstraint currLC;
+            PointLoad currPL;
+            LineLoad currLL;
+            for ( int i = 0 ; i < inputCanvas.Substructs.Count ; i++ )
+            {
+                currSub = inputCanvas.Substructs[i];
+                currBlock = canvas.MaterialBlocks[i];
+
+                currMaterial = currSub.Material;
+                currBlock.PhaseMaterials[phase] = currMaterial;
+
+                for ( int j = 0 ; j < currSub.BoundaryPoints.Count ; j++ )
+                {
+                    currNode = currBlock.BoundaryPoints[j];
+
+                    currNode.PhaseFixActiveX[phase] = currSub.BoundaryPoints[j].IsFixActiveX;
+                    currNode.PhaseFixActiveY[phase] = currSub.BoundaryPoints[j].IsFixActiveY;
+
+                }
+
+                for ( int j = 0 ; j < currSub.LineConstraints.Count ; j++ )
+                {
+                    currLC = currBlock.LineConstraints[j];
+
+                    currLC.PhaseFixedX[phase] = currSub.LineConstraints[j].IsActiveX;
+                    currLC.PhaseFixedY[phase] = currSub.LineConstraints[j].IsActiveY;
+
+                }
+
+                for ( int j = 0 ; j < currSub.PointLoads.Count ; j++ )
+                {
+                    currPL = currBlock.PointLoads[j];
+
+                    currPL.PhaseActiveX[phase] = currSub.PointLoads[j].IsActiveX;
+                    currPL.PhaseFactorX[phase] = currSub.PointLoads[j].XFactor;
+                    currPL.PhaseActiveY[phase] = currSub.PointLoads[j].IsActiveY;
+                    currPL.PhaseFactorY[phase] = currSub.PointLoads[j].YFactor;
+
+                }
+
+                for ( int j = 0 ; j < currSub.LineLoads.Count ; j++ )
+                {
+                    currLL = currBlock.LineLoads[j];
+
+                    currLL.PhaseActiveN[phase] = currSub.LineLoads[j].IsActiveN;
+                    currLL.PhaseFactorN[phase] = currSub.LineLoads[j].NFactor;
+                    currLL.PhaseActiveT[phase] = currSub.LineLoads[j].IsActiveT;
+                    currLL.PhaseFactorT[phase] = currSub.LineLoads[j].TFactor;
+
+                }
+            }
+
+            beginPhaseList.Items.Clear();
+            canvas.AnalysisPhases.ForEach( delegate( AnalysisPhase ap ) { beginPhaseList.Items.Add( ap ); } );
+
+            phaseList.Items.Clear();
+            phaseList.Items.Add( "Add new analysis phase..." );
+            for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
+            {
+                phaseList.Items.Add( canvas.AnalysisPhases[i] );
+            }
+            phaseList.SelectedIndex = 0;
+            phaseList.Focus();
+
+            canvas.IsSaved = false;
         }
 
         private void delete_Click ( object sender , RoutedEventArgs e )
         {
+            AnalysisPhase currPhase = phaseList.SelectedItem as AnalysisPhase;
+            currPhase.Delete( canvas );
+
+            beginPhaseList.Items.Clear();
+            canvas.AnalysisPhases.ForEach( delegate( AnalysisPhase ap ) { beginPhaseList.Items.Add( ap ); } );
+
+            phaseList.Items.Clear();
+            phaseList.Items.Add( "Add new analysis phase..." );
+            for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
+            {
+                phaseList.Items.Add( canvas.AnalysisPhases[i] );
+            }
+            phaseList.SelectedIndex = 0;
+            phaseList.Focus();
+
+            canvas.IsSaved = false;
         }
     }
 }

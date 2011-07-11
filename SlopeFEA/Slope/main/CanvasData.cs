@@ -878,6 +878,15 @@ namespace SlopeFEA
 
             phaseFixActiveX = new List<bool>();
             phaseFixActiveY = new List<bool>();
+            if ( parentBlocks != null )
+            {
+                int numAnalysisPhases = canvas.AnalysisPhases.Count - 1;
+                while ( phaseFixActiveX.Count < numAnalysisPhases )
+                {
+                    phaseFixActiveX.Add( false );
+                    phaseFixActiveY.Add( false );
+                }
+            }
 
             canvas.Children.Add( dot );
         }
@@ -928,9 +937,6 @@ namespace SlopeFEA
             dot.Opacity = 0.7;
             dot.Visibility = Visibility.Hidden;
             dot.MouseLeftButtonDown += new MouseButtonEventHandler( MouseLeftButtonDown );
-
-            phaseFixActiveX = new List<bool>();
-            phaseFixActiveY = new List<bool>();
 
             canvas.Children.Add( dot );
         }
@@ -1041,6 +1047,11 @@ namespace SlopeFEA
             // merge point fixities
             this.IsFixedX = this.IsFixedX || other.IsFixedX;
             this.IsFixedY = this.IsFixedY || other.IsFixedY;
+            for ( int i = 0 ; i < this.PhaseFixActiveX.Count ; i++ )
+            {
+                this.PhaseFixActiveX[i] = this.PhaseFixActiveX[i] || other.PhaseFixActiveX[i];
+                this.PhaseFixActiveY[i] = this.PhaseFixActiveY[i] || other.PhaseFixActiveY[i];
+            }
 
             // obtain all LineConstraints, LineLoads, and PointLoads containing this point
             List<LineConstraint> thisLCs = new List<LineConstraint>();
@@ -1056,19 +1067,23 @@ namespace SlopeFEA
             // merge multiple point loads at this point
             for ( int i = thisPLs.Count - 1 ; i >= 1 ; i-- )
             {
-                if ( thisPLs[i].IsLoadedX )
+                thisPLs[0].IsLoadedX = thisPLs[0].IsLoadedX || thisPLs[i].IsLoadedX;
+                thisPLs[0].XLoad += thisPLs[i].XLoad;
+
+                thisPLs[0].IsLoadedY = thisPLs[0].IsLoadedY || thisPLs[i].IsLoadedY;
+                thisPLs[0].YLoad += thisPLs[i].YLoad;
+
+                for ( int j = 0 ; j < thisPLs[0].PhaseActiveX.Count ; j++ )
                 {
-                    thisPLs[0].IsLoadedX = true;
-                    thisPLs[0].XLoad += thisPLs[i].XLoad;
-                }
-                if ( thisPLs[i].IsLoadedY )
-                {
-                    thisPLs[0].IsLoadedY = true;
-                    thisPLs[0].YLoad += thisPLs[i].YLoad;
+                    thisPLs[0].PhaseActiveX[j] = thisPLs[0].PhaseActiveX[j] || thisPLs[i].PhaseActiveX[j];
+                    thisPLs[0].PhaseFactorX[j] = thisPLs[0].PhaseActiveX[j] ? 1.0 : 0.0;
+
+                    thisPLs[0].PhaseActiveY[j] = thisPLs[0].PhaseActiveY[j] || thisPLs[i].PhaseActiveY[j];
+                    thisPLs[0].PhaseFactorY[j] = thisPLs[0].PhaseActiveY[j] ? 1.0 : 0.0;
                 }
 
                 this.ParentBlocks.ForEach(
-                    delegate( MaterialBlock mb ) 
+                    delegate( MaterialBlock mb )
                     { mb.PointLoads.RemoveAll( delegate( PointLoad pl ) { return pl == thisPLs[i]; } ); } );
                 thisPLs[i].Delete();
                 thisPLs.RemoveAt( i );
@@ -1090,15 +1105,19 @@ namespace SlopeFEA
             // merge multiple point loads at other point
             for ( int i = otherPLs.Count - 1 ; i >= 1 ; i-- )
             {
-                if ( otherPLs[i].IsLoadedX )
+                otherPLs[0].IsLoadedX = otherPLs[0].IsLoadedX || otherPLs[i].IsLoadedX;
+                otherPLs[0].XLoad += otherPLs[i].XLoad;
+
+                otherPLs[0].IsLoadedY = otherPLs[0].IsLoadedY || otherPLs[i].IsLoadedY;
+                otherPLs[0].YLoad += otherPLs[i].YLoad;
+
+                for ( int j = 0 ; j < otherPLs[0].PhaseActiveX.Count ; j++ )
                 {
-                    otherPLs[0].IsLoadedX = true;
-                    otherPLs[0].XLoad += otherPLs[i].XLoad;
-                }
-                if ( otherPLs[i].IsLoadedY )
-                {
-                    otherPLs[0].IsLoadedY = true;
-                    otherPLs[0].YLoad += otherPLs[i].YLoad;
+                    otherPLs[0].PhaseActiveX[j] = otherPLs[0].PhaseActiveX[j] || otherPLs[i].PhaseActiveX[j];
+                    otherPLs[0].PhaseFactorX[j] = otherPLs[0].PhaseActiveX[j] ? 1.0 : 0.0;
+
+                    otherPLs[0].PhaseActiveY[j] = otherPLs[0].PhaseActiveY[j] || otherPLs[i].PhaseActiveY[j];
+                    otherPLs[0].PhaseFactorY[j] = otherPLs[0].PhaseActiveY[j] ? 1.0 : 0.0;
                 }
 
                 other.ParentBlocks.ForEach(
@@ -1132,7 +1151,7 @@ namespace SlopeFEA
                     DrawingPoint otherPt = lc.Nodes.Find( delegate( DrawingPoint p ) { return p != this; } );
                     if ( otherPt != null )
                     {
-                        // check for LineConstraints former of other node that contain otherPt
+                        // check for LineConstraints formerly of other node that contain otherPt
                         otherLCs.ForEach(
                             delegate( LineConstraint otherLC )
                             {
@@ -1141,6 +1160,12 @@ namespace SlopeFEA
                                     // merge fixities
                                     lc.IsFixedX = lc.IsFixedX || otherLC.IsFixedX;
                                     lc.IsFixedY = lc.IsFixedY || otherLC.IsFixedY;
+
+                                    for ( int i = 0 ; i < lc.PhaseFixedX.Count ; i++ )
+                                    {
+                                        lc.PhaseFixedX[i] = lc.PhaseFixedX[i] || otherLC.PhaseFixedX[i];
+                                        lc.PhaseFixedY[i] = lc.PhaseFixedY[i] || otherLC.PhaseFixedY[i];
+                                    }
 
                                     // replace the LineConstraint in other points parent blocks
                                     other.ParentBlocks.ForEach(
@@ -1181,6 +1206,15 @@ namespace SlopeFEA
                                         ll.TLoad2 -= otherLL.TLoad1;
                                     }
 
+                                    for ( int i = 0 ; i < ll.PhaseActiveN.Count ; i++ )
+                                    {
+                                        ll.PhaseActiveN[i] = ll.PhaseActiveN[i] || otherLL.PhaseActiveN[i];
+                                        ll.PhaseFactorN[i] = ll.PhaseActiveN[i] ? 1.0 : 0.0;
+
+                                        ll.PhaseActiveT[i] = ll.PhaseActiveT[i] || otherLL.PhaseActiveT[i];
+                                        ll.PhaseFactorT[i] = ll.PhaseActiveT[i] ? 1.0 : 0.0;
+                                    }
+
                                     // delete the LineLoad formerly containing other point, leaving only a single summed LineLoad
                                     other.ParentBlocks.ForEach(
                                         delegate( MaterialBlock mb )
@@ -1204,6 +1238,15 @@ namespace SlopeFEA
                 {
                     thisPL.IsLoadedY = true;
                     thisPL.YLoad += otherPL.YLoad;
+                }
+
+                for ( int i = 0 ; i < thisPL.PhaseActiveX.Count ; i++ )
+                {
+                    thisPL.PhaseActiveX[i] = thisPL.PhaseActiveX[i] || otherPL.PhaseActiveX[i];
+                    thisPL.PhaseFactorX[i] = thisPL.PhaseActiveX[i] ? 1.0 : 0.0;
+
+                    thisPL.PhaseActiveY[i] = thisPL.PhaseActiveY[i] || otherPL.PhaseActiveY[i];
+                    thisPL.PhaseFactorY[i] = thisPL.PhaseActiveY[i] ? 1.0 : 0.0;
                 }
 
                 // delete PointLoad formerly of other point, leaving only a single summed load
@@ -1518,6 +1561,12 @@ namespace SlopeFEA
 
             phaseFixedX = new List<bool>();
             phaseFixedY = new List<bool>();
+            int numAnalysisPhases = canvas.AnalysisPhases.Count - 1;
+            while ( phaseFixedX.Count < numAnalysisPhases )
+            {
+                phaseFixedX.Add( fixX );
+                phaseFixedY.Add( fixY );
+            }
 
             // set visibility of constraints
             this.IsFixedX = fixX;
@@ -1571,9 +1620,6 @@ namespace SlopeFEA
 
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
-
-            phaseFixedX = new List<bool>();
-            phaseFixedY = new List<bool>();
 
             // set visibility of constraints
             this.IsFixedX = fixX;
@@ -1791,6 +1837,14 @@ namespace SlopeFEA
             phaseActiveY = new List<bool>();
             phaseFactorX = new List<double>();
             phaseFactorY = new List<double>();
+            int numAnalysisPhases = canvas.AnalysisPhases.Count - 1;
+            while ( phaseActiveX.Count < numAnalysisPhases )
+            {
+                phaseActiveX.Add( isLoadedX );
+                phaseFactorX.Add( isLoadedX ? 1.0 : 0.0 );
+                phaseActiveY.Add( isLoadedY );
+                phaseFactorY.Add( isLoadedY ? 1.0 : 0.0 );
+            }
 
             Update();
         }
@@ -1840,12 +1894,6 @@ namespace SlopeFEA
             this.IsLoadedY = isLoadedY;
             if ( this.IsLoadedY ) this.YFactor = 1.0;
             this.YLoad = yLoad;
-
-            // Initialize analysis phase lists
-            phaseActiveX = new List<bool>();
-            phaseActiveY = new List<bool>();
-            phaseFactorX = new List<double>();
-            phaseFactorY = new List<double>();
 
             Update();
         }
@@ -2068,6 +2116,8 @@ namespace SlopeFEA
         private SlopeDefineCanvas defineCanvas;
         private bool isLoadedN , isActiveN , isLoadedT , isActiveT;
         private List<Polyline> loadLines;
+        private List<bool> phaseActiveN , phaseActiveT;
+        private List<double> phaseFactorN , phaseFactorT;
         private static double Cpos = Math.Cos( 0.75 * Math.PI ) ,
                                 Spos = Math.Sin( 0.75 * Math.PI ) ,
                                 Cneg = Cpos ,
@@ -2128,6 +2178,20 @@ namespace SlopeFEA
             if ( this.IsLoadedT ) this.TFactor = 1.0;
             this.TLoad1 = tLoad1;
             this.TLoad2 = tLoad2;
+
+            // Initialize analysis phase lists
+            phaseActiveN = new List<bool>();
+            phaseFactorN = new List<double>();
+            phaseActiveT = new List<bool>();
+            phaseFactorT = new List<double>();
+            int numAnalysisPhases = canvas.AnalysisPhases.Count - 1;
+            while ( phaseActiveN.Count < numAnalysisPhases )
+            {
+                phaseActiveN.Add( isLoadedN );
+                phaseFactorN.Add( isLoadedN ? 1.0 : 0.0 );
+                phaseActiveT.Add( isLoadedT );
+                phaseFactorT.Add( isLoadedT ? 1.0 : 0.0 );
+            }
 
             Update();
         }
@@ -2231,6 +2295,7 @@ namespace SlopeFEA
                 this.Update();
             }
         }
+        public List<bool> PhaseActiveN { get { return this.phaseActiveN; } }
         public bool IsLoadedT
         {
             get { return this.isLoadedT; }
@@ -2252,9 +2317,13 @@ namespace SlopeFEA
                 this.Update();
             }
         }
+        public List<bool> PhaseActiveT { get { return this.phaseActiveT; } }
 
         public double NFactor { get; set; }
         public double TFactor { get; set; }
+
+        public List<double> PhaseFactorN { get { return this.phaseFactorN; } }
+        public List<double> PhaseFactorT { get { return this.phaseFactorT; } }
 
         /// <summary>
         /// Normal load values.
@@ -2644,6 +2713,9 @@ namespace SlopeFEA
             }
 
             phaseMaterials = new List<MaterialType>();
+            MaterialType nullMaterial = canvas.MaterialTypes[canvas.MaterialTypes.Count - 1];
+            int numAnalysisPhases = canvas.AnalysisPhases.Count - 1;
+            while ( phaseMaterials.Count < numAnalysisPhases ) phaseMaterials.Add( nullMaterial );
 
             SortPoints();
         }
@@ -2669,8 +2741,6 @@ namespace SlopeFEA
             }
 
             Material = mtl;
-
-            phaseMaterials = new List<MaterialType>();
 
             lineConstraints = new List<LineConstraint>();
             lineLoads = new List<LineLoad>();
@@ -2737,8 +2807,6 @@ namespace SlopeFEA
                     }
                 }
             }
-
-            phaseMaterials = new List<MaterialType>();
 
             SortPoints();
         }
@@ -3067,11 +3135,31 @@ namespace SlopeFEA
             // if points are the same, fix/unfix the point ...
             if ( index1 == index2 )
             {
+                bool prevFixedX = p1.IsFixedX , prevFixedY = p1.IsFixedY;
+
                 SetFixityDialog dlg = new SetFixityDialog( canvas , p1 );
                 dlg.ShowDialog();
 
                 if ( dlg.DialogResult == true )
                 {
+                    bool newFixedX = p1.IsFixedX;
+                    if ( newFixedX != prevFixedX )
+                    {
+                        for ( int i = 0 ; i < p1.PhaseFixActiveX.Count ; i++ )
+                        {
+                            p1.PhaseFixActiveX[i] = newFixedX;
+                        }
+                    }
+
+                    bool newFixedY = p1.IsFixedY;
+                    if ( newFixedY != prevFixedY )
+                    {
+                        for ( int i = 0 ; i < p1.PhaseFixActiveY.Count ; i++ )
+                        {
+                            p1.PhaseFixActiveY[i] = newFixedY;
+                        }
+                    }
+
                     canvas.IsSaved = false;
                     canvas.IsVerified = false;
                 }
@@ -3085,11 +3173,41 @@ namespace SlopeFEA
 
                 if ( existingLC != null )
                 {
+                    bool prevFixX = existingLC.IsFixedX;
+                    bool prevFixY = existingLC.IsFixedY;
+
                     SetFixityDialog dlg = new SetFixityDialog( canvas , existingLC );
                     dlg.ShowDialog();
 
                     if ( dlg.DialogResult == true )
                     {
+                        bool newFixX = existingLC.IsFixedX;
+                        if ( newFixX != prevFixX )
+                        {
+                            for ( int i = 0 ; i < existingLC.PhaseFixedX.Count ; i++ )
+                                existingLC.PhaseFixedX[i] = newFixX;
+
+                            for ( int i = 0 ; i < existingLC.Nodes.Count ; i++ )
+                            {
+                                for ( int j = 0 ; j < existingLC.Nodes[i].PhaseFixActiveX.Count ; j++ )
+                                    existingLC.Nodes[i].PhaseFixActiveX[j] = 
+                                        existingLC.Nodes[i].PhaseFixActiveX[j] || existingLC.PhaseFixedX[j];
+                            }
+                        }
+                        bool newFixY = existingLC.IsFixedY;
+                        if ( newFixY != prevFixY )
+                        {
+                            for ( int i = 0 ; i < existingLC.PhaseFixedY.Count ; i++ )
+                                existingLC.PhaseFixedY[i] = newFixY;
+
+                            for ( int i = 0 ; i < existingLC.Nodes.Count ; i++ )
+                            {
+                                for ( int j = 0 ; j < existingLC.Nodes.Count ; j++ )
+                                    existingLC.Nodes[i].PhaseFixActiveY[j] =
+                                        existingLC.Nodes[i].PhaseFixActiveY[j] || existingLC.PhaseFixedY[j];
+                            }
+                        }
+
                         canvas.IsSaved = false;
                         canvas.IsVerified = false;
                     }
@@ -3103,6 +3221,24 @@ namespace SlopeFEA
 
                     if ( dlg.DialogResult == true )
                     {
+                        bool newFixX = newLC.IsFixedX , newFixY = newLC.IsFixedY;
+                        for ( int i = 0 ; i < newLC.PhaseFixedX.Count ; i++ )
+                        {
+                            newLC.PhaseFixedX[i] = newFixX;
+                            newLC.PhaseFixedY[i] = newFixY;
+                        }
+                        for ( int i = 0 ; i < newLC.Nodes.Count ; i++ )
+                        {
+                            for ( int j = 0 ; j < newLC.Nodes[i].PhaseFixActiveX.Count ; j++ )
+                            {
+                                newLC.Nodes[i].PhaseFixActiveX[j] =
+                                    newLC.Nodes[i].PhaseFixActiveX[j] || newLC.PhaseFixedX[j];
+
+                                newLC.Nodes[i].PhaseFixActiveY[j] =
+                                    newLC.Nodes[i].PhaseFixActiveY[j] || newLC.PhaseFixedY[j];
+                            }
+                        }
+
                         canvas.MaterialBlocks.ForEach(
                             delegate( MaterialBlock mb )
                             {
@@ -3147,6 +3283,8 @@ namespace SlopeFEA
                 pointLoads.Add( load );
             }
 
+            bool prevLoadedX = load.IsLoadedX , prevLoadedY = load.IsLoadedY;
+
             // start dialog for user input
             AddPointLoadDialog dlg = new AddPointLoadDialog( canvas , load );
             dlg.ShowDialog();
@@ -3166,6 +3304,26 @@ namespace SlopeFEA
 
             if ( dlg.DialogResult == true )
             {
+                bool newLoadedX = load.IsLoadedX;
+                if ( newLoadedX != prevLoadedX )
+                {
+                    for ( int i = 0 ; i < load.PhaseActiveX.Count ; i++ )
+                    {
+                        load.PhaseActiveX[i] = newLoadedX;
+                        load.PhaseFactorX[i] = newLoadedX ? 1.0 : 0.0;
+                    }
+                }
+
+                bool newLoadedY = load.IsLoadedY;
+                if ( newLoadedY != prevLoadedY )
+                {
+                    for ( int i = 0 ; i < load.PhaseActiveY.Count ; i++ )
+                    {
+                        load.PhaseActiveY[i] = newLoadedY;
+                        load.PhaseFactorY[i] = newLoadedY ? 1.0 : 0.0;
+                    }
+                }
+
                 canvas.IsSaved = false;
                 canvas.IsVerified = false;
             }
@@ -3209,6 +3367,8 @@ namespace SlopeFEA
                     lineLoads.Add( load );
                 }
 
+                bool prevLoadedN = load.IsLoadedN , prevLoadedT = load.IsLoadedT;
+
                 // start dialog for user input
                 AddLineLoadDialog dlg = new AddLineLoadDialog( canvas , load );
                 dlg.ShowDialog();
@@ -3228,6 +3388,26 @@ namespace SlopeFEA
 
                 if ( dlg.DialogResult == true )
                 {
+                    bool newLoadedN = load.IsLoadedN;
+                    if ( newLoadedN != prevLoadedN )
+                    {
+                        for ( int i = 0 ; i < load.PhaseActiveN.Count ; i++ )
+                        {
+                            load.PhaseActiveN[i] = newLoadedN;
+                            load.PhaseFactorN[i] = newLoadedN ? 1.0 : 0.0;
+                        }
+                    }
+
+                    bool newLoadedT = load.IsLoadedT;
+                    if ( newLoadedT != prevLoadedT )
+                    {
+                        for ( int i = 0 ; i < load.PhaseActiveT.Count ; i++ )
+                        {
+                            load.PhaseActiveT[i] = newLoadedT;
+                            load.PhaseFactorT[i] = newLoadedT ? 1.0 : 0.0;
+                        }
+                    }
+
                     canvas.IsSaved = false;
                     canvas.IsVerified = false;
                 }
@@ -3783,6 +3963,68 @@ namespace SlopeFEA
         public override string ToString ()
         {
             return Name + " (" + Number.ToString() + ")";
+        }
+
+        public void Delete (SlopeCanvas canvas)
+        {
+            AnalysisPhase nextPhase = canvas.AnalysisPhases.Find( delegate( AnalysisPhase ap ) { return ap.BeginPhase == this; } );
+            while ( nextPhase != null )
+            {
+                nextPhase.Delete( canvas );
+                nextPhase = canvas.AnalysisPhases.Find( delegate( AnalysisPhase ap ) { return ap.BeginPhase == this; } );
+            }
+
+            int phase = this.Number - 1;
+
+            foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+            {
+                mb.PhaseMaterials.RemoveAt( phase );
+                int numPhases = mb.PhaseMaterials.Count;
+
+                foreach ( DrawingPoint bp in mb.BoundaryPoints )
+                {
+                    if ( bp.PhaseFixActiveX.Count > numPhases )
+                    {
+                        bp.PhaseFixActiveX.RemoveAt( phase );
+                        bp.PhaseFixActiveY.RemoveAt( phase );
+                    }
+                }
+
+                foreach ( LineConstraint lc in mb.LineConstraints )
+                {
+                    if ( lc.PhaseFixedX.Count > numPhases )
+                    {
+                        lc.PhaseFixedX.RemoveAt( phase );
+                        lc.PhaseFixedY.RemoveAt( phase );
+                    }
+                }
+
+                foreach ( PointLoad pl in mb.PointLoads )
+                {
+                    if ( pl.PhaseActiveX.Count > numPhases )
+                    {
+                        pl.PhaseActiveX.RemoveAt( phase );
+                        pl.PhaseFactorX.RemoveAt( phase );
+
+                        pl.PhaseActiveY.RemoveAt( phase );
+                        pl.PhaseFactorY.RemoveAt( phase );
+                    }
+                }
+
+                foreach ( LineLoad ll in mb.LineLoads )
+                {
+                    if ( ll.PhaseActiveN.Count >= numPhases )
+                    {
+                        ll.PhaseActiveN.RemoveAt( phase );
+                        ll.PhaseFactorN.RemoveAt( phase );
+
+                        ll.PhaseActiveT.RemoveAt( phase );
+                        ll.PhaseFactorT.RemoveAt( phase );
+                    }
+                }
+            }
+
+            canvas.AnalysisPhases.Remove( this );
         }
     }
 }

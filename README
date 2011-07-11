@@ -443,7 +443,7 @@ REVISION HISTORY:
 
 {v1.0.0.12}
 === Working on analysis phase definition tool; status check-in:
-    Contains:   - "Define Analysis Phases" dialog
+    Additions:  - "Define Analysis Phases" dialog
                     - Contains:     - Drawing region for viewing and modifying substructs, contraints, and tractions
                                     - Zoom/pan tools
                                     - All items receive click and there are no overlapping components (i.e. two points at same location are merged into a single point referenced by multiple blocks)
@@ -452,15 +452,33 @@ REVISION HISTORY:
                                     - Activate/deactivate specified kinematic constraints for lines and points
                                     - Apply material types to blocks
                                     - Active/deactivate and apply load factors to specified tractions and point loads
-                                    - Define new load phase (save material types, begin from phase, reset displacements, nstep, niter, nprint, gfact)
+                                    - Define new analysis phase (save material types, begin from phase, reset displacements, nstep, niter, nprint, gfact)
                                             - This information is also saved in and loaded from the .slp file
     
     Requires:   - "Define Analysis Phases" dialog
-                    - Requires:     - Additional items in define new load phase (recording/saving of factors for point/line loads and point/line fixities)
-                                    - Modify previous load phase
-                                    - Delete previous load phase
+                    - Requires:     - Additional items in define new analysis phase (recording/saving of factors for point/line loads and point/line fixities)
+                                    - Modify previous analysis phase
+                                    - Delete previous analysis phase
                 - SlopeFEA Main Program:
                     - Requires:     - Updates to MaterialBlock, PointLoad, LineLoad, LineConstraint, DrawingPoint constructors to add "dummy" items to analysis phase lists if phases are already present
                                     - Updates to merge point operation in order to merge analysis phase data
                 - Updates to mesh generator (all listed above)
+                - Updates to analysis code (all listed above)
+
+
+[8-10 July 2011]
+
+{v1.0.0.13}
+=== Working on analysis phase definition tool; status check-in:
+    Additions:  - "Define Analysis Phases" dialog
+                    - Recording/saving of point/line load activation/factors to new analysis phase defition
+                    - Recording/saving of point/line fixity activation to new analysis phase definition
+                    - Modification of previously defined analysis phase
+                    - Deletion of analysis phase (also recursively deletes phases that use the currently selected phase as a start point)
+                SlopeFEA Main Program:
+                    - Accounting for existing analysis phases in MaterialBlock, PointLoad, LineLoad, LineConstraint, and DrawingPoint constructors
+                    - Accounting for existing analysis phases in MaterialBlock.ApplyFixity(), MaterialBlock.ApplyPointLoad(), MaterialBlock.ApplyLineLoad()
+                    - Accounting for existing analysis phases in DrawingPoint.Merge()
+    
+    Requires:   - Updates to mesh generator (all listed above)
                 - Updates to analysis code (all listed above)
