@@ -854,9 +854,9 @@ namespace SlopeFEA
             this.phaseMaterials = materials;
 
             this.Points = new List<Point>();
-            //this.IsFixedX = new List<bool>();
-            //this.IsFixedY = new List<bool>();
-            //this.IsPrintPoint = new List<bool>();
+            this.IsFixedX = new List<List<bool>>();
+            this.IsFixedY = new List<List<bool>>();
+            this.IsPrintPoint = new List<bool>();
             this.LineConstraints = new List<feLineConstraint>();
             this.LineLoads = new List<feLineLoad>();
             this.PointLoads = new List<fePointLoad>();
@@ -865,7 +865,7 @@ namespace SlopeFEA
         /// <summary>
         /// Material type property.
         /// </summary>
-        //public MaterialType Material { get; set; }
+        public MaterialType Material { get; set; }
         public List<MaterialType> PhaseMaterials { get { return this.phaseMaterials; } }
 
         /// <summary>
@@ -891,17 +891,17 @@ namespace SlopeFEA
         /// <summary>
         /// Boundary point x-fixity property.
         /// </summary>
-        //public List<bool> IsFixedX { get; set; }
+        public List<List<bool>> IsFixedX { get; set; }
 
         /// <summary>
         /// Boundary point y-fixity property.
         /// </summary>
-        //public List<bool> IsFixedY { get; set; }
+        public List<List<bool>> IsFixedY { get; set; }
 
         /// <summary>
         /// Boundary printing point property.
         /// </summary>
-        //public List<bool> IsPrintPoint { get; set; }
+        public List<bool> IsPrintPoint { get; set; }
 
         /// <summary>
         /// Minimum x-coordinate property.
@@ -1021,10 +1021,29 @@ namespace SlopeFEA
 
             this.Nodes = new List<feNode>() { n1 , n2 };
 
+            int numPhases = 0;
+            if ( nLoad1 != null ) numPhases = nLoad1.Count;
+            else if ( nLoad2 != null ) numPhases = nLoad2.Count;
+            else if ( tLoad1 != null ) numPhases = tLoad1.Count;
+            else if ( tLoad2 != null ) numPhases = tLoad2.Count;
+
             //this.NLoads = new List<double>() { nLoad1 , nLoad2 };
             //this.TLoads = new List<double>() { tLoad1 , tLoad2 };
-            this.NLoads = new List<List<double>>() { new List<double>( nLoad1 ) , new List<double>( nLoad2 ) };
-            this.TLoads = new List<List<double>>() { new List<double>( tLoad1 ) , new List<double>( tLoad2 ) };
+            this.NLoads = new List<List<double>>() 
+            {
+                (nLoad1 != null) ? new List<double>( nLoad1 ) : new List<double>() , 
+                (nLoad2 != null) ? new List<double>( nLoad2 ) : new List<double>()
+            };
+            if ( nLoad1 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.NLoads[0].Add( 0.0 );
+            if ( nLoad2 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.NLoads[1].Add( 0.0 );
+
+            this.TLoads = new List<List<double>>() 
+            {
+                (tLoad1 != null) ? new List<double>( tLoad1 ) : null , 
+                (tLoad2 != null) ? new List<double>( tLoad2 ) : null
+            };
+            if ( tLoad1 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.TLoads[0].Add( 0.0 );
+            if ( tLoad2 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.TLoads[1].Add( 0.0 );
         }
 
         /// <summary>
@@ -1106,6 +1125,7 @@ namespace SlopeFEA
     public class fe3NodedTriElement
     {
         feSubstruct parent;
+        private MaterialType material;
         private List<MaterialType> phaseMaterials;
 
         /// <summary>
@@ -1127,6 +1147,8 @@ namespace SlopeFEA
 
             this.Nodes = new List<feNode>() { n1 , n2 , n3 };
 
+            this.phaseMaterials = new List<MaterialType>();
+
             if ( sort ) SortNodes();
         }
 
@@ -1142,7 +1164,8 @@ namespace SlopeFEA
         /// <param name="sort">Flag to initially sort the points.</param>
         public fe3NodedTriElement ( feSubstruct parent , int number ,
                                     feNode n1 , feNode n2 , feNode n3 ,
-                                    MaterialType material ,
+                                    MaterialType material,
+                                    List<MaterialType> materials ,
                                     bool sort )
         {
             this.parent = parent;
@@ -1150,6 +1173,8 @@ namespace SlopeFEA
             this.Material = material;
 
             this.Nodes = new List<feNode>() { n1 , n2 , n3 };
+
+            this.phaseMaterials = new List<MaterialType>( materials );
 
             if ( sort ) SortNodes();
         }
@@ -1167,9 +1192,18 @@ namespace SlopeFEA
         public int Number { get; set; }
 
         /// <summary>
-        /// Material type property.
+        /// Material type properties.
         /// </summary>
-        public MaterialType Material { get; set; }
+        public MaterialType Material
+        {
+            get { return this.material; }
+            set
+            {
+                this.material = value;
+                if ( Boundary != null ) Boundary.Fill = value.Fill;
+            }
+        }
+        public List<MaterialType> PhaseMaterials { get { return this.phaseMaterials; } }
 
         /// <summary>
         /// Boundary polygon property (for graphical display).
@@ -1294,6 +1328,8 @@ namespace SlopeFEA
     public class fe4NodedQuadElement
     {
         feSubstruct parent;
+        private MaterialType material;
+        private List<MaterialType> phaseMaterials;
 
         /// <summary>
         /// Parent unaware constructor (for use ONLY in loading existing .nod and .ele files).
@@ -1315,6 +1351,8 @@ namespace SlopeFEA
 
             this.Nodes = new List<feNode>() { n1 , n2 , n3 , n4 };
 
+            this.phaseMaterials = new List<MaterialType>();
+
             if ( sort ) SortNodes( false ); // do not check for repeated nodes on initial creation
         }
 
@@ -1331,7 +1369,7 @@ namespace SlopeFEA
         /// <param name="sort">Flag for intial sorting.</param>
         public fe4NodedQuadElement ( feSubstruct parent , int number ,
                                     feNode n1 , feNode n2 , feNode n3 , feNode n4 ,
-                                    MaterialType material ,
+                                    MaterialType material , List<MaterialType> materials ,
                                     bool sort )
         {
             this.parent = parent;
@@ -1339,6 +1377,8 @@ namespace SlopeFEA
             this.Material = material;
 
             this.Nodes = new List<feNode>() { n1 , n2 , n3 , n4 };
+
+            this.phaseMaterials = new List<MaterialType>( materials );
 
             if ( sort ) SortNodes( false ); // do not check for repeated nodes on initial creation
         }
@@ -1356,7 +1396,16 @@ namespace SlopeFEA
         /// <summary>
         /// Material type property.
         /// </summary>
-        public MaterialType Material { get; set; }
+        public MaterialType Material
+        {
+            get { return this.material; }
+            set
+            {
+                this.material = value;
+                if ( Boundary != null ) Boundary.Fill = value.Fill;
+            }
+        }
+        public List<MaterialType> PhaseMaterials { get { return this.phaseMaterials; } }
 
         /// <summary>
         /// Boundary polygon property (for graphical display).

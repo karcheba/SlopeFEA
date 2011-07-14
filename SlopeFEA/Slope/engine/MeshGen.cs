@@ -85,10 +85,12 @@ namespace SlopeFEA
             foreach ( MaterialBlock block in blocks )
             {
                 // skip NULL material blocks
-                if ( block.Material.Name == "NULL" ) continue;
+                //if ( block.Material.Name == "NULL" ) continue;
 
                 // create new feSubStruct and insert MaterialType
-                newSubstruct = new feSubstruct( block.Material );
+                //newSubstruct = new feSubstruct( block.Material );
+                newSubstruct = new feSubstruct( block.PhaseMaterials );
+                newSubstruct.Material = block.Material;
 
                 // insert vertices converted to true coords
                 foreach ( DrawingPoint p in block.BoundaryPoints )
@@ -97,8 +99,8 @@ namespace SlopeFEA
                         new Point( (p.Point.X - originX) / dpiX * factor * scale ,
                                     (yHeight - p.Point.Y - originY) / dpiY * factor * scale ) );
 
-                    newSubstruct.IsFixedX.Add( p.IsFixedX );
-                    newSubstruct.IsFixedY.Add( p.IsFixedY );
+                    newSubstruct.IsFixedX.Add( p.PhaseFixActiveX );
+                    newSubstruct.IsFixedY.Add( p.PhaseFixActiveY );
                     newSubstruct.IsPrintPoint.Add( p.IsPrintPoint );
                 }
 
@@ -111,7 +113,7 @@ namespace SlopeFEA
 
                     newSubstruct.LineConstraints.Add( new feLineConstraint(
                         newSubstruct.Points[index1] , newSubstruct.Points[index2] ,
-                        lc.IsFixedX , lc.IsFixedY ) );
+                        lc.PhaseFixedX , lc.PhaseFixedY ) );
                 }
 
                 // create line loads
@@ -120,10 +122,24 @@ namespace SlopeFEA
                     index1 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[0]; } );
                     index2 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == ll.Nodes[1]; } );
 
+                    List<double> nLoad1 = new List<double>(),nLoad2=new List<double>();
+                    List<double> tLoad1 = new List<double>(),tLoad2=new List<double>();
+                    for ( int i = 0 ; i < ll.PhaseFactorN.Count ; i++ )
+                    {
+                        nLoad1.Add( ll.PhaseFactorN[i] * ll.NLoad1 );
+                        nLoad2.Add( ll.PhaseFactorN[i] * ll.NLoad2 );
+
+                        tLoad1.Add( ll.PhaseFactorT[i] * ll.TLoad1 );
+                        tLoad2.Add( ll.PhaseFactorT[i] * ll.TLoad2 );
+                    }
+
+                    //newSubstruct.LineLoads.Add( new feLineLoad(
+                    //    newSubstruct.Points[index1] , newSubstruct.Points[index2] ,
+                    //    ll.IsLoadedN , ll.NLoad1 , ll.NLoad2 ,
+                    //    ll.IsLoadedT , ll.TLoad1 , ll.TLoad2 ) );
                     newSubstruct.LineLoads.Add( new feLineLoad(
                         newSubstruct.Points[index1] , newSubstruct.Points[index2] ,
-                        ll.IsLoadedN , ll.NLoad1 , ll.NLoad2 ,
-                        ll.IsLoadedT , ll.TLoad1 , ll.TLoad2 ) );
+                        nLoad1 , nLoad2 , tLoad1 , tLoad2 ) );
                 }
 
                 // create point loads
@@ -131,10 +147,21 @@ namespace SlopeFEA
                 {
                     index1 = block.BoundaryPoints.FindIndex( delegate( DrawingPoint pt ) { return pt == pl.Node; } );
 
+                    List<double> xLoad = new List<double>() , yLoad = new List<double>();
+
+                    for ( int i = 0 ; i < pl.PhaseFactorX.Count ; i++ )
+                    {
+                        xLoad.Add( pl.PhaseFactorX[i] * pl.XLoad );
+                        yLoad.Add( pl.PhaseFactorY[i] * pl.YLoad );
+                    }
+
+                    //newSubstruct.PointLoads.Add( new fePointLoad(
+                    //    newSubstruct.Points[index1] ,
+                    //    pl.IsLoadedX , pl.XLoad ,
+                    //    pl.IsLoadedY , pl.YLoad ) );
                     newSubstruct.PointLoads.Add( new fePointLoad(
                         newSubstruct.Points[index1] ,
-                        pl.IsLoadedX , pl.XLoad ,
-                        pl.IsLoadedY , pl.YLoad ) );
+                        xLoad , yLoad ) );
                 }
 
                 // ensure vertices are ordered counterclockwise
@@ -199,9 +226,12 @@ namespace SlopeFEA
                             node2 = substructNodes[rgt][bot];
                             node3 = substructNodes[rgt][top];
                             node4 = substructNodes[lft][top];
+                            //substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
+                            //    node1 , node2 , node3 , node4 ,
+                            //    substruct.Material , false ) );
                             substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
                                 node1 , node2 , node3 , node4 ,
-                                substruct.Material , false ) );
+                                substruct.Material , substruct.PhaseMaterials , false ) );
                         }
                     }
                 }   // END OF STRUCTURED MESH GENERATION LOOP
@@ -224,8 +254,10 @@ namespace SlopeFEA
                     // create locked node at the vertex
                     vertexNode = new feNode( ++nodeCount , true , substruct.Points[i].X , substruct.Points[i].Y );
                     vertexNode.IsLocked = true;
-                    vertexNode.IsFixedX = substruct.IsFixedX[i];
-                    vertexNode.IsFixedY = substruct.IsFixedY[i];
+                    //vertexNode.IsFixedX = substruct.IsFixedX[i];
+                    //vertexNode.IsFixedY = substruct.IsFixedY[i];
+                    vertexNode.PhaseFixedX.AddRange( substruct.IsFixedX[i] );
+                    vertexNode.PhaseFixedY.AddRange( substruct.IsFixedY[i] );
                     vertexNode.IsPrintPoint = substruct.IsPrintPoint[i];
 
                     // see if a node is already at the vertex
@@ -238,18 +270,24 @@ namespace SlopeFEA
 
                             if ( dist < tolerDist )
                             {
+                                node.X = vertexNode.X;
+                                node.Y = vertexNode.Y;
                                 node.IsBoundary = true;
                                 node.IsLocked = true;
-                                node.IsFixedX = substruct.IsFixedX[i];
-                                node.IsFixedY = substruct.IsFixedY[i];
+                                //node.IsFixedX = substruct.IsFixedX[i];
+                                //node.IsFixedY = substruct.IsFixedY[i];
+                                node.PhaseFixedX.AddRange( substruct.IsFixedX[i] );
+                                node.PhaseFixedY.AddRange( substruct.IsFixedY[i] );
                                 node.IsPrintPoint = substruct.IsPrintPoint[i];
 
                                 foreach ( fePointLoad pl in substruct.PointLoads )
                                 {
                                     if ( Math.Abs( pl.Point.X - node.X ) < tolerDist && Math.Abs( pl.Point.Y - node.Y ) < tolerDist )
                                     {
-                                        node.XLoad = pl.XLoad;
-                                        node.YLoad = pl.YLoad;
+                                        //node.XLoad = pl.XLoad;
+                                        //node.YLoad = pl.YLoad;
+                                        node.XLoad.AddRange( pl.XLoad );
+                                        node.YLoad.AddRange( pl.YLoad );
                                     }
                                 }
 
@@ -265,8 +303,10 @@ namespace SlopeFEA
                         {
                             if ( Math.Abs( pl.Point.X - vertexNode.X ) < tolerDist && Math.Abs( pl.Point.Y - vertexNode.Y ) < tolerDist )
                             {
-                                vertexNode.XLoad = pl.XLoad;
-                                vertexNode.YLoad = pl.YLoad;
+                                //vertexNode.XLoad = pl.XLoad;
+                                //vertexNode.YLoad = pl.YLoad;
+                                vertexNode.XLoad.AddRange( pl.XLoad );
+                                vertexNode.YLoad.AddRange( pl.YLoad );
                             }
                         }
 
@@ -284,11 +324,14 @@ namespace SlopeFEA
                 // and locking them
                 // **********************************************
                 Point p0 = substruct.Points[substruct.Points.Count - 1] , p1;
-                double xn , yn , tolerCross = 1e-8 , dNLoad = 0 , dTLoad = 0 , distLL = 0 , interpLL = 0;
+                double xn , yn , tolerCross = 1e-8 , distLL = 0 , interpLL = 0;// , dNLoad = 0 , dTLoad = 0 ;
+                List<double> dNLoad , dTLoad;
                 feNode boundNode;
                 int numNodes;
-                bool fixX = substruct.IsFixedX[substruct.IsFixedX.Count - 1] ,
-                    fixY = substruct.IsFixedY[substruct.IsFixedY.Count - 1];
+                //bool fixX = substruct.IsFixedX[substruct.IsFixedX.Count - 1] ,
+                //    fixY = substruct.IsFixedY[substruct.IsFixedY.Count - 1];
+                List<bool> fixX/* = substruct.IsFixedX[substruct.IsFixedX.Count - 1]*/ ,
+                            fixY /*= substruct.IsFixedY[substruct.IsFixedY.Count - 1]*/;
                 feLineConstraint lc;
                 feLineLoad ll;
                 fe2NodedBoundElement newBoundElement = null;
@@ -318,16 +361,33 @@ namespace SlopeFEA
                             }
                         }
 
+                        //newBoundElement = new fe2NodedBoundElement( ++boundElementCount ,
+                        //    vertexNode , null , ll.NLoad1 , 0 , ll.TLoad1 , 0 );
                         newBoundElement = new fe2NodedBoundElement( ++boundElementCount ,
-                            vertexNode , null , ll.NLoad1 , 0 , ll.TLoad1 , 0 );
+                            vertexNode , null , ll.NLoad1 , null , ll.TLoad1 , null );
 
-                        dNLoad = ll.NLoad2 - ll.NLoad1;
-                        dTLoad = ll.TLoad2 - ll.TLoad1;
-                        distLL = Math.Sqrt( Math.Pow( ll.Points[1].X - ll.Points[0].X , 2 ) + Math.Pow( ll.Points[1].Y - ll.Points[0].Y , 2 ) );
+                        //dNLoad = ll.NLoad2 - ll.NLoad1;
+                        //dTLoad = ll.TLoad2 - ll.TLoad1;
+                        dNLoad = new List<double>();
+                        dTLoad = new List<double>();
+                        for ( int j = 0 ; j < ll.NLoad1.Count ; j++ )
+                        {
+                            dNLoad.Add( ll.NLoad2[j] - ll.NLoad1[j] );
+                            dTLoad.Add( ll.TLoad2[j] - ll.TLoad1[j] );
+                        }
+                        distLL = 1 / (ll.Points[1] - ll.Points[0]).Length;  // precompute inverse for later efficiency (mult vs. div)
+                        //distLL = Math.Sqrt( Math.Pow( ll.Points[1].X - ll.Points[0].X , 2 ) + Math.Pow( ll.Points[1].Y - ll.Points[0].Y , 2 ) );
                     }
 
-                    fixX = (lc != null) && (lc.IsFixedX);
-                    fixY = (lc != null) && (lc.IsFixedY);
+                    fixX = new List<bool>();
+                    fixY = new List<bool>();
+                    for ( int j = 0 ; j < substruct.PhaseMaterials.Count ; j++ )
+                    {
+                        fixX.Add( (lc != null) && (lc.PhaseFixedX[j]) );
+                        fixY.Add( (lc != null) && (lc.PhaseFixedY[j]) );
+                    }
+                    //fixX = (lc != null) && (lc.IsFixedX);
+                    //fixY = (lc != null) && (lc.IsFixedY);
 
                     // find rise and run of line segment
                     dx = p1.X - p0.X;
@@ -354,8 +414,10 @@ namespace SlopeFEA
                                 && Math.Abs( (xn - p0.X) * dy - (yn - p0.Y) * dx ) < tolerCross )
                             {
                                 node.IsBoundary = true;
-                                node.IsFixedX = fixX;
-                                node.IsFixedY = fixY;
+                                //node.IsFixedX = fixX;
+                                //node.IsFixedY = fixY;
+                                node.PhaseFixedX.AddRange( fixX );
+                                node.PhaseFixedY.AddRange( fixY );
                                 existBoundNodes.Add( node );
                             }
                         }
@@ -376,23 +438,33 @@ namespace SlopeFEA
                         xn = p0.X + j * dx; yn = p0.Y + j * dy;
                         boundNode = new feNode( ++nodeCount , true , xn , yn );
                         boundNode.IsLocked = true;
-                        boundNode.IsFixedX = fixX;
-                        boundNode.IsFixedY = fixY;
+                        //boundNode.IsFixedX = fixX;
+                        //boundNode.IsFixedY = fixY;
+                        boundNode.PhaseFixedX.AddRange( fixX );
+                        boundNode.PhaseFixedY.AddRange( fixY );
                         insertBoundNodes.Add( boundNode );
 
                         if ( ll != null )
                         {
                             newBoundElement.Nodes[1] = boundNode;
 
-                            interpLL = Math.Sqrt( Math.Pow( xn - ll.Points[0].X , 2 ) + Math.Pow( yn - ll.Points[0].Y , 2 ) ) / distLL;
+                            interpLL = ((new Point( xn , yn )) - ll.Points[0]).Length * distLL;
+                            //interpLL = Math.Sqrt( Math.Pow( xn - ll.Points[0].X , 2 ) + Math.Pow( yn - ll.Points[0].Y , 2 ) ) / distLL;
 
-                            newBoundElement.NLoads[1] = ll.NLoad1 + dNLoad * interpLL;
-                            newBoundElement.TLoads[1] = ll.TLoad1 + dTLoad * interpLL;
+                            //newBoundElement.NLoads[1] = ll.NLoad1 + dNLoad * interpLL;
+                            //newBoundElement.TLoads[1] = ll.TLoad1 + dTLoad * interpLL;
+                            for ( int k = 0 ; k < newBoundElement.NLoads[1].Count ; k++ )
+                            {
+                                newBoundElement.NLoads[1][k] = ll.NLoad1[k] + dNLoad[k] * interpLL;
+                                newBoundElement.TLoads[1][k] = ll.TLoad1[k] + dTLoad[k] * interpLL;
+                            }
 
                             boundElements.Add( newBoundElement );
 
+                            //newBoundElement = new fe2NodedBoundElement( ++boundElementCount ,
+                            //    boundNode , null , newBoundElement.NLoads[1] , 0 , newBoundElement.TLoads[1] , 0 );
                             newBoundElement = new fe2NodedBoundElement( ++boundElementCount ,
-                                boundNode , null , newBoundElement.NLoads[1] , 0 , newBoundElement.TLoads[1] , 0 );
+                                boundNode , null , newBoundElement.NLoads[1] , null , newBoundElement.TLoads[1] , null );
                         }
                     }
 
