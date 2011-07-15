@@ -1359,14 +1359,14 @@ namespace SlopeFEA
                     ((MenuItem) analysisList.Items[i]).IsChecked = false;
                 }
             }
-            for ( int i = 0 ; i < stabilityList.Items.Count ; i++ )
+            /*for ( int i = 0 ; i < stabilityList.Items.Count ; i++ )
             {
                 if ( ((MenuItem) stabilityList.Items[i]).IsChecked )
                 {
                     ((MenuItem) stabilityList.Items[i]).IsChecked = false;
                     oldAnalysis = stabilityList.Items[i] as MenuItem;
                 }
-            }
+            }*/
             for ( int i = 0 ; i < feaList.Items.Count ; i++ )
             {
                 if ( ((MenuItem) feaList.Items[i]).IsChecked )
@@ -1383,11 +1383,11 @@ namespace SlopeFEA
             {
                 newAnalysis.IsChecked = true;
 
-                if ( newAnalysis == amBishop || newAnalysis == amRFEM )
+                /*if ( newAnalysis == amBishop || newAnalysis == amRFEM )
                 {
                     stabilityList.IsChecked = true;
                 }
-                else
+                else*/
                 {
                     feaList.IsChecked = true;
                 }

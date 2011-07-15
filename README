@@ -475,10 +475,38 @@ REVISION HISTORY:
                     - Recording/saving of point/line fixity activation to new analysis phase definition
                     - Modification of previously defined analysis phase
                     - Deletion of analysis phase (also recursively deletes phases that use the currently selected phase as a start point)
-                SlopeFEA Main Program:
+                SlopeFEA Main Program
                     - Accounting for existing analysis phases in MaterialBlock, PointLoad, LineLoad, LineConstraint, and DrawingPoint constructors
                     - Accounting for existing analysis phases in MaterialBlock.ApplyFixity(), MaterialBlock.ApplyPointLoad(), MaterialBlock.ApplyLineLoad()
                     - Accounting for existing analysis phases in DrawingPoint.Merge()
     
     Requires:   - Updates to mesh generator (all listed above)
                 - Updates to analysis code (all listed above)
+                
+
+[14-15 July 2011]
+
+{v1.0.0.14}
+=== Working on mesh generation modification to account for analysis phases; status check-in:
+    Additions:  - Mesh generator
+                    (FEA.cs)
+                    - Added lists for point loads and fixities during each phase to feNode
+                    - Modified feNode.Merge() to account for multiple phases
+                    - Added lists for line fixities during each phases to feLineConstraint
+                    - Added lists for point loads during each phase to fePointLoad
+                    - Added lists for line loads during each phase to feLineLoad
+                    - Added lists for material types during each phase to feSubstruct, fe3NodedTriElement, and fe4NodedQuadElement
+                    
+                    (MeshGen.cs)
+                    - Modified generation of feSubstructs from MaterialBlocks to account for multiple analysis phases
+                    - Modified calls to class constructors from FEA.cs to account for new additions described above
+                    - Added printing of analysis phases data to a .phs file in MeshGenStructured4NodedQuad()
+                    - Added NPHASE parameter output to .nod file and removed GFACT and LFACT since this information is captured in the analysis phase data (at global and element/node levels)
+                
+                - "Define Analysis Phases" dialog
+                    - Added OnClosing() override to set main program MaterialBlock.Material values to same as first phase (if present) and to NULL otherwise
+                
+                - Main Program
+                    - Hid options for stability analysis since the code for these aspects may require updating given the modifications toward FEA analysis
+    
+    Requires:   - Updates to analysis code (all listed above)

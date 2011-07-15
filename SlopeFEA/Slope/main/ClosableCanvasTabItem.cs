@@ -180,8 +180,8 @@ class ClosableCanvasTabItem : TabItem
         MenuItem generateMesh = (MenuItem) analyzeMenu.Items[3];
         MenuItem clearMesh = (MenuItem) analyzeMenu.Items[4];
         MenuItem analysisType = (MenuItem) analyzeMenu.Items[8];
-        MenuItem stabilityAnalysis = (MenuItem) analysisType.Items[0];
-        MenuItem feaAnalysis = (MenuItem) analysisType.Items[1];
+        //MenuItem stabilityAnalysis = (MenuItem) analysisType.Items[0];
+        MenuItem feaAnalysis = (MenuItem) analysisType.Items[0];
 
         runAnalysis.IsEnabled = canvas.IsMeshed && !canvas.IsAnalyzing;
         stopAnalysis.IsEnabled = canvas.IsAnalyzing;
@@ -284,11 +284,11 @@ class ClosableCanvasTabItem : TabItem
             if ( ((MenuItem) analysisType.Items[i]).IsChecked )
                 ((MenuItem) analysisType.Items[i]).IsChecked = false;
         }
-        for ( int i = 0 ; i < stabilityAnalysis.Items.Count ; i++ )
+        /*for ( int i = 0 ; i < stabilityAnalysis.Items.Count ; i++ )
         {
             if ( ((MenuItem) stabilityAnalysis.Items[i]).IsChecked )
                 ((MenuItem) stabilityAnalysis.Items[i]).IsChecked = false;
-        }
+        }*/
         for ( int i = 0 ; i < feaAnalysis.Items.Count ; i++ )
         {
             if ( ((MenuItem) feaAnalysis.Items[i]).IsChecked )
@@ -296,14 +296,14 @@ class ClosableCanvasTabItem : TabItem
         }
         switch ( canvas.AnalysisType )
         {
-            case AnalysisType.Bishop:
+            /*case AnalysisType.Bishop:
                 stabilityAnalysis.IsChecked = true;
                 ((MenuItem) stabilityAnalysis.Items[0]).IsChecked = true;
                 break;
             case AnalysisType.RFEM:
                 stabilityAnalysis.IsChecked = true;
                 ((MenuItem) stabilityAnalysis.Items[1]).IsChecked = true;
-                break;
+                break;*/
             case AnalysisType.FEA4NodedQuad:
                 feaAnalysis.IsChecked = true;
                 ((MenuItem) feaAnalysis.Items[0]).IsChecked = true;

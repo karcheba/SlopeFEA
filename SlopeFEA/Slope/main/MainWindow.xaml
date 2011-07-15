@@ -163,7 +163,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Material _Types..." Click="defineMaterials_Click"/>
-                    <MenuItem Header="_Assign Materials..." Click="addMaterials_Click">
+                    <MenuItem Header="_Analysis Phases..." Click="addMaterials_Click">
                         <MenuItem.Icon>
                             <Image Source="/Slope;component/icons/AssignMaterials.ico"/>
                         </MenuItem.Icon>
@@ -234,10 +234,10 @@
                     <MenuItem Header="_Verify Input" Click="verify_Click"/>
                     <Separator />
                     <MenuItem Header="_Analysis Type" Name="analysisList">
-                        <MenuItem Header="_Stability" IsChecked="True" Name="stabilityList">
+                        <!--<MenuItem Header="_Stability" IsChecked="True" Name="stabilityList" IsEnabled="False">
                             <MenuItem Header="GA _Bishop's" Name="amBishop" IsChecked="True" Click="analysisMethod_Click"/>
                             <MenuItem Header="GA _RFEM" Name="amRFEM" Click="analysisMethod_Click"/>
-                        </MenuItem>
+                        </MenuItem>-->
                         <MenuItem Header="_FEA" Name="feaList">
                             <MenuItem Header="_4-Noded Quad" Name="amFEA4NodedQuad" Click="analysisMethod_Click"/>
                             <MenuItem Header="_3-Noded Tri" Name="amFEA3NodedTri" Click="analysisMethod_Click"/>

@@ -560,7 +560,8 @@ namespace SlopeFEA
             feaParams.LFact = 1.0;
             feaParams.GFact = 1.0;
 
-            AnalysisType = AnalysisType.Bishop;
+            //AnalysisType = AnalysisType.Bishop;
+            AnalysisType = AnalysisType.FEA3NodedTri;
         }
 
 
@@ -2301,6 +2302,7 @@ namespace SlopeFEA
 
             List<feNode> nodes = new List<feNode>();
             string[] split;
+            int numPhases = AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( nodeFile ) )
             {
                 int numNodes = int.Parse( tr.ReadLine().Split( '\t' )[0] );
@@ -2309,9 +2311,10 @@ namespace SlopeFEA
                 {
                     split = tr.ReadLine().Split( '\t' );
                     newNode = new feNode( int.Parse( split[0] ) , false ,
-                        double.Parse( split[1] ) , double.Parse( split[2] ) );
-                    newNode.XLoad = double.Parse( split[3] );
-                    newNode.YLoad = double.Parse( split[4] );
+                        double.Parse( split[1] ) , double.Parse( split[2] ) ,
+                        numPhases );
+                    //newNode.XLoad = double.Parse( split[3] );
+                    //newNode.YLoad = double.Parse( split[4] );
                     nodes.Add( newNode );
                 }
             }
@@ -2403,6 +2406,7 @@ namespace SlopeFEA
 
             List<feNode> nodes = new List<feNode>();
             string[] split;
+            int numPhases = AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( nodeFile ) )
             {
                 int numNodes = int.Parse( tr.ReadLine().Split( '\t' )[0] );
@@ -2411,9 +2415,10 @@ namespace SlopeFEA
                 {
                     split = tr.ReadLine().Split( '\t' );
                     newNode = new feNode( int.Parse( split[0] ) , false ,
-                        double.Parse( split[1] ) , double.Parse( split[2] ) );
-                    newNode.XLoad = double.Parse( split[3] );
-                    newNode.YLoad = double.Parse( split[4] );
+                        double.Parse( split[1] ) , double.Parse( split[2] ) ,
+                        numPhases );
+                    //newNode.XLoad = double.Parse( split[3] );
+                    //newNode.YLoad = double.Parse( split[4] );
                     nodes.Add( newNode );
                 }
             }

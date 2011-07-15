@@ -719,6 +719,7 @@ namespace SlopeFEA
             disp = new List<List<double>>() { null };
             maxDisp = 0.0;
             double currDisp;
+            int numPhases = source.AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( nodePath ) )
             {
                 int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
@@ -737,9 +738,10 @@ namespace SlopeFEA
                 {
                     lineSplit = tr.ReadLine().Split( new char[] { ' ' } , StringSplitOptions.RemoveEmptyEntries );
 
-                    nodes.Add( new feNode( int.Parse( lineSplit[0] ) , false , 
-                                            double.Parse( lineSplit[1] ) , 
-                                            double.Parse( lineSplit[2] ) ) );
+                    nodes.Add( new feNode( int.Parse( lineSplit[0] ) , false ,
+                                            double.Parse( lineSplit[1] ) ,
+                                            double.Parse( lineSplit[2] ) ,
+                                            numPhases ) );
 
                     disp.Add( new List<double>(){   double.Parse(lineSplit[3]),
                                                     double.Parse(lineSplit[4])} );
@@ -822,11 +824,13 @@ namespace SlopeFEA
 
             // compute deformed coordinates
             deformedNodes = new List<feNode>() { null };
+            int numPhases = source.AnalysisPhases.Count - 1;
             for ( int i = 1 ; i < nodes.Count ; i++ )
             {
                 deformedNodes.Add( new feNode( i , false ,
                     nodes[i].X + Magnification * disp[i][0] ,
-                    nodes[i].Y + Magnification * disp[i][1] ) );
+                    nodes[i].Y + Magnification * disp[i][1] ,
+                    numPhases ) );
             }
 
             // set mesh to deformed coords

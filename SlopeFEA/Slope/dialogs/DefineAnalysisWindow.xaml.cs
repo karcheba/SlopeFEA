@@ -1295,5 +1295,27 @@ namespace SlopeFEA
 
             canvas.IsSaved = false;
         }
+
+
+        protected override void OnClosing ( System.ComponentModel.CancelEventArgs e )
+        {
+            if ( canvas.AnalysisPhases.Count > 1 )
+            {
+                foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                {
+                    mb.Material = mb.PhaseMaterials[0];
+                }
+            }
+            else
+            {
+                MaterialType nullMaterial = canvas.MaterialTypes.Find( delegate( MaterialType mt ) { return mt.Name == "NULL"; } );
+                foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                {
+                    mb.Material = nullMaterial;
+                }
+            }
+
+            base.OnClosing( e );
+        }
     }
 }

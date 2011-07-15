@@ -183,6 +183,7 @@ namespace SlopeFEA
             // *****************************************
             // mesh each feSubStruct
             // *****************************************
+            int numPhases = canvas.AnalysisPhases.Count - 1;
             foreach ( feSubstruct substruct in substructs )
             {
                 // create bounding box around substruct
@@ -212,7 +213,7 @@ namespace SlopeFEA
                     for ( int j = 0 ; j <= nrows ; j++ )
                     {
                         // create new node at appropriate location
-                        substructNodes[i].Add( new feNode( ++nodeCount , false , xmin + i * dx , ymin + j * dy ) );
+                        substructNodes[i].Add( new feNode( ++nodeCount , false , xmin + i * dx , ymin + j * dy , numPhases ) );
 
                         // if not on the boundary, create new quad element
                         // NOTE: nodes are added in CCW order
@@ -252,7 +253,7 @@ namespace SlopeFEA
                 for ( int i = 0 ; i < substruct.Points.Count ; i++ )
                 {
                     // create locked node at the vertex
-                    vertexNode = new feNode( ++nodeCount , true , substruct.Points[i].X , substruct.Points[i].Y );
+                    vertexNode = new feNode( ++nodeCount , true , substruct.Points[i].X , substruct.Points[i].Y , numPhases );
                     vertexNode.IsLocked = true;
                     //vertexNode.IsFixedX = substruct.IsFixedX[i];
                     //vertexNode.IsFixedY = substruct.IsFixedY[i];
@@ -325,7 +326,7 @@ namespace SlopeFEA
                 // **********************************************
                 Point p0 = substruct.Points[substruct.Points.Count - 1] , p1;
                 double xn , yn , tolerCross = 1e-8 , distLL = 0 , interpLL = 0;// , dNLoad = 0 , dTLoad = 0 ;
-                List<double> dNLoad , dTLoad;
+                List<double> dNLoad = new List<double>() , dTLoad = new List<double>();
                 feNode boundNode;
                 int numNodes;
                 //bool fixX = substruct.IsFixedX[substruct.IsFixedX.Count - 1] ,
@@ -357,7 +358,12 @@ namespace SlopeFEA
                                 {
                                     return Math.Abs( node.X - p0.X ) < tolerDist && Math.Abs( node.Y - p0.Y ) < tolerDist;
                                 } );
-                                if ( vertexNode != null ) break;
+                                if ( vertexNode != null )
+                                {
+                                    vertexNode.X = p0.X;
+                                    vertexNode.Y = p0.Y;
+                                    break;
+                                }
                             }
                         }
 
@@ -368,8 +374,8 @@ namespace SlopeFEA
 
                         //dNLoad = ll.NLoad2 - ll.NLoad1;
                         //dTLoad = ll.TLoad2 - ll.TLoad1;
-                        dNLoad = new List<double>();
-                        dTLoad = new List<double>();
+                        dNLoad.Clear();
+                        dTLoad.Clear();
                         for ( int j = 0 ; j < ll.NLoad1.Count ; j++ )
                         {
                             dNLoad.Add( ll.NLoad2[j] - ll.NLoad1[j] );
@@ -423,7 +429,8 @@ namespace SlopeFEA
                         }
                     }   // END OF EXISTING BOUNDARY NODE DETECTION LOOP
 
-                    dx = Math.Abs( dx ); dy = Math.Abs( dy );
+                    dx = Math.Abs( dx );
+                    dy = Math.Abs( dy );
 
                     // compute nearest integer number of nodes on the line segment
                     numNodes = (int) (Math.Max( Math.Max( Math.Round( dx / colWidth ) , Math.Round( dy / rowHeight ) ) , 1 ));
@@ -435,8 +442,9 @@ namespace SlopeFEA
                     // insert locked boundary nodes
                     for ( int j = 1 ; j < numNodes ; j++ )
                     {
-                        xn = p0.X + j * dx; yn = p0.Y + j * dy;
-                        boundNode = new feNode( ++nodeCount , true , xn , yn );
+                        xn = p0.X + j * dx;
+                        yn = p0.Y + j * dy;
+                        boundNode = new feNode( ++nodeCount , true , xn , yn , numPhases );
                         boundNode.IsLocked = true;
                         //boundNode.IsFixedX = fixX;
                         //boundNode.IsFixedY = fixY;
@@ -466,7 +474,7 @@ namespace SlopeFEA
                             newBoundElement = new fe2NodedBoundElement( ++boundElementCount ,
                                 boundNode , null , newBoundElement.NLoads[1] , null , newBoundElement.TLoads[1] , null );
                         }
-                    }
+                    }   // END OF LOCKED BOUND NODE INSERTION
 
                     if ( ll != null )
                     {
@@ -483,7 +491,12 @@ namespace SlopeFEA
                                 {
                                     return Math.Abs( node.X - p1.X ) < tolerDist && Math.Abs( node.Y - p1.Y ) < tolerDist;
                                 } );
-                                if ( vertexNode != null ) break;
+                                if ( vertexNode != null )
+                                {
+                                    vertexNode.X = p1.X;
+                                    vertexNode.Y = p1.Y;
+                                    break;
+                                }
                             }
                         }
 
@@ -656,12 +669,14 @@ namespace SlopeFEA
                                 node4 = node1;
                                 // make sure centroid is inside the substruct and then create the new element
                                 centroidNode = new feNode( 0 , false , (node1.X + node2.X + node3.X) / 3.0 ,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                                    0 );
                                 if ( centroidNode.IsInside( substruct ) )
                                 {
                                     substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
                                             node1 , node2 , node3 , node4 ,
-                                            substructElements[i].Material , false ) );
+                                            substructElements[i].Material ,
+                                            substructElements[i].PhaseMaterials , false ) );
                                 }
 
                                 // element 2
@@ -669,12 +684,14 @@ namespace SlopeFEA
                                 node3 = substructElements[i].Nodes[3];
                                 // make sure centroid is inside the substruct and then create the new element
                                 centroidNode = new feNode( 0 , false , (node1.X + node2.X + node3.X) / 3.0 ,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                                    0 );
                                 if ( centroidNode.IsInside( substruct ) )
                                 {
                                     substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
                                             node1 , node2 , node3 , node4 ,
-                                            substructElements[i].Material , false ) );
+                                            substructElements[i].Material ,
+                                            substructElements[i].PhaseMaterials , false ) );
                                 }
                             }
                             else
@@ -687,12 +704,14 @@ namespace SlopeFEA
                                 node4 = node1;
                                 // make sure centroid is inside the substruct and then create the new element
                                 centroidNode = new feNode( 0 , false , (node1.X + node2.X + node3.X) / 3.0 ,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                                    0 );
                                 if ( centroidNode.IsInside( substruct ) )
                                 {
                                     substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
                                             node1 , node2 , node3 , node4 ,
-                                            substructElements[i].Material , false ) );
+                                            substructElements[i].Material ,
+                                            substructElements[i].PhaseMaterials , false ) );
                                 }
 
                                 // element 2
@@ -700,12 +719,14 @@ namespace SlopeFEA
                                 node2 = substructElements[i].Nodes[2];
                                 // make sure centroid is inside the substruct and then create the new element
                                 centroidNode = new feNode( 0 , false , (node1.X + node2.X + node3.X) / 3.0 ,
-                                    (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                    (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                                    0 );
                                 if ( centroidNode.IsInside( substruct ) )
                                 {
                                     substructElements.Add( new fe4NodedQuadElement( substruct , ++quadElementCount ,
                                             node1 , node2 , node3 , node4 ,
-                                            substructElements[i].Material , false ) );
+                                            substructElements[i].Material ,
+                                            substructElements[i].PhaseMaterials , false ) );
                                 }
                             }
 
@@ -719,9 +740,10 @@ namespace SlopeFEA
                             node2 = substructElements[i].Nodes[1];
                             node3 = substructElements[i].Nodes[2];
 
-                            // make sure centroid is inside the substruct and then create the new element
+                            // if centroid is outside the substruct, delete the element
                             centroidNode = new feNode( 0 , false , (node1.X + node2.X + node3.X) / 3.0 ,
-                                (node1.Y + node2.Y + node3.Y) / 3.0 );
+                                (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                                0 );
 
                             if ( !centroidNode.IsInside( substruct ) ) substructElements.RemoveAt( i );
                         }
@@ -967,6 +989,14 @@ namespace SlopeFEA
             }
 
             // **********************************************
+            // eliminate elements with zero area
+            // **********************************************
+            for ( int i = elements.Count - 1 ; i >= 0 ; i-- )
+            {
+                if ( elements[i].Area < 1e-5 ) elements.RemoveAt( i );
+            }
+
+            // **********************************************
             // sort body elements by number and eliminate
             // gaps in numbering
             // **********************************************
@@ -980,6 +1010,7 @@ namespace SlopeFEA
             // **********************************************
             // create input files for FEA engine:
             //      - material types (.mtl)
+            //      - analysis phases (.phs)
             //      - node numbers and locations (.nod)
             //      - elements with node connectivity and 
             //          material type (.ele)
@@ -1001,10 +1032,27 @@ namespace SlopeFEA
                 }
             }
 
+            path[path.Length - 1] = "phs";
+            using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
+            {
+                tw.WriteLine( canvas.AnalysisPhases.Count - 1 );
+                for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
+                {
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
+                        canvas.AnalysisPhases[i].Number ,
+                        canvas.AnalysisPhases[i].BeginPhase.Number ,
+                        canvas.AnalysisPhases[i].ResetDisplacements ? 1 : 0 ,
+                        canvas.AnalysisPhases[i].NSteps ,
+                        canvas.AnalysisPhases[i].NIterations ,
+                        canvas.AnalysisPhases[i].NPrintLines ,
+                        canvas.AnalysisPhases[i].GravityFactor );
+                }
+            }
+
             path[path.Length - 1] = "nod";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}" ,
+                tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}"/*\t{8}"*/ ,
                     /*NNOD=*/ nodes.Count ,
                     /*NDIM=*/ 2 ,
                     /*NVAR=*/ 2 ,
@@ -1012,15 +1060,27 @@ namespace SlopeFEA
                     /*NSTEP=*/ canvas.FEAParameters.NStep ,
                     /*NITER=*/ canvas.FEAParameters.NIter ,
                     /*NPRINT=*/ canvas.FEAParameters.NPrint ,
-                    /*LFACT=*/ canvas.FEAParameters.LFact ,
-                    /*GFACT=*/ canvas.FEAParameters.GFact );
+                    /*NPHASE=*/ canvas.AnalysisPhases.Count - 1 );
+                    // /*LFACT=*/ canvas.FEAParameters.LFact ,
+                    // /*GFACT=*/ canvas.FEAParameters.GFact );
+
+                int[] xFix = new int[nodes[0].PhaseFixedX.Count] ,
+                    yFix = new int[nodes[0].PhaseFixedY.Count];
                 foreach ( feNode node in nodes )
                 {
+                    for ( int i = 0 ; i < node.PhaseFixedX.Count ; i++ )
+                    {
+                        xFix[i] = node.PhaseFixedX[i] ? 0 : 1;
+                        yFix[i] = node.PhaseFixedY[i] ? 0 : 1;
+                    }
+
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     node.Number ,
                                     node.X , node.Y ,
-                                    node.IsFixedX ? 0 : 1 , node.IsFixedY ? 0 : 1 ,
-                                    node.XLoad , node.YLoad );
+                                    string.Join( "\t" , xFix ) ,
+                                    string.Join( "\t" , yFix ) ,
+                                    string.Join( "\t" , node.XLoad ) ,
+                                    string.Join( "\t" , node.YLoad ) );
                 }
             }
 
@@ -1035,17 +1095,27 @@ namespace SlopeFEA
                                     /*NEL=*/ elements.Count ,
                                     /*NNODEL=*/ 4 );
 
-                    int mtlIndex;
+                    int[] mtlIndex = new int[elements[0].PhaseMaterials.Count];
+                    int nullIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m.Name == "NULL"; } ) + 1;
                     foreach ( fe4NodedQuadElement element in elements )
                     {
-                        mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
+                        for ( int i = 0 ; i < element.PhaseMaterials.Count ; i++ )
+                        {
+                            mtlIndex[i] = 
+                                canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.PhaseMaterials[i]; } )
+                                + 1;
+                            if ( mtlIndex[i] == nullIndex ) mtlIndex[i] = 0;
+                        }
+                        //mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
+
                         tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}" ,
                                         element.Number ,
                                         element.Nodes[0].Number ,
                                         element.Nodes[1].Number ,
                                         element.Nodes[2].Number ,
                                         element.Nodes[3].Number ,
-                                        mtlIndex + 1 );
+                                        string.Join( "\t" , mtlIndex ) );
+                                        //mtlIndex + 1 );
                     }
                 }
 
@@ -1072,8 +1142,12 @@ namespace SlopeFEA
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
                                     element.Number ,
                                     element.Nodes[0].Number , element.Nodes[1].Number ,
-                                    element.NLoads[0] , element.NLoads[1] ,
-                                    element.TLoads[0] , element.TLoads[1] );
+                                    string.Join( "\t" , element.NLoads[0] ) ,
+                                    string.Join( "\t" , element.NLoads[1] ) ,
+                                    string.Join( "\t" , element.TLoads[0] ) ,
+                                    string.Join( "\t" , element.TLoads[1] ) );
+                                    //element.NLoads[0] , element.NLoads[1] ,
+                                    //element.TLoads[0] , element.TLoads[1] );
                 }
             }
 
@@ -1133,6 +1207,9 @@ namespace SlopeFEA
             // for unboxing feNode object references
             feNode node1 , node2 , node3;
 
+            // for creating nodes
+            int numPhases = canvas.AnalysisPhases.Count - 1;
+
             // ******************************************
             // find quad elements that have repeated
             // nodes, delete the duplicate, and create
@@ -1156,7 +1233,8 @@ namespace SlopeFEA
                         // create a new tri element
                         elements.Add( new fe3NodedTriElement( quadElements[i].Parent , ++triElementCount ,
                             node1 , node2 , node3 ,
-                            quadElements[i].Material , false ) );
+                            quadElements[i].Material ,
+                            quadElements[i].PhaseMaterials , false ) );
 
                         // remove the old quad element
                         quadElements.RemoveAt( i );
@@ -1183,14 +1261,16 @@ namespace SlopeFEA
                     node3 = quadElements[0].Nodes[2];
                     elements.Add( new fe3NodedTriElement( quadElements[0].Parent , ++triElementCount ,
                             node1 , node2 , node3 ,
-                            quadElements[0].Material , false ) );
+                            quadElements[0].Material ,
+                            quadElements[0].PhaseMaterials , false ) );
 
                     // element 2
                     node2 = node3;
                     node3 = quadElements[0].Nodes[3];
                     elements.Add( new fe3NodedTriElement( quadElements[0].Parent , ++triElementCount ,
                             node1 , node2 , node3 ,
-                            quadElements[0].Material , false ) );
+                            quadElements[0].Material ,
+                            quadElements[0].PhaseMaterials , false ) );
                 }
                 else
                 {
@@ -1201,14 +1281,16 @@ namespace SlopeFEA
                     node3 = quadElements[0].Nodes[0];
                     elements.Add( new fe3NodedTriElement( quadElements[0].Parent , ++triElementCount ,
                             node1 , node2 , node3 ,
-                            quadElements[0].Material , false ) );
+                            quadElements[0].Material ,
+                            quadElements[0].PhaseMaterials , false ) );
 
                     // element 2
                     node3 = node2;
                     node2 = quadElements[0].Nodes[2];
                     elements.Add( new fe3NodedTriElement( quadElements[0].Parent , ++triElementCount ,
                             node1 , node2 , node3 ,
-                            quadElements[0].Material , false ) );
+                            quadElements[0].Material ,
+                            quadElements[0].PhaseMaterials , false ) );
                 }
 
                 // delete the quad element
@@ -1237,7 +1319,8 @@ namespace SlopeFEA
                     // compute centroid
                     centroidNode = new feNode( 0 , false ,
                         (node1.X + node2.X + node3.X) / 3.0 ,
-                        (node1.Y + node2.Y + node3.Y) / 3.0 );
+                        (node1.Y + node2.Y + node3.Y) / 3.0 ,
+                        0 );
 
                     // if centroid not inside substruct, delete the element
                     if ( !centroidNode.IsInside( substruct ) ) elements.RemoveAt( i );
@@ -1298,16 +1381,26 @@ namespace SlopeFEA
                                 /*NEL=*/ elements.Count ,
                                 /*NNODEL=*/ 3 );
 
-                int mtlIndex;
+                int[] mtlIndex = new int[elements[0].PhaseMaterials.Count];
+                int nullIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m.Name == "NULL"; } ) + 1;
                 foreach ( fe3NodedTriElement element in elements )
                 {
-                    mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
+                    for ( int i = 0 ; i < element.PhaseMaterials.Count ; i++ )
+                    {
+                        mtlIndex[i] =
+                            canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.PhaseMaterials[i]; } )
+                            + 1;
+                        if ( mtlIndex[i] == nullIndex ) mtlIndex[i] = 0;
+                    }
+
+                    //mtlIndex = canvas.MaterialTypes.FindIndex( delegate( MaterialType m ) { return m == element.Material; } );
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}" ,
                                     element.Number ,
                                     element.Nodes[0].Number ,
                                     element.Nodes[1].Number ,
                                     element.Nodes[2].Number ,
-                                    mtlIndex + 1 );
+                                    string.Join( "\t" , mtlIndex ) );
+                                    //mtlIndex + 1 );
                 }
             }
 

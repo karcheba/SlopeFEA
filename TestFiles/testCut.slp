@@ -30,8 +30,8 @@ BOUNDARY GEOMETRY DATA
 
 Number of Boundary Points = 4
 
-0, 4.00000000000002
-50, 4.00000000000002
+0, 3.99999999999999
+50, 3.99999999999999
 50, 22
 0, 22
 
@@ -70,7 +70,7 @@ MATERIAL BLOCK DATA
 Number of Material Blocks = 5
 
 Material Block #1
-Material Type = "NULL"
+Material Type = "sand"
 Number of Boundary Points = 4
 21, 20, False, False, False
 50, 20, True, False, False
@@ -82,7 +82,7 @@ Number of Line Loads = 0
 Number of Point Loads = 0
 
 Material Block #2
-Material Type = "NULL"
+Material Type = "sand"
 Number of Boundary Points = 4
 27, 17, False, False, False
 50, 17, True, False, False
@@ -94,7 +94,7 @@ Number of Line Loads = 0
 Number of Point Loads = 0
 
 Material Block #3
-Material Type = "NULL"
+Material Type = "sand"
 Number of Boundary Points = 4
 31, 15, False, False, False
 50, 15, True, False, False
@@ -106,12 +106,12 @@ Number of Line Loads = 0
 Number of Point Loads = 0
 
 Material Block #4
-Material Type = "sand"
+Material Type = "bedrock"
 Number of Boundary Points = 4
-0, 3.99999999999999, True, True, False
-50, 3.99999999999999, True, True, False
-50, 7, True, False, False
-0, 7, True, False, False
+0, 3.99999999999997, True, True, False
+50, 3.99999999999997, True, True, False
+50, 6.99999999999998, True, False, False
+0, 6.99999999999998, True, False, False
 Number of Line Constraints = 3
 3, 0, True, False
 1, 2, True, False
@@ -126,14 +126,15 @@ Number of Boundary Points = 10
 27, 17, False, False, False
 21, 20, False, False, False
 17, 22, False, False, False
-10, 22, False, False, False
+9.99999999999999, 22, False, False, False
 6, 22, False, False, False
 0, 22, True, False, False
-0, 7, True, False, False
-50, 7, True, False, False
+0, 6.99999999999998, True, False, False
+50, 6.99999999999998, True, False, False
 50, 15, True, False, False
-Number of Line Constraints = 1
+Number of Line Constraints = 2
 6, 7, True, False
+8, 9, True, False
 Number of Line Loads = 1
 4, 5, True, -3, -3, False, 0, 0
 Number of Point Loads = 0
@@ -220,7 +221,7 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
@@ -232,7 +233,8 @@ True,False
 True,False
 True,False
 True,False
-True,1,False,0
+True,False
+False,0,False,0
 
 Phase #2
 Name = "first lift"
@@ -246,9 +248,9 @@ Material Block #1
 NULL
 False,False
 True,False
-True,False
 False,False
-True,False
+False,False
+False,False
 Material Block #2
 sand
 False,False
@@ -273,7 +275,7 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
@@ -285,7 +287,8 @@ True,False
 True,False
 True,False
 True,False
-True,1,False,0
+True,False
+False,0,False,0
 
 Phase #3
 Name = "first lift, loaded"
@@ -299,9 +302,9 @@ Material Block #1
 NULL
 False,False
 True,False
-True,False
 False,False
-True,False
+False,False
+False,False
 Material Block #2
 sand
 False,False
@@ -326,7 +329,7 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
@@ -338,7 +341,8 @@ True,False
 True,False
 True,False
 True,False
-True,1,False,0
+True,False
+True,0.5,False,0
 
 Phase #4
 Name = "second lift"
@@ -351,15 +355,15 @@ Gravity Factor = 1
 Material Block #1
 NULL
 False,False
-True,False
-True,False
 False,False
-True,False
+False,False
+False,False
+False,False
 Material Block #2
 NULL
 False,False
 True,False
-True,False
+False,False
 False,False
 False,False
 Material Block #3
@@ -379,7 +383,7 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
@@ -391,7 +395,8 @@ True,False
 True,False
 True,False
 True,False
-True,1,False,0
+True,False
+False,0,False,0
 
 Phase #5
 Name = "third lift"
@@ -404,15 +409,15 @@ Gravity Factor = 1
 Material Block #1
 NULL
 False,False
-True,False
-True,False
 False,False
-True,False
+False,False
+False,False
+False,False
 Material Block #2
 NULL
 False,False
 False,False
-True,False
+False,False
 False,False
 False,False
 Material Block #3
@@ -432,7 +437,7 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
@@ -444,7 +449,8 @@ True,False
 True,False
 True,False
 True,False
-True,1,False,0
+True,False
+False,0,False,0
 
 Phase #6
 Name = "final"
@@ -457,15 +463,15 @@ Gravity Factor = 1
 Material Block #1
 NULL
 False,False
-True,False
-True,False
 False,False
-True,False
+False,False
+False,False
+False,False
 Material Block #2
 NULL
 False,False
 False,False
-True,False
+False,False
 False,False
 False,False
 Material Block #3
@@ -485,13 +491,14 @@ True,False
 True,False
 True,True
 Material Block #5
-NULL
+sand
 False,False
 False,False
 False,False
 False,False
 False,False
 False,False
+True,False
 True,False
 True,False
 True,False

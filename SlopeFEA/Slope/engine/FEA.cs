@@ -49,7 +49,8 @@ namespace SlopeFEA
         /// <param name="number">Node number.</param>
         /// <param name="x">Global coordinate.</param>
         public feNode ( int number ,
-                        double x )
+                        double x ,
+                        int phases )
         {
             this.Number = number;
             this.IsBoundary = false;
@@ -71,6 +72,18 @@ namespace SlopeFEA
             phaseFixedX = new List<bool>();
             phaseFixedY = new List<bool>();
             phaseFixedZ = new List<bool>();
+
+
+            for ( int i = 0 ; i < phases ; i++ )
+            {
+                xLoad.Add( 0.0 );
+                yLoad.Add( 0.0 );
+                zLoad.Add( 0.0 );
+
+                phaseFixedX.Add( false );
+                phaseFixedY.Add( false );
+                phaseFixedZ.Add( false );
+            }
         }
 
         /// <summary>
@@ -83,7 +96,8 @@ namespace SlopeFEA
         public feNode ( int number ,
                         bool isBoundary ,
                         double x ,
-                        double y )
+                        double y ,
+                        int phases )
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
@@ -105,6 +119,18 @@ namespace SlopeFEA
             phaseFixedX = new List<bool>();
             phaseFixedY = new List<bool>();
             phaseFixedZ = new List<bool>();
+
+
+            for ( int i = 0 ; i < phases ; i++ )
+            {
+                xLoad.Add( 0.0 );
+                yLoad.Add( 0.0 );
+                zLoad.Add( 0.0 );
+
+                phaseFixedX.Add( false );
+                phaseFixedY.Add( false );
+                phaseFixedZ.Add( false );
+            }
         }
 
         /// <summary>
@@ -119,7 +145,8 @@ namespace SlopeFEA
                         bool isBoundary ,
                         double x ,
                         double y ,
-                        double z )
+                        double z ,
+                        int phases )
         {
             this.Number = number;
             this.IsBoundary = isBoundary;
@@ -141,6 +168,18 @@ namespace SlopeFEA
             phaseFixedX = new List<bool>();
             phaseFixedY = new List<bool>();
             phaseFixedZ = new List<bool>();
+
+
+            for ( int i = 0 ; i < phases ; i++ )
+            {
+                xLoad.Add( 0.0 );
+                yLoad.Add( 0.0 );
+                zLoad.Add( 0.0 );
+
+                phaseFixedX.Add( false );
+                phaseFixedY.Add( false );
+                phaseFixedZ.Add( false );
+            }
         }
 
         /// <summary>
@@ -240,42 +279,28 @@ namespace SlopeFEA
                 this.Z = m.Z;
             }
 
-            if ( this.XLoad.Count > 0 )
+            for ( int i = 0 ; i < this.XLoad.Count ; i++ )
             {
-                if ( m.XLoad.Count > 0 )
-                {
-                    for ( int i = 0 ; i < this.XLoad.Count ; i++ )
-                    {
-                        this.XLoad[i] += m.XLoad[i];
-                        this.YLoad[i] += m.YLoad[i];
-                        this.ZLoad[i] += m.ZLoad[i];
-                    }
-                }
-            }
-            else if ( m.XLoad.Count > 0 )
-            {
-                this.XLoad.AddRange( m.XLoad );
-                this.YLoad.AddRange( m.YLoad );
-                this.ZLoad.AddRange( m.ZLoad );
-            }
-            //this.XLoad += m.XLoad;
-            //this.YLoad += m.YLoad;
-            //this.ZLoad += m.ZLoad;
+                this.XLoad[i] += m.XLoad[i];
+                this.YLoad[i] += m.YLoad[i];
+                this.ZLoad[i] += m.ZLoad[i];
 
-            this.IsBoundary = this.IsBoundary || m.IsBoundary;
-            this.IsLocked = this.IsLocked || m.IsLocked;
-            this.Number = Math.Min( this.Number , m.Number );
-
-            for ( int i = 0 ; i < this.PhaseFixedX.Count ; i++ )
-            {
                 this.PhaseFixedX[i] = this.PhaseFixedX[i] || m.PhaseFixedX[i];
                 this.PhaseFixedY[i] = this.PhaseFixedY[i] || m.PhaseFixedY[i];
                 this.PhaseFixedZ[i] = this.PhaseFixedZ[i] || m.PhaseFixedZ[i];
             }
+
+            //this.XLoad += m.XLoad;
+            //this.YLoad += m.YLoad;
+            //this.ZLoad += m.ZLoad;
+
             //this.IsFixedX = this.IsFixedX || m.IsFixedX;
             //this.IsFixedY = this.IsFixedY || m.IsFixedY;
             //this.IsFixedZ = this.IsFixedZ || m.IsFixedZ;
-            
+
+            this.IsBoundary = this.IsBoundary || m.IsBoundary;
+            this.IsLocked = this.IsLocked || m.IsLocked;
+            this.Number = Math.Min( this.Number , m.Number );
             this.IsPrintPoint = this.IsPrintPoint || m.IsPrintPoint;
         }
 
@@ -1000,8 +1025,6 @@ namespace SlopeFEA
     /// </summary>
     public class fe2NodedBoundElement
     {
-        private List<double> nLoad1 , nLoad2 , tLoad1 , tLoad2;
-
         /// <summary>
         /// Class constructor.
         /// </summary>
@@ -1039,8 +1062,8 @@ namespace SlopeFEA
 
             this.TLoads = new List<List<double>>() 
             {
-                (tLoad1 != null) ? new List<double>( tLoad1 ) : null , 
-                (tLoad2 != null) ? new List<double>( tLoad2 ) : null
+                (tLoad1 != null) ? new List<double>( tLoad1 ) : new List<double>() , 
+                (tLoad2 != null) ? new List<double>( tLoad2 ) : new List<double>()
             };
             if ( tLoad1 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.TLoads[0].Add( 0.0 );
             if ( tLoad2 == null ) for ( int i = 0 ; i < numPhases ; i++ ) this.TLoads[1].Add( 0.0 );
