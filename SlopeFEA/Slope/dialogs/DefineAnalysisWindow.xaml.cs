@@ -29,15 +29,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace SlopeFEA
@@ -318,8 +312,6 @@ namespace SlopeFEA
             {
                 beginPhaseList.Items.Add( canvas.AnalysisPhases[i] );
             }
-
-            //phaseList.SelectedIndex = 0;
 
 
             /*
@@ -1019,6 +1011,38 @@ namespace SlopeFEA
             }
 
             inputCanvas.Substructs.ForEach( delegate( MaterialBlock mb ) { if ( mb.IsSelected ) mb.Material = selectedMaterial; } );
+
+            // Deactivate loads and constraints associated with NULL blocks
+            List<MaterialBlock> nullBlocks = inputCanvas.Substructs.FindAll( delegate( MaterialBlock mb ) { return mb.Material.Name == "NULL"; } );
+            foreach ( MaterialBlock nmb in nullBlocks )
+            {
+                foreach ( LineConstraint nlc in nmb.LineConstraints )
+                {
+                    nlc.IsActiveX = false;
+                    nlc.IsActiveY = false;
+                }
+
+                foreach ( LineLoad nll in nmb.LineLoads )
+                {
+                    nll.IsActiveN = false;
+                    nll.IsActiveT = false;
+                }
+
+                foreach ( PointLoad npl in nmb.PointLoads )
+                {
+                    npl.IsActiveX = false;
+                    npl.IsActiveY = false;
+                }
+
+                foreach ( DrawingPoint ndp in nmb.BoundaryPoints )
+                {
+                    if ( ndp.ParentBlocks.Find( delegate( MaterialBlock pmb ) { return pmb.Material.Name != "NULL"; } ) == null )
+                    {
+                        ndp.IsFixActiveX = false;
+                        ndp.IsFixActiveY = false;
+                    }
+                }
+            }
         }
 
         private void add_Click ( object sender , RoutedEventArgs e )

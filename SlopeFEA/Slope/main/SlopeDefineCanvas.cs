@@ -640,7 +640,10 @@ namespace SlopeFEA
                 {
                     MaterialBlock block;
                     MaterialType mtl;
+                    DrawingPoint p1 , p2;
                     LineConstraint newLC, existingLC;
+                    LineLoad newLL , existingLL;
+                    PointLoad newPL , existingPL;
                     Point[] materialBoundPoints;
                     bool[] isFixedX;
                     bool[] isFixedY;
@@ -684,59 +687,140 @@ namespace SlopeFEA
                             block.BoundaryPoints[j].IsPrintPoint = isPrintPoint[j];
                         }
 
+                        substructs.Add( block );
+
                         numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numLineConstraints ; j++ )
                         {
                             lineConstraint = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            newLC = new LineConstraint( this ,
-                                block.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
-                                block.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
-                                lineConstraint[2] == bool.TrueString ,
-                                lineConstraint[3] == bool.TrueString );
+
+                            p1 = block.BoundaryPoints[int.Parse( lineConstraint[0] )];
+                            p2 = block.BoundaryPoints[int.Parse( lineConstraint[1] )];
+
                             existingLC = null;
                             foreach ( MaterialBlock mb in substructs )
                             {
-                                existingLC = mb.LineConstraints.Find(
-                                    delegate( LineConstraint lc )
-                                    {
-                                        return lc.Nodes.Contains( newLC.Nodes[0] ) && lc.Nodes.Contains( newLC.Nodes[1] );
-                                    } );
+                                existingLC = mb.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
                                 if ( existingLC != null ) break;
                             }
-                            if ( existingLC != null )
+
+                            if ( existingLC == null )
                             {
-                                if ( !block.LineConstraints.Contains( existingLC ) )
-                                    block.LineConstraints.Add( existingLC );
+                                newLC = new LineConstraint( this , p1 , p2 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                                    lineConstraint[2] == bool.TrueString ,
+                                    lineConstraint[3] == bool.TrueString );
                             }
-                            else block.LineConstraints.Add( newLC );
+                            else
+                            {
+                                block.LineConstraints.Add( existingLC );
+                            }
+
+                            //newLC = new LineConstraint( this ,
+                            //    block.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                            //    block.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                            //    lineConstraint[2] == bool.TrueString ,
+                            //    lineConstraint[3] == bool.TrueString );
+                            //existingLC = null;
+                            //foreach ( MaterialBlock mb in substructs )
+                            //{
+                            //    existingLC = mb.LineConstraints.Find(
+                            //        delegate( LineConstraint lc )
+                            //        {
+                            //            return lc.Nodes.Contains( newLC.Nodes[0] ) && lc.Nodes.Contains( newLC.Nodes[1] );
+                            //        } );
+                            //    if ( existingLC != null ) break;
+                            //}
+                            //if ( existingLC != null )
+                            //{
+                            //    if ( !block.LineConstraints.Contains( existingLC ) )
+                            //        block.LineConstraints.Add( existingLC );
+                            //}
+                            //else block.LineConstraints.Add( newLC );
                         }
 
                         numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numLineLoads ; j++ )
                         {
                             lineLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            block.LineLoads.Add( new LineLoad( this ,
-                                block.BoundaryPoints[int.Parse( lineLoad[0] )] ,
-                                block.BoundaryPoints[int.Parse( lineLoad[1] )] ,
-                                lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
-                                lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
+
+                            p1 = block.BoundaryPoints[int.Parse( lineLoad[0] )];
+                            p2 = block.BoundaryPoints[int.Parse( lineLoad[1] )];
+
+                            existingLL = null;
+                            foreach ( MaterialBlock mb in substructs )
+                            {
+                                existingLL = mb.LineLoads.Find( delegate( LineLoad ll ) { return ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ); } );
+                                if ( existingLL != null ) break;
+                            }
+
+                            if ( existingLL == null )
+                            {
+                                newLL = new LineLoad( this , p1 , p2 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                                    lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                                    lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) );
+                            }
+                            else
+                            {
+                                block.LineLoads.Add( existingLL );
+                            }
+                            
+                            //block.LineLoads.Add( new LineLoad( this ,
+                            //    block.BoundaryPoints[int.Parse( lineLoad[0] )] ,
+                            //    block.BoundaryPoints[int.Parse( lineLoad[1] )] ,
+                            //    lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                            //    lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
                         }
 
                         numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numPointLoads ; j++ )
                         {
                             pointLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            block.PointLoads.Add( new PointLoad( this ,
-                                block.BoundaryPoints[int.Parse( pointLoad[0] )] ,
-                                pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
-                                pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) ) );
+
+                            p1 = block.BoundaryPoints[int.Parse( pointLoad[0] )];
+
+                            existingPL = null;
+                            foreach ( MaterialBlock mb in substructs )
+                            {
+                                existingPL = mb.PointLoads.Find( delegate( PointLoad pl ) { return pl.Node == p1; } );
+                                if ( existingPL != null ) break;
+                            }
+
+                            if ( existingPL == null )
+                            {
+                                newPL = new PointLoad( this , p1 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                                    pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
+                                    pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) );
+                            }
+                            else
+                            {
+                                block.PointLoads.Add( existingPL );
+                            }
+
+                            //block.PointLoads.Add( new PointLoad( this ,
+                            //    block.BoundaryPoints[int.Parse( pointLoad[0] )] ,
+                            //    pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
+                            //    pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) ) );
                         }
 
-                        substructs.Add( block );
+                        
 
                         tr.ReadLine();
                     }
                 }
+            }
+
+            // Set selected analysis phase to first (if present)
+            if ( source.AnalysisPhases.Count > 1 )
+            {
+                ComboBox phaseList = (ComboBox) ((Grid) ((GroupBox) ((Grid) ((ScrollViewer) ((Grid) this.Parent).Children[2]).Content).Children[1]).Content).Children[1];
+                AnalysisPhase initial = source.AnalysisPhases[1];
+                phaseList.SelectedItem = initial;
             }
         }
         

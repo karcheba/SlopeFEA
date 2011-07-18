@@ -1042,7 +1042,10 @@ namespace SlopeFEA
                 {
                     MaterialBlock newMaterialBlock;
                     MaterialType newMaterialType;
+                    DrawingPoint p1 , p2;
                     LineConstraint newLineConstraint, existingLineConstraint;
+                    LineLoad newLineLoad , existingLineLoad;
+                    PointLoad newPointLoad , existingPointLoad;
                     Point[] materialBoundPoints;
                     bool[] isFixedX;
                     bool[] isFixedY;
@@ -1085,60 +1088,133 @@ namespace SlopeFEA
                             newMaterialBlock.BoundaryPoints[j].IsPrintPoint = isPrintPoint[j];
                         }
 
+                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
+
+                        if ( newMaterialType != null ) newMaterialBlock.Material = newMaterialType;
+
+                        materialBlocks.Add( newMaterialBlock );
+
                         numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numLineConstraints ; j++ )
                         {
                             lineConstraint = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            newLineConstraint = new LineConstraint( this ,
-                                newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
-                                newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
-                                lineConstraint[2] == bool.TrueString ,
-                                lineConstraint[3] == bool.TrueString );
+
+                            p1 = newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )];
+                            p2 = newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )];
+
                             existingLineConstraint = null;
                             foreach ( MaterialBlock mb in materialBlocks )
                             {
-                                existingLineConstraint = mb.LineConstraints.Find(
-                                    delegate( LineConstraint lc )
-                                    {
-                                        return lc.Nodes.Contains( newLineConstraint.Nodes[0] )
-                                            && lc.Nodes.Contains( newLineConstraint.Nodes[1] );
-                                    } );
+                                existingLineConstraint = mb.LineConstraints.Find( delegate( LineConstraint lc ) { return lc.Nodes.Contains( p1 ) && lc.Nodes.Contains( p2 ); } );
                                 if ( existingLineConstraint != null ) break;
                             }
-                            if ( existingLineConstraint != null )
+
+                            if ( existingLineConstraint == null )
                             {
-                                if ( !newMaterialBlock.LineConstraints.Contains( existingLineConstraint ) )
-                                    newMaterialBlock.LineConstraints.Add( existingLineConstraint );
+                                newLineConstraint = new LineConstraint( this , p1 , p2 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[0] )] ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineConstraint[1] )] ,
+                                    lineConstraint[2] == bool.TrueString ,
+                                    lineConstraint[3] == bool.TrueString );
                             }
-                            else newMaterialBlock.LineConstraints.Add( newLineConstraint );
+                            else
+                            {
+                                newMaterialBlock.LineConstraints.Add( existingLineConstraint );
+                            }
+
+                            //existingLineConstraint = null;
+                            //foreach ( MaterialBlock mb in materialBlocks )
+                            //{
+                            //    existingLineConstraint = mb.LineConstraints.Find(
+                            //        delegate( LineConstraint lc )
+                            //        {
+                            //            return lc.Nodes.Contains( newLineConstraint.Nodes[0] )
+                            //                && lc.Nodes.Contains( newLineConstraint.Nodes[1] );
+                            //        } );
+                            //    if ( existingLineConstraint != null ) break;
+                            //}
+                            //if ( existingLineConstraint != null )
+                            //{
+                            //    if ( !newMaterialBlock.LineConstraints.Contains( existingLineConstraint ) )
+                            //        newMaterialBlock.LineConstraints.Add( existingLineConstraint );
+                            //}
+                            //else newMaterialBlock.LineConstraints.Add( newLineConstraint );
                         }
 
                         numLineLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numLineLoads ; j++ )
                         {
                             lineLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            newMaterialBlock.LineLoads.Add( new LineLoad( this ,
-                                newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[0] )] ,
-                                newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[1] )] ,
-                                lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
-                                lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) ) );
+
+                            p1 = newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[0] )];
+                            p2 = newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[1] )];
+
+                            existingLineLoad = null;
+                            foreach ( MaterialBlock mb in materialBlocks )
+                            {
+                                existingLineLoad = mb.LineLoads.Find( delegate( LineLoad ll ) { return ll.Nodes.Contains( p1 ) && ll.Nodes.Contains( p2 ); } );
+                                if ( existingLineLoad != null ) break;
+                            }
+
+                            if ( existingLineLoad == null )
+                            {
+                                newLineLoad = new LineLoad( this , p1 , p2 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[0] )] ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( lineLoad[1] )] ,
+                                    lineLoad[2] == bool.TrueString , double.Parse( lineLoad[3] ) , double.Parse( lineLoad[4] ) ,
+                                    lineLoad[5] == bool.TrueString , double.Parse( lineLoad[6] ) , double.Parse( lineLoad[7] ) );
+                            }
+                            else
+                            {
+                                newMaterialBlock.LineLoads.Add( existingLineLoad );
+                            }
+
+                            
+                            //existingLineLoad = null;
+                            //foreach ( MaterialBlock mb in materialBlocks )
+                            //{
+                            //    existingLineLoad = mb.LineLoads.Find(
+                            //        delegate( LineLoad ll )
+                            //        {
+                            //            return ll.Nodes.Contains( newLineLoad.Nodes[0] )
+                            //                && ll.Nodes.Contains( newLineLoad.Nodes[1] );
+                            //        } );
+                            //    if ( existingLineLoad != null ) break;
+                            //}
+                            //if ( existingLineLoad != null )
+                            //{
+                            //    if ( !newMaterialBlock.LineLoads.Contains( existingLineLoad ) )
+                            //        newMaterialBlock.LineLoads.Add( existingLineLoad );
+                            //}
+                            //else newMaterialBlock.LineLoads.Add( newLineLoad );
                         }
 
                         numPointLoads = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numPointLoads ; j++ )
                         {
                             pointLoad = tr.ReadLine().Split( new char[] { ',' , ' ' } , StringSplitOptions.RemoveEmptyEntries );
-                            newMaterialBlock.PointLoads.Add( new PointLoad( this ,
-                                newMaterialBlock.BoundaryPoints[int.Parse( pointLoad[0] )] ,
-                                pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
-                                pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) ) );
+
+                            p1 = newMaterialBlock.BoundaryPoints[int.Parse( pointLoad[0] )];
+
+                            existingPointLoad = null;
+                            foreach ( MaterialBlock mb in materialBlocks )
+                            {
+                                existingPointLoad = mb.PointLoads.Find( delegate( PointLoad pl ) { return pl.Node == p1; } );
+                                if ( existingPointLoad != null ) break;
+                            }
+
+                            if ( existingPointLoad == null )
+                            {
+                                newPointLoad = new PointLoad( this , p1 ,
+                                    //newMaterialBlock.BoundaryPoints[int.Parse( pointLoad[0] )] ,
+                                    pointLoad[1] == bool.TrueString , double.Parse( pointLoad[2] ) ,
+                                    pointLoad[3] == bool.TrueString , double.Parse( pointLoad[4] ) );
+                            }
+                            else
+                            {
+                                newMaterialBlock.PointLoads.Add( existingPointLoad );
+                            }
                         }
-
-                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
-
-                        if ( newMaterialType != null ) newMaterialBlock.Material = newMaterialType;
-
-                        materialBlocks.Add( newMaterialBlock );
 
                         tr.ReadLine();
                     }

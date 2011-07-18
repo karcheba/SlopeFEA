@@ -1178,6 +1178,8 @@ namespace SlopeFEA
                                 }
                             } );
                     }
+
+                    lc.Update();
                 } );
             // merge any LineLoads on a newly shared edge
             thisLLs.ForEach(
@@ -1215,16 +1217,25 @@ namespace SlopeFEA
                                         ll.PhaseFactorT[i] = ll.PhaseActiveT[i] ? 1.0 : 0.0;
                                     }
 
-                                    // delete the LineLoad formerly containing other point, leaving only a single summed LineLoad
+                                    // replace the LineLoad in other points parent blocks
                                     other.ParentBlocks.ForEach(
                                         delegate( MaterialBlock mb )
                                         {
-                                            mb.LineLoads.RemoveAll( delegate( LineLoad ll0 ) { return ll0 == otherLL; } );
+                                            int index = mb.LineLoads.FindIndex( delegate( LineLoad ll0 ) { return ll0 == otherLL; } );
+                                            if ( index >= 0 ) mb.LineLoads[index] = ll;
                                         } );
+                                    //// delete the LineLoad formerly containing other point, leaving only a single summed LineLoad
+                                    //other.ParentBlocks.ForEach(
+                                    //    delegate( MaterialBlock mb )
+                                    //    {
+                                    //        mb.LineLoads.RemoveAll( delegate( LineLoad ll0 ) { return ll0 == otherLL; } );
+                                    //    } );
                                     otherLL.Delete();
                                 }
                             } );
                     }
+
+                    ll.Update();
                 } );
             // merge PointLoads if both points contained one
             if ( thisPL != null && otherPL != null )
@@ -1249,10 +1260,19 @@ namespace SlopeFEA
                     thisPL.PhaseFactorY[i] = thisPL.PhaseActiveY[i] ? 1.0 : 0.0;
                 }
 
-                // delete PointLoad formerly of other point, leaving only a single summed load
+                // replace the PointLoad in other points parent blocks
                 other.ParentBlocks.ForEach(
-                    delegate( MaterialBlock mb ) { mb.PointLoads.RemoveAll( delegate( PointLoad pl ) { return pl == otherPL; } ); } );
+                    delegate( MaterialBlock mb )
+                    {
+                        int index = mb.PointLoads.FindIndex( delegate( PointLoad pl0 ) { return pl0 == otherPL; } );
+                        if ( index >= 0 ) mb.PointLoads[index] = thisPL;
+                    } );
+                //// delete PointLoad formerly of other point, leaving only a single summed load
+                //other.ParentBlocks.ForEach(
+                //    delegate( MaterialBlock mb ) { mb.PointLoads.RemoveAll( delegate( PointLoad pl ) { return pl == otherPL; } ); } );
                 otherPL.Delete();
+
+                thisPL.Update();
             }
 
             foreach ( MaterialBlock mb in other.ParentBlocks )
@@ -1262,6 +1282,8 @@ namespace SlopeFEA
                 mb.BoundaryPoints[index] = this;
                 mb.Boundary.Points[index] = this.Point;
                 if ( !this.ParentBlocks.Contains( mb ) ) this.ParentBlocks.Add( mb );
+
+                if ( thisPL != null && !mb.PointLoads.Contains( thisPL ) ) mb.PointLoads.Add( thisPL );
 
                 // eliminate oddities such as LineLoads and LineConstraints containing duplicate points
                 for ( int i = mb.LineLoads.Count - 1 ; i >= 0 ; i-- )
@@ -1568,6 +1590,13 @@ namespace SlopeFEA
                 phaseFixedY.Add( fixY );
             }
 
+            // Add the constraint to all blocks that contain both of its points
+            List<MaterialBlock> parents = canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.LineConstraints.Contains( this ) ) pmb.LineConstraints.Add( this );
+            }
+
             // set visibility of constraints
             this.IsFixedX = fixX;
             this.IsFixedY = fixY;
@@ -1620,6 +1649,13 @@ namespace SlopeFEA
 
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y + 7 ) );
             fixLines[3].Points.Add( new Point( MidPoint.X + 3.5 , MidPoint.Y - 7 ) );
+
+            // Add the constraint to all blocks that contain both of its points
+            List<MaterialBlock> parents = canvas.Substructs.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.LineConstraints.Contains( this ) ) pmb.LineConstraints.Add( this );
+            }
 
             // set visibility of constraints
             this.IsFixedX = fixX;
@@ -1846,6 +1882,13 @@ namespace SlopeFEA
                 phaseFactorY.Add( isLoadedY ? 1.0 : 0.0 );
             }
 
+            // Add the point load to all blocks that contain its point
+            List<MaterialBlock> parents = canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( node ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.PointLoads.Contains( this ) ) pmb.PointLoads.Add( this );
+            }
+
             Update();
         }
 
@@ -1894,6 +1937,13 @@ namespace SlopeFEA
             this.IsLoadedY = isLoadedY;
             if ( this.IsLoadedY ) this.YFactor = 1.0;
             this.YLoad = yLoad;
+
+            // Add the point load to all blocks that contain its point
+            List<MaterialBlock> parents = canvas.Substructs.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( node ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.PointLoads.Contains( this ) ) pmb.PointLoads.Add( this );
+            }
 
             Update();
         }
@@ -2070,17 +2120,18 @@ namespace SlopeFEA
                     if ( !this.IsLoadedX && !this.IsLoadedY )
                     {
                         this.Delete();
+                        canvas.MaterialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.PointLoads.Remove( this ); } );
 
-                        MaterialBlock parent = null;
-                        foreach ( MaterialBlock mb in canvas.MaterialBlocks )
-                        {
-                            if ( mb.PointLoads.Contains( this ) )
-                            {
-                                parent = mb;
-                                break;
-                            }
-                        }
-                        if ( parent != null ) parent.PointLoads.Remove( this );
+                        //MaterialBlock parent = null;
+                        //foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                        //{
+                        //    if ( mb.PointLoads.Contains( this ) )
+                        //    {
+                        //        parent = mb;
+                        //        break;
+                        //    }
+                        //}
+                        //if ( parent != null ) parent.PointLoads.Remove( this );
                     }
 
                     // ... otherwise update its visibility and plotting location
@@ -2193,6 +2244,13 @@ namespace SlopeFEA
                 phaseFactorT.Add( isLoadedT ? 1.0 : 0.0 );
             }
 
+            // Add the constraint to all blocks that contain both of its points
+            List<MaterialBlock> parents = canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.LineLoads.Contains( this ) ) pmb.LineLoads.Add( this );
+            }
+
             Update();
         }
 
@@ -2252,6 +2310,13 @@ namespace SlopeFEA
             if ( this.IsLoadedT ) this.TFactor = 1.0;
             this.TLoad1 = tLoad1;
             this.TLoad2 = tLoad2;
+
+            // Add the constraint to all blocks that contain both of its points
+            List<MaterialBlock> parents = canvas.Substructs.FindAll( delegate( MaterialBlock mb ) { return mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ); } );
+            foreach ( MaterialBlock pmb in parents )
+            {
+                if ( !pmb.LineLoads.Contains( this ) ) pmb.LineLoads.Add( this );
+            }
 
             Update();
         }
@@ -2471,17 +2536,18 @@ namespace SlopeFEA
                     if ( !this.IsLoadedN && !this.IsLoadedT )
                     {
                         this.Delete();
+                        canvas.MaterialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.LineLoads.Remove( this ); } );
 
-                        MaterialBlock parent = null;
-                        foreach ( MaterialBlock mb in canvas.MaterialBlocks )
-                        {
-                            if ( mb.LineLoads.Contains( this ) )
-                            {
-                                parent = mb;
-                                break;
-                            }
-                        }
-                        if ( parent != null ) parent.LineLoads.Remove( this );
+                        //MaterialBlock parent = null;
+                        //foreach ( MaterialBlock mb in canvas.MaterialBlocks )
+                        //{
+                        //    if ( mb.LineLoads.Contains( this ) )
+                        //    {
+                        //        parent = mb;
+                        //        break;
+                        //    }
+                        //}
+                        //if ( parent != null ) parent.LineLoads.Remove( this );
                     }
 
                     // ... otherwise update its visibility and plotting location
@@ -2911,9 +2977,26 @@ namespace SlopeFEA
                 } );
             Boundary.Points.Clear();
 
-            LineConstraints.ForEach( delegate( LineConstraint lc ) { lc.Delete(); } );
-            LineLoads.ForEach( delegate( LineLoad ll ) { ll.Delete(); } );
-            PointLoads.ForEach( delegate( PointLoad pl ) { pl.Delete(); } );
+            LineConstraints.ForEach(
+                delegate( LineConstraint lc )
+                {
+                    if ( canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.LineConstraints.Contains( lc ); } ).Count == 1 )
+                        lc.Delete();
+                } );
+
+            LineLoads.ForEach(
+                delegate( LineLoad ll )
+                {
+                    if ( canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.LineLoads.Contains( ll ); } ).Count == 1 )
+                        ll.Delete();
+                } );
+
+            PointLoads.ForEach(
+                delegate( PointLoad pl )
+                {
+                    if ( canvas.MaterialBlocks.FindAll( delegate( MaterialBlock mb ) { return mb.PointLoads.Contains( pl ); } ).Count == 1 )
+                        pl.Delete();
+                } );
 
             canvas.MaterialBlocks.Remove( this );
         }
@@ -3239,12 +3322,12 @@ namespace SlopeFEA
                             }
                         }
 
-                        canvas.MaterialBlocks.ForEach(
-                            delegate( MaterialBlock mb )
-                            {
-                                if ( mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ) )
-                                    mb.LineConstraints.Add( newLC );
-                            } );
+                        //canvas.MaterialBlocks.ForEach(
+                        //    delegate( MaterialBlock mb )
+                        //    {
+                        //        if ( mb.BoundaryPoints.Contains( p1 ) && mb.BoundaryPoints.Contains( p2 ) )
+                        //            mb.LineConstraints.Add( newLC );
+                        //    } );
 
                         canvas.IsSaved = false;
                         canvas.IsVerified = false;
@@ -3280,7 +3363,7 @@ namespace SlopeFEA
             if ( load == null )
             {
                 load = new PointLoad( canvas , p , false , 0 , false , 0 );
-                pointLoads.Add( load );
+                //pointLoads.Add( load );
             }
 
             bool prevLoadedX = load.IsLoadedX , prevLoadedY = load.IsLoadedY;
@@ -3293,7 +3376,8 @@ namespace SlopeFEA
             if ( !load.IsLoadedX && !load.IsLoadedY )
             {
                 load.Delete();
-                pointLoads.Remove( load );
+                //pointLoads.Remove( load );
+                canvas.MaterialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.PointLoads.Remove( load ); } );
             }
 
             // ... otherwise update its visibility and plotting location
@@ -3343,7 +3427,8 @@ namespace SlopeFEA
             }
 
             // ensure max and min as appropriate
-            if ( (index1 > index2) || (index1 == 0 && index2 == BoundaryPoints.Count - 1) )
+            if ( ((index1 > index2) && !(index2 == 0 && index1 == BoundaryPoints.Count - 1))
+                || (index1 == 0 && index2 == BoundaryPoints.Count - 1) )
             {
                 int tmp = index1;
                 index1 = index2;
@@ -3364,7 +3449,7 @@ namespace SlopeFEA
                 if ( load == null )
                 {
                     load = new LineLoad( canvas , p1 , p2 , false , 0 , 0 , false , 0 , 0 );
-                    lineLoads.Add( load );
+                    //lineLoads.Add( load );
                 }
 
                 bool prevLoadedN = load.IsLoadedN , prevLoadedT = load.IsLoadedT;
@@ -3377,7 +3462,8 @@ namespace SlopeFEA
                 if ( !load.IsLoadedN && !load.IsLoadedT )
                 {
                     load.Delete();
-                    lineLoads.Remove( load );
+                    //lineLoads.Remove( load );
+                    canvas.MaterialBlocks.ForEach( delegate( MaterialBlock mb ) { mb.LineLoads.Remove( load ); } );
                 }
 
                 // ... otherwise update its visibility and plotting location

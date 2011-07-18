@@ -76,13 +76,14 @@ namespace SlopeFEA
             coords2.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
-            isLoadedN.IsEnabled = load.IsLoadedN;
-            isLoadedN.IsChecked = nFactor.IsEnabled = load.IsActiveN;
+            MaterialBlock parent = canvas.Substructs.Find( delegate( MaterialBlock mb ) { return mb.Material.Name != "NULL" && mb.LineLoads.Contains( load ); } );
+            isLoadedN.IsEnabled = parent != null && load.IsLoadedN;
+            isLoadedN.IsChecked = nFactor.IsEnabled = parent != null && load.IsActiveN;
             nFactor.Text = string.Format( "{0}" , Math.Round( load.NFactor , 3 ) );
             nLoad1.Text = string.Format( "{0}" , Math.Round( load.NLoad1 , 2 ) );
             nLoad2.Text = string.Format( "{0}" , Math.Round( load.NLoad2 , 2 ) );
-            isLoadedT.IsEnabled = load.IsLoadedT;
-            isLoadedT.IsChecked = tFactor.IsEnabled = load.IsActiveT;
+            isLoadedT.IsEnabled = parent != null && load.IsLoadedT;
+            isLoadedT.IsChecked = tFactor.IsEnabled = parent != null && load.IsActiveT;
             tFactor.Text = string.Format( "{0}" , Math.Round( load.TFactor , 3 ) );
             tLoad1.Text = string.Format( "{0}" , Math.Round( load.TLoad1 , 2 ) );
             tLoad2.Text = string.Format( "{0}" , Math.Round( load.TLoad2 , 2 ) );

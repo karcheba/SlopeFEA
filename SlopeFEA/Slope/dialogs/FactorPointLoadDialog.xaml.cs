@@ -70,12 +70,13 @@ namespace SlopeFEA
             coords.Content = string.Format( "({0}, {1})" , Math.Round( xCoord , 2 ) , Math.Round( yCoord , 2 ) );
 
             // set existing load values (if present)
-            isLoadedX.IsEnabled = load.IsLoadedX;
-            isLoadedX.IsChecked = xFactor.IsEnabled = load.IsActiveX;
+            MaterialBlock parent = canvas.Substructs.Find( delegate( MaterialBlock mb ) { return mb.Material.Name != "NULL" && mb.PointLoads.Contains( load ); } );
+            isLoadedX.IsEnabled = parent != null && load.IsLoadedX;
+            isLoadedX.IsChecked = xFactor.IsEnabled = parent != null && load.IsActiveX;
             xFactor.Text = string.Format( "{0}" , Math.Round( load.XFactor , 3 ) );
             xLoad.Text = string.Format( "{0}" , Math.Round( load.XLoad , 2 ) );
-            isLoadedY.IsEnabled = load.IsLoadedY;
-            isLoadedY.IsChecked = yFactor.IsEnabled = load.IsActiveY;
+            isLoadedY.IsEnabled = parent != null && load.IsLoadedY;
+            isLoadedY.IsChecked = yFactor.IsEnabled = parent != null && load.IsActiveY;
             yFactor.Text = string.Format( "{0}" , Math.Round( load.YFactor , 3 ) );
             yLoad.Text = string.Format( "{0}" , Math.Round( load.YLoad , 2 ) );
         }

@@ -44,14 +44,17 @@ namespace SlopeFEA
         public ActivateFixityDialog ( SlopeDefineCanvas canvas , LineConstraint lc )
         {
             InitializeComponent();
-            
+
             this.canvas = canvas;
 
             this.lc = lc;
-            isFixedX.IsEnabled = lc.IsFixedX;
-            isFixedY.IsEnabled = lc.IsFixedY;
-            isFixedX.IsChecked = lc.IsActiveX;
-            isFixedY.IsChecked = lc.IsActiveY;
+
+            MaterialBlock parent = canvas.Substructs.Find( delegate( MaterialBlock mb ) { return mb.Material.Name != "NULL" && mb.LineConstraints.Contains( lc ); } );
+
+            isFixedX.IsEnabled = parent != null && lc.IsFixedX;
+            isFixedY.IsEnabled = parent != null && lc.IsFixedY;
+            isFixedX.IsChecked = parent != null && lc.IsActiveX;
+            isFixedY.IsChecked = parent != null && lc.IsActiveY;
         }
 
         public ActivateFixityDialog ( SlopeDefineCanvas canvas , DrawingPoint p )
@@ -61,10 +64,13 @@ namespace SlopeFEA
             this.canvas = canvas;
 
             this.p = p;
-            isFixedX.IsEnabled = p.IsFixedX;
-            isFixedY.IsEnabled = p.IsFixedY;
-            isFixedX.IsChecked = p.IsFixActiveX;
-            isFixedY.IsChecked = p.IsFixActiveY;
+
+            MaterialBlock parent = canvas.Substructs.Find( delegate( MaterialBlock mb ) { return mb.Material.Name != "NULL" && mb.BoundaryPoints.Contains( p ); } );
+
+            isFixedX.IsEnabled = parent != null && p.IsFixedX;
+            isFixedY.IsEnabled = parent != null && p.IsFixedY;
+            isFixedX.IsChecked = parent != null && p.IsFixActiveX;
+            isFixedY.IsChecked = parent != null && p.IsFixActiveY;
 
             List<LineConstraint> attachedLCs = new List<LineConstraint>();
             canvas.Substructs.ForEach(
