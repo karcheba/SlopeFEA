@@ -1082,52 +1082,55 @@ namespace SlopeFEA
             path[path.Length - 1] = "phs";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( canvas.AnalysisPhases.Count - 1 );
+                tw.WriteLine( /*NPHASE=*/ canvas.AnalysisPhases.Count - 1 );
+
                 for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
                 {
                     tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
-                        canvas.AnalysisPhases[i].Number ,
-                        canvas.AnalysisPhases[i].BeginPhase.Number ,
-                        canvas.AnalysisPhases[i].ResetDisplacements ? 1 : 0 ,
-                        canvas.AnalysisPhases[i].NSteps ,
-                        canvas.AnalysisPhases[i].NIterations ,
-                        canvas.AnalysisPhases[i].NPrintLines ,
-                        canvas.AnalysisPhases[i].GravityFactor );
+                        /*iphase=*/ canvas.AnalysisPhases[i].Number ,
+                        /*BEGPHS(i)=*/ canvas.AnalysisPhases[i].BeginPhase.Number ,
+                        /*RESET(i)=*/ canvas.AnalysisPhases[i].ResetDisplacements ? 1 : 0 ,
+                        /*NSTEP(i)=*/  canvas.AnalysisPhases[i].NSteps ,
+                        /*NITER(i)=*/  canvas.AnalysisPhases[i].NIterations ,
+                        /*NPRINT(i)=*/ canvas.AnalysisPhases[i].NPrintLines ,
+                        /*GFACT(i)=*/  canvas.AnalysisPhases[i].GravityFactor );
                 }
             }
 
             path[path.Length - 1] = "nod";
             using ( TextWriter tw = new StreamWriter( string.Join( "." , path ) ) )
             {
-                tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}"/*\t{8}"*/ ,
+                tw.WriteLine( "{0}\t{1}\t{2}\t{3}"/*\t{4}\t{5}\t{6}\t{7}\t{8}"*/ ,
                     /*NNOD=*/ nodes.Count ,
                     /*NDIM=*/ 2 ,
                     /*NVAR=*/ 2 ,
-                    /*IPRINT=*/ printNode ,
-                    /*NSTEP=*/ canvas.FEAParameters.NStep ,
-                    /*NITER=*/ canvas.FEAParameters.NIter ,
-                    /*NPRINT=*/ canvas.FEAParameters.NPrint ,
-                    /*NPHASE=*/ canvas.AnalysisPhases.Count - 1 );
+                    /*IPRINT=*/ printNode );
+                    // /*NSTEP=*/ canvas.FEAParameters.NStep ,
+                    // /*NITER=*/ canvas.FEAParameters.NIter ,
+                    // /*NPRINT=*/ canvas.FEAParameters.NPrint ,
                     // /*LFACT=*/ canvas.FEAParameters.LFact ,
                     // /*GFACT=*/ canvas.FEAParameters.GFact );
 
-                int[] xFix = new int[nodes[0].PhaseFixedX.Count] ,
-                    yFix = new int[nodes[0].PhaseFixedY.Count];
+                int[] fix = new int[2 * nodes[0].PhaseFixedX.Count];
+                double[] load = new double[2 * nodes[0].XLoad.Count];
+                int ii , iii;
                 foreach ( feNode node in nodes )
                 {
                     for ( int i = 0 ; i < node.PhaseFixedX.Count ; i++ )
                     {
-                        xFix[i] = node.PhaseFixedX[i] ? 0 : 1;
-                        yFix[i] = node.PhaseFixedY[i] ? 0 : 1;
+                        ii = 2 * i;
+                        iii = ii + 1;
+                        fix[ii] = node.PhaseFixedX[i] ? 0 : 1;
+                        fix[iii] = node.PhaseFixedY[i] ? 0 : 1;
+                        load[ii] = node.XLoad[i];
+                        load[iii] = node.YLoad[i];
                     }
 
-                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}" ,
                                     node.Number ,
                                     node.X , node.Y ,
-                                    string.Join( "\t" , xFix ) ,
-                                    string.Join( "\t" , yFix ) ,
-                                    string.Join( "\t" , node.XLoad ) ,
-                                    string.Join( "\t" , node.YLoad ) );
+                                    string.Join( "\t" , fix ) ,
+                                    string.Join( "\t" , load ) );
                 }
             }
 
@@ -1184,15 +1187,31 @@ namespace SlopeFEA
                                 /*NELB=*/ boundElements.Count ,
                                 /*NNODELB=*/ 2 );
 
+                double[] nload = new double[2 * boundElements[0].NLoads[0].Count];
+                double[] tload = new double[2 * boundElements[0].TLoads[0].Count];
+                int i0 , i1;
                 foreach ( fe2NodedBoundElement element in boundElements )
                 {
-                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}" ,
+                    for ( int i = 0 ; i < element.NLoads[0].Count ; i++ )
+                    {
+                        i0 = 2 * i;
+                        i1 = i0 + 1;
+
+                        nload[i0] = element.NLoads[0][i];
+                        nload[i1] = element.NLoads[1][i];
+                        tload[i0] = element.TLoads[0][i];
+                        tload[i1] = element.TLoads[1][i];
+                    }
+
+                    tw.WriteLine( "{0}\t{1}\t{2}\t{3}\t{4}" ,
                                     element.Number ,
                                     element.Nodes[0].Number , element.Nodes[1].Number ,
-                                    string.Join( "\t" , element.NLoads[0] ) ,
-                                    string.Join( "\t" , element.NLoads[1] ) ,
-                                    string.Join( "\t" , element.TLoads[0] ) ,
-                                    string.Join( "\t" , element.TLoads[1] ) );
+                                    string.Join( "\t" , nload ) ,
+                                    string.Join( "\t" , tload ) );
+                                    //string.Join( "\t" , element.NLoads[0] ) ,
+                                    //string.Join( "\t" , element.NLoads[1] ) ,
+                                    //string.Join( "\t" , element.TLoads[0] ) ,
+                                    //string.Join( "\t" , element.TLoads[1] ) );
                                     //element.NLoads[0] , element.NLoads[1] ,
                                     //element.TLoads[0] , element.TLoads[1] );
                 }
