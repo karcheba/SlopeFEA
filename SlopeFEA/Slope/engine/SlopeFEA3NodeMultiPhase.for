@@ -39,7 +39,7 @@
 !
       INTEGER, PARAMETER :: ik = KIND(1), dk = KIND(1.0D0)  ! int/doub kind params
       REAL(dk), PARAMETER :: PI = 3.1415926535898
-      REAL(dk), PARAMETER :: degTOrad = PI / 180.0D0
+      REAL(dk), PARAMETER :: degTOrad = PI/180.0D0,radTOdeg = 180.0D0/PI
       REAL(dk), PARAMETER :: TOLER = 1.0E-8
       REAL(dk), PARAMETER :: ONE_THIRD = 1.0D0 / 3.0D0
 !
@@ -149,7 +149,8 @@
 !
       IMPLICIT NONE
 !
-      INTEGER, PARAMETER :: output=2,phs=3,mtl=4,nod=5,ele=6,bel=7,his=8  ! file unit numbers
+      INTEGER, PARAMETER :: output=2,phs=3,mtl=4,nod=5,ele=6,bel=7,  ! file unit numbers
+     +                      his=8,ld=9,uv=10,st=11,ermsg=12
       CHARACTER(LEN=64) :: ANTYPE   ! string denoting analysis type
 !
       INTEGER(ik), ALLOCATABLE :: BEGPHS(:)   ! phase # to load initial conditions from (stresses, disps, etc.)
@@ -161,6 +162,7 @@
 !
       REAL(dk), ALLOCATABLE :: GFACT(:)     ! gravity factor
 !
+      INTEGER(ik), SAVE :: NTOT             ! # of possible system dofs (NNOD*NVAR)
       INTEGER(ik), ALLOCATABLE :: NNET(:)   ! # of system dofs (computed in INPUT)
       INTEGER(ik), ALLOCATABLE :: LBAND(:)  ! # of co-diagonal bands in stiff mat (computed in BANDWH)
 !
@@ -189,7 +191,6 @@
       CHARACTER*(*), INTENT(IN) :: fpath        ! input file path
       INTEGER(ik) :: i,i1,i2,j      ! loop variables
       INTEGER(ik) :: ntot           ! total possible dofs
-      INTEGER(ik) :: currtime(8)    ! for printing analysis date/time
       REAL(dk), ALLOCATABLE :: lcoords(:,:)   ! for computing element area
       INTEGER(ik) :: ierr   ! for check allocation status
 !
@@ -200,41 +201,32 @@
       OPEN(ele,     FILE=fpath(1:LEN(fpath)-1)//".ele")
       OPEN(bel,     FILE=fpath(1:LEN(fpath)-1)//".bel")
 !
-!     open and clean output file units
-      OPEN(output,  FILE=fpath(1:LEN(fpath)-1)//".out");  REWIND(output)
-      OPEN(his,     FILE=fpath(1:LEN(fpath)-1)//".his");  REWIND(his);
+!     open unit for displaying error messages
+      OPEN(ermsg,   FILE=fpath(1:LEN(fpath)-1)//".ERR")
+!
 !
 !     *********************************
 !     ********* CONTROL DATA **********
 !     *********************************
       REAL(phs,*) NPHASE        ! # of analysis phases
       ALLOCATE( BEGPHS(NPHASE), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating BEGPHS."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating BEGPHS."
       ALLOCATE( RESET(NPHASE),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating RESET."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating RESET."
       ALLOCATE( NSTEP(NPHASE),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NSTEP."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating NSTEP."
       ALLOCATE( NITER(NPHASE),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NITER."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating NITER."
       ALLOCATE( NPRINT(NPHASE), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NPRINT."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating NPRINT."
       ALLOCATE( GFACT(NPHASE,   STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GFACT."
-      ALLOCATE( NNET(NPHASE), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NNET."
-      ALLOCATE( LBAND(NPHASE), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating LBAND."
-      ALLOCATE( HBW(NPHASE), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating HBW."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating GFACT."
       BEGPHS(:) = 0
       RESET(:)  = 0
       NSTEP(:)  = 0
       NITER(:)  = 0
       NPRINT(:) = 0
       GFACT(:)  = 0.0D0
-      NNET(:)   = 0
-      LBAND(:)  = 0
-      HBW(:)    = 0
       DO i = 1,NPHASE
         READ(phs,*) j, BEGPHS(i), RESET(i),
      +                  NSTEP(i), NITER(i), NPRINT(i), GFACT(i)
@@ -246,17 +238,17 @@
 !
       READ(mtl,*) NMTL          ! # of materials
       ALLOCATE( GRR(NMTL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GRR."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating GRR."
       ALLOCATE( PHI(NMTL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PHI."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating PHI."
       ALLOCATE( COH(NMTL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating COH."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating COH."
       ALLOCATE( PSI(NMTL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PSI."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating PSI."
       ALLOCATE( EMOD(NMTL), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EMOD."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating EMOD."
       ALLOCATE( NU(NMTL),   STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating NU."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating NU."
       GRR(:)    = 0.0D0
       PHI(:)    = 0.0D0
       COH(:)    = 0.0D0
@@ -264,21 +256,22 @@
       EMOD(:)   = 0.0D0
       NU(:)     = 0.0D0
 !
-      READ(nod,*) NNOD, NDIM, NVAR, IPRINT,   ! # nodes, # dimensions, # dofs/node, print node
+      READ(nod,*) NNOD, NDIM, NVAR, IPRINT   ! # nodes, # dimensions, # dofs/node, print node
+      NTOT = NVAR*NNOD
       ALLOCATE( COORDS(NDIM,NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating COORDS."
-      ALLOCATE( PLOAD(NVAR*NPHASE,NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating PLOADS."
-      ALLOCATE( IX(NNOD*NVAR,NPHASE),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating IX."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating COORDS."
+      ALLOCATE( PLOAD(NTOT,NPHASE),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating PLOAD."
+      ALLOCATE( IX(NTOT,NPHASE),  STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating IX."
       ALLOCATE( EVOL(NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOL."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating EVOL."
       ALLOCATE( EVOL0(NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOL0."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating EVOL0."
       ALLOCATE( EVOLi(NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOLi."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating EVOLi."
       ALLOCATE( DIA(NNOD), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating DIA."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating DIA."
       COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
       PLOADS(:,:)   = 0.0D0
       IX(:,:)       = 0
@@ -291,29 +284,29 @@
       NVEL = NVAR*NNODEL          ! compute #dofs/element
       NNN = NNODEL+NPHASE         ! compute #nodes + mtl type/element (per phase)
       ALLOCATE( LJ(NVEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating LJ."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating LJ."
       ALLOCATE( ICO(NNN,NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ICO."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating ICO."
       ALLOCATE( AREA(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating AREA."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating AREA."
       ALLOCATE( CENT(NDIM,NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating CENT."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating CENT."
       ALLOCATE( IPL(NEL), STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating IPL."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating IPL."
       ALLOCATE( EVOLB(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating EVOLB."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating EVOLB."
       ALLOCATE( SXX(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SXX."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating SXX."
       ALLOCATE( SYY(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SYY."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating SYY."
       ALLOCATE( SXY(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SXY."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating SXY."
       ALLOCATE( SZZ(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating SZZ."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating SZZ."
       ALLOCATE( FBAR(NEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating FBAR."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating FBAR."
       ALLOCATE( lcoords(NDIM,NNODEL),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating lcoords."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating lcoords."
       LJ(:)         = 0                     ! alloc and init element data storage
       ICO(:,:)      = 0
       AREA(:)       = 0.0D0
@@ -330,31 +323,15 @@
       READ(bel,*) NELT, NNODELT     ! # traction elements, # nodes/traction element
       NVELT = NVAR*NNODELT    ! compute # dofs per traction element
       ALLOCATE( ICOT(NNODELT,NELT),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ICOT."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating ICOT."
       ALLOCATE( TNF(NNODELT*NPHASE,NELT),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TNF."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating TNF."
       ALLOCATE( TSF(NNODELT*NPHASE,NELT),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TSF."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating TSF."
       ICOT(:,:) = 0                     ! alloc and init traction data storage
       TNF(:,:)  = 0.0D0
       TSF(:,:)  = 0.0D0
 !
-!     write output file headers
-      CALL DATE_AND_TIME(VALUES=currtime)
-      WRITE(output,100)     NNODEL,
-     +                      fpath(1:LEN(fpath)-1),
-     +                      currtime(2), currtime(3), currtime(1),
-     +                      currtime(5:8)
-      WRITE(his,100)        NNODEL,
-     +                      fpath(1:LEN(fpath)-1),
-     +                      currtime(2), currtime(3), currtime(1),
-     +                      currtime(5:8)
-!
-!     write control data to output file
-      WRITE(output,101) ANTYPE, NMTL, NNOD, NDIM, NVAR,
-     +                  NEL, NNODEL, NVEL, NELT, NNODELT, NVELT
-!     +                  NSTEP, NITER, NPRINT, IPRINT,
-!     +                  LFACT, GFACT
 !
 !     *********************************
 !     ********* MATERIAL DATA *********
@@ -362,43 +339,25 @@
       WRITE(output,140)   ! material data header
       DO i = 1,NMTL
         READ(mtl,*) GRR(i), PHI(i), COH(i), PSI(i), EMOD(i), NU(i)    ! get data from file
-        WRITE(output,141) i, GRR(i), PHI(i), COH(i),
-     +                    PSI(i), EMOD(i), NU(i)
-        
+!
         IF (COH(i) .LT. 1.0D-8) COH(i) = 1.0D-8   ! ensure small cohesion for numerical stability
         COH(i) = COH(i)*COS(degTOrad*PHI(i))
         PHI(i) = SIN(degTOrad*PHI(i))             ! pre-calculate trig functions of material props
         PSI(i) = SIN(degTOrad*PSI(i))
-        
       END DO
 !
 !     *********************************
 !     *********** NODE DATA ***********
 !     *********************************
-!      WRITE(output,110);  WRITE(output,111) ! node data headers
+      WRITE(output,110);  WRITE(output,111) ! node data headers
       DO i = 1,NNOD
         i2 = NVAR*i     ! indices for fixity/node numbering vector
         i1 = i2-1
         READ(nod,*) j,
      +              COORDS(:,i),    ! node locations
      +              IX(i1:i2,:),      ! fixity data
-     +              PLOAD(:,i)     ! point load data
+     +              PLOAD(i1:i2,:)     ! point load data
       END DO
-      ntot = NVAR*NNOD;     ! compute total possible dofs
-      NNET(:) = 0              ! initialize actual total dofs
-      DO j = 1,NPHASE   ! loop through analysis phases
-        DO i = 1,ntot     ! loop through possible dofs
-          IF (IX(i,j) .GT. 0) THEN  ! if the dof is not fixed
-              NNET(j) = NNET(j)+1   ! increment actual total dofs
-              IX(i,j) = NNET(j)    ! label the node
-          END IF
-        END DO
-      END DO
-!      DO i = 1,NNOD
-!        i2 = NVAR*i     ! indices for fixity/node numbering vector
-!        i1 = i2-1
-!        WRITE(output,112) i, COORDS(:,i), IX(i1:i2), PLOAD(:,i)
-!      END DO
 !
 !     *********************************
 !     ********* ELEMENT DATA **********
@@ -419,43 +378,12 @@
         DO j = 1,NDIM
           CENT(j,i) = SUM(lcoords(j,:))/NNODEL    ! compute element centroid
         END DO
-!        WRITE(output,122) i, ICO(:,i), AREA(i), CENT(:,i)
       END DO
       DEALLOCATE(lcoords, STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(output,*) "Error in deallocating lcoords."
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in deallocating lcoords."
 !
-      CALL BANDWH()     ! compute number of codiagonal bands
-!      WRITE(output,130) 
-!      WRITE(output,131) NNET, LBAND ! write stiffness matrix stats to output
-!      ALLOCATE( TLOAD(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TLOAD."
-!      ALLOCATE( GLOAD(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD."
-!      ALLOCATE( STRC(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating STRC."
-!      ALLOCATE( STRP(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating STRC."
-!      ALLOCATE( GLOAD0(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD0."
-!      ALLOCATE( DISP(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating DISP."
-!      ALLOCATE( TDISP(NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TDISP."
-!      ALLOCATE( GSTIF(HBW,NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GSTIF."
-!      ALLOCATE( fGSTIF(HBW,NNET),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating fGSTIF."
-!      ALLOCATE( ESTIF(NVEL,NVEL),  STAT=ierr)
-!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ESTIF."
-!      TLOAD(:)    = 0.0D0
-!      GLOAD(:)    = 0.0D0
-!      STR(:)      = 0.0D0
-!      GLOAD0(:)   = 0.0D0               ! alloc and init solution space
-!      DISP(:)     = 0.0D0
-!      TDISP(:)    = 0.0D0
-!      GSTIF(:,:)  = 0.0D0
-!      fGSTIF(:,:) = 0.0D0
-!      ESTIF(:,:)  = 0.0D0
+!     compute stiffness matrix information
+      CALL BANDWH()
 !
 !     *********************************
 !     ********* TRACTION DATA *********
@@ -543,6 +471,62 @@
 !
 !
 ! ......................................................................
+! .... ALLOCPHS ........................................................
+! ......................................................................
+!     allocate memory and open data files for current phase
+! ......................................................................
+      SUBROUTINE ALLOCPHS ()
+!
+!      ALLOCATE( TLOAD(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TLOAD."
+!      ALLOCATE( GLOAD(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD."
+!      ALLOCATE( STRC(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating STRC."
+!      ALLOCATE( STRP(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating STRC."
+!      ALLOCATE( GLOAD0(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GLOAD0."
+!      ALLOCATE( DISP(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating DISP."
+!      ALLOCATE( TDISP(NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating TDISP."
+!      ALLOCATE( GSTIF(HBW,NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating GSTIF."
+!      ALLOCATE( fGSTIF(HBW,NNET),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating fGSTIF."
+!      ALLOCATE( ESTIF(NVEL,NVEL),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(output,*) "Error in allocating ESTIF."
+!      TLOAD(:)    = 0.0D0
+!      GLOAD(:)    = 0.0D0
+!      STR(:)      = 0.0D0
+!      GLOAD0(:)   = 0.0D0               ! alloc and init solution space
+!      DISP(:)     = 0.0D0
+!      TDISP(:)    = 0.0D0
+!      GSTIF(:,:)  = 0.0D0
+!      fGSTIF(:,:) = 0.0D0
+!      ESTIF(:,:)  = 0.0D0
+!
+!
+!
+      RETURN
+!
+      END SUBROUTINE ALLOCPHS
+!
+!
+! ......................................................................
+! .... DEALLOCPHS ......................................................
+! ......................................................................
+!     deallocate memory and close data files for current phase
+! ......................................................................
+      SUBROUTINE DEALLOCPHS ()
+!
+      RETURN
+!
+      END SUBROUTINE DEALLOCPHS
+!
+!
+! ......................................................................
 ! .... CLEANUP .........................................................
 ! ......................................................................
 !     deallocate memory, rewind data units, close data files
@@ -592,13 +576,31 @@
       IMPLICIT NONE
 !
       INTEGER :: lmin, lmax     ! connectivity stats
-      INTEGER :: i,j,k, iphs          ! loop variables      
+      INTEGER :: i,j,k          ! loop variables      
       INTEGER :: k1, lbcurr     ! begin index, current band
+!
+!     allocate memory for stiffness matrix information
+      ALLOCATE( NNET(NPHASE), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating NNET."
+      ALLOCATE( HBW(NPHASE), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating HBW."
+      ALLOCATE( LBAND(NPHASE), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(ermsg,*) "Error in allocating LBAND."
+!
+      NNET(:) = 0              ! initialize actual total dofs
+      DO j = 1,NPHASE   ! loop through analysis phases
+        DO i = 1,NTOT     ! loop through possible dofs
+          IF (IX(i,j) .GT. 0) THEN  ! if the dof is not fixed
+              NNET(j) = NNET(j)+1   ! increment actual total dofs
+              IX(i,j) = NNET(j)    ! label the node
+          END IF
+        END DO
+      END DO
 !
 !     initialize bandwidth
       LBAND(:) = 0
 !
-      DO iphs = 1,NPHASE
+      DO iphase = 1,NPHASE
 !
 !$OMP PARALLEL PRIVATE(lmin,lmax,j,k,k1,lbcurr)
 !$OMP DO
@@ -609,7 +611,7 @@
           DO k = 1,NNODEL ! nodes per element
 !
             k1 = (k-1)*NVAR ! initial index
-            LJ(j+k1) = IX(NVAR*ICO(k,i)-NVAR+j, iphs) ! get global node number
+            LJ(j+k1) = IX(NVAR*ICO(k,i)-NVAR+j, iphase) ! get global node number
 !
           END DO
         END DO
@@ -631,13 +633,13 @@
 !
         lbcurr = lmax-lmin
 !$OMP ATOMIC    ! only one thread may update at a time
-        IF (lbcurr .GT. LBAND(iphs)) LBAND(iphs) = lbcurr
+        IF (lbcurr .GT. LBAND(iphase)) LBAND(iphase) = lbcurr
 !
       END DO
 !$OMP END DO
 !$OMP END PARALLEL
 !
-      HBW(iphs) = LBAND(iphs)+1
+      HBW(iphase) = LBAND(iphase)+1
 !
       END DO
 !
@@ -819,6 +821,110 @@
       RETURN
 !
       END SUBROUTINE GLOLOC
+!
+!
+! ......................................................................
+! .... INITOP ..........................................................
+! ......................................................................
+!     initialize output files
+! ......................................................................
+      SUBROUTINE INITOP (fpath)
+!
+      IMPLICIT NONE
+!
+      CHARACTER*(*), INTENT(IN) :: fpath        ! input file path
+      INTEGER(ik) :: currtime(8)    ! for printing analysis date/time
+      CHARACTER(LEN=3) :: phsnum   ! string denoting phase number
+!
+!     write phase number to string
+      WRITE(phsnum,"I3.3") iphase
+!
+!     open output files
+      OPEN(output,  FILE=fpath(1:LEN(fpath)-1)//".OP"//phsnum)
+      OPEN(his,     FILE=fpath(1:LEN(fpath)-1)//".HS"//phsnum)
+      OPEN(ld,      FILE=fpath(1:LEN(fpath)-1)//".LD"//phsnum)
+      OPEN(uv,      FILE=fpath(1:LEN(fpath)-1)//".UV"//phsnum)
+      OPEN(st,      FILE=fpath(1:LEN(fpath)-1)//".ST"//phsnum)
+!
+!     write output file headers
+      CALL DATE_AND_TIME(VALUES=currtime)
+      WRITE(output,100)     NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+      WRITE(his,100)        NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+      WRITE(ld,100)         NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+      WRITE(uv,100)         NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+      WRITE(st,100)         NNODEL,
+     +                      fpath(1:LEN(fpath)-1),
+     +                      currtime(2), currtime(3), currtime(1),
+     +                      currtime(5:8)
+!
+!     write control data to output file
+      WRITE(output,101) ANTYPE, NMTL, NNOD, NDIM, NVAR,
+     +                  NEL, NNODEL, NVEL, NELT, NNODELT, NVELT
+     +                  NSTEP(iphase), NITER(iphase), NPRINT(iphase),
+     +                  IPRINT, GFACT(iphase)
+!
+!
+!     *********************************
+!     ********* MATERIAL DATA *********
+!     *********************************
+      WRITE(output,140)   ! material data header
+      DO i = 1,NMTL
+        WRITE(output,141) i, GRR(i),
+     +                    ASIN(PHI(i))*radTOdeg,
+     +                    COH(i)/COS(ASIN(PHI(i))),
+     +                    ASIN(PSI(i))*radTOdeg,
+     +                    EMOD(i), NU(i)
+      END DO
+!
+!
+!     *********************************
+!     *********** NODE DATA ***********
+!     *********************************
+      WRITE(output,110);  WRITE(output,111) ! node data headers
+      DO i = 1,NNOD
+        i2 = NVAR*i     ! indices for fixity/node numbering vector
+        i1 = i2-1
+        WRITE(output,112) i,
+     +                    COORDS(:,i),
+     +                    IX(i1:i2, iphase),
+     +                    PLOAD(i1:i2, iphase)
+      END DO
+!
+!
+!     *********************************
+!     ********* ELEMENT DATA **********
+!     *********************************
+      WRITE(output,120);  WRITE(output,121) ! element data headers
+      DO i = 1,NEL
+        WRITE(output,122) i, ICO(:,i), AREA(i), CENT(:,i)
+      END DO
+      WRITE(output,130) 
+      WRITE(output,131) NNET(iphase), LBAND(iphase) ! write stiffness matrix stats to output
+!
+!
+!     *********************************
+!     ********* TRACTION DATA *********
+!     *********************************
+      WRITE(output,150);  WRITE(output,151) ! traction element headers
+      DO i = 1,NELT
+        WRITE(output,152) i, ICOT(:,i), TNF(:,i), TSF(:,i)
+      END DO
+!
+      RETURN
+!
+      END SUBROUTINE INITOP
 !
 !
 ! ......................................................................
@@ -1785,6 +1891,7 @@
 ! **** MAIN PROGRAM ****************************************************
 ! **********************************************************************
 !     Non-Linear Finite Element Analysis
+!     Multiple Analysis Phases (e.g. staged construction, load stepping)
 !     3-Noded Triangular Body Elements (Linear Interpolation)
 !     2-Noded Linear Traction Elements (Linear Interpolation)
 !     Mohr-Coulomb Failure Criterion (Linear Elastic, Perfectly Plastic)
@@ -1806,45 +1913,9 @@
      +          " (MOHR-COULOMB FAILURE CRITERION)"
       CALL INPUT(fpath)     ! initialize data in GCONTROL
 !
-!     set up load vectors (gravity and traction)
-      CALL LOAD(GLOAD, TLOAD)
+      DO iphase = 1,NPHASE      ! loop through analysis phases
 !
-!     form and decompose global stiffness matrix
-      CALL STFMAT(GSTIF, rerr)
-      IF (rerr .NE. 0) THEN
-        CALL CLEANUP()
-        RETURN
-      END IF
-!
-!     solve gravity loading
-      IF (GFACT .GT. 0.0D0) THEN
-        WRITE(nod,10)
-        WRITE(ele,10)
-        WRITE(output,10)
-        WRITE(his,10)
-   10   FORMAT(///,"=============== GRAVITY LOADING ===============",/)
-        GLOAD(:) = GFACT*GLOAD(:)
-        CALL FEASLV(GLOAD, GLOAD0, gfact, rerr)
-        IF (rerr .NE. 0) THEN
-          CALL CLEANUP()
-          RETURN
-        END IF
-      END IF
-!
-!     solve traction loading
-      IF (LFACT .GT. 0.0D0) THEN
-        WRITE(nod,20)
-        WRITE(ele,20)
-        WRITE(output,20)
-        WRITE(his,20)
-   20   FORMAT(///,"============== TRACTION LOADING ===============",/)
-        TLOAD(:) = LFACT*TLOAD(:)
-        CALL FEASLV(TLOAD, GLOAD, lfact, rerr)
-        IF (rerr .NE. 0) THEN
-          CALL CLEANUP()
-          RETURN
-        END IF
-      END IF
+      END DO      ! END analysis phases
 !
       CALL CLEANUP()
 !
