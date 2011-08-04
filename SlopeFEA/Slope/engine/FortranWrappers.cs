@@ -36,7 +36,7 @@ namespace SlopeFEA
         [DllImport( "DLLtest.dll" , CallingConvention = CallingConvention.Cdecl )]
         public static extern void dlltest_ ( string fname , int strLen );
 
-        [DllImport( "SlopeFEA3Node.dll" , CallingConvention = CallingConvention.Cdecl )]
+        [DllImport( "SlopeFEA3NodeMultiPhase.dll" , CallingConvention = CallingConvention.Cdecl )]
         public static extern void slopefea3node_ ( string fpath , int len );
 
         [DllImport( "SlopeFEA4Node.dll" , CallingConvention = CallingConvention.Cdecl )]

@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from SlopeFEA3Node.for on Mon Jun 27 13:10:05 2011
-MD5:75802c0fee1ec7a20ace145461a9a189 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from SlopeFEA3NodeMultiPhase.for on Thu Aug 04 14:12:45 2011
+MD5:4dde74797f1ec990295128928e3bc0c2 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -49,20 +49,30 @@ CONSTANT (REAL 8 0 0 REAL ()) 0 '0.55555555555554@0') () 0 () () () 0 0)
 13 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0
 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
-14 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-2 DEFERRED () () () ()) 0 () () () 0 0)
-15 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+14 'radtodeg' 'numeric' 'radtodeg' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
+CONSTANT (REAL 8 0 0 REAL ()) 0 '0.394bb81a079e4c@2') () 0 () () () 0 0)
+15 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
+DEFERRED () () () ()) 0 () () () 0 0)
+16 'tnfc' 'tractions' 'tnfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
+DEFERRED () () () ()) 0 () () () 0 0)
+17 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
-0 0 REAL ()) 0 '0.2af31dc0000000@-6') () 0 () () () 0 0)
-16 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
+0 0 REAL ()) 0 '0.1ad7f2a0000000@-5') () 0 () () () 0 0)
+18 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
 () () () 0 0)
-17 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
-2 DEFERRED () () () ()) 0 () () () 0 0)
+19 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
+DEFERRED () () () ()) 0 () () () 0 0)
+20 'tsfc' 'tractions' 'tsfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
+DEFERRED () () () ()) 0 () () () 0 0)
 )
 
 ('__convert_r4_r8' 0 2 'degtorad' 0 3 'dk' 0 4 'icot' 0 5 'ik' 0 6 'kind'
 0 7 'nelt' 0 8 'nnodelt' 0 9 'numeric' 0 10 'nvelt' 0 11 'one_third' 0
-12 'pi' 0 13 'tnf' 0 14 'toler' 0 15 'tractions' 0 16 'tsf' 0 17)
+12 'pi' 0 13 'radtodeg' 0 14 'tnf' 0 15 'tnfc' 0 16 'toler' 0 17
+'tractions' 0 18 'tsf' 0 19 'tsfc' 0 20)

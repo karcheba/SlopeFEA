@@ -1026,6 +1026,26 @@ namespace SlopeFEA
 
 
             // **********************************************
+            // for each analysis phase, find nodes that are
+            // only attached to elements with NULL material
+            // and ensure their fixities are true
+            // **********************************************
+            MaterialType nullMaterial = canvas.MaterialTypes.Find( delegate( MaterialType mt ) { return mt.Name == "NULL"; } );
+            foreach ( feNode node in nodes )
+            {
+                for ( int i = 0 ; i < node.PhaseFixedX.Count ; i++ )
+                {
+                    if ( elements.Find( delegate( fe4NodedQuadElement el ) { return el.Nodes.Contains( node ) && el.PhaseMaterials[i] != nullMaterial; } )
+                        == null )
+                    {
+                        node.PhaseFixedX[i] = true;
+                        node.PhaseFixedY[i] = true;
+                    }
+                }
+            }
+
+
+            // **********************************************
             // sort boundary elements by number and eliminate
             // gaps in numbering
             // **********************************************

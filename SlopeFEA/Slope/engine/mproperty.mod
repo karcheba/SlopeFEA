@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from SlopeFEA3Node.for on Mon Jun 27 13:10:05 2011
-MD5:878687e96365c69f48a2aa0e3b2ffb0c -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from SlopeFEA3NodeMultiPhase.for on Thu Aug 04 14:12:45 2011
+MD5:d1f12ea3283d42488bab6cca3b694fc6 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -61,11 +61,15 @@ REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
 17 'psi' 'mproperty' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-18 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+18 'radtodeg' 'numeric' 'radtodeg' 1 ((PARAMETER UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
+CONSTANT (REAL 8 0 0 REAL ()) 0 '0.394bb81a079e4c@2') () 0 () () () 0 0)
+19 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
-0 0 REAL ()) 0 '0.2af31dc0000000@-6') () 0 () () () 0 0)
+0 0 REAL ()) 0 '0.1ad7f2a0000000@-5') () 0 () () () 0 0)
 )
 
 ('__convert_r4_r8' 0 2 'coh' 0 3 'degtorad' 0 4 'dk' 0 5 'emod' 0 6 'grr'
 0 7 'ik' 0 8 'kind' 0 9 'mproperty' 0 10 'nmtl' 0 11 'nu' 0 12 'numeric'
-0 13 'one_third' 0 14 'phi' 0 15 'pi' 0 16 'psi' 0 17 'toler' 0 18)
+0 13 'one_third' 0 14 'phi' 0 15 'pi' 0 16 'psi' 0 17 'radtodeg' 0 18
+'toler' 0 19)

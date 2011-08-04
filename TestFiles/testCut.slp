@@ -75,7 +75,7 @@ Number of Boundary Points = 4
 21, 20, False, False, False
 50, 20, True, False, False
 50, 22, True, False, False
-17, 22, False, False, False
+17, 22, False, False, True
 Number of Line Constraints = 1
 1, 2, True, False
 Number of Line Loads = 0
@@ -127,7 +127,7 @@ Number of Boundary Points = 10
 31, 15, False, False, False
 27, 17, False, False, False
 21, 20, False, False, False
-17, 22, False, False, False
+17, 22, False, False, True
 9.99999999999998, 22, False, False, False
 6, 22, False, False, False
 0, 22, True, False, False
@@ -177,7 +177,7 @@ ANALYSIS STATUS
 Analysis Type = FEA3NodedTri
 Verified = True
 Meshed = True
-Analyzed = False
+Analyzed = True
 
 
 --------------------------------
@@ -191,8 +191,8 @@ Name = "initial"
 Begin Phase = "NULL"
 Reset Displacements="True"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 sand
@@ -249,8 +249,8 @@ Name = "first lift"
 Begin Phase = "initial"
 Reset Displacements="True"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 NULL
@@ -307,8 +307,8 @@ Name = "first lift, loaded"
 Begin Phase = "first lift"
 Reset Displacements="False"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 NULL
@@ -365,8 +365,8 @@ Name = "second lift"
 Begin Phase = "first lift"
 Reset Displacements="False"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 NULL
@@ -423,8 +423,8 @@ Name = "third lift"
 Begin Phase = "second lift"
 Reset Displacements="False"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 NULL
@@ -481,8 +481,8 @@ Name = "final"
 Begin Phase = "third lift"
 Reset Displacements="False"
 Number of Load Steps = 10
-Number of Iterations = 200
-Number of Load Steps / Print Line = 2
+Number of Iterations = 400
+Number of Load Steps / Print Line = 1
 Gravity Factor = 1
 Material Block #1
 NULL

@@ -510,3 +510,34 @@ REVISION HISTORY:
                     - Hid options for stability analysis since the code for these aspects may require updating given the modifications toward FEA analysis
     
     Requires:   - Updates to analysis code (all listed above)
+    
+
+[16 July - 4 August 2011]
+
+{v1.0.0.15}
+=== Working on analysis code (SlopeFEA3NodeMultiPhase.for) modifications to account for analysis phases
+    Additions:  - Mesh generator
+                    (MeshGen.cs)
+                    - Added a loop to search for nodes attached only to elements with NULL material for each phase; fixities set to TRUE in this case so that a dof is not assigned in the analysis code
+                
+                - SlopeFEA3NodeMultiPhase.for
+                    - Changed structures that will contain information in input files to POINTER arrays as opposed to ALLOCATABLE arrays as appropriate
+                    - Added POINTER array structures that will point to appropriate analysis phase data (ending in C = current, ending in P = previous)
+                    - Modified INPUT() so that it only allocates structures that will be fixed throughout the program; also INPUT() no longer writes anything
+                    - Modified BANDWH() to calculate NNET, LBAND, and HBW for all phases
+                    - Added ALLOCPHS() and DEALLOCPHS() to manage data and files that will change depending on the analysis phase including allocations and loading of previous phase state
+                    - Added INITOP() to initialize writing to output files; this handles writing formerly performed by INPUT() as well as some additional features related to inter-phase data exchange
+                    - Modified LOAD(), STFMAT(), FEASLV(), UPDATE(), VOLSTR(), and some others with appropriate variable names (note: the logic is essentially the same as before for these since the pre-processing in INPUT(), ALLOCPHS(), and INITOP() as well as post-processing in OUTPUT() takes care of the majority of the bookkeeping details; however, there were some variable name changes that needed to be updated)
+                    - Modified OUTPUT() and SMOOTH() to account for multi-phase information; some of the output data has been moved to different files
+                    - The program now produces output for each phase in the following files (*** = 3 digit analysis phase number code left-padded with 0s):
+                        .OP*** - "output" file; contains general input information, stiffness matrix statistics, node displacements, and element stresses
+                        .HS*** - "history" file; contains load stepping / iteration history
+                        .LD*** - "load" file; stores load vector for inter-phase data exchange
+                        .ST*** - "stress" file; stores stress vector and element stresses for inter-phase data exchange
+                        .UV*** - "displacement" file; stores displacement/solution vector for inter-phase data exchange
+                        .EL*** - "element" file; stores element output formerly placed at the end of the .ele input file
+                        .ND*** - "node" file; stores node output formerly placed at the end of the .nod input file
+    
+    Requires:   - After some preliminary testing the code runs and provides a solution to phase 1; there appears to be an issue with loading up previous phase data causing NaNs in the results for subsequent phases
+                - More testing and debugging is required, but the majority of this component is complete
+                - Updates to plotting functions / window

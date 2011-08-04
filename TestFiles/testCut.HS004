@@ -1,0 +1,23 @@
+
+====================================================
+      3-NODED FINITE ELEMENT STRESS ANALYSIS
+====================================================
+
+FILE: Q:\Research\2010-2011\SlopeFEA\TestFiles\testCut
+DATE:  8/ 4/2011
+TIME: 14:15:41. 27
+
+
+
+   STEP   ITER NPLAST   NTEN  NFBAR       ERROR      FACTOR      D
+
+      1      1      0      0      0           NaN  0.1000E+00         NaN
+      2      1      0      0      0           NaN  0.2000E+00         NaN
+      3      1      0      0      0           NaN  0.3000E+00         NaN
+      4      1      0      0      0           NaN  0.4000E+00         NaN
+      5      1      0      0      0           NaN  0.5000E+00         NaN
+      6      1      0      0      0           NaN  0.6000E+00         NaN
+      7      1      0      0      0           NaN  0.7000E+00         NaN
+      8      1      0      0      0           NaN  0.8000E+00         NaN
+      9      1      0      0      0           NaN  0.9000E+00         NaN
+     10      1      0      0      0           NaN  0.1000E+01         NaN
