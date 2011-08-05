@@ -717,7 +717,7 @@
       END DO
 !
 !
-!     write results to ERR file (testing
+!     write results to ERR file (testing)
       WRITE(er,*) NNET(:)
       WRITE(er,*) LBAND(:)
       WRITE(er,*) HBW(:)
@@ -1307,6 +1307,7 @@
 !     gravity loads
       DO iel = 1,NEL  ! body elements
         CALL LOCAL(iel, lcoords, mtype)   ! get coords and material of element
+        IF (mtype .EQ. 0) CYCLE   ! skip if element is inactive
         eload(:) = 0.0D0                  ! initialize element load vec
         eload(2:NVEL:NVAR) = -GRR(mtype)*AREA(iel) / NNODEL ! distribute grav load
         CALL MAPLD(GLOADC, eload, NVEL)    ! insert into global load vec
@@ -1757,7 +1758,9 @@
 !     iterate to reduce "???LUMPING???"
       EVOL0(:) = EVOL(:)
       EVOL(:) = EVOLi(:)
+      mindex = NNODEL+IPHASE
       DO iel = 1,NEL
+        IF (ICO(mindex,iel) .EQ. 0) CYCLE
         LJ(1:NNODEL) = ICO(1:NNODEL,iel)
         larea = AREA(iel) / 12.0D0
         sumEV = SUM(EVOL0(LJ(1:NNODEL)))
@@ -1767,7 +1770,6 @@
       EVOL(:) = EVOL0(:) + (EVOLi(:) - EVOL(:)) / DIA(:)
 !
 !     update global volumetric strain
-      mindex = NNODEL+IPHASE
       DO iel = 1,NEL
         IF (ICO(mindex,iel) .EQ. 0) CYCLE
         LJ(1:NNODEL) = ICO(1:NNODEL,iel)
