@@ -51,11 +51,12 @@ namespace SlopeFEA
         private List<MaterialType> materialTypes;
         private FEAParams feaParams;
         private List<MaterialBlock> substructs;
-        private List<fe3NodedTriElement> deformedTriMesh;
+        private List<fe3NodedTriElement> triElements, deformedTriMesh;
         private List<feNode> nodes , deformedNodes;
         private List<List<double>> disp;
         private List<DisplacementVector> dispVectors;
         private PlotModes plotMode;
+        private AnalysisPhase selectedPhase;
         private double maxDisp;
 
 
@@ -81,15 +82,23 @@ namespace SlopeFEA
             // Initialize list of FEA parameters
             feaParams = source.FEAParameters;
 
-            // Initialize node data
-            LoadNodeData();
-
             // Initialize mesh
             substructs = new List<MaterialBlock>();
+            nodes = new List<feNode>();
+            deformedNodes = new List<feNode>();
+            triElements = new List<fe3NodedTriElement>();
             deformedTriMesh = new List<fe3NodedTriElement>();
 
             // Initialize disp vectors
+            disp = new List<List<double>>();
             dispVectors = new List<DisplacementVector>();
+
+            // Intialize analysis phase
+            selectedPhase = source.AnalysisPhases[1];
+
+            // Load mesh
+            LoadNodeData();
+            LoadElementData();
         }
 
 
@@ -150,6 +159,19 @@ namespace SlopeFEA
                         PlotDeformedMesh();
                         break;
                 }
+            }
+        }
+
+        public AnalysisPhase SelectedPhase
+        {
+            get { return this.selectedPhase; }
+            set
+            {
+                this.selectedPhase = value;
+                LoadSubstructData();
+                LoadNodeData();
+                LoadElementData();
+                this.PlotMode = this.PlotMode;  // refresh plot
             }
         }
 
@@ -659,7 +681,8 @@ namespace SlopeFEA
                     {
                         tr.ReadLine();
 
-                        materialName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
+                        tr.ReadLine();
+                        //materialName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
@@ -674,9 +697,9 @@ namespace SlopeFEA
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                         }
 
-                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
+                        //newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
 
-                        newMaterialBlock = new MaterialBlock( this , newMaterialType , materialBoundPoints );
+                        newMaterialBlock = new MaterialBlock( this , null , materialBoundPoints );
 
                         numLineConstraints = int.Parse( tr.ReadLine().Split( '=' )[1] );
                         for ( int j = 0 ; j < numLineConstraints ; j++ ) tr.ReadLine();
@@ -691,6 +714,25 @@ namespace SlopeFEA
 
                         tr.ReadLine();
                     }
+
+
+                    // advance to phase data
+                    while ( !tr.ReadLine().Contains( "ANALYSIS PHASES" ) ) ;
+                    int phaseNum = SelectedPhase.Number;
+                    string phaseHeader = string.Format( "Phase #{0}" , phaseNum );
+                    while ( !tr.ReadLine().Contains( phaseHeader ) ) ;
+                    while ( !tr.ReadLine().Contains( "Material Block #" ) ) ;
+                    
+                    // get material type info
+                    string line;
+                    for ( int i = 0 ; i < numMaterialBlocks ; i++ )
+                    {
+                        materialName = tr.ReadLine();
+                        newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
+                        substructs[i].Material = newMaterialType;
+
+                        while ( (line = tr.ReadLine()) != null ) if ( line.Contains( "Material Block #" ) ) break;
+                    }
                 }
             }
         }
@@ -703,8 +745,11 @@ namespace SlopeFEA
         {
             string[] pathSplit = FilePath.Split( '.' );
 
+            string phaseNum = SelectedPhase.Number.ToString();
+            while ( phaseNum.Length < 3 ) phaseNum = "0" + phaseNum;
+
             // Find node file
-            pathSplit[1] = "nod";
+            pathSplit[1] = "ND" + phaseNum;
             string nodePath = string.Join( "." , pathSplit );
             if ( !File.Exists( nodePath ) )
             {
@@ -715,30 +760,34 @@ namespace SlopeFEA
             // Load node data from file
             // N.B.: nodes list is initialized with a null to 
             //          account for 1 based indexing in Fortran
-            nodes = new List<feNode>() { null };
-            disp = new List<List<double>>() { null };
+            nodes.Clear(); nodes.Add( null );
+            disp.Clear(); disp.Add( null );
             maxDisp = 0.0;
             double currDisp;
             int numPhases = source.AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( nodePath ) )
             {
-                int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
+                //int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
 
-                // advance to line containing "GRAVITY LOADING" header
-                while ( !tr.ReadLine().Contains( "GRAVITY LOADING" ) ) ;
+                // advance to line containing data
+                tr.ReadLine();  //
+                tr.ReadLine();  //
+                tr.ReadLine();  // INOD         COORDS (X,Y...) ....
+                tr.ReadLine();  //
 
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-                tr.ReadLine();
-
+                string line;
                 string[] lineSplit;
-                for ( int i = 1 ; i <= nnod ; i++ )
+                int inod;
+                //for ( int i = 1 ; i <= nnod ; i++ )
+                //{
+                while ( (line = tr.ReadLine() ) != null )
                 {
-                    lineSplit = tr.ReadLine().Split( new char[] { ' ' } , StringSplitOptions.RemoveEmptyEntries );
+                    lineSplit = line.Split( new char[] { ' ' , '\t' } , StringSplitOptions.RemoveEmptyEntries );
 
-                    nodes.Add( new feNode( int.Parse( lineSplit[0] ) , false ,
+                    if ( lineSplit[0][0] == '#' ) continue;     // skip comment lines
+
+                    inod = int.Parse( lineSplit[0] );
+                    nodes.Add( new feNode( inod , false ,
                                             double.Parse( lineSplit[1] ) ,
                                             double.Parse( lineSplit[2] ) ,
                                             numPhases ) );
@@ -746,8 +795,63 @@ namespace SlopeFEA
                     disp.Add( new List<double>(){   double.Parse(lineSplit[3]),
                                                     double.Parse(lineSplit[4])} );
 
-                    currDisp = Math.Sqrt( Math.Pow( disp[i][0] , 2 ) + Math.Pow( disp[i][1] , 2 ) );
+                    currDisp = Math.Sqrt( Math.Pow( disp[inod][0] , 2 ) + Math.Pow( disp[inod][1] , 2 ) );
                     if ( currDisp > maxDisp ) maxDisp = currDisp;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Gets element data from output file
+        /// </summary>
+        public void LoadElementData ()
+        {
+            string[] pathSplit = FilePath.Split( '.' );
+
+            string phaseNum = SelectedPhase.Number.ToString();
+            while ( phaseNum.Length < 3 ) phaseNum = "0" + phaseNum;
+
+            // Find node file
+            pathSplit[1] = "EL" + phaseNum;
+            string elementPath = string.Join( "." , pathSplit );
+            if ( !File.Exists( elementPath ) )
+            {
+                MessageBox.Show( "Could not find element data file." , "Error" );
+                return;
+            }
+
+            // Load element data from file
+            triElements.Clear();
+            int numPhases = source.AnalysisPhases.Count - 1;
+            using ( TextReader tr = new StreamReader( elementPath ) )
+            {
+                //int nel = int.Parse( tr.ReadLine().Split( '\t' )[0] );
+
+                // advance to line containing data
+                tr.ReadLine();  //
+                tr.ReadLine();  //
+                tr.ReadLine();  // IEL         ICO ....
+                tr.ReadLine();  //
+
+                string line;
+                string[] lineSplit;
+                int materialIndex;
+                //for ( int i = 0 ; i < nel ; i++ )
+                //{
+                while ( (line = tr.ReadLine()) != null )
+                {
+                    lineSplit = line.Split( new char[] { ' ' , '\t' } , StringSplitOptions.RemoveEmptyEntries );
+
+                    if ( lineSplit[0][0] == '#' ) continue;     // skip comment lines
+
+                    materialIndex = int.Parse( lineSplit[4] ) - 1;
+                    triElements.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
+                        nodes[int.Parse( lineSplit[1] )] ,
+                        nodes[int.Parse( lineSplit[2] )] ,
+                        nodes[int.Parse( lineSplit[3] )] ,
+                        materialIndex >= 0 ? materialTypes[materialIndex] : null ,
+                        false ) );
                 }
             }
         }
@@ -786,44 +890,11 @@ namespace SlopeFEA
             Polygon newPolygon;
             double x , y;
 
-            // on first call (from constructor) read from file
-            if ( deformedTriMesh.Count == 0 )
-            {
-                string[] pathSplit = FilePath.Split( '.' );
-
-                // Find element file
-                pathSplit[1] = "ele";
-                string elementPath = string.Join( "." , pathSplit );
-                if ( !File.Exists( elementPath ) )
-                {
-                    MessageBox.Show( "Could not find element data file." , "Error" );
-                    return;
-                }
-
-                string[] lineSplit;
-                using ( TextReader tr = new StreamReader( elementPath ) )
-                {
-                    int nel = int.Parse( tr.ReadLine().Split( '\t' )[0] );
-
-                    for ( int i = 0 ; i < nel ; i++ )
-                    {
-                        lineSplit = tr.ReadLine().Split( '\t' );
-
-                        deformedTriMesh.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
-                            nodes[int.Parse( lineSplit[1] )] ,
-                            nodes[int.Parse( lineSplit[2] )] ,
-                            nodes[int.Parse( lineSplit[3] )] ,
-                            materialTypes[int.Parse( lineSplit[4] ) - 1] ,
-                            false ) );
-                    }
-                }
-            }
-
             // compute magnification
             if ( autoMag ) Magnification = 0.25 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
 
             // compute deformed coordinates
-            deformedNodes = new List<feNode>() { null };
+            deformedNodes.Clear(); deformedNodes.Add( null );
             int numPhases = source.AnalysisPhases.Count - 1;
             for ( int i = 1 ; i < nodes.Count ; i++ )
             {
@@ -834,11 +905,16 @@ namespace SlopeFEA
             }
 
             // set mesh to deformed coords
-            deformedTriMesh.ForEach( delegate( fe3NodedTriElement element )
+            fe3NodedTriElement newElement;
+            foreach ( fe3NodedTriElement element in triElements )
             {
-                element.Nodes[0] = deformedNodes[element.Nodes[0].Number];
-                element.Nodes[1] = deformedNodes[element.Nodes[1].Number];
-                element.Nodes[2] = deformedNodes[element.Nodes[2].Number];
+                if ( element.Material == null ) continue;    // skip inactive elements
+
+                newElement = new fe3NodedTriElement( element.Number ,
+                    deformedNodes[element.Nodes[0].Number] ,
+                    deformedNodes[element.Nodes[1].Number] ,
+                    deformedNodes[element.Nodes[2].Number] ,
+                    element.Material , false );
 
                 newPolygon = new Polygon();
                 newPolygon.StrokeThickness = 0.8;
@@ -846,15 +922,17 @@ namespace SlopeFEA
                 newPolygon.Opacity = /*1.0*/ 0.8;
                 newPolygon.Fill = /*Brushes.White*/ element.Material.Fill;
 
-                foreach ( feNode node in element.Nodes )
+                foreach ( feNode node in newElement.Nodes )
                 {
                     x = node.X / (scale * factor) * dpiX + originX;
                     y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
                     newPolygon.Points.Add( new Point( x , y ) );
                 }
 
-                element.Boundary = newPolygon;
-            } );
+                newElement.Boundary = newPolygon;
+
+                deformedTriMesh.Add( newElement );
+            }
 
             // refresh plotting axes
             BuildAxes();
@@ -893,7 +971,6 @@ namespace SlopeFEA
             if ( autoMag ) Magnification = 0.5 * 0.5 * (feaParams.RowHeight + feaParams.ColWidth) / maxDisp;
 
             // plot the disp vectors
-            dispVectors = new List<DisplacementVector>();
             for ( int i = 1 ; i < nodes.Count ; i++ )
             {
                 x = nodes[i].X / (scale * factor) * dpiX + originX;
@@ -1149,7 +1226,7 @@ namespace SlopeFEA
                 yAxis = (Grid) ((Grid) this.Parent).Children[1];
                 infoBlock = (Grid) ((Grid) this.Parent).Children[2];
 
-                // Initialize substructs for plotting
+                // load substruct information for plotting
                 LoadSubstructData();
 
                 // Set plot mode and construct axes and grid

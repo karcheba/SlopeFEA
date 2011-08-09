@@ -109,6 +109,7 @@
                     <Separator/>
                     <MenuItem Header="Set Ma_gnification..." Name="setMag" Click="setMag_Click"/>
                 </MenuItem>
+                <MenuItem Header="P_hase" Name="phaseMenu"/>
             </Menu>
         </DockPanel>
     </Grid>

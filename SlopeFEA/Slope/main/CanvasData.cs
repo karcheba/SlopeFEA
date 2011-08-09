@@ -2797,7 +2797,7 @@ namespace SlopeFEA
             Boundary.StrokeLineJoin = PenLineJoin.Round;
             Boundary.StrokeStartLineCap = PenLineCap.Round;
             Boundary.StrokeEndLineCap = PenLineCap.Round;
-            Boundary.Fill = mtl.Fill;
+            //Boundary.Fill = mtl.Fill;
             Boundary.Opacity = 0.6;
             Boundary.Visibility = Visibility.Visible;
 
@@ -2806,7 +2806,7 @@ namespace SlopeFEA
                 Boundary.Points.Add( pts[i] );
             }
 
-            Material = mtl;
+            //Material = mtl;
 
             lineConstraints = new List<LineConstraint>();
             lineLoads = new List<LineLoad>();

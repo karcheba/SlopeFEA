@@ -201,6 +201,17 @@ namespace SlopeFEA
             drawingCanvas.Margin = new Thickness( axisWidth , 0 , infoBlockWidth , axisWidth + progressBarWidth );
             drawingCanvas.InitializeCanvas();
             plottingGrid.Children.Add( drawingCanvas );
+
+            // Add analysis phase information to menu
+            MenuItem phaseItem;
+            for ( int i = 1 ; i < canvas.AnalysisPhases.Count ; i++ )
+            {
+                phaseItem = new MenuItem();
+                phaseItem.Header = canvas.AnalysisPhases[i];
+                phaseItem.Click += new RoutedEventHandler( phaseItem_Click );
+                phaseMenu.Items.Add( phaseItem );
+            }
+            ((MenuItem) phaseMenu.Items[0]).IsChecked = true;
         }
 
         private void pan_Click ( object sender , RoutedEventArgs e )
@@ -651,6 +662,34 @@ namespace SlopeFEA
                         currCanvas.PlotDisplacementVectors( false );
                         break;
                 }
+            }
+        }
+
+        private void phaseItem_Click ( object sender , RoutedEventArgs e )
+        {
+            Grid plottingGrid = contentGrid.Children[1] as Grid;
+
+            SlopePlotCanvas currCanvas = null;
+            if ( plottingGrid != null )
+            {
+                currCanvas = plottingGrid.Children[3] as SlopePlotCanvas;
+            }
+            if ( currCanvas == null ) return;
+
+            for ( int i = 0 ; i < phaseMenu.Items.Count ; i++ )
+            {
+                MenuItem phase = phaseMenu.Items[i] as MenuItem;
+                if ( phase != null ) phase.IsChecked = false;
+            }
+
+            MenuItem selectedPhaseItem = sender as MenuItem;
+            if ( selectedPhaseItem != null )
+            {
+                selectedPhaseItem.IsChecked = true;
+
+                int phaseNum = int.Parse( selectedPhaseItem.Header.ToString().Split( new char[] { '(' , ')' } , StringSplitOptions.RemoveEmptyEntries )[1] );
+
+                currCanvas.SelectedPhase = canvas.AnalysisPhases[phaseNum];
             }
         }
     }

@@ -86,7 +86,7 @@
       REAL(dk), ALLOCATABLE :: COORDS(:,:)    ! grid coords
       REAL(dk), POINTER :: PLOAD(:,:)         ! point loads
       REAL(dk), POINTER :: PLOADC(:)          ! current phase point loads
-      REAL(dk), ALLOCATABLE :: EVOL(:), EVOL0(:), EVOLi(:), DIA(:)  ! for volumetric strain
+      REAL(dk), ALLOCATABLE :: EVOL(:), DIA(:)!, EVOLi(:), EVOL0(:)  ! for volumetric strain
 !
       END MODULE NODES
 !
@@ -270,19 +270,19 @@
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating IX."
       ALLOCATE( EVOL(NNOD),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOL."
-      ALLOCATE( EVOL0(NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOL0."
-      ALLOCATE( EVOLi(NNOD),  STAT=ierr)
-      IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOLi."
       ALLOCATE( DIA(NNOD), STAT=ierr)
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating DIA."
+!      ALLOCATE( EVOLi(NNOD),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOLi."
+!      ALLOCATE( EVOL0(NNOD),  STAT=ierr)
+!      IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOL0."
       COORDS(:,:)   = 0.0D0           ! alloc and init grid data storage
       PLOAD(:,:)    = 0.0D0
       IX(:,:)       = 0
       EVOL(:)       = 0.0D0
-      EVOL0(:)      = 0.0D0
-      EVOLi(:)      = 0.0D0
       DIA(:)        = 0.0D0
+!      EVOLi(:)      = 0.0D0
+!      EVOL0(:)      = 0.0D0
 !
       READ(ele,*) NEL, NNODEL     ! # body elements, # nodes per element
       NVEL = NVAR*NNODEL          ! compute #dofs/element
@@ -607,7 +607,7 @@
       DEALLOCATE( GRR, PHI, COH, PSI, EMOD, NU )
 !
 !     node data
-      DEALLOCATE( COORDS, IX, PLOAD, EVOL, EVOL0, EVOLi, DIA )
+      DEALLOCATE( COORDS, IX, PLOAD, EVOL, DIA )!, EVOLi, EVOL0 )
 !
 !     body element data
       DEALLOCATE( ICO, LJ, AREA, CENT,
@@ -1160,7 +1160,7 @@
       REAL(dk) :: p,q, d, ldisp(NVAR), larea, s1,s2, theta, st(NNODEL)
       REAL(dk), DIMENSION(NNODEL) :: eXX,eYY,eXY,eZZ,eFBAR
       REAL(dk), DIMENSION(NNOD) :: pXX,pYY,pXY,pZZ,pFBAR
-      INTEGER(ik) :: inod, iel, ivar, ii
+      INTEGER(ik) :: inod, iel, ivar, ii, mindex
 !
 !     initialize
       DIA(:) = 0.0D0
@@ -1172,9 +1172,11 @@
 !
 !     map element areas and stresses to nodes
       WRITE(el,10)   ! write results header
+      mindex = NNODEL + IPHASE
       DO iel = 1,NEL
 !
         LJ(1:NNODEL) = ICO(1:NNODEL, iel)   ! get local connectivity
+        LJ(NNODEL+1) = ICO(mindex, iel)
         larea = AREA(iel) / NNODEL          ! get local area
 !
 !       local to global mapping
@@ -1204,7 +1206,7 @@
         END IF
 !
 !       write to element data file
-        WRITE(el,11) iel, LJ(1:NNODEL),
+        WRITE(el,11) iel, LJ(1:NNODEL+1), IPL(iel),
      +                SXX(iel), SYY(iel), SXY(iel), SZZ(iel), FBAR(iel),
      +                p, q, s1, s2, theta
 !
@@ -1253,10 +1255,11 @@
 !
 !     format statements
    10 FORMAT(//,
-     +        2X, "IEL", 6X, "ICO", 18X, "SXX", 12X, "SYY", 12X, "SXY",
-     +        12X, "SZZ", 11X, "FBAR", 14X, "p", 14X, "q", 13X, "s1",
+     +        2X, "IEL", 8X, "ICO", 6X, "MTL", 2X, "IPL",
+     +        12X, "SXX", 12X, "SYY", 12X, "SXY", 12X, "SZZ",
+     +        11X, "FBAR", 14X, "p", 14X, "q", 13X, "s1",
      +        13X, "s2", 10X, "theta", /)
-   11 FORMAT(I5, 3I5, 10E15.6)
+   11 FORMAT(I5, 5I5, 10E15.6)
 !
    20 FORMAT(//,
      +        1X, "INOD", 8X, "COORDS (X,Y,..)", 16X, "DISP (U,V,..)",
@@ -1425,10 +1428,11 @@
       END DO
 !
 !     print packed stiff mat (testing)
-!      WRITE(hs,*) 'GSTIF'
-!      DO iel = 1,HBW
-!        WRITE(hs,*) GSTIF(iel,:)
-!      END DO
+      WRITE(er,*)
+      WRITE(er,*) 'GSTIF'
+      DO iel = 1,HBW(IPHASE)
+        WRITE(er,*) GSTIF(iel,:)
+      END DO
 !
 !      WRITE(hs,*)
 !
@@ -1459,9 +1463,10 @@
       END IF
 !
 !     print factored packed stiff mat (testing)
-!      WRITE(hs,*) 'fGSTIF'
-!      DO iel = 1,HBW
-!        WRITE(hs,*) fGSTIF(iel,:)
+!      WRITE(er,*)
+!      WRITE(er,*) 'fGSTIF'
+!     DO iel = 1,HBW(IPHASE)
+!        WRITE(er,*) fGSTIF(iel,:)
 !      END DO
 !
 !      WRITE(hs,*)
@@ -1549,18 +1554,18 @@
 !
       REAL(dk), INTENT(IN) :: lcoords(:,:), area  ! element coords and area
       REAL(dk), INTENT(OUT) :: B(:,:)             ! kinematic matrix
-      REAL(dk) :: invArea     ! for calc efficiency
+      REAL(dk) :: invJac     ! for calc efficiency
 !
       B(:,:) = 0.0D0    ! intialize kinematic matrix
-      invArea = 2.0D0 / area  ! compute 2/area
+      invJac = 1.0D0 / (2.0D0*area)  ! compute jacobian
 !
-      B(1,1) = (lcoords(2,2)-lcoords(2,3)) * invArea
-      B(1,3) = (lcoords(2,3)-lcoords(2,1)) * invArea
-      B(1,5) = (lcoords(2,1)-lcoords(2,2)) * invArea
+      B(1,1) = (lcoords(2,2)-lcoords(2,3)) * invJac
+      B(1,3) = (lcoords(2,3)-lcoords(2,1)) * invJac
+      B(1,5) = (lcoords(2,1)-lcoords(2,2)) * invJac
 !
-      B(2,2) = (lcoords(1,3)-lcoords(1,2)) * invArea
-      B(2,4) = (lcoords(1,1)-lcoords(1,3)) * invArea
-      B(2,6) = (lcoords(1,2)-lcoords(1,1)) * invArea
+      B(2,2) = (lcoords(1,3)-lcoords(1,2)) * invJac
+      B(2,4) = (lcoords(1,1)-lcoords(1,3)) * invJac
+      B(2,6) = (lcoords(1,2)-lcoords(1,1)) * invJac
 !
       B(3,2:6:2) = B(1,1:5:2)
       B(3,1:5:2) = B(2,2:6:2)
@@ -1600,9 +1605,6 @@
 !
 !     write output header
       WRITE(hs,10)
-!
-!     initialize total displacement
-!      TDISP(:) = 0.0D0
 !
 !     initialize non-linear stepping variables
       dfact = 1.0D0 / DBLE(nstepC)
@@ -1722,16 +1724,19 @@
 !
 !     initialize nodal volumetric strain
       DIA(:)    = 0.0D0   ! nodal area of influence
-      EVOL(:)   = 0.0D0   
-      EVOL0(:)  = 0.0D0
+      EVOL(:)   = 0.0D0
+!      EVOL0(:)  = 0.0D0
+!
+!     initialize material type index
+      mindex = NNODEL + IPHASE
 !
 !     compute volumetric strain at nodes
       DO iel = 1,NEL
 !
 !       get local area, coords, and displacements
-        larea = AREA(iel)
         CALL LOCAL(iel, lcoords, mtype)
         IF (mtype .EQ. 0) CYCLE   ! skip the element if it is inactive
+        larea = AREA(iel)
         WHERE (LJ .GT. 0)
           ldisp = disp(LJ)
         ELSEWHERE
@@ -1746,28 +1751,31 @@
 !
 !       increment vol strain and influence area
         ev = DOT_PRODUCT(B(1,:),ldisp(:)) + DOT_PRODUCT(B(2,:),ldisp(:))
-        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL)) + ev*area*ONE_THIRD
-        DIA(LJ(1:NNODEL)) = DIA(LJ(1:NNODEL)) + area*ONE_THIRD
+        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL)) + ev*area
+        DIA(LJ(1:NNODEL)) = DIA(LJ(1:NNODEL)) + area
 !
       END DO
 !
-!     save results for iteration and divide by influence area
-      EVOLi(:) = EVOL(:)
+!     save volumetric strains for iteration
+!      EVOLi(:) = EVOL(:)
+!
+!     divide weighted strain by influence area weight
       EVOL(:) = EVOL(:) / DIA(:)
 !
-!     iterate to reduce "???LUMPING???"
-      EVOL0(:) = EVOL(:)
-      EVOL(:) = EVOLi(:)
-      mindex = NNODEL+IPHASE
-      DO iel = 1,NEL
-        IF (ICO(mindex,iel) .EQ. 0) CYCLE
-        LJ(1:NNODEL) = ICO(1:NNODEL,iel)
-        larea = AREA(iel) / 12.0D0
-        sumEV = SUM(EVOL0(LJ(1:NNODEL)))
-        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL))
-     +                + larea*(sumEV + EVOL0(LJ(1:NNODEL)))
-      END DO
-      EVOL(:) = EVOL0(:) + (EVOLi(:) - EVOL(:)) / DIA(:)
+!     iterate to reduce lumping
+!      EVOL0(:) = EVOL(:)
+!      EVOL(:) = EVOLi(:)
+!      DO iel = 1,NEL
+!        IF (ICO(mindex,iel) .EQ. 0) CYCLE
+!        LJ(1:NNODEL) = ICO(1:NNODEL,iel)
+!        larea = AREA(iel) / 12.0D0
+!        sumEV = SUM(EVOL0(LJ(1:NNODEL)))
+!        EVOL(LJ(1:NNODEL)) = EVOL(LJ(1:NNODEL)) +
+!     +                          larea*(sumEV + EVOL0(LJ(1:NNODEL)))
+!      END DO
+!
+!     update to corrected vol strains
+!      EVOL(:) = EVOL0(:) + (EVOLi - EVOL(:))/DIA(:)
 !
 !     update global volumetric strain
       DO iel = 1,NEL
@@ -1934,7 +1942,7 @@
       f21 = 0.5D0 * ((sig2-sig1) + (sig2+sig1)*sphi) - cohs
       f32 = 0.5D0 * ((sig3-sig2) + (sig3+sig2)*sphi) - cohs
       f31 = 0.5D0 * ((sig3-sig1) + (sig3+sig1)*sphi) - cohs
-      fbarel = -0.5D0*(sig3-sig1) / (0.5D0*(sig3+sig1) - cohs)
+      fbarel = -0.5D0*(sig3-sig1) / (0.5D0*(sig3+sig1)*sphi - cohs)
 !
 !     if point is plastic, bring it back to yield surface
       IF (      f31.GT.0.0D0
@@ -1947,7 +1955,7 @@
 !       compute poisson's ratio terms
         nu1 = 1.0D0 - 2.0D0*nu
         nu2 = 1.0D0 + 2.0D0*nu
-        nuQ = nu1 / nu2
+        nuQ = nu2 / nu1
 !
 !       compute dilatancy terms
         psiRat = spsi / nu1

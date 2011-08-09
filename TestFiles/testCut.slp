@@ -161,8 +161,8 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 5
-Row Height = 5
+Column Width = 2.5
+Row Height = 2.5
 Number of Load Steps = 5
 Number of Iterations = 200
 Number of Print Lines = 1
@@ -305,7 +305,7 @@ False,0,False,0
 Phase #3
 Name = "first lift, loaded"
 Begin Phase = "first lift"
-Reset Displacements="False"
+Reset Displacements="True"
 Number of Load Steps = 10
 Number of Iterations = 400
 Number of Load Steps / Print Line = 1
@@ -479,7 +479,7 @@ False,0,False,0
 Phase #6
 Name = "final"
 Begin Phase = "third lift"
-Reset Displacements="False"
+Reset Displacements="True"
 Number of Load Steps = 10
 Number of Iterations = 400
 Number of Load Steps / Print Line = 1
