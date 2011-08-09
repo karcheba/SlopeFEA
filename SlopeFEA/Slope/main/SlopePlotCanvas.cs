@@ -51,10 +51,15 @@ namespace SlopeFEA
         private List<MaterialType> materialTypes;
         private FEAParams feaParams;
         private List<MaterialBlock> substructs;
-        private List<fe3NodedTriElement> triElements, deformedTriMesh;
+        private List<fe3NodedTriElement> triElements, deformedTriMesh, stressTriMesh;
+        private List<double> sxxE , syyE , sxyE , szzE , fbarE;
+        private List<double> sxxN , syyN , sxyN , szzN , fbarN;
+        private double minSxxE , maxSxxE , minSyyE , maxSyyE , minSxyE , maxSxyE , minSzzE , maxSzzE , minFbarE , maxFbarE;
+        private double minSxxN , maxSxxN , minSyyN , maxSyyN , minSxyN , maxSxyN , minSzzN , maxSzzN , minFbarN , maxFbarN;
         private List<feNode> nodes , deformedNodes;
         private List<List<double>> disp;
         private List<DisplacementVector> dispVectors;
+        private List<PlasticPoint> plasticPoints;
         private PlotModes plotMode;
         private AnalysisPhase selectedPhase;
         private double maxDisp;
@@ -88,10 +93,26 @@ namespace SlopeFEA
             deformedNodes = new List<feNode>();
             triElements = new List<fe3NodedTriElement>();
             deformedTriMesh = new List<fe3NodedTriElement>();
+            stressTriMesh = new List<fe3NodedTriElement>();
 
             // Initialize disp vectors
             disp = new List<List<double>>();
             dispVectors = new List<DisplacementVector>();
+
+            // Initialize plastic points
+            plasticPoints = new List<PlasticPoint>();
+
+            // Initialize stress vectors
+            sxxE = new List<double>();
+            syyE = new List<double>();
+            sxyE = new List<double>();
+            szzE = new List<double>();
+            fbarE = new List<double>();
+            sxxN = new List<double>();
+            syyN = new List<double>();
+            sxyN = new List<double>();
+            szzN = new List<double>();
+            fbarN = new List<double>();
 
             // Intialize analysis phase
             selectedPhase = source.AnalysisPhases[1];
@@ -380,6 +401,14 @@ namespace SlopeFEA
             dispVectors.ForEach(
                 delegate( DisplacementVector dv ) { dv.PlotLines.ForEach( delegate( Polyline l ) { this.Children.Add( l ); } ); } );
 
+            // ... then add plastic points on top of disp vectors (these will never be present simultaneously) ...
+            plasticPoints.ForEach(
+                delegate( PlasticPoint pp ) { this.Children.Add( pp.Display ); } );
+
+            // ... then stress plot elements on top of plastic points (these will never be present simultaneously) ...
+            stressTriMesh.ForEach(
+                delegate( fe3NodedTriElement element ) { this.Children.Add( element.Boundary ); } );
+
             // ... then add temporary drawing objects on top of everything
             this.Children.Add( zoomRect.Boundary );
         }
@@ -447,6 +476,12 @@ namespace SlopeFEA
 
             // Update disp vectors
             dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
+
+            // Update plastic points
+            plasticPoints.ForEach( delegate( PlasticPoint pp ) { pp.Translate( delta ); } );
+
+            // Update stress plot
+            stressTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
         }
 
 
@@ -519,6 +554,12 @@ namespace SlopeFEA
 
             // Zoom disp vectors
             dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Zoom( factor , centre ); } );
+
+            // Zoom plastic points
+            plasticPoints.ForEach( delegate( PlasticPoint pp ) { pp.Zoom( factor , centre ); } );
+
+            // Zoom stress plot
+            stressTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Zoom( factor , centre ); } );
         }
 
 
@@ -797,7 +838,33 @@ namespace SlopeFEA
 
                     currDisp = Math.Sqrt( Math.Pow( disp[inod][0] , 2 ) + Math.Pow( disp[inod][1] , 2 ) );
                     if ( currDisp > maxDisp ) maxDisp = currDisp;
+
+                    sxxN.Add( double.Parse( lineSplit[5] ) );
+                    syyN.Add( double.Parse( lineSplit[6] ) );
+                    sxyN.Add( double.Parse( lineSplit[7] ) );
+                    szzN.Add( double.Parse( lineSplit[8] ) );
+                    fbarN.Add( double.Parse( lineSplit[9] ) );
                 }
+            }
+
+            minSxxN = minSyyN = minSxyN = minSzzN = minFbarN = double.MaxValue;
+            maxSxxN = maxSyyN = maxSxyN = maxSzzN = maxFbarN = double.MinValue;
+            for ( int i = 0 ; i < sxxN.Count ; i++ )
+            {
+                if ( sxxN[i] < minSxxN ) minSxxN = sxxN[i];
+                if ( sxxN[i] > maxSxxN ) maxSxxN = sxxN[i];
+
+                if ( syyN[i] < minSyyN ) minSyyN = syyN[i];
+                if ( syyN[i] > maxSyyN ) maxSyyN = syyN[i];
+
+                if ( sxyN[i] < minSxyN ) minSxyN = sxyN[i];
+                if ( sxyN[i] > maxSxyN ) maxSxyN = sxyN[i];
+
+                if ( szzN[i] < minSzzN ) minSzzN = szzN[i];
+                if ( szzN[i] > maxSzzN ) maxSzzN = szzN[i];
+
+                if ( fbarN[i] < minFbarN ) minFbarN = fbarN[i];
+                if ( fbarN[i] > maxFbarN ) maxFbarN = fbarN[i];
             }
         }
 
@@ -846,13 +913,42 @@ namespace SlopeFEA
                     if ( lineSplit[0][0] == '#' ) continue;     // skip comment lines
 
                     materialIndex = int.Parse( lineSplit[4] ) - 1;
+                    if ( materialIndex < 0 ) continue;
+
                     triElements.Add( new fe3NodedTriElement( int.Parse( lineSplit[0] ) ,
                         nodes[int.Parse( lineSplit[1] )] ,
                         nodes[int.Parse( lineSplit[2] )] ,
                         nodes[int.Parse( lineSplit[3] )] ,
-                        materialIndex >= 0 ? materialTypes[materialIndex] : null ,
+                        int.Parse( lineSplit[5] ) == 1 , int.Parse( lineSplit[6] ) == 1 ,
+                        materialTypes[materialIndex] ,
                         false ) );
+
+                    sxxE.Add( double.Parse( lineSplit[7] ) );
+                    syyE.Add( double.Parse( lineSplit[8] ) );
+                    sxyE.Add( double.Parse( lineSplit[9] ) );
+                    szzE.Add( double.Parse( lineSplit[10] ) );
+                    fbarE.Add( double.Parse( lineSplit[11] ) );
                 }
+            }
+
+            minSxxE = minSyyE = minSxyE = minSzzE = minFbarE = double.MaxValue;
+            maxSxxE = maxSyyE = maxSxyE = maxSzzE = maxFbarE = double.MinValue;
+            for ( int i = 0 ; i < sxxE.Count ; i++ )
+            {
+                if ( sxxE[i] < minSxxE ) minSxxE = sxxE[i];
+                if ( sxxE[i] > maxSxxE ) maxSxxE = sxxE[i];
+
+                if ( syyE[i] < minSyyE ) minSyyE = syyE[i];
+                if ( syyE[i] > maxSyyE ) maxSyyE = syyE[i];
+
+                if ( sxyE[i] < minSxyE ) minSxyE = sxyE[i];
+                if ( sxyE[i] > maxSxyE ) maxSxyE = sxyE[i];
+
+                if ( szzE[i] < minSzzE ) minSzzE = szzE[i];
+                if ( szzE[i] > maxSzzE ) maxSzzE = szzE[i];
+
+                if ( fbarE[i] < minFbarE ) minFbarE = fbarE[i];
+                if ( fbarE[i] > maxFbarE ) maxFbarE = fbarE[i];
             }
         }
 
@@ -860,6 +956,8 @@ namespace SlopeFEA
         {
             deformedTriMesh.Clear();
             dispVectors.Clear();
+            plasticPoints.Clear();
+            stressTriMesh.Clear();
         }
 
         /// <summary>
@@ -914,6 +1012,7 @@ namespace SlopeFEA
                     deformedNodes[element.Nodes[0].Number] ,
                     deformedNodes[element.Nodes[1].Number] ,
                     deformedNodes[element.Nodes[2].Number] ,
+                    false , false ,
                     element.Material , false );
 
                 newPolygon = new Polygon();
@@ -987,6 +1086,40 @@ namespace SlopeFEA
         /// </summary>
         public void PlotPlasticPoints ()
         {
+            // clear existing plots
+            ClearPlots();
+
+            // get canvas dimensions/properties
+            double originX = OriginOffsetX ,
+                   originY = OriginOffsetY ,
+                   scale = Scale ,
+                   yHeight = ActualHeight;
+            Units units = Units;
+
+            // get units dependent scaling factor
+            double factor;
+            switch ( units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            double x , y;
+
+            // plot the plastic points
+            foreach(fe3NodedTriElement element in triElements)
+            {
+                if ( !(element.IsPlastic || element.IsTensile) ) continue;
+
+                x = element.Centroid.X / (scale * factor) * dpiX + originX;
+                y = yHeight - (element.Centroid.Y / (scale * factor) * dpiY + originY);
+
+                plasticPoints.Add( new PlasticPoint( new Point( x , y ) , element.IsPlastic , element.IsTensile ) );
+            }
+
+            BuildAxes();
         }
 
 
@@ -1004,6 +1137,118 @@ namespace SlopeFEA
         /// </summary>
         public void PlotUnSmoothedStress ()
         {
+            // clear existing plots
+            ClearPlots();
+
+            // get canvas dimensions/properties
+            double originX = OriginOffsetX ,
+                   originY = OriginOffsetY ,
+                   scale = Scale ,
+                   yHeight = ActualHeight;
+            Units units = Units;
+
+            // get units dependent scaling factor
+            double factor;
+            switch ( units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            // set plot type
+            MenuItem unSmoothedMenu = (MenuItem) ((MenuItem) ((Menu) ((DockPanel) ((Grid) ((Grid) this.Parent).Parent).Children[0]).Children[0]).Items[1]).Items[4];
+            int plotType = 0;
+            for ( int i = 0 ; i < unSmoothedMenu.Items.Count ; i++ )
+            {
+                if ( ((MenuItem) unSmoothedMenu.Items[i]).IsChecked )
+                {
+                    plotType = i;
+                    break;
+                }
+            }
+
+            // load appropriate stress values
+            List<double> stress;
+            double minVal , maxVal;
+            switch ( plotType )
+            {
+                case 0: // XX
+                    stress = sxxE;
+                    minVal = minSxxE;
+                    maxVal = maxSxxE;
+                    break;
+                case 1: // YY
+                    stress = syyE;
+                    minVal = minSyyE;
+                    maxVal = maxSyyE;
+                    break;
+                case 2: // XY
+                    stress = sxyE;
+                    minVal = minSxyE;
+                    maxVal = maxSxyE;
+                    break;
+                case 3: // ZZ
+                    stress = szzE;
+                    minVal = minSzzE;
+                    maxVal = maxSzzE;
+                    break;
+                case 4: // FBAR
+                    stress = fbarE;
+                    minVal = minFbarE;
+                    maxVal = maxFbarE;
+                    break;
+            }
+
+
+            //Polygon newPolygon;
+            //double x , y;
+
+            //// compute deformed coordinates
+            //deformedNodes.Clear(); deformedNodes.Add( null );
+            //int numPhases = source.AnalysisPhases.Count - 1;
+            //for ( int i = 1 ; i < nodes.Count ; i++ )
+            //{
+            //    deformedNodes.Add( new feNode( i , false ,
+            //        nodes[i].X + Magnification * disp[i][0] ,
+            //        nodes[i].Y + Magnification * disp[i][1] ,
+            //        numPhases ) );
+            //}
+
+            //// set mesh to deformed coords
+            //fe3NodedTriElement newElement;
+            //foreach ( fe3NodedTriElement element in triElements )
+            //{
+            //    if ( element.Material == null ) continue;    // skip inactive elements
+
+            //    newElement = new fe3NodedTriElement( element.Number ,
+            //        deformedNodes[element.Nodes[0].Number] ,
+            //        deformedNodes[element.Nodes[1].Number] ,
+            //        deformedNodes[element.Nodes[2].Number] ,
+            //        false , false ,
+            //        element.Material , false );
+
+            //    newPolygon = new Polygon();
+            //    newPolygon.StrokeThickness = 0.8;
+            //    newPolygon.Stroke = Brushes.Red;
+            //    newPolygon.Opacity = /*1.0*/ 0.8;
+            //    newPolygon.Fill = /*Brushes.White*/ element.Material.Fill;
+
+            //    foreach ( feNode node in newElement.Nodes )
+            //    {
+            //        x = node.X / (scale * factor) * dpiX + originX;
+            //        y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
+            //        newPolygon.Points.Add( new Point( x , y ) );
+            //    }
+
+            //    newElement.Boundary = newPolygon;
+
+            //    deformedTriMesh.Add( newElement );
+            //}
+
+            // refresh plotting axes
+            BuildAxes();
         }
 
 

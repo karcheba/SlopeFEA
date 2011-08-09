@@ -108,7 +108,7 @@
       INTEGER(ik), ALLOCATABLE :: LJ(:), ICO(:,:)                       ! connect info
       REAL(dk), ALLOCATABLE :: AREA(:)                                  ! element area
       REAL(dk), ALLOCATABLE :: CENT(:,:)                                ! element centroid
-      INTEGER(ik), ALLOCATABLE :: IPL(:)                                ! plastic points
+      INTEGER(ik), ALLOCATABLE :: IPL(:), ITN(:)                        ! plastic points
       REAL(dk), ALLOCATABLE :: EVOLB(:)                                 ! element volumetric strain
       REAL(dk), ALLOCATABLE :: SXX(:), SYY(:), SXY(:), SZZ(:), FBAR(:)  ! internal stresses
 !
@@ -307,6 +307,8 @@
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating FBAR."
       ALLOCATE( IPL(NEL), STAT=ierr)
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating IPL."
+      ALLOCATE( ITN(NEL), STAT=ierr)
+      IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating ITN."
       ALLOCATE( EVOLB(NEL),  STAT=ierr)
       IF (ierr .NE. 0)  WRITE(er,*) "Error in allocating EVOLB."
       ALLOCATE( ESTIF(NVEL,NVEL),  STAT=ierr)
@@ -321,6 +323,7 @@
       SZZ(:)        = 0.0D0
       FBAR(:)       = 0.0D0
       IPL(:)        = 0
+      ITN(:)        = 0
       EVOLB(:)      = 0.0D0
       ESTIF(:,:)    = 0.0D0
 !
@@ -459,6 +462,7 @@
       SZZ(:)      = 0.0D0
       FBAR(:)     = 0.0D0
       IPL(:)      = 0
+      ITN(:)      = 0
       EVOLB(:)    = 0.0D0
 !
 !     point to listings for current phase
@@ -611,7 +615,7 @@
 !
 !     body element data
       DEALLOCATE( ICO, LJ, AREA, CENT,
-     +            SXX, SYY, SXY, SZZ, FBAR, IPL, EVOLB )
+     +            SXX, SYY, SXY, SZZ, FBAR, IPL, ITN, EVOLB )
 !
 !     traction element data
       DEALLOCATE( ICOT, TNF, TSF )
@@ -1206,7 +1210,7 @@
         END IF
 !
 !       write to element data file
-        WRITE(el,11) iel, LJ(1:NNODEL+1), IPL(iel),
+        WRITE(el,11) iel, LJ(1:NNODEL+1), IPL(iel), ITN(iel),
      +                SXX(iel), SYY(iel), SXY(iel), SZZ(iel), FBAR(iel),
      +                p, q, s1, s2, theta
 !
@@ -1255,11 +1259,11 @@
 !
 !     format statements
    10 FORMAT(//,
-     +        2X, "IEL", 8X, "ICO", 6X, "MTL", 2X, "IPL",
+     +        2X, "IEL", 8X, "ICO", 6X, "MTL", 2X, "IPL", 2X, "ITN",
      +        12X, "SXX", 12X, "SYY", 12X, "SXY", 12X, "SZZ",
      +        11X, "FBAR", 14X, "p", 14X, "q", 13X, "s1",
      +        13X, "s2", 10X, "theta", /)
-   11 FORMAT(I5, 5I5, 10E15.6)
+   11 FORMAT(I5, 6I5, 10E15.6)
 !
    20 FORMAT(//,
      +        1X, "INOD", 8X, "COORDS (X,Y,..)", 16X, "DISP (U,V,..)",
@@ -1858,8 +1862,8 @@
 !
 !       check for plastic yielding and tensile points
         CALL MOHRC(PHI(mtype), PSI(mtype), COH(mtype), EMOD(mtype),
-     +                NU(mtype), sig, nplast, nten, FBAR(iel), IPL(iel),
-     +                rerr)
+     +                NU(mtype), sig, nplast, nten, FBAR(iel),
+     +                IPL(iel), ITN(iel), rerr)
         IF (rerr .NE. 0) WRITE(hs,*) "Element ", iel
 !
 !       compute increase in internal forces and increment global internal forces
@@ -1880,7 +1884,7 @@
 !     evaluate plastic state according to Mohr-Coulomb failure criterion
 ! ......................................................................
       SUBROUTINE MOHRC (sphi, spsi, cohs, emod, nu, sig,
-     +                      nplast, nten, fbarel, iplel,
+     +                      nplast, nten, fbarel, iplel, itnel,
      +                      rerr)
 !
       IMPLICIT NONE
@@ -1890,7 +1894,7 @@
       INTEGER(ik), INTENT(OUT) :: nplast, nten    ! count of plastic/tensile points
       INTEGER(ik), INTENT(OUT) :: rerr            ! error return code, == 0 successful return, /= 0 failed
       REAL(dk), INTENT(OUT) :: fbarel           ! mean Mohr-Coulomb criterion
-      INTEGER(ik), INTENT(OUT) :: iplel         ! == 0 if point is elastic, == 1 if point is plastic
+      INTEGER(ik), INTENT(OUT) :: iplel, itnel  ! == 0 if point is elastic, == 1 if point is plastic/tensile
       REAL(dk) :: gmod, sxe, sstar, tstar       ! shear modulus, stress invariants
       REAL(dk) :: sinalf, cosalf                ! for Mohr-Coulomb model
       REAL(dk) :: sig1,sig2,sig3, sig1T,sig2T,sig3T, sFail  ! principal stresses
@@ -1901,8 +1905,10 @@
       REAL(dk) :: dsp1,dsp2,dsp3, a11,a12, deter, rlam31,rlam32,rlam21  ! for bringing principal stresses back to yield surface
       REAL(dk) :: dsstar,dtstar, dspXX,dspYY,dspXY,dspZZ, tauMax  ! for bringing global stresses back to yield surface
 !
-!     initialize return code
+!     initialize return codes
       rerr = 0
+      iplel = 0
+      itnel = 0
 !
 !     compute shear modulus
       gmod = 0.5D0 * emod / (1.0D0 + nu)
@@ -1979,6 +1985,7 @@
           iArea = 3                     ! compression yield
         ELSE IF (hB .LT. 0.0D0) THEN
           iArea = 1                     ! tension yield
+          itnel = 1
         ELSE
           iArea = 2                     ! shear yield
         END IF
@@ -2066,10 +2073,6 @@
           WRITE(hs,*) "Warning: tauMax is negative !!!"
           rerr = -1
         END IF
-!
-      ELSE  ! elastic point
-!
-        iplel = 0   ! indicate point is elastic
 !
       END IF  ! plastic point
 !

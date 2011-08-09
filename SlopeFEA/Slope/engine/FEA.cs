@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace SlopeFEA
 {
@@ -1162,6 +1163,7 @@ namespace SlopeFEA
         /// <param name="sort">Flag to initially sort the points.</param>
         public fe3NodedTriElement ( int number ,
                                     feNode n1 , feNode n2 , feNode n3 ,
+                                    bool isPlast , bool isTens ,
                                     MaterialType material ,
                                     bool sort )
         {
@@ -1169,6 +1171,11 @@ namespace SlopeFEA
             this.Material = material;
 
             this.Nodes = new List<feNode>() { n1 , n2 , n3 };
+
+            this.Centroid = new Point( (n1.X + n2.X + n3.X) / 3 , (n1.Y + n2.Y + n3.Y) / 3 );
+
+            this.IsPlastic = isPlast;
+            this.IsTensile = isTens;
 
             this.phaseMaterials = new List<MaterialType>();
 
@@ -1237,6 +1244,12 @@ namespace SlopeFEA
         /// List of boundary nodes property.
         /// </summary>
         public List<feNode> Nodes { get; set; }
+
+
+        public Point Centroid { get; set; }
+
+        public bool IsPlastic { get; set; }
+        public bool IsTensile { get; set; }
 
         /// <summary>
         /// Element area property.
@@ -1574,6 +1587,54 @@ namespace SlopeFEA
                 p.Y = centre.Y + factor * (p.Y - centre.Y);
                 Boundary.Points[i] = p;
             }
+        }
+    }
+
+    public class PlasticPoint
+    {
+        private Point pt;
+        private Rectangle display;
+
+        public PlasticPoint ( Point pt , bool isPlast , bool isTens )
+        {
+            this.pt = pt;
+
+            display = new Rectangle();
+            display.Stroke = Brushes.Black;
+            display.StrokeThickness = 0.5;
+            if ( isTens ) display.Fill = Brushes.White;
+            else if ( isPlast ) display.Fill = Brushes.ForestGreen;
+            display.HorizontalAlignment = HorizontalAlignment.Left;
+            display.VerticalAlignment = VerticalAlignment.Top;
+            display.Height = 7;
+            display.Width = 7;
+            display.Margin = new Thickness( pt.X - display.Width / 2 , pt.Y - display.Height / 2 , 0 , 0 );
+            display.Visibility = Visibility.Visible;
+        }
+
+        public Rectangle Display { get { return this.display; } }
+
+        /// <summary>
+        /// Translates boundary polygon graphics coordinates.
+        /// </summary>
+        /// <param name="delta">Translation vector.</param>
+        public void Translate ( Vector delta )
+        {
+            pt.X += delta.X;
+            pt.Y += delta.Y;
+            display.Margin = new Thickness( pt.X - display.Width / 2 , pt.Y - display.Height / 2 , 0 , 0 );
+        }
+
+        /// <summary>
+        /// Zooms boundary polygon graphics coordinates.
+        /// </summary>
+        /// <param name="factor">Scaling factor.</param>
+        /// <param name="centre">Plotting canvas centre.</param>
+        public void Zoom ( double factor , Point centre )
+        {
+            pt.X = centre.X + factor * (pt.X - centre.X);
+            pt.Y = centre.Y + factor * (pt.Y - centre.Y);
+            display.Margin = new Thickness( pt.X - display.Width / 2 , pt.Y - display.Height / 2 , 0 , 0 );
         }
     }
 }

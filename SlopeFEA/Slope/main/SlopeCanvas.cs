@@ -2406,6 +2406,7 @@ namespace SlopeFEA
                         nodes[int.Parse( split[1] ) - 1] ,
                         nodes[int.Parse( split[2] ) - 1] ,
                         nodes[int.Parse( split[3] ) - 1] ,
+                        false , false ,
                         MaterialTypes[int.Parse( split[4] ) - 1] , false ) );
                 }
             }

@@ -1,5 +1,5 @@
-GFORTRAN module version '4' created from SlopeFEA3NodeMultiPhase.for on Tue Aug 09 08:33:17 2011
-MD5:733978ce5bf2c07e3f0efc3d5bae639d -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '4' created from SlopeFEA3NodeMultiPhase.for on Tue Aug 09 13:56:07 2011
+MD5:836dbf376af0a70d39004947862bca51 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () ()
 () () () ())
@@ -146,226 +146,229 @@ UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 59 'iprint' 'nodes' 'iprint' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-60 'ix' 'nodes' 'ix' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+60 'itn' 'elements' 'itn' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
+0 () (1 DEFERRED () ()) 0 () () () 0 0)
+61 'ix' 'nodes' 'ix' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 DIMENSION POINTER) (INTEGER 4 0 0 INTEGER ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-61 'ixc' 'nodes' 'ixc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+62 'ixc' 'nodes' 'ixc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 DIMENSION POINTER) (INTEGER 4 0 0 INTEGER ()) 0 0 () (1
 DEFERRED () ()) 0 () () () 0 0)
-62 'ixp' 'nodes' 'ixp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+63 'ixp' 'nodes' 'ixp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 DIMENSION POINTER) (INTEGER 4 0 0 INTEGER ()) 0 0 () (1
 DEFERRED () ()) 0 () () () 0 0)
-63 'kind' '(intrinsic)' 'kind' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0 FUNCTION) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 63 ()
+64 'kind' '(intrinsic)' 'kind' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 FUNCTION) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 64 ()
 () () 0 0)
-64 'lband' 'gcontrol' 'lband' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+65 'lband' 'gcontrol' 'lband' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-65 'ld' 'gcontrol' 'ld' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+66 'ld' 'gcontrol' 'ld' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '7') () 0 () () () 0 0)
-66 'lj' 'elements' 'lj' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+67 'lj' 'elements' 'lj' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0 0 () (1
 DEFERRED () ()) 0 () () () 0 0)
-67 'local' 'gcontrol' 'local' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+68 'local' 'gcontrol' 'local' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
 DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ())
-68 0 (69 70 71) () 0 () () () 0 0)
-72 'localt' 'gcontrol' 'localt' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+69 0 (70 71 72) () 0 () () () 0 0)
+73 'localt' 'gcontrol' 'localt' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
 DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ())
-73 0 (74 75) () 0 () () () 0 0)
-76 'mapld' 'gcontrol' 'mapld' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+74 0 (75 76) () 0 () () () 0 0)
+77 'mapld' 'gcontrol' 'mapld' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
 DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ())
-77 0 (78 79 80) () 0 () () () 0 0)
-81 'mapst' 'gcontrol' 'mapst' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+78 0 (79 80 81) () 0 () () () 0 0)
+82 'mapst' 'gcontrol' 'mapst' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
 DECL UNKNOWN 0 0 SUBROUTINE ALWAYS_EXPLICIT) (UNKNOWN 0 0 0 UNKNOWN ())
-82 0 (83 84) () 0 () () () 0 0)
-85 'mproperty' 'mproperty' 'mproperty' 1 ((MODULE UNKNOWN-INTENT
+83 0 (84 85) () 0 () () () 0 0)
+86 'mproperty' 'mproperty' 'mproperty' 1 ((MODULE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
 () () () 0 0)
-86 'mtl' 'gcontrol' 'mtl' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+87 'mtl' 'gcontrol' 'mtl' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '3') () 0 () () () 0 0)
-87 'nd' 'gcontrol' 'nd' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+88 'nd' 'gcontrol' 'nd' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '12') () 0 () () () 0 0)
-88 'ndim' 'nodes' 'ndim' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+89 'ndim' 'nodes' 'ndim' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-89 'nel' 'elements' 'nel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+90 'nel' 'elements' 'nel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-90 'nelt' 'tractions' 'nelt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+91 'nelt' 'tractions' 'nelt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-91 'niter' 'gcontrol' 'niter' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+92 'niter' 'gcontrol' 'niter' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-92 'nmtl' 'mproperty' 'nmtl' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+93 'nmtl' 'mproperty' 'nmtl' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-93 'nnet' 'gcontrol' 'nnet' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+94 'nnet' 'gcontrol' 'nnet' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-94 'nnn' 'elements' 'nnn' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+95 'nnn' 'elements' 'nnn' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-95 'nnod' 'nodes' 'nnod' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+96 'nnod' 'nodes' 'nnod' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-96 'nnodel' 'elements' 'nnodel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+97 'nnodel' 'elements' 'nnodel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-97 'nnodelt' 'tractions' 'nnodelt' 1 ((VARIABLE UNKNOWN-INTENT
+98 'nnodelt' 'tractions' 'nnodelt' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 ()
 () 0 () () () 0 0)
-98 'nod' 'gcontrol' 'nod' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+99 'nod' 'gcontrol' 'nod' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '4') () 0 () () () 0 0)
-99 'nodes' 'nodes' 'nodes' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
+100 'nodes' 'nodes' 'nodes' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-100 'nphase' 'gcontrol' 'nphase' 1 ((VARIABLE UNKNOWN-INTENT
+101 'nphase' 'gcontrol' 'nphase' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 ()
 () 0 () () () 0 0)
-101 'nprint' 'gcontrol' 'nprint' 1 ((VARIABLE UNKNOWN-INTENT
+102 'nprint' 'gcontrol' 'nprint' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0
 INTEGER ()) 0 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-102 'nstep' 'gcontrol' 'nstep' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+103 'nstep' 'gcontrol' 'nstep' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-103 'ntot' 'gcontrol' 'ntot' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+104 'ntot' 'gcontrol' 'ntot' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-104 'nu' 'mproperty' 'nu' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+105 'nu' 'mproperty' 'nu' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-105 'numeric' 'numeric' 'numeric' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
+106 'numeric' 'numeric' 'numeric' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-106 'nvar' 'nodes' 'nvar' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+107 'nvar' 'nodes' 'nvar' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-107 'nvel' 'elements' 'nvel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+108 'nvel' 'elements' 'nvel' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-108 'nvelt' 'tractions' 'nvelt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+109 'nvelt' 'tractions' 'nvelt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN EXPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-109 'one_third' 'numeric' 'one_third' 1 ((PARAMETER UNKNOWN-INTENT
+110 'one_third' 'numeric' 'one_third' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 REAL ()) 0 '0.55555555555554@0') () 0 () () () 0 0)
-110 'op' 'gcontrol' 'op' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+111 'op' 'gcontrol' 'op' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '10') () 0 () () () 0 0)
-111 'output' 'gcontrol' 'output' 1 ((PROCEDURE UNKNOWN-INTENT
-MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 UNKNOWN ()) 112
-0 (113) () 0 () () () 0 0)
-114 'phi' 'mproperty' 'phi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+112 'output' 'gcontrol' 'output' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 UNKNOWN ()) 113
+0 (114) () 0 () () () 0 0)
+115 'phi' 'mproperty' 'phi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-115 'phs' 'gcontrol' 'phs' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+116 'phs' 'gcontrol' 'phs' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '2') () 0 () () () 0 0)
-116 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+117 'pi' 'numeric' 'pi' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
 0 0 REAL ()) 0 '0.3243f6c0000000@1') () 0 () () () 0 0)
-117 'pload' 'nodes' 'pload' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+118 'pload' 'nodes' 'pload' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-118 'ploadc' 'nodes' 'ploadc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+119 'ploadc' 'nodes' 'ploadc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (1
 DEFERRED () ()) 0 () () () 0 0)
-119 'psi' 'mproperty' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+120 'psi' 'mproperty' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-120 'radtodeg' 'numeric' 'radtodeg' 1 ((PARAMETER UNKNOWN-INTENT
+121 'radtodeg' 'numeric' 'radtodeg' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (
 CONSTANT (REAL 8 0 0 REAL ()) 0 '0.394bb81a079e4c@2') () 0 () () () 0 0)
-121 'reset' 'gcontrol' 'reset' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+122 'reset' 'gcontrol' 'reset' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0
 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-122 'smooth' 'gcontrol' 'smooth' 1 ((PROCEDURE UNKNOWN-INTENT
+123 'smooth' 'gcontrol' 'smooth' 1 ((PROCEDURE UNKNOWN-INTENT
 MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0
 () () 0 () () () 0 0)
-123 'st' 'gcontrol' 'st' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+124 'st' 'gcontrol' 'st' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '9') () 0 () () () 0 0)
-124 'strc' 'gcontrol' 'strc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+125 'strc' 'gcontrol' 'strc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-125 'strp' 'gcontrol' 'strp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+126 'strp' 'gcontrol' 'strp' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-126 'sxx' 'elements' 'sxx' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+127 'sxx' 'elements' 'sxx' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-127 'sxy' 'elements' 'sxy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+128 'sxy' 'elements' 'sxy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-128 'syy' 'elements' 'syy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+129 'syy' 'elements' 'syy' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-129 'szz' 'elements' 'szz' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+130 'szz' 'elements' 'szz' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (
 1 DEFERRED () ()) 0 () () () 0 0)
-130 'tdispc' 'gcontrol' 'tdispc' 1 ((VARIABLE UNKNOWN-INTENT
+131 'tdispc' 'gcontrol' 'tdispc' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL
 ()) 0 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-131 'tdispp' 'gcontrol' 'tdispp' 1 ((VARIABLE UNKNOWN-INTENT
+132 'tdispp' 'gcontrol' 'tdispp' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL
 ()) 0 0 () (1 DEFERRED () ()) 0 () () () 0 0)
-132 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+133 'tnf' 'tractions' 'tnf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-133 'tnfc' 'tractions' 'tnfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+134 'tnfc' 'tractions' 'tnfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-134 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+135 'toler' 'numeric' 'toler' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8
 0 0 REAL ()) 0 '0.1ad7f2a0000000@-5') () 0 () () () 0 0)
-135 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
+136 'tractions' 'tractions' 'tractions' 1 ((MODULE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
 () () () 0 0)
-136 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+137 'tsf' 'tractions' 'tsf' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-137 'tsfc' 'tractions' 'tsfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+138 'tsfc' 'tractions' 'tsfc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 DIMENSION POINTER) (REAL 8 0 0 REAL ()) 0 0 () (2
 DEFERRED () () () ()) 0 () () () 0 0)
-138 'uv' 'gcontrol' 'uv' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+139 'uv' 'gcontrol' 'uv' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '8') () 0 () () () 0 0)
 56 'fpath' '' 'fpath' 55 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
 5 'fpath' '' 'fpath' 4 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
-69 'iel' '' 'iel' 68 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+80 'loc' '' 'loc' 78 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
+(INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
+70 'iel' '' 'iel' 69 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-70 'lcoords' '' 'lcoords' 68 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN
+71 'lcoords' '' 'lcoords' 69 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN
 0 0 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2 ASSUMED_SHAPE (
 CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (INTEGER 4 0 0
 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
-71 'mtype' '' 'mtype' 68 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+72 'mtype' '' 'mtype' 69 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-74 'iel' '' 'iel' 73 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+75 'iel' '' 'iel' 74 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-75 'lcoordst' '' 'lcoordst' 73 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN
+76 'lcoordst' '' 'lcoordst' 74 ((VARIABLE OUT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2
 ASSUMED_SHAPE (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
-83 'ab' '' 'ab' 82 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+84 'ab' '' 'ab' 83 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2 ASSUMED_SHAPE (CONSTANT
 (INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (INTEGER 4 0 0 INTEGER ())
 0 '1') ()) 0 () () () 0 0)
-84 's' '' 's' 82 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+85 's' '' 's' 83 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (2 ASSUMED_SHAPE (CONSTANT
 (INTEGER 4 0 0 INTEGER ()) 0 '1') () (CONSTANT (INTEGER 4 0 0 INTEGER ())
 0 '1') ()) 0 () () () 0 0)
-78 'glo' '' 'glo' 77 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+79 'glo' '' 'glo' 78 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
 (INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
-79 'loc' '' 'loc' 77 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
-(INTEGER 4 0 0 INTEGER ()) 0 '1') ()) 0 () () () 0 0)
-80 'nv' '' 'nv' 77 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
+81 'nv' '' 'nv' 78 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DUMMY)
 (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
 37 'sxx' '' 'sxx' 36 ((VARIABLE INOUT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DIMENSION DUMMY) (REAL 8 0 0 REAL ()) 0 0 () (1 ASSUMED_SHAPE (CONSTANT
@@ -388,7 +391,7 @@ DUMMY) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
 DUMMY) (LOGICAL 4 0 0 LOGICAL ()) 0 0 () () 0 () () () 0 0)
 53 'fpath' '' 'fpath' 52 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
 DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
-113 'factor' '' 'factor' 112 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN
+114 'factor' '' 'factor' 113 ((VARIABLE IN UNKNOWN-PROC UNKNOWN UNKNOWN
 0 0 DUMMY) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
 )
 
@@ -399,16 +402,16 @@ DUMMY) (CHARACTER 1 0 0 CHARACTER (())) 0 0 () () 0 () () () 0 0)
 'evol' 0 26 'evolb' 0 27 'fbar' 0 28 'fgstif' 0 29 'gcontrol' 0 30 'gfact'
 0 31 'gload0' 0 32 'gloadc' 0 33 'gloadp' 0 34 'gloloc' 0 35 'grr' 0 44
 'gstif' 0 45 'hbw' 0 46 'hs' 0 47 'ico' 0 48 'icot' 0 49 'ik' 0 50
-'initop' 0 51 'input' 0 54 'iphase' 0 57 'ipl' 0 58 'iprint' 0 59 'ix' 0
-60 'ixc' 0 61 'ixp' 0 62 'kind' 0 63 'lband' 0 64 'ld' 0 65 'lj' 0 66
-'local' 0 67 'localt' 0 72 'mapld' 0 76 'mapst' 0 81 'mproperty' 0 85
-'mtl' 0 86 'nd' 0 87 'ndim' 0 88 'nel' 0 89 'nelt' 0 90 'niter' 0 91
-'nmtl' 0 92 'nnet' 0 93 'nnn' 0 94 'nnod' 0 95 'nnodel' 0 96 'nnodelt' 0
-97 'nod' 0 98 'nodes' 0 99 'nphase' 0 100 'nprint' 0 101 'nstep' 0 102
-'ntot' 0 103 'nu' 0 104 'numeric' 0 105 'nvar' 0 106 'nvel' 0 107 'nvelt'
-0 108 'one_third' 0 109 'op' 0 110 'output' 0 111 'phi' 0 114 'phs' 0
-115 'pi' 0 116 'pload' 0 117 'ploadc' 0 118 'psi' 0 119 'radtodeg' 0 120
-'reset' 0 121 'smooth' 0 122 'st' 0 123 'strc' 0 124 'strp' 0 125 'sxx'
-0 126 'sxy' 0 127 'syy' 0 128 'szz' 0 129 'tdispc' 0 130 'tdispp' 0 131
-'tnf' 0 132 'tnfc' 0 133 'toler' 0 134 'tractions' 0 135 'tsf' 0 136
-'tsfc' 0 137 'uv' 0 138)
+'initop' 0 51 'input' 0 54 'iphase' 0 57 'ipl' 0 58 'iprint' 0 59 'itn'
+0 60 'ix' 0 61 'ixc' 0 62 'ixp' 0 63 'kind' 0 64 'lband' 0 65 'ld' 0 66
+'lj' 0 67 'local' 0 68 'localt' 0 73 'mapld' 0 77 'mapst' 0 82 'mproperty'
+0 86 'mtl' 0 87 'nd' 0 88 'ndim' 0 89 'nel' 0 90 'nelt' 0 91 'niter' 0
+92 'nmtl' 0 93 'nnet' 0 94 'nnn' 0 95 'nnod' 0 96 'nnodel' 0 97 'nnodelt'
+0 98 'nod' 0 99 'nodes' 0 100 'nphase' 0 101 'nprint' 0 102 'nstep' 0
+103 'ntot' 0 104 'nu' 0 105 'numeric' 0 106 'nvar' 0 107 'nvel' 0 108
+'nvelt' 0 109 'one_third' 0 110 'op' 0 111 'output' 0 112 'phi' 0 115
+'phs' 0 116 'pi' 0 117 'pload' 0 118 'ploadc' 0 119 'psi' 0 120 'radtodeg'
+0 121 'reset' 0 122 'smooth' 0 123 'st' 0 124 'strc' 0 125 'strp' 0 126
+'sxx' 0 127 'sxy' 0 128 'syy' 0 129 'szz' 0 130 'tdispc' 0 131 'tdispp'
+0 132 'tnf' 0 133 'tnfc' 0 134 'toler' 0 135 'tractions' 0 136 'tsf' 0
+137 'tsfc' 0 138 'uv' 0 139)
