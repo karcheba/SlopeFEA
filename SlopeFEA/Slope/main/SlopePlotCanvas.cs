@@ -721,9 +721,7 @@ namespace SlopeFEA
                     for ( int i = 0 ; i < numMaterialBlocks ; i++ )
                     {
                         tr.ReadLine();
-
                         tr.ReadLine();
-                        //materialName = tr.ReadLine().Split( new char[] { '\"' } , StringSplitOptions.RemoveEmptyEntries )[1];
 
                         numMaterialBoundPoints = int.Parse( tr.ReadLine().Split( '=' )[1] );
 
@@ -737,8 +735,6 @@ namespace SlopeFEA
                             materialBoundPoints[j].X = xCoord / (factor * Scale) * dpiX + OriginOffsetX;
                             materialBoundPoints[j].Y = ActualHeight - (yCoord / (factor * Scale) * dpiY + OriginOffsetY);
                         }
-
-                        //newMaterialType = materialTypes.Find( delegate( MaterialType mt ) { return mt.Name == materialName; } );
 
                         newMaterialBlock = new MaterialBlock( this , null , materialBoundPoints );
 
@@ -803,13 +799,13 @@ namespace SlopeFEA
             //          account for 1 based indexing in Fortran
             nodes.Clear(); nodes.Add( null );
             disp.Clear(); disp.Add( null );
+            sxxN.Clear(); syyN.Clear(); sxyN.Clear(); szzN.Clear(); fbarN.Clear();
+            sxxN.Add( 0 ); syyN.Add( 0 ); sxyN.Add( 0 ); szzN.Add( 0 ); fbarN.Add( 0 );
             maxDisp = 0.0;
             double currDisp;
             int numPhases = source.AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( nodePath ) )
             {
-                //int nnod = int.Parse( tr.ReadLine().Split( '\t' )[0] );
-
                 // advance to line containing data
                 tr.ReadLine();  //
                 tr.ReadLine();  //
@@ -819,8 +815,6 @@ namespace SlopeFEA
                 string line;
                 string[] lineSplit;
                 int inod;
-                //for ( int i = 1 ; i <= nnod ; i++ )
-                //{
                 while ( (line = tr.ReadLine() ) != null )
                 {
                     lineSplit = line.Split( new char[] { ' ' , '\t' } , StringSplitOptions.RemoveEmptyEntries );
@@ -849,7 +843,7 @@ namespace SlopeFEA
 
             minSxxN = minSyyN = minSxyN = minSzzN = minFbarN = double.MaxValue;
             maxSxxN = maxSyyN = maxSxyN = maxSzzN = maxFbarN = double.MinValue;
-            for ( int i = 0 ; i < sxxN.Count ; i++ )
+            for ( int i = 1 ; i < sxxN.Count ; i++ )
             {
                 if ( sxxN[i] < minSxxN ) minSxxN = sxxN[i];
                 if ( sxxN[i] > maxSxxN ) maxSxxN = sxxN[i];
@@ -890,6 +884,7 @@ namespace SlopeFEA
 
             // Load element data from file
             triElements.Clear();
+            sxxE.Clear(); syyE.Clear(); sxyE.Clear(); szzE.Clear(); fbarE.Clear();
             int numPhases = source.AnalysisPhases.Count - 1;
             using ( TextReader tr = new StreamReader( elementPath ) )
             {
@@ -904,8 +899,6 @@ namespace SlopeFEA
                 string line;
                 string[] lineSplit;
                 int materialIndex;
-                //for ( int i = 0 ; i < nel ; i++ )
-                //{
                 while ( (line = tr.ReadLine()) != null )
                 {
                     lineSplit = line.Split( new char[] { ' ' , '\t' } , StringSplitOptions.RemoveEmptyEntries );
@@ -1129,6 +1122,321 @@ namespace SlopeFEA
         /// </summary>
         public void PlotSmoothedStress ()
         {
+            // clear existing plots
+            ClearPlots();
+
+            // get canvas dimensions/properties
+            double originX = OriginOffsetX ,
+                   originY = OriginOffsetY ,
+                   scale = Scale ,
+                   yHeight = ActualHeight;
+            Units units = Units;
+
+            // get units dependent scaling factor
+            double factor;
+            switch ( units )
+            {
+                case Units.Metres: factor = 0.0254; break;
+                case Units.Millimetres: factor = 25.4; break;
+                case Units.Feet: factor = 1.0 / 12.0; break;
+                default: factor = 1.0; break;
+            }
+
+            // set plot type
+            MenuItem smoothedMenu = (MenuItem) ((MenuItem) ((Menu) ((DockPanel) ((Grid) ((Grid) this.Parent).Parent).Children[0]).Children[0]).Items[1]).Items[3];
+            int plotType = 0;
+            for ( int i = 0 ; i < smoothedMenu.Items.Count ; i++ )
+            {
+                if ( ((MenuItem) smoothedMenu.Items[i]).IsChecked )
+                {
+                    plotType = i;
+                    break;
+                }
+            }
+
+            // load appropriate stress values
+            List<double> stress;
+            double minVal , maxVal;
+            switch ( plotType )
+            {
+                case 0: // XX
+                    stress = sxxN;
+                    maxVal = minSxxN;
+                    minVal = maxSxxN;
+                    break;
+                case 1: // YY
+                    stress = syyN;
+                    maxVal = minSyyN;
+                    minVal = maxSyyN;
+                    break;
+                case 2: // XY
+                    stress = sxyN;
+                    maxVal = minSxyN;
+                    minVal = maxSxyN;
+                    break;
+                case 3: // ZZ
+                    stress = szzN;
+                    maxVal = minSzzN;
+                    minVal = maxSzzN;
+                    break;
+                default: // FBAR
+                    stress = fbarN;
+                    minVal = minFbarN;
+                    maxVal = maxFbarN;
+                    break;
+            }
+
+            // compute key values for colour scale
+            double diff = maxVal - minVal;
+            double qdiff = 0.25 * diff;
+            double lowQVal = minVal + 0.25 * diff;
+            double midVal = minVal + 0.5 * diff;
+            double uppQVal = minVal + 0.75 * diff;
+
+
+            // set mesh to regular coords and
+            // create fill colours based on stress
+            // at integration points
+            Polygon newPolygon;
+            double x , y;
+            fe3NodedTriElement newElement;
+            byte r , g , b;
+            double st;
+            double x1 , y1 , x2 , y2 , x3 , y3 ,
+                s1 , s2 , s3 ,
+                x_min , x_max , x_ymin , y_min , y_xmax, s_ymin , s_xymin , s_xmax ,
+                dsdx , dsdy , dydx , detA , detA1 , detA2;
+            for ( int i = 0 ; i < triElements.Count ; i++ )
+            {
+                if ( triElements[i].Material == null ) continue;    // skip inactive elements
+
+                newElement = new fe3NodedTriElement( triElements[i].Number ,
+                    nodes[triElements[i].Nodes[0].Number] ,
+                    nodes[triElements[i].Nodes[1].Number] ,
+                    nodes[triElements[i].Nodes[2].Number] ,
+                    false , false ,
+                    null , false );
+
+                newPolygon = new Polygon();
+                newPolygon.StrokeThickness = 0;
+                newPolygon.Stroke = Brushes.Transparent;
+                newPolygon.Opacity = 1.0;
+
+                // compute linear gradient brush values
+                x_min = double.MaxValue; x_max = double.MinValue; y_min = double.MaxValue;
+                x_ymin = 0; s_ymin = 0;
+                foreach ( feNode node in newElement.Nodes )
+                {
+                    if ( node.X < x_min ) x_min = node.X;
+                    if ( node.X > x_max ) x_max = node.X;
+                    if ( node.Y < y_min )
+                    {
+                        y_min = node.Y;
+                        x_ymin = node.X;
+                        s_ymin = stress[node.Number];
+                    }
+
+                    x = node.X / (scale * factor) * dpiX + originX;
+                    y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
+                    newPolygon.Points.Add( new Point( x , y ) );
+                }
+
+                x1 = newElement.Nodes[0].X;
+                y1 = newElement.Nodes[0].Y;
+                s1 = stress[newElement.Nodes[0].Number];
+                x2 = newElement.Nodes[1].X;
+                y2 = newElement.Nodes[1].Y;
+                s2 = stress[newElement.Nodes[1].Number];
+                x3 = newElement.Nodes[2].X;
+                y3 = newElement.Nodes[2].Y;
+                s3 = stress[newElement.Nodes[2].Number];
+
+                detA = (x2 * y3 - x3 * y2) - (x1 * y3 - x3 * y1) + (x1 * y2 - x2 * y1);
+                detA1 = (s2 * y3 - s3 * y2) - (s1 * y3 - s3 * y1) + (s1 * y2 - s2 * y1);
+                detA2 = (x2 * s3 - x3 * s2) - (x1 * s3 - x3 * s1) + (x1 * s2 - x2 * s1);
+                dsdx = detA1 / detA;
+                dsdy = detA2 / detA;
+                dydx = dsdx / dsdy;
+                s_xymin = s_ymin - dsdx * (x_ymin - x_min);
+                y_xmax = y_min + dydx * (x_max - x_min);
+                s_xmax = s_xymin + dsdx * (x_max - x_min) + dsdy * (y_xmax - y_min);
+
+                // compute fill colour
+                st = s_xymin;
+                if ( plotType == 4 )
+                {
+                    if ( st <= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st < lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st < midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st < uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st < maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                else
+                {
+                    if ( st >= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st > lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st > midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st > uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st > maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                Color startColour = Color.FromRgb( r , g , b );
+                Point startPoint = new Point( x_min / (scale * factor) * dpiX + originX ,
+                    y = yHeight - (y_min / (scale * factor) * dpiY + originY) );
+
+                st = s_xmax;
+                if ( plotType == 4 )
+                {
+                    if ( st <= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st < lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st < midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st < uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st < maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                else
+                {
+                    if ( st >= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st > lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st > midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st > uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st > maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                Color endColour = Color.FromRgb( r , g , b );
+                Point endPoint = new Point( x_max / (scale * factor) * dpiX + originX ,
+                    y = yHeight - (y_xmax / (scale * factor) * dpiY + originY) );
+
+                newPolygon.Fill = new LinearGradientBrush( startColour , endColour , startPoint , endPoint );
+
+                newElement.Boundary = newPolygon;
+
+                stressTriMesh.Add( newElement );
+            }
+
+            // refresh plotting axes
+            BuildAxes();
         }
 
 
@@ -1176,76 +1484,156 @@ namespace SlopeFEA
             {
                 case 0: // XX
                     stress = sxxE;
-                    minVal = minSxxE;
-                    maxVal = maxSxxE;
+                    maxVal = minSxxE;
+                    minVal = maxSxxE;
                     break;
                 case 1: // YY
                     stress = syyE;
-                    minVal = minSyyE;
-                    maxVal = maxSyyE;
+                    maxVal = minSyyE;
+                    minVal = maxSyyE;
                     break;
                 case 2: // XY
                     stress = sxyE;
-                    minVal = minSxyE;
-                    maxVal = maxSxyE;
+                    maxVal = minSxyE;
+                    minVal = maxSxyE;
                     break;
                 case 3: // ZZ
                     stress = szzE;
-                    minVal = minSzzE;
-                    maxVal = maxSzzE;
+                    maxVal = minSzzE;
+                    minVal = maxSzzE;
                     break;
-                case 4: // FBAR
+                default: // FBAR
                     stress = fbarE;
                     minVal = minFbarE;
                     maxVal = maxFbarE;
                     break;
             }
 
+            // compute key values for colour scale
+            double diff = maxVal - minVal;
+            double qdiff = 0.25 * diff;
+            double lowQVal = minVal + 0.25 * diff;
+            double midVal = minVal + 0.5 * diff;
+            double uppQVal = minVal + 0.75 * diff;
 
-            //Polygon newPolygon;
-            //double x , y;
 
-            //// compute deformed coordinates
-            //deformedNodes.Clear(); deformedNodes.Add( null );
-            //int numPhases = source.AnalysisPhases.Count - 1;
-            //for ( int i = 1 ; i < nodes.Count ; i++ )
-            //{
-            //    deformedNodes.Add( new feNode( i , false ,
-            //        nodes[i].X + Magnification * disp[i][0] ,
-            //        nodes[i].Y + Magnification * disp[i][1] ,
-            //        numPhases ) );
-            //}
+            // set mesh to regular coords and
+            // create fill colours based on stress
+            // at integration points
+            Polygon newPolygon;
+            double x , y;
+            fe3NodedTriElement newElement;
+            byte r , g , b;
+            double st;
+            for ( int i = 0 ; i < triElements.Count ; i++ )
+            {
+                if ( triElements[i].Material == null ) continue;    // skip inactive elements
 
-            //// set mesh to deformed coords
-            //fe3NodedTriElement newElement;
-            //foreach ( fe3NodedTriElement element in triElements )
-            //{
-            //    if ( element.Material == null ) continue;    // skip inactive elements
+                newElement = new fe3NodedTriElement( triElements[i].Number ,
+                    nodes[triElements[i].Nodes[0].Number] ,
+                    nodes[triElements[i].Nodes[1].Number] ,
+                    nodes[triElements[i].Nodes[2].Number] ,
+                    false , false ,
+                    null , false );
 
-            //    newElement = new fe3NodedTriElement( element.Number ,
-            //        deformedNodes[element.Nodes[0].Number] ,
-            //        deformedNodes[element.Nodes[1].Number] ,
-            //        deformedNodes[element.Nodes[2].Number] ,
-            //        false , false ,
-            //        element.Material , false );
+                newPolygon = new Polygon();
+                newPolygon.StrokeThickness = 0;
+                newPolygon.Stroke = Brushes.Transparent;
+                newPolygon.Opacity = 1.0;
 
-            //    newPolygon = new Polygon();
-            //    newPolygon.StrokeThickness = 0.8;
-            //    newPolygon.Stroke = Brushes.Red;
-            //    newPolygon.Opacity = /*1.0*/ 0.8;
-            //    newPolygon.Fill = /*Brushes.White*/ element.Material.Fill;
+                // compute fill colour
+                st = stress[i];
+                if ( plotType == 4 )
+                {
+                    if ( st <= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st < lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st < midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st < uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st < maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                else
+                {
+                    if ( st >= minVal )
+                    {
+                        r = 0;
+                        g = 0;
+                        b = 255;
+                    }
+                    else if ( st > lowQVal )
+                    {
+                        r = 0;
+                        g = (byte) (255 * (st - minVal) / qdiff);
+                        b = 255;
+                    }
+                    else if ( st > midVal )
+                    {
+                        r = 0;
+                        g = 255;
+                        b = (byte) (255 * (1 - (st - lowQVal) / qdiff));
+                    }
+                    else if ( st > uppQVal )
+                    {
+                        r = (byte) (255 * (st - midVal) / qdiff);
+                        g = 255;
+                        b = 0;
+                    }
+                    else if ( st > maxVal )
+                    {
+                        r = 255;
+                        g = (byte) (255 * (1 - (st - uppQVal) / qdiff));
+                        b = 0;
+                    }
+                    else
+                    {
+                        r = 255;
+                        g = 0;
+                        b = 0;
+                    }
+                }
+                newPolygon.Fill = new SolidColorBrush( Color.FromRgb( r , g , b ) );
 
-            //    foreach ( feNode node in newElement.Nodes )
-            //    {
-            //        x = node.X / (scale * factor) * dpiX + originX;
-            //        y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
-            //        newPolygon.Points.Add( new Point( x , y ) );
-            //    }
+                foreach ( feNode node in newElement.Nodes )
+                {
+                    x = node.X / (scale * factor) * dpiX + originX;
+                    y = yHeight - (node.Y / (scale * factor) * dpiY + originY);
+                    newPolygon.Points.Add( new Point( x , y ) );
+                }
 
-            //    newElement.Boundary = newPolygon;
+                newElement.Boundary = newPolygon;
 
-            //    deformedTriMesh.Add( newElement );
-            //}
+                stressTriMesh.Add( newElement );
+            }
 
             // refresh plotting axes
             BuildAxes();
@@ -1509,6 +1897,12 @@ namespace SlopeFEA
 
                 // Update disp vectors
                 dispVectors.ForEach( delegate( DisplacementVector dv ) { dv.Translate( delta ); } );
+
+                // Update plastic points
+                plasticPoints.ForEach( delegate( PlasticPoint pp ) { pp.Translate( delta ); } );
+
+                // Update stress plot
+                stressTriMesh.ForEach( delegate( fe3NodedTriElement element ) { element.Translate( delta ); } );
             }
         }
     }

@@ -1179,6 +1179,7 @@
       mindex = NNODEL + IPHASE
       DO iel = 1,NEL
 !
+        IF (ICO(mindex,iel) .EQ. 0) CYCLE
         LJ(1:NNODEL) = ICO(1:NNODEL, iel)   ! get local connectivity
         LJ(NNODEL+1) = ICO(mindex, iel)
         larea = AREA(iel) / NNODEL          ! get local area
