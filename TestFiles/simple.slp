@@ -2,7 +2,7 @@
 
         Slope 2011 Input File
 
-        Project Name: footing
+        Project Name: simple
 
 *****************************************
 
@@ -12,16 +12,16 @@ PLOTTING DATA
 
 Units = m, kPa, kN/m^3
 
-XAxisMax = 40
+XAxisMax = 10
 XAxisMin = 0
-YAxisMax = 20
+YAxisMax = 10
 YAxisMin = 0
 
-XMajorDivision = 10
-YMajorDivision = 10
+XMajorDivision = 1
+YMajorDivision = 1
 
-XMinorDivisions = 5
-YMinorDivisions = 5
+XMinorDivisions = 2
+YMinorDivisions = 2
 
 
 --------------------------------
@@ -30,10 +30,10 @@ BOUNDARY GEOMETRY DATA
 
 Number of Boundary Points = 4
 
-0, -2.13697063386496E-15
-40, -2.13697063386496E-15
-40, 20
-0, 20
+0, 10
+0, 0
+9.99999999999999, 0
+9.99999999999999, 10
 
 
 --------------------------------
@@ -43,14 +43,14 @@ MATERIAL TYPE DATA
 Number of Material Types = 1
 
 Material #1
-Name = "clay"
-Colour = #FFEED766
+Name = "test"
+Colour = #FF96B0ED
 Phi = 0
-Coh = 50
+Coh = 10000
 Psi = 0
-Gamma = 17
-Emod = 10000
-Nu = 0.45
+Gamma = 0
+Emod = 1000
+Nu = 0.3
 
 
 --------------------------------
@@ -60,19 +60,16 @@ MATERIAL BLOCK DATA
 Number of Material Blocks = 1
 
 Material Block #1
-Material Type = "clay"
-Number of Boundary Points = 5
-0, -2.13697063386496E-15, True, True, False
-40, -2.13697063386496E-15, True, True, False
-40, 20, True, False, False
-2, 20, False, False, False
-0, 20, True, False, False
-Number of Line Constraints = 3
-4, 0, True, False
-0, 1, False, True
-1, 2, True, False
+Material Type = "test"
+Number of Boundary Points = 4
+0, 10, False, False, False
+0, 0, True, True, False
+9.99999999999999, 0, False, True, False
+9.99999999999999, 10, False, False, False
+Number of Line Constraints = 1
+1, 2, False, True
 Number of Line Loads = 1
-3, 4, True, -1400, -1400, False, 0, 0
+3, 0, True, -100, -100, False, 0, 0
 Number of Point Loads = 0
 
 
@@ -93,8 +90,8 @@ Slice Width = 10
 FEA PARAMETERS
 --------------------------------
 
-Column Width = 2
-Row Height = 2
+Column Width = 5
+Row Height = 5
 Number of Load Steps = 5
 Number of Iterations = 200
 Number of Print Lines = 10
@@ -108,7 +105,7 @@ ANALYSIS STATUS
 
 Analysis Type = FEA3NodedTri
 Verified = True
-Meshed = True
+Meshed = False
 Analyzed = False
 
 
@@ -116,45 +113,22 @@ Analyzed = False
 ANALYSIS PHASES
 --------------------------------
 
-Number of Analysis Phases = 2
+Number of Analysis Phases = 1
 
 Phase #1
-Name = "initial"
+Name = "test"
 Begin Phase = "NULL"
 Reset Displacements="False"
 Number of Load Steps = 10
 Number of Iterations = 400
 Number of Load Steps / Print Line = 1
-Gravity Factor = 1
+Gravity Factor = 0
 Material Block #1
-clay
-True,True
-True,True
-True,False
+test
 False,False
-True,False
-True,False
+True,True
 False,True
-True,False
-False,0,False,0
-
-Phase #2
-Name = "loading"
-Begin Phase = "initial"
-Reset Displacements="True"
-Number of Load Steps = 10
-Number of Iterations = 400
-Number of Load Steps / Print Line = 1
-Gravity Factor = 1
-Material Block #1
-clay
-True,True
-True,True
-True,False
 False,False
-True,False
-True,False
 False,True
-True,False
 True,1,False,0
 
