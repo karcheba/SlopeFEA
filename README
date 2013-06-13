@@ -1,4 +1,4 @@
-PROJECT:        SlopeFEA (c) 2011 Brandon Karchewski
+PROJECT:        SlopeFEA (c) 2011-2013 Brandon Karchewski
                 Licensed under the Academic Free License version 3.0
                     http://www.opensource.org/licenses/afl-3.0.php
 
@@ -93,6 +93,17 @@ REFERENCES:
 
 
 REVISION HISTORY:
+
+[13 June 2013]
+
+=== Analysis code (SlopeFEA3NodeMultiPhase.for) is tested and working properly
+=== Output viewing in shell is working, although the stress field plotting is primitive
++++ Added 32-bit and 64-bit versions of the compiled LAPACK libraries
++++ Added 'SlopeFEA Install Instructions.txt' file, which provides details on how to
+	download, install, and test that the code is working
++++ Added Makefile to SlopeFEA/SlopeFEA/Slope/engine directory to ease compilation
+	of the analysis code
+
 
 [29 May 2011]
 
