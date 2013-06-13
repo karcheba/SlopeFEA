@@ -1,0 +1,102 @@
+Instructions for downloading and running SlopeFEA Shell and analysis
+code.
+
+Contact:	Brandon Karchewski
+			Department of Civil Engineering
+			McMaster University, JHE-301
+			1280 Main St W
+			Hamilton, Ontario, Canada
+			L8S 4L7
+			p: 905-525-9140 x24287
+			f: 905-529-9688
+			e: karcheba@mcmaster.ca
+			
+			
+1.	Ensure that the msys packages MinGW (Minimalist GNU for Windows) and
+	git are installed on your system. The latest versions are available
+	at:
+	
+	MinGW:
+	http://sourceforge.net/projects/mingw/
+		Download and run mingw-get-inst-(V#).exe
+		where (V#) is the version number. For the latest version select
+		'Download latest repository catalogues' in the install wizard.
+		The script to start the shell is located at:
+		C:\MinGW\msys\1.0\msys.bat
+		
+	msysgit:
+	https://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git
+		Download and run the latest installer. If you would like the
+		git commands to be available in the MinGW shell (so that a
+		separate Git Bash shell is not necessary), select 'Run Git from
+		the Windows Command Prompt' in the installer.
+		
+2.	Open the MinGW shell and define ROOT and PROJECT paths as well as
+	the type of operating system. For example, if your root drive is
+	labelled 'C:\' and you would like the project to reside in the root
+	directory:
+	
+	$ ROOT=/c
+	$ PROJECT=$ROOT
+	
+	(For 32-bit systems):	$ SYS=x86
+	(For 64-bit systems):	$ SYS=x64
+	
+3.	Change to the project directory:
+	
+	$ cd $PROJECT
+	
+4.	Ensure that previous versions of SlopeFEA are not in this directory:
+
+	$ rm -rf SlopeFEA
+	
+5.	Clone the latest version of the SlopeFEA repository (note this may
+	take a few minutes to download):
+
+	$ git clone https://github.com/karcheba/SlopeFEA.git
+	
+6.	Ensure old versions of LAPACK and BLAS libraries are removed:
+
+	$ cd $ROOT/MinGW/lib
+	$ rm -f *blas* *lapack* *tmglib*
+	
+7.	Copy updated versions of LAPACK and BLAS libraries from the SlopeFEA
+	project into your MinGW lib folder:
+	
+	$ cd $PROJECT/SlopeFEA/LAPACK/$SYS
+	$ cp *.a $ROOT/MinGW/lib
+	
+8.	Compile the analysis code (note that the 'engine' directory contains
+	an example Makefile that contains useful commands and shortcuts):
+	
+	$ cd $PROJECT/SlopeFEA/SlopeFEA/Slope/engine
+	$ make
+	
+9.	Open the SlopeFEA project in Microsoft Visual Studio. To do this,
+	navigate to $PROJECT/SlopeFEA/SlopeFEA using Windows Explorer. Now
+	double-click on 'SlopeFEA.sln'.
+	
+10.	Build the project. To do this, in MS Visual Studio, right-click on
+	'SlopeFEA' and click 'Build'.
+	
+11.	Ensure that analysis code resides in the program folder. Using the
+	MinGW shell:
+	
+	$ cd $PROJECT/SlopeFEA/SlopeFEA/Slope/engine
+	$ cp *.dll ../bin/Debug
+	
+12.	Test that the program works properly:
+		a.	In MS Visual Studio, push the 'Play' button to run the
+			shell.
+		b.	Click the 'Open' button in the shell.
+		c.	Navigate to the $PROJECT/SlopeFEA/TestFiles directory.
+		d.	Select the 'simple.slp' test file.
+		f.	Generate the mesh:		'Analyze > Generate Mesh'
+		g.	Run the analysis code:	'Analyze > Run Analysis'
+		h.	View the output:		'Output > Plot Results'
+		i.	Verify that the deformation mode and SYY stress field are
+			consistent with simple normal compressive stress in the Y
+			direction and no horizontal or shear stress.
+		e.	Repeat steps b-i for the 'testCup.slp' test file. The
+			problem represents staged construction of an embankment
+			by cutting in three lifts.
