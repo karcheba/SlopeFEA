@@ -176,8 +176,8 @@ ANALYSIS STATUS
 
 Analysis Type = FEA3NodedTri
 Verified = True
-Meshed = True
-Analyzed = True
+Meshed = False
+Analyzed = False
 
 
 --------------------------------
