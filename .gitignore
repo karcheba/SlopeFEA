@@ -4,15 +4,6 @@
 bin/
 obj/
 *.suo
-*.UV*
-*.ST*
-*.OP*
-*.ERR
-*.LD*
-*.ND*
-*.EL*
-*.HS*
-*.out
 *.mod
 *.exe
 *.dll
