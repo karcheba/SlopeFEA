@@ -17,3 +17,6 @@ obj/
 *.exe
 *.dll
 *.o
+*.bel
+*.mtl
+*.nod
