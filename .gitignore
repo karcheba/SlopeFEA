@@ -7,4 +7,12 @@ obj/
 *.mod
 *.exe
 *.dll
+*.EL*
+*.ERR
+*.HS*
+*.LD*
+*.ND*
+*.OP*
+*.ST*
+*.UV*
 *.o
